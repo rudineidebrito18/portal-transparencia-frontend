@@ -1,3 +1,4 @@
+import PublicLayout from '@/layouts/PublicLayout'
 import './globals.css'
 import { ReactNode } from 'react'
 
@@ -10,7 +11,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <body className="font-sans text-gray-800">
-        {children}
+        <PublicLayout>
+          {children}
+        </PublicLayout>
       </body>
     </html>
   )

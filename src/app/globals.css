@@ -1,3 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+html, body {
+  overflow-x: hidden;
+}
+
+:root {
+  --color-primary: #1f3e73;
+  --color-secondary: #e30613;
+  --color-accent: #0074c8;
+  --color-neutral: #f1f5f9;
+  --color-light: #ffffff;
+}
+
+@theme {
+    --color-primary: #1f3e73;
+    --color-primary: #1f3e73;
+    --color-secondary: #e30613;
+    --color-accent: #0074c8;
+    --color-neutral: #f1f5f9;
+    --color-light: #ffffff;
+}
