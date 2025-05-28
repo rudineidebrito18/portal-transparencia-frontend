@@ -2,7 +2,7 @@ import { MdAttachMoney, MdDescription, MdAssignment, MdPeople } from 'react-icon
 
 const items = [
   { title: 'Despesas', icon: <MdAttachMoney />, href: '#' },
-  { title: 'Licitações', icon: <MdDescription />, href: '#' },
+  { title: 'Licitações', icon: <MdDescription />, href: '/licitacoes' },
   { title: 'Contratos', icon: <MdAssignment />, href: '#' },
   { title: 'Servidores', icon: <MdPeople />, href: '#' },
 ]

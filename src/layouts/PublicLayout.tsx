@@ -1,3 +1,4 @@
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { ReactNode } from "react";
 
@@ -14,9 +15,7 @@ export default function PublicLayout({ children }: Props) {
         {children}
       </main>
 
-      <footer className="bg-gray-100 text-center text-sm text-gray-600 py-4 mt-8">
-        &copy; {new Date().getFullYear()} Prefeitura Municipal. Todos os direitos reservados.
-      </footer>
+      <Footer />
     </div>
   );
 }

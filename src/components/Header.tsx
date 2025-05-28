@@ -8,7 +8,6 @@ import {
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showLogoSelos, setShowLogoSelos] = useState(true);
   const [offsetY, setOffsetY] = useState(0);
   const topbarRef = useRef<HTMLDivElement>(null);
   const logoSelosRef = useRef<HTMLDivElement>(null);
@@ -16,20 +15,14 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
+      const threshold = 150;
 
-      // Limite para quando o logo/selos começam a desaparecer
-      const threshold = 150; // ajuste conforme altura do logo + selos
-
-      // Controla o deslocamento vertical para animar o bloco logo+selos+nav subindo
       if (scrollY < threshold) {
         setOffsetY(scrollY);
-        setShowLogoSelos(true);
       } else {
         setOffsetY(threshold);
-        setShowLogoSelos(false);
       }
 
-      // Se menu estiver aberto, fecha no scroll
       if (menuOpen) setMenuOpen(false);
     };
 
@@ -37,21 +30,11 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [menuOpen]);
 
-  // Alturas fixas para animar o bloco
-  const topbarHeight = 28; // px, altura do topbar
-  const logoSelosHeight = 120; // px, altura do bloco logo+selos (ajuste se necessário)
-  const navHeight = 48; // px, altura do nav (ajuste)
+  const topbarHeight = 28;
+  const logoSelosHeight = 120;
+  const navHeight = 48;
+  const fase1Max = logoSelosHeight - navHeight;
 
-  // Calcula o translateY do bloco que contém logo + selos + nav
-  // Primeiro sobe o bloco inteiro até que o nav "grude" no topbar, depois some o logo e selos com opacidade + height 0
-  // O total do deslocamento para esconder logo/selos é logoSelosHeight, e para fixar o nav é logoSelosHeight - navHeight
-
-  // Vamos dividir o movimento em duas fases:
-  // 1) De 0 até (logoSelosHeight - navHeight): bloco todo sobe (translateY negativo)
-  // 2) Depois disso, o logo/selos desaparecem (altura e opacidade vão pra 0)
-  const fase1Max = logoSelosHeight - navHeight; // ex: 80 - 48 = 32
-
-  // translateY para bloco logoSelos + nav:
   let translateY = 0;
   let logoSelosVisible = true;
   if (offsetY <= fase1Max) {
@@ -64,10 +47,10 @@ export default function Header() {
 
   return (
     <>
-      {/* Topbar fixo no topo */}
+      {/* Topbar */}
       <div
         ref={topbarRef}
-        className="fixed top-0 left-0 w-full bg-blue-900 text-white text-sm flex justify-between items-center px-4"
+        className="fixed top-0 left-0 w-full bg-primary text-light text-sm flex justify-between items-center px-4"
         style={{ height: topbarHeight, lineHeight: `${topbarHeight}px`, zIndex: 60 }}
       >
         <div className="text-xs">Prefeitura Municipal de Lago dos Rodrigues</div>
@@ -83,16 +66,15 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Bloco logo + selos + nav, que será animado subindo */}
+      {/* Logo + Selos + Nav */}
       <div
         ref={logoSelosRef}
-        className="fixed top-[28px] left-0 w-full bg-white z-50 shadow"
+        className="fixed top-[28px] left-0 w-full bg-light z-50 shadow"
         style={{
           transform: `translateY(${translateY}px)`,
           transition: 'transform 0.3s ease',
         }}
       >
-        {/* Logo + selos - some quando scroll passa do limite */}
         <div
           className="flex justify-around items-center px-4"
           style={{
@@ -112,8 +94,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Nav Menu */}
-        <nav className="bg-blue-900 text-white text-sm shadow">
+        <nav className="bg-primary text-light text-sm shadow">
           <ul className={`flex flex-col md:flex-row px-4 md:px-6 py-2 gap-2 md:gap-6 justify-center items-center ${menuOpen ? 'flex' : 'hidden md:flex'}`}>
             <li className="hover:underline cursor-pointer"><MdHome /></li>
             <li className="hover:underline cursor-pointer flex items-center gap-1">A PREFEITURA <MdExpandMore /></li>
@@ -128,16 +109,18 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* Botão menu fixo no topo em mobile */}
+      {/* Botão do menu (mobile) */}
       <div className="fixed top-2 right-3 md:hidden z-60">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="text-blue-900 text-3xl bg-white rounded-full p-2 shadow-lg transition duration-200 hover:bg-blue-100"
+          className="text-primary text-3xl bg-light rounded-full p-2 shadow-lg transition duration-200 hover:bg-[--color-neutral]"
           aria-label="Menu"
         >
           {menuOpen ? <MdClose /> : <MdMenu />}
         </button>
       </div>
+
+      {/* Espaço reservado para não sobrepor conteúdo */}
       <div className="pt-[140px] md:pt-[180px]" />
     </>
   );
