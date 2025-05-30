@@ -83,11 +83,11 @@ export default function Header() {
             opacity: logoVisible ? 1 : 0,
             overflow: 'hidden',
             transition: 'opacity 0.3s ease, height 0.3s ease',
-            backgroundImage: "url('/fundo_header.jpg')",
+            backgroundImage: "url('/fundo_header.png')",
           }}
         >
-          <div className="w-40 md:w-48">
-            <img src="/logo_lago_r.png" alt="Logo Lago dos Rodrigues" className="w-[100px] h-auto" />
+          <div className="w-40 md:w-68">
+            <img src="/logo_lago_r.png" alt="Logo Lago dos Rodrigues" className="w-[200px] h-auto" />
           </div>
           <br/>
         </div>
