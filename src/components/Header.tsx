@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import {
-  MdFacebook, MdHome, MdEmail, MdSettings, MdSearch, MdAccessibility, MdInfo, MdHeadsetMic,
+  MdFacebook, MdHome, MdEmail, MdSettings, MdSearch,
+  MdAccessibility, MdInfo, MdHeadsetMic,
   MdExpandMore, MdMenu, MdClose
 } from 'react-icons/md';
 
@@ -10,7 +11,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [offsetY, setOffsetY] = useState(0);
   const topbarRef = useRef<HTMLDivElement>(null);
-  const logoSelosRef = useRef<HTMLDivElement>(null);
+  const logoBackgroundRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,18 +32,18 @@ export default function Header() {
   }, [menuOpen]);
 
   const topbarHeight = 28;
-  const logoSelosHeight = 120;
+  const logoSectionHeight = 120;
   const navHeight = 48;
-  const fase1Max = logoSelosHeight - navHeight;
+  const fase1Max = logoSectionHeight - navHeight;
 
   let translateY = 0;
-  let logoSelosVisible = true;
+  let logoVisible = true;
   if (offsetY <= fase1Max) {
     translateY = -offsetY;
-    logoSelosVisible = true;
+    logoVisible = true;
   } else {
     translateY = -fase1Max;
-    logoSelosVisible = false;
+    logoVisible = false;
   }
 
   return (
@@ -66,9 +67,9 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Logo + Selos + Nav */}
+      {/* Logo com imagem de fundo + Nav */}
       <div
-        ref={logoSelosRef}
+        ref={logoBackgroundRef}
         className="fixed top-[28px] left-0 w-full bg-light z-50 shadow"
         style={{
           transform: `translateY(${translateY}px)`,
@@ -76,24 +77,22 @@ export default function Header() {
         }}
       >
         <div
-          className="flex justify-around items-center px-4"
+          className="flex justify-around items-center px-4 bg-cover bg-center"
           style={{
-            height: logoSelosVisible ? logoSelosHeight : fase1Max,
-            opacity: logoSelosVisible ? 1 : 0,
+            height: logoVisible ? logoSectionHeight : fase1Max,
+            opacity: logoVisible ? 1 : 0,
             overflow: 'hidden',
             transition: 'opacity 0.3s ease, height 0.3s ease',
+            backgroundImage: "url('/fundo_header.jpg')",
           }}
         >
           <div className="w-40 md:w-48">
             <img src="/logo_lago_r.png" alt="Logo Lago dos Rodrigues" className="w-[100px] h-auto" />
           </div>
-          <div className="hidden md:flex gap-3">
-            <img src="/selo1.png" className="h-12 md:h-14" />
-            <img src="/selo2.png" className="h-12 md:h-14" />
-            <img src="/selo3.png" className="h-12 md:h-14" />
-          </div>
+          <br/>
         </div>
 
+        {/* Nav */}
         <nav className="bg-primary text-light text-sm shadow">
           <ul className={`flex flex-col md:flex-row px-4 md:px-6 py-2 gap-2 md:gap-6 justify-center items-center ${menuOpen ? 'flex' : 'hidden md:flex'}`}>
             <li className="hover:underline cursor-pointer"><MdHome /></li>
@@ -109,7 +108,7 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* Botão do menu (mobile) */}
+      {/* Botão menu mobile */}
       <div className="fixed top-2 right-3 md:hidden z-60">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
@@ -120,7 +119,7 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Espaço reservado para não sobrepor conteúdo */}
+      {/* Padding para o conteúdo não ficar coberto */}
       <div className="pt-[140px] md:pt-[180px]" />
     </>
   );
