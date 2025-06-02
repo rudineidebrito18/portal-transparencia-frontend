@@ -6,6 +6,7 @@ import {
   MdAccessibility, MdInfo, MdHeadsetMic,
   MdExpandMore, MdMenu, MdClose
 } from 'react-icons/md';
+import DropdownMenuItem from './DropdownMenuItem';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -89,23 +90,46 @@ export default function Header() {
           <div className="w-40 md:w-68">
             <img src="/logo_lago_r.png" alt="Logo Lago dos Rodrigues" className="w-[200px] h-auto" />
           </div>
-          <br/>
+          <br />
         </div>
 
         {/* Nav */}
         <nav className="bg-primary text-light text-sm shadow">
           <ul className={`flex flex-col md:flex-row px-4 md:px-6 py-2 gap-2 md:gap-6 justify-center items-center ${menuOpen ? 'flex' : 'hidden md:flex'}`}>
-            <li className="hover:underline cursor-pointer"><MdHome /></li>
-            <li className="hover:underline cursor-pointer flex items-center gap-1">A PREFEITURA <MdExpandMore /></li>
-            <li className="hover:underline cursor-pointer flex items-center gap-1">O MUNICÍPIO <MdExpandMore /></li>
-            <li className="hover:underline cursor-pointer flex items-center gap-1">SECRETARIAS <MdExpandMore /></li>
+            <li className="hover:bg-secondary cursor-pointer"><MdHome /></li>
+
+            <DropdownMenuItem label="A PREFEITURA">
+              <li className="px-4 py-2 hover:bg-gray-100">Gabinete do Prefeito</li>
+              <li className="px-4 py-2 hover:bg-gray-100">Controladoria</li>
+              <li className="px-4 py-2 hover:bg-gray-100">Procuradoria</li>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem label="O MUNICÍPIO">
+              <li className="px-4 py-2 hover:bg-gray-100">História</li>
+              <li className="px-4 py-2 hover:bg-gray-100">Símbolos</li>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem label="SECRETARIAS">
+              <li className="px-4 py-2 hover:bg-gray-100">Saúde</li>
+              <li className="px-4 py-2 hover:bg-gray-100">Educação</li>
+            </DropdownMenuItem>
+
             <li className="hover:underline cursor-pointer">DIÁRIO OFICIAL</li>
             <li className="hover:underline cursor-pointer">SERVIÇOS</li>
             <li className="hover:underline cursor-pointer">TRANSPARÊNCIA</li>
-            <li className="hover:underline cursor-pointer flex items-center gap-1">LRF E CONTAS PÚBLICAS <MdExpandMore /></li>
-            <li className="hover:underline cursor-pointer flex items-center gap-1">PUBLICAÇÕES <MdExpandMore /></li>
+
+            <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
+              <li className="px-4 py-2 hover:bg-gray-100">Relatórios</li>
+              <li className="px-4 py-2 hover:bg-gray-100">Prestação de Contas</li>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem label="PUBLICAÇÕES">
+              <li className="px-4 py-2 hover:bg-gray-100">Notícias</li>
+              <li className="px-4 py-2 hover:bg-gray-100">Editais</li>
+            </DropdownMenuItem>
           </ul>
         </nav>
+
       </div>
 
       {/* Botão menu mobile */}

@@ -4,7 +4,7 @@ import { MdVisibility } from 'react-icons/md'
 
 export default function LicitacaoCard({ licitacao }: { licitacao: Licitacao }) {
   return (
-    <div className="border rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition relative">
+    <div className="border rounded-lg shadow-sm p-2 bg-white hover:shadow-md transition relative">
       <div className="flex justify-between items-start mb-1">
         <h2 className="text-lg font-bold text-gray-800">
           {licitacao.modalidade?.toUpperCase()}: {licitacao.numero}
