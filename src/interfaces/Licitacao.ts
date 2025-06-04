@@ -1,4 +1,5 @@
 export interface Licitacao {
+  id: string
   numero: string
   modalidade: string
   tipo: string
@@ -8,6 +9,4 @@ export interface Licitacao {
   dataPublicacao: string
   valorEstimado: number
   situacao: string
-  link: string
-  sequencial: string
 }

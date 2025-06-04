@@ -5,9 +5,42 @@ html, body {
 }
 
 @theme {
-    --color-primary: #1f3e73;
-    --color-secondary: #e30613;
-    --color-accent: #0074c8;
-    --color-neutral: #f1f5f9;
-    --color-light: #ffffff;
+  --color-primary: #1f3e73;      /* Azul escuro */
+  --color-secondary: #e30613;    /* Vermelho vibrante */
+  --color-accent: #0074c8;       /* Azul claro */
+  --color-neutral: #f1f5f9;      /* Cinza muito claro */
+  --color-light: #ffffff;        /* Branco */
+
+  /* Complementares */
+  --color-primary-light: #3a5ea8;     /* Azul primário mais claro */
+  --color-primary-dark: #162d54;      /* Azul primário mais escuro */
+
+  --color-secondary-light: #ff4d4d;   /* Vermelho secundário mais claro */
+  --color-secondary-dark: #b0020e;    /* Vermelho secundário mais escuro */
+
+  --color-accent-light: #3399ff;      /* Azul acento mais claro */
+  --color-accent-dark: #005ea2;       /* Azul acento mais escuro */
+
+  --color-neutral-light: #f9fafb;     /* Fundo quase branco */
+  --color-neutral-dark: #cbd5e1;      /* Cinza médio */
+
+  /* Texto */
+  --color-text-primary: #0f172a;      /* Preto azulado para texto principal */
+  --color-text-secondary: #000000;    /* Cinza para texto secundário */
+  --color-text-inverse: var(--color-light); /* Branco para textos em fundo escuro */
+
+  /* Bordas */
+  --color-border: #e2e8f0;            /* Cinza claro para bordas */
+
+  /* Estados */
+  --color-success: #22c55e;           /* Verde */
+  --color-success-light: #dcfce7;
+  --color-error: #ef4444;             /* Vermelho */
+  --color-error-light: #fee2e2;
+  --color-warning: #facc15;           /* Amarelo */
+  --color-warning-light: #fef3c7;
+
+  /* Sombreamento */
+  --color-shadow-light: rgba(31, 62, 115, 0.1);
+  --color-shadow-dark: rgba(31, 62, 115, 0.3);
 }

@@ -1,10 +1,11 @@
-import LicitacaoCard from '@/components/LicitacaoCard'
+import LicitacaoCard from '@/components/licitacao/LicitacaoCard'
 import { Licitacao } from '@/interfaces/Licitacao'
 import React from 'react'
 
 
 const licitacoesFake: Licitacao[] = [
   {
+    id: '001',
     numero: '02/2025',
     modalidade: 'Pregão Eletrônico',
     tipo: 'MENOR PREÇO (Registro de preço)',
@@ -14,10 +15,9 @@ const licitacoesFake: Licitacao[] = [
     dataPublicacao: '21/04/2025',
     valorEstimado: 17000000,
     situacao: 'aberta',
-    link: '#',
-    sequencial: '001'
   },
   {
+    id: '002',
     numero: '02/2025',
     modalidade: 'Pregão Eletrônico',
     tipo: 'MENOR PREÇO (Registro de preço)',
@@ -27,10 +27,9 @@ const licitacoesFake: Licitacao[] = [
     dataPublicacao: '21/04/2025',
     valorEstimado: 17000000,
     situacao: 'aberta',
-    link: '#',
-    sequencial: '001'
   },
   {
+    id: '003',
     numero: '02/2025',
     modalidade: 'Pregão Eletrônico',
     tipo: 'MENOR PREÇO (Registro de preço)',
@@ -40,10 +39,9 @@ const licitacoesFake: Licitacao[] = [
     dataPublicacao: '21/04/2025',
     valorEstimado: 17000000,
     situacao: 'aberta',
-    link: '#',
-    sequencial: '001'
   },
   {
+    id: '004',
     numero: '02/2025',
     modalidade: 'Pregão Eletrônico',
     tipo: 'MENOR PREÇO (Registro de preço)',
@@ -53,8 +51,6 @@ const licitacoesFake: Licitacao[] = [
     dataPublicacao: '21/04/2025',
     valorEstimado: 17000000,
     situacao: 'aberta',
-    link: '#',
-    sequencial: '001'
   }
 ]
 

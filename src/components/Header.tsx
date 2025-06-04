@@ -7,6 +7,7 @@ import {
   MdExpandMore, MdMenu, MdClose
 } from 'react-icons/md';
 import DropdownMenuItem from './DropdownMenuItem';
+import Link from 'next/link';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -95,8 +96,10 @@ export default function Header() {
 
         {/* Nav */}
         <nav className="bg-primary text-light text-sm shadow">
-          <ul className={`flex flex-col md:flex-row px-4 md:px-6 py-2 gap-2 md:gap-6 justify-center items-center ${menuOpen ? 'flex' : 'hidden md:flex'}`}>
-            <li className="hover:bg-secondary cursor-pointer"><MdHome /></li>
+          <ul className={`flex flex-col md:flex-row flex-wrap px-4 md:px-6 py-2 gap-2 md:gap-6 justify-center items-center ${menuOpen ? 'flex' : 'hidden md:flex'}`}>
+            <li className=" px-4 py-2 hover:bg-secondary cursor-pointer ">
+              <Link href="/"><MdHome /></Link>
+            </li>
 
             <DropdownMenuItem label="A PREFEITURA">
               <li className="px-4 py-2 hover:bg-gray-100">Gabinete do Prefeito</li>

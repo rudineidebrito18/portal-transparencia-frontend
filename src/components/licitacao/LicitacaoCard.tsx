@@ -38,16 +38,13 @@ export default function LicitacaoCard({ licitacao }: { licitacao: Licitacao }) {
       </div>
 
       <div className="text-xs text-gray-500 italic mt-2 md:absolute md:top-4 md:right-4 md:text-right">
-        <p>Sequencial: {licitacao.sequencial}</p>
         <p>Publicação: {licitacao.dataPublicacao}</p>
       </div>
 
       <div className="mt-4 flex justify-end md:absolute md:bottom-4 md:right-4">
         <div className="inline-flex">
           <Link
-            href={licitacao.link}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/licitacoes/${licitacao.id}`}
             className="inline-flex items-center gap-2 bg-primary hover:bg-blue-800 text-white text-sm px-4 py-2 rounded-md transition"
           >
             <MdVisibility className="w-4 h-4" />
