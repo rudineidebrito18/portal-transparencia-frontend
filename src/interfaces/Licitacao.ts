@@ -10,3 +10,11 @@ export interface Licitacao {
   valorEstimado: number
   situacao: string
 }
+
+export interface FiltroLicitacao {
+  modalidade: string
+  numero: string
+  objeto: string
+  dataInicio: string
+  dataFim: string
+}

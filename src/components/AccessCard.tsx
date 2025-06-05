@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 type AccessCardProps = {
@@ -8,7 +9,7 @@ type AccessCardProps = {
 
 export default function AccessCard({ title, icon, href }: AccessCardProps) {
   return (
-    <a
+    <Link
       href={href}
       className="bg-neutral p-6 rounded-lg text-center shadow hover:bg-accent-light transition-all flex flex-col items-center justify-center"
     >
@@ -18,6 +19,6 @@ export default function AccessCard({ title, icon, href }: AccessCardProps) {
       <h3 className="text-base md:text-lg font-semibold text-text-secondary">
         {title}
       </h3>
-    </a>
+    </Link>
   );
 }

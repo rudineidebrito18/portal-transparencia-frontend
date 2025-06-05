@@ -25,12 +25,11 @@ html, body {
   --color-neutral-dark: #cbd5e1;      /* Cinza médio */
 
   /* Texto */
-  --color-text-primary: #0f172a;      /* Preto azulado para texto principal */
+  --color-text-primary: #ffffff;      /* Preto azulado para texto principal */
   --color-text-secondary: #000000;    /* Cinza para texto secundário */
-  --color-text-inverse: var(--color-light); /* Branco para textos em fundo escuro */
 
   /* Bordas */
-  --color-border: #e2e8f0;            /* Cinza claro para bordas */
+  --color-border: #2424245;            /* Cinza claro para bordas */
 
   /* Estados */
   --color-success: #22c55e;           /* Verde */

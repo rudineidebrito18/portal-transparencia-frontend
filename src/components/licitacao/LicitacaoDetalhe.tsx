@@ -49,10 +49,10 @@ export default function LicitacaoDetalhe({
                         <span className="font-medium">Data de Abertura:</span> {dataAbertura}
                     </p>
                     <p className="text-sm text-gray-600">
-                        <span className="font-medium">Data da Situação:</span> {dataSituacao}
+                        <span className="font-medium">Data de Publicação:</span> {dataPublicacao}
                     </p>
                     <p className="text-sm text-gray-600">
-                        <span className="font-medium">Data de Publicação:</span> {dataPublicacao}
+                        <span className="font-medium">Data da Situação:</span> {dataSituacao}
                     </p>
                     <p className="text-sm text-gray-600">
                         <span className="font-medium">Valor Estimado:</span> R$ {valorEstimado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}

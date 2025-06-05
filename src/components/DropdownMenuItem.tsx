@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MdExpandMore } from 'react-icons/md';
 
 interface DropdownMenuItemProps {
@@ -30,7 +30,7 @@ export default function DropdownMenuItem({ label, children }: DropdownMenuItemPr
     >
       {/* Botão do menu */}
       <div
-        className="flex items-center gap-1 cursor-pointer hover:bg-secondary px-2 py-1"
+        className="flex items-center gap-1 cursor-pointer hover:bg-secondary px-2 py-2"
         onClick={() => setIsOpen((prev) => !prev)}
       >
         {label}

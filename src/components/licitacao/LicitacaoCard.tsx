@@ -1,8 +1,21 @@
-import { Licitacao } from '@/interfaces/Licitacao'
-import Link from 'next/link'
-import { MdVisibility } from 'react-icons/md'
+import { Licitacao } from '@/interfaces/Licitacao';
+import Link from 'next/link';
+import { MdVisibility } from 'react-icons/md';
 
 export default function LicitacaoCard({ licitacao }: { licitacao: Licitacao }) {
+  let corSituacao = '';
+
+  switch (licitacao.situacao.toLowerCase()) {
+    case 'aberta':
+      corSituacao = 'text-success font-bold';
+      break;
+    case 'finalizada':
+      corSituacao = 'text-error font-bold';
+      break;
+    default:
+      corSituacao = 'text-gray-500';
+      break;
+  }
   return (
     <div className="border rounded-lg shadow-sm p-2 bg-white hover:shadow-md transition relative">
       <div className="flex justify-between items-start mb-1">
@@ -28,7 +41,7 @@ export default function LicitacaoCard({ licitacao }: { licitacao: Licitacao }) {
         </div>
         <div>
           <span className="font-semibold">Situação:</span>{' '}
-          <span className={licitacao.situacao.toLowerCase() === 'aberta' ? 'text-green-600 font-bold' : 'text-gray-500'}>
+          <span className={corSituacao}>
             {licitacao.situacao}
           </span>
         </div>
@@ -45,7 +58,7 @@ export default function LicitacaoCard({ licitacao }: { licitacao: Licitacao }) {
         <div className="inline-flex">
           <Link
             href={`/licitacoes/${licitacao.id}`}
-            className="inline-flex items-center gap-2 bg-primary hover:bg-blue-800 text-white text-sm px-4 py-2 rounded-md transition"
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-text-primary text-sm px-4 py-2 rounded-md transition"
           >
             <MdVisibility className="w-4 h-4" />
             Acessar

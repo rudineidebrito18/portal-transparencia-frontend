@@ -1,13 +1,21 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import {
-  MdFacebook, MdHome, MdEmail, MdSettings, MdSearch,
-  MdAccessibility, MdInfo, MdHeadsetMic,
-  MdExpandMore, MdMenu, MdClose
+  MdAccessibility,
+  MdClose,
+  MdEmail,
+  MdFacebook,
+  MdHeadsetMic,
+  MdHome,
+  MdInfo,
+  MdMenu,
+  MdSearch,
+  MdSettings
 } from 'react-icons/md';
 import DropdownMenuItem from './DropdownMenuItem';
-import Link from 'next/link';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -89,54 +97,52 @@ export default function Header() {
           }}
         >
           <div className="w-40 md:w-68">
-            <img src="/logo_lago_r.png" alt="Logo Lago dos Rodrigues" className="w-[200px] h-auto" />
+            <Image src="/logo_lago_r.png" alt="Logo Lago dos Rodrigues" width={200} height={200}/>
           </div>
           <br />
         </div>
 
         {/* Nav */}
         <nav className="bg-primary text-light text-sm shadow">
-          <ul className={`flex flex-col md:flex-row flex-wrap px-4 md:px-6 py-2 gap-2 md:gap-6 justify-center items-center ${menuOpen ? 'flex' : 'hidden md:flex'}`}>
-            <li className=" px-4 py-2 hover:bg-secondary cursor-pointer ">
-              <Link href="/"><MdHome /></Link>
-            </li>
+          <ul className={`flex flex-col md:flex-row flex-wrap gap-2 md:gap-2 justify-center items-center ${menuOpen ? 'flex' : 'hidden md:flex'}`}>
+            <Link className="px-4 py-2 hover:bg-secondary" href="/"><MdHome /></Link>
 
             <DropdownMenuItem label="A PREFEITURA">
-              <li className="px-4 py-2 hover:bg-gray-100">Gabinete do Prefeito</li>
-              <li className="px-4 py-2 hover:bg-gray-100">Controladoria</li>
-              <li className="px-4 py-2 hover:bg-gray-100">Procuradoria</li>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Gabinete do Prefeito</Link>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Controladoria</Link>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Procuradoria</Link>
             </DropdownMenuItem>
 
             <DropdownMenuItem label="O MUNICÍPIO">
-              <li className="px-4 py-2 hover:bg-gray-100">História</li>
-              <li className="px-4 py-2 hover:bg-gray-100">Símbolos</li>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">História</Link>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Símbolos</Link>
             </DropdownMenuItem>
 
             <DropdownMenuItem label="SECRETARIAS">
-              <li className="px-4 py-2 hover:bg-gray-100">Saúde</li>
-              <li className="px-4 py-2 hover:bg-gray-100">Educação</li>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Saúde</Link>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Educação</Link>
             </DropdownMenuItem>
 
-            <li className="hover:underline cursor-pointer">DIÁRIO OFICIAL</li>
-            <li className="hover:underline cursor-pointer">SERVIÇOS</li>
-            <li className="hover:underline cursor-pointer">TRANSPARÊNCIA</li>
+            <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer">DIÁRIO OFICIAL</Link>
+            <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer">SERVIÇOS</Link>
+            <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer">TRANSPARÊNCIA</Link>
 
             <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
-              <li className="px-4 py-2 hover:bg-gray-100">Relatórios</li>
-              <li className="px-4 py-2 hover:bg-gray-100">Prestação de Contas</li>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Relatórios</Link>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Prestação de Contas</Link>
             </DropdownMenuItem>
 
             <DropdownMenuItem label="PUBLICAÇÕES">
-              <li className="px-4 py-2 hover:bg-gray-100">Notícias</li>
-              <li className="px-4 py-2 hover:bg-gray-100">Editais</li>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Notícias</Link>
+              <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Editais</Link>
             </DropdownMenuItem>
           </ul>
         </nav>
 
-      </div>
+      </div >
 
       {/* Botão menu mobile */}
-      <div className="fixed top-2 right-3 md:hidden z-60">
+      < div className="fixed top-2 right-3 md:hidden z-60" >
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="text-primary text-3xl bg-light rounded-full p-2 shadow-lg transition duration-200 hover:bg-[--color-neutral]"
@@ -144,10 +150,10 @@ export default function Header() {
         >
           {menuOpen ? <MdClose /> : <MdMenu />}
         </button>
-      </div>
+      </div >
 
       {/* Padding para o conteúdo não ficar coberto */}
-      <div className="pt-[140px] md:pt-[180px]" />
+      < div className="pt-[140px] md:pt-[180px]" />
     </>
   );
 }

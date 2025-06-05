@@ -1,19 +1,11 @@
-import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import Footer from "@/components/Footer";
-import AccessCard from "@/components/AccessCard";
+import AccessCardSection from "@/components/SectionCardGrid";
 import {
-  MdAttachMoney,
-  MdDescription,
-  MdAssignment,
-  MdPeople,
-  MdAssessment,
-  MdBusiness,
-  MdGavel,
   MdAccountCircle,
+  MdDescription,
+  MdGavel,
   MdHandshake
 } from "react-icons/md";
-import AccessCardSection from "@/components/SectionCardGrid";
 
 export default function HomePage() {
    return (
