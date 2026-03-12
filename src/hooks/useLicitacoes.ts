@@ -1,4 +1,4 @@
-import { Licitacao } from '@/interfaces/Licitacao'
+import { Licitacao } from '@/interfaces/licitacao/Licitacao'
 import { licitacoesMock } from '@/mocks/licitacoesMock'
 import { listarLicitacoes } from '@/services/licitacaoService'
 import { useEffect, useState } from 'react'

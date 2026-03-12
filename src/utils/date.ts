@@ -1,17 +1,38 @@
-export function formatarData(data: string | Date): string {
-  if (!data) return ''
+function parseData(data: string | Date): Date {
+  if (data instanceof Date) return data
 
-  const date = new Date(data)
+  // garante formato ISO correto caso venha com espaço
+  const iso = data.includes("T") ? data : data.replace(" ", "T")
 
-  return date.toLocaleDateString('pt-BR')
+  return new Date(iso)
 }
 
-export function formatarDataHora(data: string | Date): string {
-  if (!data) return ''
+export function formatarData(data?: string | Date): string {
+  if (!data) return "Não informado"
 
-  const date = new Date(data)
+  if (typeof data === "string") {
+    const partes = data.split("T")[0].split("-")
 
-  return date.toLocaleString('pt-BR')
+    if (partes.length === 3) {
+      const [ano, mes, dia] = partes
+      return `${dia}/${mes}/${ano}`
+    }
+  }
+
+  const date = parseData(data)
+
+  return date.toLocaleDateString("pt-BR")
+}
+
+export function formatarDataHora(data?: string | Date): string {
+  if (!data) return "Não informado"
+
+  const date = parseData(data)
+
+  return date.toLocaleString("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short"
+  })
 }
 
 export function dataDentroIntervalo(
@@ -20,10 +41,17 @@ export function dataDentroIntervalo(
   fim?: string
 ): boolean {
 
-  const date = new Date(data)
+  const date = parseData(data)
 
-  if (inicio && date < new Date(inicio)) return false
-  if (fim && date > new Date(fim)) return false
+  if (inicio) {
+    const inicioDate = parseData(inicio)
+    if (date < inicioDate) return false
+  }
+
+  if (fim) {
+    const fimDate = parseData(fim)
+    if (date > fimDate) return false
+  }
 
   return true
 }

@@ -1,4 +1,4 @@
-import { Licitacao } from "@/interfaces/Licitacao";
+import { Licitacao } from "@/interfaces/licitacao/Licitacao";
 import { api } from "./api";
 
 export const listarLicitacoes = async (): Promise<Licitacao[]> => {
