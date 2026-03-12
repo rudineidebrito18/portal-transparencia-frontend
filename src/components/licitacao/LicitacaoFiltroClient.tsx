@@ -1,84 +1,62 @@
 'use client'
+
+import { useLicitacoes } from '@/hooks/useLicitacoes'
 import { FiltroLicitacao, Licitacao } from '@/interfaces/Licitacao'
+import { dataDentroIntervalo } from '@/utils/date'
 import { useState } from 'react'
 import LicitacaoCard from './LicitacaoCard'
 import LicitacaoFiltro from './LicitacaoFiltro'
 
-const licitacoesFake: Licitacao[] = [
-  {
-    id: '001',
-    numero: '02/2025',
-    modalidade: 'Pregão Eletrônico',
-    tipo: 'MENOR PREÇO (Registro de preço)',
-    objeto: 'Aquisição de materiais de informática',
-    dataAbertura: '20/04/2025',
-    dataSituacao: '22/04/2025',
-    dataPublicacao: '21/04/2025',
-    valorEstimado: 17000000,
-    situacao: 'aberta',
-  },
-  {
-    id: '002',
-    numero: '02/2025',
-    modalidade: 'Pregão Eletrônico',
-    tipo: 'MENOR PREÇO (Registro de preço)',
-    objeto: 'Aquisição de materiais de informática',
-    dataAbertura: '20/04/2025',
-    dataSituacao: '22/04/2025',
-    dataPublicacao: '21/04/2025',
-    valorEstimado: 17000000,
-    situacao: 'aberta',
-  },
-  {
-    id: '003',
-    numero: '02/2025',
-    modalidade: 'Pregão Eletrônico',
-    tipo: 'MENOR PREÇO (Registro de preço)',
-    objeto: 'Aquisição de materiais de informática',
-    dataAbertura: '20/04/2025',
-    dataSituacao: '22/04/2025',
-    dataPublicacao: '21/04/2025',
-    valorEstimado: 17000000,
-    situacao: 'finalizada',
-  },
-  {
-    id: '004',
-    numero: '02/2025',
-    modalidade: 'Pregão Eletrônico',
-    tipo: 'MENOR PREÇO (Registro de preço)',
-    objeto: 'Aquisição de materiais de informática',
-    dataAbertura: '20/04/2025',
-    dataSituacao: '22/04/2025',
-    dataPublicacao: '21/04/2025',
-    valorEstimado: 17000000,
-    situacao: 'finalizada',
-  }
-]
-
 export default function LicitacaoFiltroClient() {
-  const [licitacoes, setLicitacoes] = useState<Licitacao[]>(licitacoesFake)
+
+  const { licitacoes, loading } = useLicitacoes()
+
+  const [resultado, setResultado] = useState<Licitacao[]>([])
+
+  const lista = resultado.length > 0 ? resultado : licitacoes
 
   const filtrar = (filtros: FiltroLicitacao) => {
-    const resultado = licitacoesFake.filter(item => {
-      const matchModalidade = filtros.modalidade === '' || item.modalidade === filtros.modalidade
-      const matchNumero = filtros.numero === '' || item.numero.includes(filtros.numero)
-      const matchObjeto = filtros.objeto === '' || item.objeto.toLowerCase().includes(filtros.objeto.toLowerCase())
-      const matchData =
-        (!filtros.dataInicio || new Date(item.dataPublicacao) >= new Date(filtros.dataInicio)) &&
-        (!filtros.dataFim || new Date(item.dataPublicacao) <= new Date(filtros.dataFim))
 
-      return matchModalidade && matchNumero && matchObjeto && matchData
+    const filtradas = licitacoes.filter(item => {
+
+      if (filtros.modalidade && item.modalidade !== filtros.modalidade)
+        return false
+
+      if (filtros.numero && !item.numero.includes(filtros.numero))
+        return false
+
+      if (
+        filtros.objeto &&
+        !item.objeto.toLowerCase().includes(filtros.objeto.toLowerCase())
+      )
+        return false
+
+      if (
+        !dataDentroIntervalo(
+          item.dataPublicacao,
+          filtros.dataInicio,
+          filtros.dataFim
+        )
+      )
+        return false
+
+      return true
     })
 
-    setLicitacoes(resultado)
+    setResultado(filtradas)
+  }
+
+  if (loading) {
+    return <p>Carregando licitações...</p>
   }
 
   return (
     <>
       <LicitacaoFiltro onFiltrar={filtrar} />
+
       <div className="grid gap-2">
-        {licitacoes.map((item, index) => (
-          <LicitacaoCard key={index} licitacao={item} />
+        {lista.map(item => (
+          <LicitacaoCard key={item.id} licitacao={item} />
         ))}
       </div>
     </>
