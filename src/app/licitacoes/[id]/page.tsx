@@ -1,35 +1,29 @@
 import LicitacaoDetalhe from '@/components/licitacao/LicitacaoDetalhe'
-import { licitacoesMock } from '@/mocks/licitacoesMock'
-import { listarLicitacoes } from '@/services/licitacaoService'
+import { licitacoesMockPage } from '@/mocks/licitacoesMock'
+import { buscarLicitacao } from '@/services/licitacaoService'
 
 export default async function LicitacaoPage({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
+  const numericId = Number(id)
 
-  const { id } = params
-
-  let licitacoes = []
+  let licitacao;
 
   try {
-    const dados = await listarLicitacoes()
-
-    licitacoes = dados?.length ? dados : licitacoesMock
+    licitacao = await buscarLicitacao(numericId)
   } catch {
-    licitacoes = licitacoesMock
+    licitacao = undefined
   }
 
-  const licitacao = licitacoes.find(
-    (l) => l.id === Number(id)
-  )
+  if (!licitacao) {
+    licitacao = licitacoesMockPage.content.find(l => l.id === numericId)
+  }
 
   if (!licitacao) {
-    return (
-      <div className="p-4">
-        Licitação não encontrada.
-      </div>
-    )
+    return <div className="p-4">Licitação não encontrada.</div>
   }
 
   return (

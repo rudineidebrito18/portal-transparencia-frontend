@@ -2,82 +2,74 @@
 
 import { useLicitacoes } from '@/hooks/useLicitacoes'
 import { FiltroLicitacao } from '@/interfaces/licitacao/Licitacao'
-import { dataDentroIntervalo } from '@/utils/date'
-import { useMemo, useState } from 'react'
 
 import LicitacaoCard from './LicitacaoCard'
 import LicitacaoFiltro from './LicitacaoFiltro'
 
 export default function LicitacaoFiltroClient() {
+  const {
+    licitacoes,
+    loading,
+    paginaAtual,
+    totalPaginas,
+    filtros,
+    carregarLicitacoes,
+    setFiltros
+  } = useLicitacoes({}, 5) // tamanho da página 5
 
-  const { licitacoes, loading } = useLicitacoes()
+  // Ao alterar filtros
+  function handleFiltrar(novosFiltros: FiltroLicitacao) {
+    setFiltros(novosFiltros)
+    carregarLicitacoes(novosFiltros, 0) // sempre reinicia na página 0
+  }
 
-  const [filtros, setFiltros] = useState<FiltroLicitacao>({})
-
-  const listaFiltrada = useMemo(() => {
-
-    return licitacoes.filter(item => {
-
-      if (
-        filtros.tipoProcedimento &&
-        item.tipoProcedimento !== filtros.tipoProcedimento
-      ) {
-        return false
-      }
-
-      if (
-        filtros.numeroInstrumento &&
-        !item.numeroInstrumento.includes(filtros.numeroInstrumento)
-      ) {
-        return false
-      }
-
-      if (
-        filtros.objeto &&
-        !item.objeto
-          .toLowerCase()
-          .includes(filtros.objeto.toLowerCase())
-      ) {
-        return false
-      }
-
-      if (
-        !dataDentroIntervalo(
-          item.dataPublicacao,
-          filtros.dataInicio,
-          filtros.dataFim
-        )
-      ) {
-        return false
-      }
-
-      return true
-    })
-    
-    .sort((a, b) =>
-      new Date(b.dataPublicacao).getTime() -
-      new Date(a.dataPublicacao).getTime()
-    )
-
-  }, [licitacoes, filtros])
-
-  if (loading) {
-    return (
-      <p className="text-center text-text-secondary">
-        Carregando licitações...
-      </p>
-    )
+  // Navegação de página
+  function mudarPagina(novaPagina: number) {
+    if (novaPagina >= 0 && novaPagina < totalPaginas) {
+      carregarLicitacoes(filtros, novaPagina)
+    }
   }
 
   return (
-    <>
-      <LicitacaoFiltro onFiltrar={setFiltros} />
+    <div>
+      <LicitacaoFiltro onFiltrar={handleFiltrar} />
 
-      <div className="grid gap-4 mt-4">
-        {listaFiltrada.map(item => (
-          <LicitacaoCard key={item.id} licitacao={item} />
-        ))}
-      </div>
-    </>
+      {loading ? (
+        <p className="text-center text-text-secondary">Carregando licitações...</p>
+      ) : (
+        <>
+          <div className="grid gap-4 mt-4">
+            {licitacoes.map(item => (
+              <LicitacaoCard key={item.id} licitacao={item} />
+            ))}
+          </div>
+
+          {/* Paginação */}
+          {totalPaginas > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-4">
+              <button
+                onClick={() => mudarPagina(paginaAtual - 1)}
+                disabled={paginaAtual === 0}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                Anterior
+              </button>
+
+              <span>
+                Página {paginaAtual + 1} de {totalPaginas}
+              </span>
+
+              <button
+                onClick={() => mudarPagina(paginaAtual + 1)}
+                disabled={paginaAtual + 1 >= totalPaginas}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                Próxima
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   )
 }
