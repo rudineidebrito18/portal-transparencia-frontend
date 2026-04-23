@@ -1,5 +1,5 @@
 import { FiltroLicitacao, Licitacao } from '@/interfaces/licitacao/Licitacao'
-import { gerarMockPaginado } from '@/mocks/licitacoesMockGenerator'
+import { licitacoesMockPage } from '@/mocks/licitacoesMock'
 import { listarLicitacoes } from '@/services/licitacaoService'
 import { useEffect, useState } from 'react'
 
@@ -36,11 +36,8 @@ export function useLicitacoes(initialFiltros?: FiltroLicitacao, tamanhoPagina: n
       query.append('page', pagina.toString())
       query.append('size', tamanhoPagina.toString())
 
-      // Faz fetch da API
       const res = await listarLicitacoes(query.toString())
-
-      // Se API não retornar, usa mock gerado
-      const data: Page<Licitacao> = res || gerarMockPaginado(pagina, tamanhoPagina, 50)
+      const data: Page<Licitacao> = res || licitacoesMockPage
 
       setLicitacoes(data.content)
       setTotalPaginas(data.totalPages)
@@ -49,9 +46,8 @@ export function useLicitacoes(initialFiltros?: FiltroLicitacao, tamanhoPagina: n
     } catch (error: unknown) {
       console.warn('API indisponível, usando mock paginado')
 
-      const mock = gerarMockPaginado(pagina, tamanhoPagina, 50)
-      setLicitacoes(mock.content)
-      setTotalPaginas(mock.totalPages)
+      setLicitacoes(licitacoesMockPage.content)
+      setTotalPaginas(licitacoesMockPage.totalPages)
 
       if (error instanceof Error) {
         setErro(error.message)
