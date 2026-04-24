@@ -2,8 +2,7 @@ import { StatusLicitacao } from "@/interfaces/enums/StatusLicitacao"
 import { TipoProcedimentoLicitacao } from "@/interfaces/enums/TipoProcedimentoLicitacao"
 import { Licitacao } from "@/interfaces/licitacao/Licitacao"
 
-// Array de licitações
-const licitacoesMock: Licitacao[] = [
+export const licitacoesMock: Licitacao[] = [
   {
     id: 1,
     numeroInstrumento: "001",
@@ -60,10 +59,3 @@ const licitacoesMock: Licitacao[] = [
     contratos: []
   }
 ]
-
-// Mock paginado, compatível com API
-export const licitacoesMockPage = {
-  content: licitacoesMock,
-  totalPages: 1,
-  totalElements: licitacoesMock.length
-}
