@@ -15,12 +15,13 @@ export default function LicitacaoFiltroClient() {
     erro,
     pagina,
     totalPaginas,
+    totalElements,
     setPagina,
     setFiltros,
     setOrdenacao
   } = usePageableResource<Licitacao, FiltroLicitacao>({
     fetchFunction: listarLicitacoes,
-    size: 5
+    size: 10
   })
 
   function handleFiltrar(novosFiltros: FiltroLicitacao) {
@@ -38,7 +39,7 @@ export default function LicitacaoFiltroClient() {
       
       <div className="flex justify-between items-center mt-4">
         <span className="text-sm text-text-secondary">
-          {licitacoes.length} resultados
+          {totalElements} resultados
         </span>
 
         <select

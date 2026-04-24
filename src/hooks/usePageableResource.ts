@@ -29,6 +29,7 @@ export function usePageableResource<
 
   const [pagina, setPagina] = useState(0)
   const [totalPaginas, setTotalPaginas] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
 
   const [filtros, setFiltros] = useState<F>(initialFilters)
   const [ordenacao, setOrdenacao] = useState<string>("")
@@ -54,7 +55,8 @@ export function usePageableResource<
 
         setData(response.content)
         setTotalPaginas(response.totalPages)
-
+        setTotalElements(response.totalElements)
+        
       } catch (e: unknown) {
         const message =
           e instanceof Error ? e.message : "Erro ao carregar dados"
@@ -75,7 +77,7 @@ export function usePageableResource<
 
     pagina,
     totalPaginas,
-
+    totalElements,
     setPagina,
     setFiltros,
     setOrdenacao,

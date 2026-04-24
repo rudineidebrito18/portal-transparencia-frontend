@@ -53,6 +53,7 @@ export interface FiltroLicitacao {
   nomeAutoridade?: string
   unidade?: string
   covid?: boolean
+  objeto?: string
 
   dataInicio?: string
   dataFim?: string
