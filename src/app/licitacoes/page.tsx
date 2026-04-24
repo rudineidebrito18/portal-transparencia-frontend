@@ -1,4 +1,4 @@
-import LicitacaoFiltroClient from '@/components/licitacao/LicitacaoFiltroClient'
+import LicitacaoFiltroClient from '@/app/licitacoes/components/LicitacaoFiltroClient'
 
 export default function Licitacoes() {
   return (
