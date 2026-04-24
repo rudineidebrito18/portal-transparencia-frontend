@@ -43,9 +43,19 @@ export interface Licitacao {
 }
 
 export interface FiltroLicitacao {
-  tipoProcedimento?: string
+  [key: string]: unknown
+
   numeroInstrumento?: string
-  objeto?: string
+  numeroProcesso?: string
+  ano?: number
+  tipoProcedimento?: string
+  status?: string
+  nomeAutoridade?: string
+  unidade?: string
+  covid?: boolean
+
   dataInicio?: string
   dataFim?: string
+
+  busca?: string
 }

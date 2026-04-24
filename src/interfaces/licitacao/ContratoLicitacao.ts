@@ -1,3 +1,6 @@
+import { AditivoContratoLicitacao } from "./AditivoContratoLicitacao"
+import { DocumentoContratoLicitacao } from "./DocumentoContratoLicitacao"
+
 export interface ContratoLicitacao {
   id: number
 
