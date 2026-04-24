@@ -82,7 +82,7 @@ export default function Header() {
         {/* 1. Topbar */}
         <div
           className="sticky w-full bg-primary text-light text-sm flex justify-between items-center px-4 z-40"
-          style={{ height: topbarHeight, lineHeight: `${topbarHeight}px`}}
+          style={{ height: topbarHeight, lineHeight: `${topbarHeight}px` }}
         >
           <div className="text-xs">Prefeitura Municipal de Lago dos Rodrigues</div>
           <div className="hidden lg:flex items-center gap-3 text-xs">
@@ -107,7 +107,7 @@ export default function Header() {
         >
           {/* Logo Section */}
           <div
-            className="flex justify-around items-center px-4 bg-cover bg-center"
+            className="flex justify-start items-center px-4 bg-cover bg-center"
             style={{
               height: logoVisible ? logoSectionHeight : fase1Max,
               opacity: logoVisible ? 1 : 0,
@@ -116,9 +116,15 @@ export default function Header() {
               backgroundImage: "url('/fundo_header.png')",
             }}
           >
-            <div className="w-40 md:w-68">
-              <Image src="/logo_lago_r.png" alt="Logo" width={200} height={200} priority />
-            </div>
+            <Link href="/" className="w-40 md:w-68 flex items-center ml-20 hover:opacity-90 transition-opacity">
+              <Image
+                src="/logo_lago_r.png"
+                alt="Logo Lago dos Rodrigues"
+                width={200}
+                height={200}
+                priority
+              />
+            </Link>
           </div>
 
           {/* Nav */}
