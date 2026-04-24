@@ -1,6 +1,5 @@
-import LicitacaoDetalhe from '@/components/licitacao/LicitacaoDetalhe'
-import { licitacoesMockPage } from '@/mocks/licitacoesMock'
-import { buscarLicitacao } from '@/services/licitacaoService'
+import LicitacaoDetalhe from '@/app/licitacoes/components/LicitacaoDetalhe'
+import { buscarLicitacao } from '@/services/licitacao.service'
 
 export default async function LicitacaoPage({
   params
@@ -10,19 +9,11 @@ export default async function LicitacaoPage({
   const { id } = await params
   const numericId = Number(id)
 
-  let licitacao;
+  let licitacao
 
   try {
     licitacao = await buscarLicitacao(numericId)
   } catch {
-    licitacao = undefined
-  }
-
-  if (!licitacao) {
-    licitacao = licitacoesMockPage.content.find(l => l.id === numericId)
-  }
-
-  if (!licitacao) {
     return <div className="p-4">Licitação não encontrada.</div>
   }
 
