@@ -16,27 +16,24 @@ export interface Licitacao {
   dataHomologacao?: string
 
   valorEstimado?: number
-  valorTotalDespesa?: number
+  valorAdjudicado?: number
   valorDotacao?: number
-  valorGlobalAdjudicado?: number
 
-  tipoProcedimento: TipoProcedimentoLicitacao
-  status: StatusLicitacao
-
+  tipoProcedimento: string
+  status: string
   tipoCriterio?: string
-  finalidade?: string
-  naturezaDespesa?: string
   regimeExecucao?: string
+  finalidade?: string
   tipoResultado?: string
+  naturezaDespesa?: string
   origemRecurso?: string
-  sistemaEletronico?: string
-  lei?: string
   unidade?: string
   nomeAutoridade?: string
-
-  objeto: string
+  sistemaEletronico?: string
+  lei?: string
 
   covid: boolean
+  objeto: string
 
   documentos?: DocumentoLicitacao[]
   contratos?: ContratoLicitacao[]
@@ -47,16 +44,18 @@ export interface FiltroLicitacao {
 
   numeroInstrumento?: string
   numeroProcesso?: string
+  objeto?: string
   ano?: number
-  tipoProcedimento?: string
-  status?: string
+  tipo?: TipoProcedimentoLicitacao | string
+  status?: StatusLicitacao | string
   nomeAutoridade?: string
   unidade?: string
   covid?: boolean
-  objeto?: string
 
   dataInicio?: string
   dataFim?: string
+  dataPublicacaoInicio?: string
+  dataPublicacaoFim?: string
 
   busca?: string
 }

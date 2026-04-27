@@ -16,7 +16,6 @@ export const listarLicitacoesMock = async (
 
   let data = [...licitacoesMock]
 
-
   if (filtros.numeroInstrumento) {
     data = data.filter(item =>
       item.numeroInstrumento.includes(String(filtros.numeroInstrumento))
@@ -31,9 +30,9 @@ export const listarLicitacoesMock = async (
     )
   }
 
-  if (filtros.tipoProcedimento) {
+  if (filtros.tipo) {
     data = data.filter(item =>
-      item.tipoProcedimento === filtros.tipoProcedimento
+      item.tipoProcedimento === filtros.tipo
     )
   }
 
@@ -43,19 +42,36 @@ export const listarLicitacoesMock = async (
     )
   }
 
+  if (filtros.ano !== undefined && filtros.ano !== '') {
+    data = data.filter(item =>
+      item.ano === Number(filtros.ano)
+    )
+  }
+
+  if (filtros.covid !== undefined && filtros.covid !== '') {
+    const isCovid = String(filtros.covid) === 'true'
+    data = data.filter(item => item.covid === isCovid)
+  }
+
+  if (filtros.dataPublicacaoInicio) {
+    const inicio = new Date(String(filtros.dataPublicacaoInicio)).getTime()
+    data = data.filter(item => new Date(item.dataPublicacao).getTime() >= inicio)
+  }
+
+  if (filtros.dataPublicacaoFim) {
+    const fim = new Date(String(filtros.dataPublicacaoFim)).getTime()
+    data = data.filter(item => new Date(item.dataPublicacao).getTime() <= fim)
+  }
+
   if (sort) {
     const parts = sort.split(',')
-
     if (parts.length === 2) {
       const campo = parts[0] as keyof Licitacao
       const direcao = parts[1] as 'asc' | 'desc'
 
       data.sort((a: Licitacao, b: Licitacao) => {
-        const valorA = a[campo]
-        const valorB = b[campo]
-
-        if (valorA == null) return 1
-        if (valorB == null) return -1
+        const valorA = a[campo] ?? ''
+        const valorB = b[campo] ?? ''
 
         if (valorA < valorB) return direcao === 'asc' ? -1 : 1
         if (valorA > valorB) return direcao === 'asc' ? 1 : -1
@@ -63,16 +79,16 @@ export const listarLicitacoesMock = async (
       })
     }
   }
+
   const start = page * size
-    const end = start + size
+  const end = start + size
+  const paginated = data.slice(start, end)
 
-    const paginated = data.slice(start, end)
-
-    return {
-      content: paginated,
-      totalPages: Math.ceil(data.length / size),
-      totalElements: data.length,
-      number: page,
-      size
-    }
+  return {
+    content: paginated,
+    totalPages: Math.ceil(data.length / size),
+    totalElements: data.length,
+    number: page,
+    size
+  }
 }
