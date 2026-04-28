@@ -1,7 +1,28 @@
 import { StatusLicitacao } from "@/interfaces/enums/StatusLicitacao";
 import { TipoProcedimentoLicitacao } from "@/interfaces/enums/TipoProcedimentoLicitacao";
+import { DocumentoLicitacao } from "@/interfaces/licitacao/DocumentoLicitacao";
 import { Licitacao } from "@/interfaces/licitacao/Licitacao";
 import { fakerPT_BR as faker } from '@faker-js/faker';
+import { gerarListaContratosMock } from "./contratoMock";
+
+const gerarDocumentosMock = (quantidade: number): DocumentoLicitacao[] => {
+  const tipos = ['Edital', 'Anexo', 'Ata de Reunião', 'Termo de Referência', 'Homologação', 'Contrato Assinado'];
+  const assuntos = [
+    'Documentação técnica para análise',
+    'Publicação de resultado preliminar',
+    'Abertura de certame licitatório',
+    'Minuta do contrato administrativo',
+    'Parecer jurídico de aprovação'
+  ];
+
+  return Array.from({ length: quantidade }, (_, i) => ({
+    id: faker.number.int({ min: 1000, max: 9999 }),
+    assunto: faker.helpers.arrayElement(assuntos),
+    tipoDocumento: faker.helpers.arrayElement(tipos),
+    dataEnvio: faker.date.recent().toISOString(), // Mantém formato ISO string
+    caminhoPdf: `/arquivos/exemplo_${i + 1}.pdf`
+  }));
+};
 
 const gerarLicitacoes = (quantidade: number): Licitacao[] => {
   return Array.from({ length: quantidade }, (_, index) => {
@@ -29,8 +50,8 @@ const gerarLicitacoes = (quantidade: number): Licitacao[] => {
       nomeAutoridade: faker.person.fullName(),
       objeto: faker.lorem.paragraph(1),
       covid: false,
-      documentos: [],
-      contratos: []
+      documentos: gerarDocumentosMock(3),
+      contratos: gerarListaContratosMock(id)
     };
   });
 };

@@ -210,7 +210,7 @@ export default function LicitacaoFiltro({ onFiltrar }: Props) {
 
             {/* Covid */}
             <div>
-              <label className="block text-xs font-bold uppercase text-text-secondary mb-2 flex items-center gap-1">
+              <label className="text-xs font-bold uppercase text-text-secondary mb-2 flex items-center gap-1">
                 <MdCoronavirus className="text-danger" /> COVID-19?
               </label>
               <select

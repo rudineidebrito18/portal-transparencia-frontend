@@ -1,5 +1,5 @@
-import { StatusLicitacaoDescricao } from "@/interfaces/enums/StatusLicitacao"
-import { TipoProcedimentoDescricao } from "@/interfaces/enums/TipoProcedimentoLicitacao"
+import { StatusLicitacao, StatusLicitacaoDescricao } from "@/interfaces/enums/StatusLicitacao"
+import { TipoProcedimentoDescricao, TipoProcedimentoLicitacao } from "@/interfaces/enums/TipoProcedimentoLicitacao"
 import { Licitacao } from "@/interfaces/licitacao/Licitacao"
 
 import { formatarMoeda } from "@/utils/currency"
@@ -33,7 +33,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
       {/* Título */}
       <div className="flex justify-between items-start mb-2">
         <h2 className="text-lg font-bold text-primary">
-          {TipoProcedimentoDescricao[licitacao.tipoProcedimento]} {licitacao.numeroInstrumento}/{licitacao.ano}
+          {TipoProcedimentoDescricao[licitacao.tipoProcedimento as TipoProcedimentoLicitacao]} {licitacao.numeroInstrumento}/{licitacao.ano}
         </h2>
       </div>
 
@@ -47,7 +47,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
 
         <div>
           <span className="font-semibold">Modalidade:</span>{" "}
-          {TipoProcedimentoDescricao[licitacao.tipoProcedimento]}
+          {TipoProcedimentoDescricao[licitacao.tipoProcedimento as TipoProcedimentoLicitacao]}
         </div>
 
         <div>
@@ -70,7 +70,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
         <div>
           <span className="font-semibold">Status:</span>{" "}
           <span className={corStatus}>
-            {StatusLicitacaoDescricao[licitacao.status]}
+            {StatusLicitacaoDescricao[licitacao.status as StatusLicitacao]}
           </span>
         </div>
 
