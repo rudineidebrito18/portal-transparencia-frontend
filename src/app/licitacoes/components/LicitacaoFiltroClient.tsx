@@ -5,6 +5,7 @@ import { listarLicitacoes } from '@/services/licitacao.service'
 
 import { FiltroLicitacao, Licitacao } from '@/interfaces/licitacao/Licitacao'
 
+import { MdSwapVert } from 'react-icons/md'
 import LicitacaoCard from './LicitacaoCard'
 import LicitacaoFiltro from './LicitacaoFiltro'
 
@@ -18,7 +19,8 @@ export default function LicitacaoFiltroClient() {
     totalElements,
     setPagina,
     setFiltros,
-    setOrdenacao
+    setOrdenacao,
+    ordenacao
   } = usePageableResource<Licitacao, FiltroLicitacao>({
     fetchFunction: listarLicitacoes,
     size: 10
@@ -33,64 +35,141 @@ export default function LicitacaoFiltroClient() {
     setPagina(novaPagina)
   }
 
+  // 🔥 GERA PAGINAÇÃO INTELIGENTE
+  function gerarPaginas() {
+    const paginas: (number | string)[] = []
+
+    const inicio = Math.max(0, pagina - 2)
+    const fim = Math.min(totalPaginas - 1, pagina + 2)
+
+    if (inicio > 0) {
+      paginas.push(0)
+      if (inicio > 1) paginas.push('...')
+    }
+
+    for (let i = inicio; i <= fim; i++) {
+      paginas.push(i)
+    }
+
+    if (fim < totalPaginas - 1) {
+      if (fim < totalPaginas - 2) paginas.push('...')
+      paginas.push(totalPaginas - 1)
+    }
+
+    return paginas
+  }
+
   return (
-    <div>
+    <div className="space-y-6">
+
+      {/* FILTRO */}
       <LicitacaoFiltro onFiltrar={handleFiltrar} />
-      
-      <div className="flex justify-between items-center mt-4">
+
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
+
         <span className="text-sm text-text-secondary">
-          {totalElements} resultados
+          <strong className="text-primary">{totalElements}</strong> resultados encontrados
         </span>
 
-        <select
-          onChange={(e) => setOrdenacao(e.target.value)}
-          className="border px-3 py-2 rounded"
-        >
-          <option value="">Ordenar por</option>
-          <option value="dataPublicacao,desc">Mais recentes</option>
-          <option value="dataPublicacao,asc">Mais antigos</option>
-        </select>
-      </div>
-
-      {erro && (
-        <p className="text-center text-red-500">
-          {erro}
-        </p>
-      )}
-
-      {loading ? (
-        <p className="text-center text-text-secondary">
-          Carregando licitações...
-        </p>
-      ) : (
-        <>
-          <div className="grid gap-4 mt-4">
-            {licitacoes.map(item => (
-              <LicitacaoCard key={item.id} licitacao={item} />
-            ))}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-text-secondary text-sm">
+            <MdSwapVert />
+            Ordenar
           </div>
 
-          {totalPaginas > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-4">
-              <button
-                onClick={() => mudarPagina(pagina - 1)}
-                disabled={pagina === 0}
-                className="px-3 py-1 border rounded disabled:opacity-50"
-              >
-                Anterior
-              </button>
+          <select
+            value={ordenacao || 'dataPublicacao,desc'}
+            onChange={(e) => setOrdenacao(e.target.value)}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none"
+          >
+            <option value="dataPublicacao,desc">Mais recentes</option>
+            <option value="dataPublicacao,asc">Mais antigos</option>
+          </select>
+        </div>
 
-              <span>
-                Página {pagina + 1} de {totalPaginas}
+      </div>
+
+      {/* ERRO */}
+      {erro && (
+        <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-4 rounded-xl">
+          {erro}
+        </div>
+      )}
+
+      {/* LOADING */}
+      {loading ? (
+        <div className="grid gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-28 bg-neutral-light animate-pulse rounded-xl border border-border/30"
+            />
+          ))}
+        </div>
+      ) : (
+        <>
+          {/* LISTA */}
+          <div className="grid gap-4">
+            {licitacoes.length > 0 ? (
+              licitacoes.map(item => (
+                <LicitacaoCard key={item.id} licitacao={item} />
+              ))
+            ) : (
+              <div className="bg-white border border-border/30 rounded-xl p-8 text-center shadow-sm">
+                <p className="text-text-secondary">
+                  Nenhuma licitação encontrada com os filtros aplicados.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* PAGINAÇÃO */}
+          {totalPaginas > 1 && (
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-6 bg-white border border-border/30 rounded-xl px-4 md:px-5 py-3 shadow-sm">
+
+              <span className="text-sm text-text-secondary">
+                Página <strong>{pagina + 1}</strong> de <strong>{totalPaginas}</strong>
               </span>
 
-              <button
-                onClick={() => mudarPagina(pagina + 1)}
-                disabled={pagina + 1 >= totalPaginas}
-                className="px-3 py-1 border rounded disabled:opacity-50"
-              >
-                Próxima
-              </button>
+              <div className="flex items-center gap-1 overflow-x-auto max-w-full scrollbar-thin">
+
+                <button
+                  onClick={() => mudarPagina(pagina - 1)}
+                  disabled={pagina === 0}
+                  className="px-3 py-2 rounded-lg border border-border/30 text-sm font-medium hover:bg-neutral-light disabled:opacity-40 transition whitespace-nowrap"
+                >
+                  Anterior
+                </button>
+
+                {gerarPaginas().map((p, i) =>
+                  p === '...' ? (
+                    <span key={i} className="px-2 text-text-secondary text-sm">...</span>
+                  ) : (
+                    <button
+                      key={i}
+                      onClick={() => mudarPagina(p as number)}
+                      className={`px-3 py-2 rounded-md text-sm font-semibold transition whitespace-nowrap
+                        ${p === pagina
+                          ? 'bg-primary text-white'
+                          : 'hover:bg-neutral-light text-text-secondary'
+                        }`}
+                    >
+                      {(p as number) + 1}
+                    </button>
+                  )
+                )}
+
+                <button
+                  onClick={() => mudarPagina(pagina + 1)}
+                  disabled={pagina + 1 >= totalPaginas}
+                  className="px-3 py-2 rounded-lg border border-border/30 text-sm font-medium hover:bg-neutral-light disabled:opacity-40 transition whitespace-nowrap"
+                >
+                  Próxima
+                </button>
+
+              </div>
+
             </div>
           )}
         </>

@@ -30,7 +30,7 @@ export default async function LicitacaoPage({
       <Breadcrumbs 
         items={[
           { label: 'Licitações', href: '/licitacoes' },
-          { label: `${licitacao.numeroInstrumento}/${licitacao.ano}` }
+          { label: `${licitacao.tipoProcedimento} Nº ${licitacao.numeroInstrumento}/${licitacao.ano}` }
         ]} 
       />
 

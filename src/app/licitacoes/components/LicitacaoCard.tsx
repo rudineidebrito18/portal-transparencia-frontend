@@ -14,89 +14,97 @@ interface Props {
 
 export default function LicitacaoCard({ licitacao }: Props) {
 
-  const corStatus = {
-    EM_ABERTO: "text-accent font-semibold",
-    EM_ANDAMENTO: "text-warning font-semibold",
-    FINALIZADO: "text-success font-semibold",
-    SUSPENSO: "text-error font-semibold",
-    DESERTA: "text-neutral-dark font-semibold",
-    FRACASSADA: "text-neutral-dark font-semibold",
-    ANULADA: "text-error font-semibold",
-    SINC_ABERTO: "text-accent-light font-semibold",
-    SINC_ANDAMENTO: "text-warning font-semibold",
-    INCLUIDO_SISTEMA: "text-neutral-dark font-semibold"
+  const statusStyle = {
+    EM_ABERTO: "bg-blue-100 text-blue-700",
+    EM_ANDAMENTO: "bg-yellow-100 text-yellow-700",
+    FINALIZADO: "bg-green-100 text-green-700",
+    SUSPENSO: "bg-red-100 text-red-700",
+    DESERTA: "bg-gray-100 text-gray-600",
+    FRACASSADA: "bg-gray-100 text-gray-600",
+    ANULADA: "bg-red-100 text-red-700",
+    SINC_ABERTO: "bg-blue-100 text-blue-700",
+    SINC_ANDAMENTO: "bg-yellow-100 text-yellow-700",
+    INCLUIDO_SISTEMA: "bg-gray-100 text-gray-600"
   }[licitacao.status]
 
   return (
-    <div className="border border-border rounded-lg shadow-sm p-4 bg-light hover:shadow-md transition relative">
+    <div className="bg-white border border-border/30 rounded-xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all relative flex flex-col gap-4">
 
-      {/* Título */}
-      <div className="flex justify-between items-start mb-2">
-        <h2 className="text-lg font-bold text-primary">
-          {TipoProcedimentoDescricao[licitacao.tipoProcedimento as TipoProcedimentoLicitacao]} {licitacao.numeroInstrumento}/{licitacao.ano}
-        </h2>
+      {/* HEADER */}
+      <div className="flex justify-between items-start gap-3">
+
+        <div>
+          <h2 className="text-base font-bold text-primary leading-tight">
+            {TipoProcedimentoDescricao[licitacao.tipoProcedimento as TipoProcedimentoLicitacao]}{" "}
+            {licitacao.numeroInstrumento}/{licitacao.ano}
+          </h2>
+
+          <p className="text-xs text-text-secondary/60 mt-1">
+            Processo: {licitacao.numeroProcesso || "-"}
+          </p>
+        </div>
+
+        <span className={`text-[11px] px-3 py-1 rounded-full font-semibold uppercase tracking-wide ${statusStyle}`}>
+          {StatusLicitacaoDescricao[licitacao.status as StatusLicitacao]}
+        </span>
+
       </div>
 
-      {/* Objeto */}
-      <p className="text-sm text-text-secondary mb-4">
+      {/* OBJETO */}
+      <p className="text-sm text-text-secondary leading-relaxed line-clamp-3">
         {licitacao.objeto}
       </p>
 
-      {/* Informações */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-text-secondary mb-3">
+      {/* GRID INFO */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
 
         <div>
-          <span className="font-semibold">Modalidade:</span>{" "}
-          {TipoProcedimentoDescricao[licitacao.tipoProcedimento as TipoProcedimentoLicitacao]}
+          <p className="text-[11px] uppercase text-text-secondary/50">Abertura</p>
+          <p className="font-semibold text-text-secondary">
+            {formatarData(licitacao.dataAbertura)}
+          </p>
         </div>
 
         <div>
-          <span className="font-semibold">Abertura:</span>{" "}
-          {formatarData(licitacao.dataAbertura)}
+          <p className="text-[11px] uppercase text-text-secondary/50">Sessão</p>
+          <p className="font-semibold text-text-secondary">
+            {formatarData(licitacao.dataSessao)}
+          </p>
         </div>
 
         <div>
-          <span className="font-semibold">Processo:</span>{" "}
-          {licitacao.numeroProcesso}
+          <p className="text-[11px] uppercase text-text-secondary/50">Valor</p>
+          <p className="font-semibold text-accent">
+            {licitacao.valorEstimado
+              ? formatarMoeda(licitacao.valorEstimado)
+              : "Não informado"}
+          </p>
         </div>
 
         <div>
-          <span className="font-semibold">Valor estimado:</span>{" "}
-          {licitacao.valorEstimado
-            ? formatarMoeda(licitacao.valorEstimado)
-            : "Não informado"}
-        </div>
-
-        <div>
-          <span className="font-semibold">Status:</span>{" "}
-          <span className={corStatus}>
-            {StatusLicitacaoDescricao[licitacao.status as StatusLicitacao]}
-          </span>
-        </div>
-
-        <div>
-          <span className="font-semibold">Sessão:</span>{" "}
-          {formatarData(licitacao.dataSessao)}
+          <p className="text-[11px] uppercase text-text-secondary/50">Modalidade</p>
+          <p className="font-semibold text-text-secondary truncate">
+            {TipoProcedimentoDescricao[licitacao.tipoProcedimento as TipoProcedimentoLicitacao]}
+          </p>
         </div>
 
       </div>
 
-      {/* Publicação */}
-      <div className="text-xs text-accent-dark italic mt-2 md:absolute md:top-4 md:right-4 md:text-right">
-        <p>
+      {/* FOOTER */}
+      <div className="flex items-center justify-between pt-3 border-t border-border/20">
+
+        <p className="text-xs text-text-secondary/60">
           Publicação: {formatarData(licitacao.dataPublicacao)}
         </p>
-      </div>
 
-      {/* Botão */}
-      <div className="mt-4 flex justify-end md:absolute md:bottom-4 md:right-4">
         <Link
           href={`/licitacoes/${licitacao.id}`}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-text-primary text-sm px-4 py-2 rounded-md transition"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
-          <MdVisibility className="w-4 h-4" />
-          Acessar
+          <MdVisibility size={18} />
+          Ver
         </Link>
+
       </div>
 
     </div>

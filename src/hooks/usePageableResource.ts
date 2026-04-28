@@ -32,7 +32,7 @@ export function usePageableResource<
   const [totalElements, setTotalElements] = useState(0)
 
   const [filtros, setFiltros] = useState<F>(initialFilters)
-  const [ordenacao, setOrdenacao] = useState<string>("")
+  const [ordenacao, setOrdenacao] = useState<string>("dataPublicacao,desc")
 
   const debouncedFiltros = useDebounce(filtros, 500)
 

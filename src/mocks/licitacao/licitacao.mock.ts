@@ -30,9 +30,9 @@ export const listarLicitacoesMock = async (
     )
   }
 
-  if (filtros.tipo) {
+  if (filtros.tipoProcedimento) {
     data = data.filter(item =>
-      item.tipoProcedimento === filtros.tipo
+      item.tipoProcedimento === filtros.tipoProcedimento
     )
   }
 
