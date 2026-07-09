@@ -1,11 +1,11 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
 import { Page } from '@/modules/shared/types/Page'
-import { ContratoLicitacao } from '../contrato.types'
+import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { StatusLicitacao, TipoProcedimentoLicitacao } from '../enums'
 import { DocumentoLicitacao, FiltroLicitacao, LicitacaoDetalhe, LicitacaoResumo } from '../types'
 
-interface LicitacaoCompleta extends LicitacaoDetalhe {
+export interface LicitacaoCompleta extends LicitacaoDetalhe {
   id: number
 }
 
@@ -13,12 +13,6 @@ type ListParams = FiltroLicitacao & {
   page?: number
   size?: number
   sort?: string
-}
-
-function criarErroNaoEncontrado(mensagem: string) {
-  const erro = new Error(mensagem) as Error & { status?: number }
-  erro.status = 404
-  return erro
 }
 
 function gerarDocumentos(quantidade: number): DocumentoLicitacao[] {
@@ -91,65 +85,9 @@ function paraResumo(licitacao: LicitacaoCompleta): LicitacaoResumo {
   }
 }
 
-function gerarContratos(licitacao: LicitacaoCompleta): ContratoLicitacao[] {
-  faker.seed(licitacao.id + 10_000)
-
-  const quantidade = faker.number.int({ min: 0, max: 3 })
-
-  return Array.from({ length: quantidade }, (_, i) => {
-    const dataAssinatura = faker.date.past()
-    const dataInicio = new Date(dataAssinatura)
-    dataInicio.setDate(dataInicio.getDate() + 5)
-    const dataTermino = new Date(dataInicio)
-    dataTermino.setFullYear(dataTermino.getFullYear() + 1)
-
-    return {
-      id: licitacao.id * 100 + i,
-      numeroContrato: faker.number.int({ min: 1, max: 500 }),
-      exercicio: licitacao.ano,
-      fornecedor: faker.company.name().toUpperCase(),
-      dataAssinatura: dataAssinatura.toISOString().split('T')[0],
-      dataPublicacao: dataAssinatura.toISOString().split('T')[0],
-      dataInicio: dataInicio.toISOString().split('T')[0],
-      dataTermino: dataTermino.toISOString().split('T')[0],
-      unidade: licitacao.unidade ?? '',
-      gestorContrato: faker.person.fullName().toUpperCase(),
-      meioPublicacao: 'DIÁRIO OFICIAL DO MUNICÍPIO',
-      valorContrato: Number(faker.commerce.price({ min: 10000, max: 1000000 })),
-      status: faker.helpers.arrayElement(['EM_ANDAMENTO', 'CONCLUIDO', 'RESCINDIDO', 'SUSPENSO']),
-      objeto: licitacao.objeto,
-      numeroLicitacao: `${licitacao.numeroInstrumento}/${licitacao.ano}`
-    }
-  })
-}
-
-function ordenar<T extends Record<string, unknown>>(dados: T[], sort?: string): T[] {
-  if (!sort) return dados
-
-  const [campo, direcao] = sort.split(',')
-  if (!campo) return dados
-
-  return [...dados].sort((a, b) => {
-    const valorA = a[campo] ?? ''
-    const valorB = b[campo] ?? ''
-
-    if (valorA < valorB) return direcao === 'desc' ? 1 : -1
-    if (valorA > valorB) return direcao === 'desc' ? -1 : 1
-    return 0
-  })
-}
-
-function paginar<T>(dados: T[], page = 0, size = 10): Page<T> {
-  const start = page * size
-  const end = start + size
-
-  return {
-    content: dados.slice(start, end),
-    totalPages: Math.ceil(dados.length / size) || 0,
-    totalElements: dados.length,
-    number: page,
-    size
-  }
+// Reaproveitado pelo mock de src/modules/contratos — contratos são um sub-recurso de licitação
+export function buscarLicitacaoMockPorId(id: number): LicitacaoCompleta | undefined {
+  return licitacoes.find(l => l.id === id)
 }
 
 export const licitacaoMock = {
@@ -205,22 +143,9 @@ export const licitacaoMock = {
   },
 
   async buscarPorId(id: number): Promise<LicitacaoDetalhe> {
-    const licitacao = licitacoes.find(l => l.id === id)
+    const licitacao = buscarLicitacaoMockPorId(id)
     if (!licitacao) throw criarErroNaoEncontrado(`Licitação ${id} não encontrada (mock)`)
 
     return licitacao
-  },
-
-  async listarContratos(
-    licitacaoId: number,
-    params: { page?: number; size?: number; sort?: string }
-  ): Promise<Page<ContratoLicitacao>> {
-    const licitacao = licitacoes.find(l => l.id === licitacaoId)
-    if (!licitacao) throw criarErroNaoEncontrado(`Licitação ${licitacaoId} não encontrada (mock)`)
-
-    const { page = 0, size = 10, sort } = params
-    const contratos = ordenar(gerarContratos(licitacao) as unknown as Record<string, unknown>[], sort) as unknown as ContratoLicitacao[]
-
-    return paginar(contratos, page, size)
   }
 }

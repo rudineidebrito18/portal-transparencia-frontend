@@ -1,6 +1,7 @@
 'use client'
 
-import { MdAccessTime, MdBusiness } from 'react-icons/md'
+import Link from 'next/link'
+import { MdAccessTime, MdBusiness, MdVisibility } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
@@ -8,9 +9,10 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
+import { useContratosDaLicitacao } from '@/modules/contratos/hooks/useContratosDaLicitacao'
+import { contratoStatusLabel, contratoStatusStyle } from '@/modules/contratos/status'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
-import { useContratosDaLicitacao } from '../hooks/useContratosDaLicitacao'
 
 interface Props {
   licitacaoId: number
@@ -57,8 +59,8 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
               Contrato {contrato.numeroContrato}/{contrato.exercicio}
             </h4>
 
-            <Badge className="bg-green-100 text-green-700">
-              {contrato.status.replace('_', ' ')}
+            <Badge className={contratoStatusStyle(contrato.status)}>
+              {contratoStatusLabel(contrato.status)}
             </Badge>
           </div>
 
@@ -97,14 +99,24 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
               </div>
             </div>
 
-            {/* VALOR */}
-            <div>
-              <p className="text-[11px] uppercase font-semibold text-text-secondary/50 tracking-wide">
-                Valor Total
-              </p>
-              <p className="text-base font-bold text-accent">
-                {formatarMoeda(contrato.valorContrato)}
-              </p>
+            {/* VALOR + AÇÃO */}
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[11px] uppercase font-semibold text-text-secondary/50 tracking-wide">
+                  Valor Total
+                </p>
+                <p className="text-base font-bold text-accent">
+                  {formatarMoeda(contrato.valorContrato)}
+                </p>
+              </div>
+
+              <Link
+                href={`/contratos/${contrato.id}`}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
+              >
+                <MdVisibility size={18} />
+                Ver
+              </Link>
             </div>
 
           </div>
