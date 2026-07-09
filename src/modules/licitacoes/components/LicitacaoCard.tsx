@@ -30,7 +30,8 @@ export default function LicitacaoCard({ licitacao }: Props) {
   const statusStyle = statusKey ? StatusLicitacaoStyle[statusKey] : "bg-gray-100 text-gray-600"
 
   const tipoLabel =
-    TipoProcedimentoDescricao[licitacao.tipo as TipoProcedimentoLicitacao] || licitacao.tipo
+    TipoProcedimentoDescricao[licitacao.tipoProcedimentoLicitacao as TipoProcedimentoLicitacao] ||
+    licitacao.tipoProcedimentoLicitacao
 
   return (
     <Card className="p-5 flex flex-col gap-4">

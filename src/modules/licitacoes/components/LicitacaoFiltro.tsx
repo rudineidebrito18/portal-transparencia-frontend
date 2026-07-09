@@ -20,7 +20,7 @@ interface Props {
 const initialState: FiltroLicitacao = {
   numeroInstrumento: '',
   numeroProcesso: '',
-  tipo: '',
+  tipoProcedimentoLicitacao: '',
   status: '',
   ano: undefined,
   covid: undefined,
@@ -143,8 +143,8 @@ export default function LicitacaoFiltro({ onFiltrar }: Props) {
                 Modalidade
               </label>
               <select
-                name="tipo"
-                value={filtros.tipo ?? ''}
+                name="tipoProcedimentoLicitacao"
+                value={filtros.tipoProcedimentoLicitacao ?? ''}
                 onChange={handleChange}
                 className={inputClass}
               >

@@ -1,3 +1,14 @@
+export interface Aditivo {
+  id: number
+  dataAssinatura: string
+  objeto: string
+  fornecedorId?: number
+  fornecedorNome?: string
+  fornecedorCnpj?: string
+  caminhoPdf: string
+  contratoLicitacaoId: number
+}
+
 export interface ContratoLicitacao {
   id: number
   numeroContrato: number

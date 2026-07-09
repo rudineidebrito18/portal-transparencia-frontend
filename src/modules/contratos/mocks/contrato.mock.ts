@@ -1,9 +1,10 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
-import { Page } from '@/modules/shared/types/Page'
-import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { buscarLicitacaoMockPorId, LicitacaoCompleta } from '@/modules/licitacoes/mocks/licitacao.mock'
-import { ContratoLicitacao } from '../types'
+import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
+import { Documento } from '@/modules/shared/types/Documento'
+import { Page } from '@/modules/shared/types/Page'
+import { Aditivo, ContratoLicitacao } from '../types'
 
 function gerarContratosDaLicitacao(licitacao: LicitacaoCompleta): ContratoLicitacao[] {
   faker.seed(licitacao.id + 10_000)
@@ -37,6 +38,37 @@ function gerarContratosDaLicitacao(licitacao: LicitacaoCompleta): ContratoLicita
   })
 }
 
+function gerarDocumentosDoContrato(contratoId: number): Documento[] {
+  faker.seed(contratoId + 20_000)
+
+  const tipos = ['Termo de Contrato', 'Ata de Registro de Preços', 'Nota de Empenho']
+  const quantidade = faker.number.int({ min: 1, max: 3 })
+
+  return Array.from({ length: quantidade }, (_, i) => ({
+    id: contratoId * 10 + i,
+    assunto: faker.lorem.sentence(4),
+    tipoDocumento: faker.helpers.arrayElement(tipos),
+    dataEnvio: faker.date.past().toISOString().split('T')[0],
+    caminhoPdf: `/documentos/contratos/${contratoId}/documento_${i + 1}.pdf`
+  }))
+}
+
+function gerarAditivosDoContrato(contratoId: number): Aditivo[] {
+  faker.seed(contratoId + 30_000)
+
+  const quantidade = faker.helpers.maybe(() => faker.number.int({ min: 1, max: 2 }), { probability: 0.3 }) ?? 0
+
+  return Array.from({ length: quantidade }, (_, i) => ({
+    id: contratoId * 10 + i,
+    dataAssinatura: faker.date.past().toISOString().split('T')[0],
+    objeto: 'Termo aditivo de acréscimo de valor e prorrogação de prazo.',
+    fornecedorNome: faker.company.name().toUpperCase(),
+    fornecedorCnpj: faker.string.numeric(14),
+    caminhoPdf: `/documentos/contratos/${contratoId}/aditivo_${i + 1}.pdf`,
+    contratoLicitacaoId: contratoId
+  }))
+}
+
 export const contratoMock = {
   async buscarPorId(id: number): Promise<ContratoLicitacao> {
     const licitacaoId = Math.floor(id / 100)
@@ -63,5 +95,13 @@ export const contratoMock = {
     ) as unknown as ContratoLicitacao[]
 
     return paginar(contratos, page, size)
+  },
+
+  async listarDocumentos(contratoId: number): Promise<Documento[]> {
+    return gerarDocumentosDoContrato(contratoId)
+  },
+
+  async listarAditivos(contratoId: number): Promise<Aditivo[]> {
+    return gerarAditivosDoContrato(contratoId)
   }
 }

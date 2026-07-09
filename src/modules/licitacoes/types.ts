@@ -1,20 +1,15 @@
+import { Documento } from '@/modules/shared/types/Documento'
+
 export interface LicitacaoResumo {
   id: number
   numeroInstrumento: string
   ano: number
   dataAbertura: string
-  tipo: string
+  tipoProcedimentoLicitacao: string
   statusDescricao: string
   valorTotalDespesa?: number
   unidade?: string
   objeto: string
-}
-
-export interface DocumentoLicitacao {
-  assunto: string
-  tipoDocumento: string
-  dataEnvio: string
-  caminhoPdf: string
 }
 
 export interface LicitacaoDetalhe {
@@ -42,14 +37,14 @@ export interface LicitacaoDetalhe {
   lei?: string
   covid: boolean
   objeto: string
-  documentos?: DocumentoLicitacao[]
+  documentos?: Documento[]
 }
 
 export interface FiltroLicitacao {
   numeroInstrumento?: string
   numeroProcesso?: string
   ano?: number
-  tipo?: string
+  tipoProcedimentoLicitacao?: string
   nomeAutoridade?: string
   status?: string
   unidade?: string

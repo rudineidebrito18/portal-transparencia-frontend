@@ -1,25 +1,26 @@
 import { MdDescription, MdFileDownload } from 'react-icons/md'
 
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
+import { Documento } from '@/modules/shared/types/Documento'
 import { formatarData } from '@/utils/date'
-import { DocumentoLicitacao } from '../types'
+import Card from './Card'
+import EmptyState from './EmptyState'
 
 interface Props {
-  documentos?: DocumentoLicitacao[]
+  documentos?: Documento[]
+  emptyMessage?: string
 }
 
-export default function LicitacaoDocumentos({ documentos }: Props) {
+export default function DocumentList({ documentos, emptyMessage = 'Nenhum documento disponível.' }: Props) {
 
   if (!documentos?.length) {
-    return <EmptyState message="Nenhum documento disponível." />
+    return <EmptyState message={emptyMessage} />
   }
 
   return (
     <div className="space-y-3">
 
-      {documentos.map((doc, i) => (
-        <Card key={i} className="flex items-center justify-between gap-4 p-4">
+      {documentos.map((doc) => (
+        <Card key={doc.id} className="flex items-center justify-between gap-4 p-4">
 
           {/* INFO */}
           <div className="flex items-start gap-3">

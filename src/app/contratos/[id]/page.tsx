@@ -22,6 +22,11 @@ export default async function ContratoPage({
     throw error
   }
 
+  const [documentos, aditivos] = await Promise.all([
+    contratoService.listarDocumentos(numericId),
+    contratoService.listarAditivos(numericId)
+  ])
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <Breadcrumbs
@@ -38,7 +43,7 @@ export default async function ContratoPage({
         <div className="h-1.5 w-16 bg-secondary mt-2 rounded-full" />
       </div>
 
-      <ContratoDetalhe contrato={contrato} />
+      <ContratoDetalhe contrato={contrato} documentos={documentos} aditivos={aditivos} />
     </div>
   )
 }

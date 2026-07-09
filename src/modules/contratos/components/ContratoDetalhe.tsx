@@ -1,25 +1,33 @@
 import {
   MdAccountBalance,
+  MdAssignment,
   MdAttachMoney,
   MdBusiness,
   MdCalendarToday,
   MdDescription,
+  MdFileDownload,
   MdGavel,
   MdPerson
 } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
+import Card from '@/components/ui/Card'
+import DocumentList from '@/components/ui/DocumentList'
+import EmptyState from '@/components/ui/EmptyState'
 import InfoBlock from '@/components/ui/InfoBlock'
+import { Documento } from '@/modules/shared/types/Documento'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
 import { contratoStatusLabel, contratoStatusStyle } from '../status'
-import { ContratoLicitacao } from '../types'
+import { Aditivo, ContratoLicitacao } from '../types'
 
 interface Props {
   contrato: ContratoLicitacao
+  documentos: Documento[]
+  aditivos: Aditivo[]
 }
 
-export default function ContratoDetalhe({ contrato }: Props) {
+export default function ContratoDetalhe({ contrato, documentos, aditivos }: Props) {
   return (
     <div className="bg-light border border-border/30 rounded-2xl shadow-md overflow-hidden mb-10">
 
@@ -70,7 +78,7 @@ export default function ContratoDetalhe({ contrato }: Props) {
         </div>
 
         {/* OBJETO */}
-        <div>
+        <div className="mb-10">
           <h3 className="font-bold text-primary uppercase text-sm tracking-wider mb-3 flex items-center gap-2">
             <MdDescription /> Objeto do Contrato
           </h3>
@@ -80,6 +88,51 @@ export default function ContratoDetalhe({ contrato }: Props) {
               {contrato.objeto}
             </p>
           </div>
+        </div>
+
+        {/* DOCUMENTOS */}
+        <div className="mb-10">
+          <h3 className="font-bold text-primary uppercase text-sm tracking-wider mb-3 flex items-center gap-2">
+            <MdDescription /> Documentos do Contrato
+          </h3>
+
+          <DocumentList documentos={documentos} emptyMessage="Nenhum documento disponível." />
+        </div>
+
+        {/* ADITIVOS */}
+        <div>
+          <h3 className="font-bold text-primary uppercase text-sm tracking-wider mb-3 flex items-center gap-2">
+            <MdAssignment /> Aditivos
+          </h3>
+
+          {aditivos.length === 0 ? (
+            <EmptyState message="Nenhum aditivo registrado." />
+          ) : (
+            <div className="space-y-3">
+              {aditivos.map(aditivo => (
+                <Card key={aditivo.id} className="flex items-center justify-between gap-4 p-4">
+                  <div className="overflow-hidden">
+                    <p className="text-sm font-semibold text-text-secondary">
+                      {aditivo.objeto}
+                    </p>
+                    <p className="text-xs text-text-secondary/70">
+                      {aditivo.fornecedorNome ?? '-'} • {formatarData(aditivo.dataAssinatura)}
+                    </p>
+                  </div>
+
+                  <a
+                    href={aditivo.caminhoPdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
+                  >
+                    <MdFileDownload size={18} />
+                    Baixar
+                  </a>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>

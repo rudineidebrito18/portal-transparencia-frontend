@@ -1,9 +1,10 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
-import { Page } from '@/modules/shared/types/Page'
 import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
+import { Documento } from '@/modules/shared/types/Documento'
+import { Page } from '@/modules/shared/types/Page'
 import { StatusLicitacao, TipoProcedimentoLicitacao } from '../enums'
-import { DocumentoLicitacao, FiltroLicitacao, LicitacaoDetalhe, LicitacaoResumo } from '../types'
+import { FiltroLicitacao, LicitacaoDetalhe, LicitacaoResumo } from '../types'
 
 export interface LicitacaoCompleta extends LicitacaoDetalhe {
   id: number
@@ -15,7 +16,7 @@ type ListParams = FiltroLicitacao & {
   sort?: string
 }
 
-function gerarDocumentos(quantidade: number): DocumentoLicitacao[] {
+function gerarDocumentos(licitacaoId: number, quantidade: number): Documento[] {
   const tipos = ['Edital', 'Anexo', 'Ata de Reunião', 'Termo de Referência', 'Homologação']
   const assuntos = [
     'Documentação técnica para análise',
@@ -26,6 +27,7 @@ function gerarDocumentos(quantidade: number): DocumentoLicitacao[] {
   ]
 
   return Array.from({ length: quantidade }, (_, i) => ({
+    id: licitacaoId * 100 + i,
     assunto: faker.helpers.arrayElement(assuntos),
     tipoDocumento: faker.helpers.arrayElement(tipos),
     dataEnvio: faker.date.recent().toISOString().split('T')[0],
@@ -64,7 +66,7 @@ function gerarLicitacao(id: number): LicitacaoCompleta {
     lei: 'Lei 14.133/2021',
     covid: faker.datatype.boolean({ probability: 0.1 }),
     objeto: faker.lorem.paragraph(1),
-    documentos: gerarDocumentos(3)
+    documentos: gerarDocumentos(id, 3)
   }
 }
 
@@ -77,7 +79,7 @@ function paraResumo(licitacao: LicitacaoCompleta): LicitacaoResumo {
     numeroInstrumento: licitacao.numeroInstrumento,
     ano: licitacao.ano,
     dataAbertura: licitacao.dataAbertura,
-    tipo: licitacao.tipoProcedimentoLicitacao,
+    tipoProcedimentoLicitacao: licitacao.tipoProcedimentoLicitacao,
     statusDescricao: licitacao.status,
     valorTotalDespesa: licitacao.valorEstimado,
     unidade: licitacao.unidade,
@@ -102,8 +104,8 @@ export const licitacaoMock = {
     if (filtros.numeroProcesso) {
       dados = dados.filter(l => l.numeroProcesso.includes(String(filtros.numeroProcesso)))
     }
-    if (filtros.tipo) {
-      dados = dados.filter(l => l.tipoProcedimentoLicitacao === filtros.tipo)
+    if (filtros.tipoProcedimentoLicitacao) {
+      dados = dados.filter(l => l.tipoProcedimentoLicitacao === filtros.tipoProcedimentoLicitacao)
     }
     if (filtros.status) {
       dados = dados.filter(l => l.status === filtros.status)

@@ -13,6 +13,7 @@ import {
 } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
+import DocumentList from '@/components/ui/DocumentList'
 import InfoBlock from '@/components/ui/InfoBlock'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
@@ -25,7 +26,6 @@ import {
 } from '../enums'
 import { LicitacaoDetalhe as LicitacaoDetalheType } from '../types'
 import LicitacaoContratos from './LicitacaoContratos'
-import LicitacaoDocumentos from './LicitacaoDocumentos'
 
 interface Props {
   id: number
@@ -164,7 +164,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
 
             {/* DOCUMENTOS */}
             <div className="pt-6 border-t border-border/20">
-              <LicitacaoDocumentos documentos={licitacao.documentos} />
+              <DocumentList documentos={licitacao.documentos} />
             </div>
 
           </div>
