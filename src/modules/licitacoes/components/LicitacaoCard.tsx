@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { MdVisibility } from "react-icons/md"
 
+import Badge from "@/components/ui/Badge"
+import Card from "@/components/ui/Card"
 import { formatarMoeda } from "@/utils/currency"
 import { formatarData } from "@/utils/date"
 
@@ -31,7 +33,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
     TipoProcedimentoDescricao[licitacao.tipo as TipoProcedimentoLicitacao] || licitacao.tipo
 
   return (
-    <div className="bg-white border border-border/30 rounded-xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all relative flex flex-col gap-4">
+    <Card className="p-5 flex flex-col gap-4">
 
       {/* HEADER */}
       <div className="flex justify-between items-start gap-3">
@@ -39,9 +41,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
           {tipoLabel} {licitacao.numeroInstrumento}/{licitacao.ano}
         </h2>
 
-        <span className={`text-[11px] px-3 py-1 rounded-full font-semibold uppercase tracking-wide whitespace-nowrap ${statusStyle}`}>
-          {statusLabel}
-        </span>
+        <Badge className={statusStyle}>{statusLabel}</Badge>
       </div>
 
       {/* OBJETO */}
@@ -86,6 +86,6 @@ export default function LicitacaoCard({ licitacao }: Props) {
         </Link>
       </div>
 
-    </div>
+    </Card>
   )
 }

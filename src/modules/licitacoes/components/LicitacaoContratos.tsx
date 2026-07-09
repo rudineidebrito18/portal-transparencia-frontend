@@ -2,6 +2,12 @@
 
 import { MdAccessTime, MdBusiness } from 'react-icons/md'
 
+import Badge from '@/components/ui/Badge'
+import Card from '@/components/ui/Card'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
+import Skeleton from '@/components/ui/Skeleton'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
 import { useContratosDaLicitacao } from '../hooks/useContratosDaLicitacao'
@@ -24,28 +30,18 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
     return (
       <div className="space-y-4">
         {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="h-32 bg-neutral-light animate-pulse rounded-xl border border-border/30" />
+          <Skeleton key={i} className="h-32" />
         ))}
       </div>
     )
   }
 
   if (erro) {
-    return (
-      <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-4 rounded-xl">
-        {erro}
-      </div>
-    )
+    return <ErrorState message={erro} />
   }
 
   if (contratos.length === 0) {
-    return (
-      <div className="bg-white border border-border/30 rounded-xl p-8 text-center shadow-sm">
-        <p className="text-sm text-text-secondary">
-          Nenhum contrato associado encontrado.
-        </p>
-      </div>
-    )
+    return <EmptyState message="Nenhum contrato associado encontrado." />
   }
 
   return (
@@ -53,10 +49,7 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
 
       {contratos.map((contrato) => (
 
-        <div
-          key={contrato.id}
-          className="bg-white border border-border/30 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
-        >
+        <Card key={contrato.id}>
 
           {/* HEADER */}
           <div className="flex items-center justify-between px-5 py-3 border-b border-border/20 bg-neutral-light/40 rounded-t-xl">
@@ -64,9 +57,9 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
               Contrato {contrato.numeroContrato}/{contrato.exercicio}
             </h4>
 
-            <span className="text-[11px] px-3 py-1 rounded-full font-semibold uppercase tracking-wide bg-green-100 text-green-700">
+            <Badge className="bg-green-100 text-green-700">
               {contrato.status.replace('_', ' ')}
-            </span>
+            </Badge>
           </div>
 
           {/* BODY */}
@@ -115,34 +108,12 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
             </div>
 
           </div>
-        </div>
+        </Card>
 
       ))}
 
       {/* PAGINAÇÃO */}
-      {totalPaginas > 1 && (
-        <div className="flex items-center justify-between gap-4 pt-2">
-          <button
-            onClick={() => setPagina(pagina - 1)}
-            disabled={pagina === 0}
-            className="px-3 py-2 rounded-lg border border-border/30 text-sm font-medium hover:bg-neutral-light disabled:opacity-40 transition"
-          >
-            Anterior
-          </button>
-
-          <span className="text-sm text-text-secondary">
-            Página <strong>{pagina + 1}</strong> de <strong>{totalPaginas}</strong>
-          </span>
-
-          <button
-            onClick={() => setPagina(pagina + 1)}
-            disabled={pagina + 1 >= totalPaginas}
-            className="px-3 py-2 rounded-lg border border-border/30 text-sm font-medium hover:bg-neutral-light disabled:opacity-40 transition"
-          >
-            Próxima
-          </button>
-        </div>
-      )}
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
 
     </div>
   )

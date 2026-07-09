@@ -1,4 +1,5 @@
 import Breadcrumbs from '@/components/Breadcrumbs'
+import Skeleton from '@/components/ui/Skeleton'
 
 export default function LoadingLicitacoes() {
   return (
@@ -15,10 +16,7 @@ export default function LoadingLicitacoes() {
 
       <div className="grid gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-28 bg-neutral-light animate-pulse rounded-xl border border-border/30"
-          />
+          <Skeleton key={i} />
         ))}
       </div>
     </div>

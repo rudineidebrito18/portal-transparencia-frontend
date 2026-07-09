@@ -12,6 +12,8 @@ import {
   MdInfoOutline
 } from 'react-icons/md'
 
+import Badge from '@/components/ui/Badge'
+import InfoBlock from '@/components/ui/InfoBlock'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
 import {
@@ -32,12 +34,6 @@ interface Props {
 
 type TabType = 'dados' | 'contratos'
 
-interface InfoBlockProps {
-  label: string
-  value?: string | number
-  icon?: React.ComponentType<{ size: number }>
-}
-
 export default function LicitacaoDetalhe({ id, licitacao }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>('dados')
 
@@ -51,24 +47,6 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
   const tipoLabel =
     TipoProcedimentoDescricao[licitacao.tipoProcedimentoLicitacao as TipoProcedimentoLicitacao] ||
     licitacao.tipoProcedimentoLicitacao
-
-  const InfoBlock = ({ label, value, icon: Icon }: InfoBlockProps) => (
-    <div className="flex items-start gap-3 p-4 rounded-xl border border-border/30 bg-white hover:shadow-md hover:-translate-y-0.5 transition-all">
-      {Icon && (
-        <div className="p-2 rounded-lg bg-primary/10 text-primary">
-          <Icon size={18} />
-        </div>
-      )}
-      <div className="overflow-hidden">
-        <p className="text-[11px] uppercase font-semibold text-text-secondary/50 tracking-wide">
-          {label}
-        </p>
-        <p className="text-sm font-bold text-text-secondary truncate">
-          {value || '-'}
-        </p>
-      </div>
-    </div>
-  )
 
   return (
     <div className="bg-light border border-border/30 rounded-2xl shadow-md overflow-hidden mb-10">
@@ -95,9 +73,9 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
             </h1>
           </div>
 
-          <div className={`self-start px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${statusStyle}`}>
+          <Badge size="md" className={`self-start ${statusStyle}`}>
             {statusLabel}
-          </div>
+          </Badge>
         </div>
       </div>
 
