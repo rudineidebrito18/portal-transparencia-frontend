@@ -1,25 +1,34 @@
-import { StatusLicitacao } from "../enums/StatusLicitacao"
-import { TipoProcedimentoLicitacao } from "../enums/TipoProcedimentoLicitacao"
-import { ContratoLicitacao } from "./ContratoLicitacao"
-import { DocumentoLicitacao } from "./DocumentoLicitacao"
-
-export interface Licitacao {
+export interface LicitacaoResumo {
   id: number
+  numeroInstrumento: string
+  ano: number
+  dataAbertura: string
+  tipo: string
+  statusDescricao: string
+  valorTotalDespesa?: number
+  unidade?: string
+  objeto: string
+}
 
+export interface DocumentoLicitacao {
+  assunto: string
+  tipoDocumento: string
+  dataEnvio: string
+  caminhoPdf: string
+}
+
+export interface LicitacaoDetalhe {
   numeroInstrumento: string
   ano: number
   numeroProcesso: string
-
   dataPublicacao: string
   dataSessao: string
   dataAbertura: string
   dataHomologacao?: string
-
   valorEstimado?: number
   valorAdjudicado?: number
   valorDotacao?: number
-
-  tipoProcedimento: string
+  tipoProcedimentoLicitacao: string
   status: string
   tipoCriterio?: string
   regimeExecucao?: string
@@ -31,31 +40,22 @@ export interface Licitacao {
   nomeAutoridade?: string
   sistemaEletronico?: string
   lei?: string
-
   covid: boolean
   objeto: string
-
   documentos?: DocumentoLicitacao[]
-  contratos?: ContratoLicitacao[]
 }
 
 export interface FiltroLicitacao {
-  [key: string]: unknown
-
   numeroInstrumento?: string
   numeroProcesso?: string
-  objeto?: string
   ano?: number
-  tipo?: TipoProcedimentoLicitacao | string
-  status?: StatusLicitacao | string
+  tipo?: string
   nomeAutoridade?: string
+  status?: string
   unidade?: string
   covid?: boolean
-
-  dataInicio?: string
-  dataFim?: string
+  dataAberturaInicio?: string
+  dataAberturaFim?: string
   dataPublicacaoInicio?: string
   dataPublicacaoFim?: string
-
-  busca?: string
 }

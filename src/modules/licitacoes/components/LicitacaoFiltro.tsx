@@ -10,12 +10,8 @@ import {
   MdSearch
 } from 'react-icons/md'
 
-import { StatusLicitacao, StatusLicitacaoDescricao } from '@/interfaces/enums/StatusLicitacao'
-import {
-  TipoProcedimentoDescricao,
-  TipoProcedimentoLicitacao
-} from '@/interfaces/enums/TipoProcedimentoLicitacao'
-import { FiltroLicitacao } from '@/interfaces/licitacao/Licitacao'
+import { StatusLicitacao, StatusLicitacaoDescricao, TipoProcedimentoDescricao, TipoProcedimentoLicitacao } from '../enums'
+import { FiltroLicitacao } from '../types'
 
 interface Props {
   onFiltrar: (filtros: FiltroLicitacao) => void
@@ -23,13 +19,15 @@ interface Props {
 
 const initialState: FiltroLicitacao = {
   numeroInstrumento: '',
-  objeto: '',
-  tipoProcedimento: '',
+  numeroProcesso: '',
+  tipo: '',
   status: '',
   ano: undefined,
   covid: undefined,
-  dataInicio: '',
-  dataFim: ''
+  dataAberturaInicio: '',
+  dataAberturaFim: '',
+  dataPublicacaoInicio: '',
+  dataPublicacaoFim: ''
 }
 
 const anoAtual = new Date().getFullYear()
@@ -124,18 +122,18 @@ export default function LicitacaoFiltro({ onFiltrar }: Props) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
-            {/* OBJETO */}
+            {/* NÚMERO DO PROCESSO */}
             <div className="md:col-span-2">
               <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
-                Objeto
+                Número do Processo
               </label>
               <input
-                name="objeto"
-                value={filtros.objeto ?? ''}
+                name="numeroProcesso"
+                value={filtros.numeroProcesso ?? ''}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
                 className={inputClass}
-                placeholder="Ex: Merenda, Obras, Software..."
+                placeholder="Ex: 456/2025"
               />
             </div>
 
@@ -145,8 +143,8 @@ export default function LicitacaoFiltro({ onFiltrar }: Props) {
                 Modalidade
               </label>
               <select
-                name="tipoProcedimento"
-                value={(filtros.tipoProcedimento ?? '') as string}
+                name="tipo"
+                value={filtros.tipo ?? ''}
                 onChange={handleChange}
                 className={inputClass}
               >
@@ -215,16 +213,16 @@ export default function LicitacaoFiltro({ onFiltrar }: Props) {
               </div>
             </div>
 
-            {/* DATAS */}
+            {/* DATAS DE ABERTURA */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
-                  Início
+                  Abertura (início)
                 </label>
                 <input
                   type="date"
-                  name="dataInicio"
-                  value={filtros.dataInicio ?? ''}
+                  name="dataAberturaInicio"
+                  value={filtros.dataAberturaInicio ?? ''}
                   onChange={handleChange}
                   className={inputClass}
                 />
@@ -232,12 +230,41 @@ export default function LicitacaoFiltro({ onFiltrar }: Props) {
 
               <div>
                 <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
-                  Fim
+                  Abertura (fim)
                 </label>
                 <input
                   type="date"
-                  name="dataFim"
-                  value={filtros.dataFim ?? ''}
+                  name="dataAberturaFim"
+                  value={filtros.dataAberturaFim ?? ''}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {/* DATAS DE PUBLICAÇÃO */}
+            <div className="lg:col-span-2 grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                  Publicação (início)
+                </label>
+                <input
+                  type="date"
+                  name="dataPublicacaoInicio"
+                  value={filtros.dataPublicacaoInicio ?? ''}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                  Publicação (fim)
+                </label>
+                <input
+                  type="date"
+                  name="dataPublicacaoFim"
+                  value={filtros.dataPublicacaoFim ?? ''}
                   onChange={handleChange}
                   className={inputClass}
                 />

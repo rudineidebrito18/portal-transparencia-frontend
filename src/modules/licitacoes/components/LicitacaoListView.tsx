@@ -1,15 +1,12 @@
 'use client'
 
-import { usePageableResource } from '@/hooks/usePageableResource'
-import { listarLicitacoes } from '@/services/licitacao.service'
-
-import { FiltroLicitacao, Licitacao } from '@/interfaces/licitacao/Licitacao'
-
 import { MdSwapVert } from 'react-icons/md'
+
+import { useLicitacoes } from '../hooks/useLicitacoes'
 import LicitacaoCard from './LicitacaoCard'
 import LicitacaoFiltro from './LicitacaoFiltro'
 
-export default function LicitacaoFiltroClient() {
+export default function LicitacaoListView() {
   const {
     data: licitacoes,
     loading,
@@ -21,12 +18,9 @@ export default function LicitacaoFiltroClient() {
     setFiltros,
     setOrdenacao,
     ordenacao
-  } = usePageableResource<Licitacao, FiltroLicitacao>({
-    fetchFunction: listarLicitacoes,
-    size: 10
-  })
+  } = useLicitacoes()
 
-  function handleFiltrar(novosFiltros: FiltroLicitacao) {
+  function handleFiltrar(novosFiltros: Parameters<typeof setFiltros>[0]) {
     setFiltros(novosFiltros)
     setPagina(0)
   }
@@ -35,7 +29,6 @@ export default function LicitacaoFiltroClient() {
     setPagina(novaPagina)
   }
 
-  // 🔥 GERA PAGINAÇÃO INTELIGENTE
   function gerarPaginas() {
     const paginas: (number | string)[] = []
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { Page } from '@/types/Page'
+import { Page } from '@/modules/shared/types/Page'
 import { useEffect, useState } from 'react'
 import { useDebounce } from './useDebounce'
 
@@ -16,7 +16,7 @@ type UsePageableResourceProps<T, F> = {
 
 export function usePageableResource<
   T,
-  F extends Record<string, unknown> = Record<string, never>
+  F extends object = Record<string, never>
 >({
   fetchFunction,
   initialFilters = {} as F,

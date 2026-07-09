@@ -1,7 +1,6 @@
 import Breadcrumbs from '@/components/Breadcrumbs'
-import LicitacaoListView from '@/modules/licitacoes/components/LicitacaoListView'
 
-export default function Licitacoes() {
+export default function LoadingLicitacoes() {
   return (
     <div className="max-w-6xl mx-auto p-2">
       <Breadcrumbs
@@ -14,7 +13,14 @@ export default function Licitacoes() {
 
       <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
 
-      <LicitacaoListView />
+      <div className="grid gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-28 bg-neutral-light animate-pulse rounded-xl border border-border/30"
+          />
+        ))}
+      </div>
     </div>
   )
 }

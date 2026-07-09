@@ -1,10 +1,5 @@
 'use client'
 
-import { StatusLicitacao, StatusLicitacaoDescricao } from '@/interfaces/enums/StatusLicitacao'
-import { TipoProcedimentoDescricao, TipoProcedimentoLicitacao } from '@/interfaces/enums/TipoProcedimentoLicitacao'
-import { Licitacao } from '@/interfaces/licitacao/Licitacao'
-import { formatarMoeda } from '@/utils/currency'
-import { formatarData } from '@/utils/date'
 import { useState } from 'react'
 import {
   MdAccountBalance,
@@ -16,11 +11,23 @@ import {
   MdGavel,
   MdInfoOutline
 } from 'react-icons/md'
+
+import { formatarMoeda } from '@/utils/currency'
+import { formatarData } from '@/utils/date'
+import {
+  StatusLicitacao,
+  StatusLicitacaoDescricao,
+  StatusLicitacaoStyle,
+  TipoProcedimentoDescricao,
+  TipoProcedimentoLicitacao
+} from '../enums'
+import { LicitacaoDetalhe as LicitacaoDetalheType } from '../types'
 import LicitacaoContratos from './LicitacaoContratos'
 import LicitacaoDocumentos from './LicitacaoDocumentos'
 
 interface Props {
-  licitacao: Licitacao
+  id: number
+  licitacao: LicitacaoDetalheType
 }
 
 type TabType = 'dados' | 'contratos'
@@ -31,11 +38,19 @@ interface InfoBlockProps {
   icon?: React.ComponentType<{ size: number }>
 }
 
-export default function LicitacaoDetalhe({ licitacao }: Props) {
+export default function LicitacaoDetalhe({ id, licitacao }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>('dados')
 
   const formatarValor = (valor?: number) =>
     valor != null ? formatarMoeda(valor) : 'R$ 0,00'
+
+  const statusKey = licitacao.status as StatusLicitacao
+  const statusLabel = StatusLicitacaoDescricao[statusKey] ?? licitacao.status
+  const statusStyle = StatusLicitacaoStyle[statusKey] ?? 'bg-gray-100 text-gray-600'
+
+  const tipoLabel =
+    TipoProcedimentoDescricao[licitacao.tipoProcedimentoLicitacao as TipoProcedimentoLicitacao] ||
+    licitacao.tipoProcedimentoLicitacao
 
   const InfoBlock = ({ label, value, icon: Icon }: InfoBlockProps) => (
     <div className="flex items-start gap-3 p-4 rounded-xl border border-border/30 bg-white hover:shadow-md hover:-translate-y-0.5 transition-all">
@@ -65,7 +80,7 @@ export default function LicitacaoDetalhe({ licitacao }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="text-xs font-bold uppercase bg-primary text-white px-2 py-1 rounded">
-                {TipoProcedimentoDescricao[licitacao.tipoProcedimento as TipoProcedimentoLicitacao] || licitacao.tipoProcedimento}
+                {tipoLabel}
               </span>
 
               {licitacao.covid && (
@@ -80,14 +95,8 @@ export default function LicitacaoDetalhe({ licitacao }: Props) {
             </h1>
           </div>
 
-          <div
-            className={`self-start px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm
-            ${licitacao.status === 'ABERTA'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-yellow-100 text-yellow-700'
-              }`}
-          >
-            {StatusLicitacaoDescricao[licitacao.status as StatusLicitacao] || licitacao.status}
+          <div className={`self-start px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${statusStyle}`}>
+            {statusLabel}
           </div>
         </div>
       </div>
@@ -114,11 +123,6 @@ export default function LicitacaoDetalhe({ licitacao }: Props) {
             }`}
         >
           Contratos
-          {licitacao.contratos && licitacao.contratos.length > 0 && (
-            <span className="bg-white/20 px-2 py-0.5 text-xs rounded-full">
-              {licitacao.contratos.length}
-            </span>
-          )}
         </button>
       </div>
 
@@ -206,7 +210,7 @@ export default function LicitacaoDetalhe({ licitacao }: Props) {
               </div>
             </div>
 
-            <LicitacaoContratos contratos={licitacao.contratos} />
+            <LicitacaoContratos licitacaoId={id} />
           </div>
         )}
 

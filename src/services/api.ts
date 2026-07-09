@@ -1,12 +1,23 @@
 import axios from "axios";
 
+// No navegador, usa caminho relativo (mesma origem do Next.js) para evitar CORS —
+// next.config.ts reescreve /api/* pro backend real. No servidor (SSR/Server Components),
+// chama o backend diretamente, já que não há política de CORS entre servidores.
+const baseURL = typeof window === "undefined"
+  ? process.env.NEXT_PUBLIC_API_URL
+  : "/api";
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json"
   }
 });
+
+export interface ApiError extends Error {
+  status?: number;
+}
 
 api.interceptors.response.use(
   (response) => response,
@@ -18,6 +29,9 @@ api.interceptors.response.use(
 
     console.error("API ERROR:", message);
 
-    return Promise.reject(new Error(message));
+    const apiError: ApiError = new Error(message);
+    apiError.status = error.response?.status;
+
+    return Promise.reject(apiError);
   }
 );
