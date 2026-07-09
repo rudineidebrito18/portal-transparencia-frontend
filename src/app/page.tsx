@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 
-import Hero from "@/components/Hero";
 import AccessCardSection from "@/components/SectionCardGrid";
 import Skeleton from "@/components/ui/Skeleton";
 import DiarioOficialDestaque from "@/modules/home/components/DiarioOficialDestaque";
@@ -19,12 +18,6 @@ import {
 export default function HomePage() {
    return (
     <div className="bg-[--color-neutral] min-h-screen flex flex-col">
-      <Hero
-        title="Portal da Transparência"
-        subtitle="Acompanhe os gastos, receitas e licitações da gestão pública"
-        backgroundUrl="/banner-transparencia.jpg"
-      />
-
       <main className="flex-1">
         <AccessCardSection
           title="Licitações e Contratos"
