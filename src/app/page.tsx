@@ -1,5 +1,11 @@
+import { Suspense } from "react";
+
 import Hero from "@/components/Hero";
 import AccessCardSection from "@/components/SectionCardGrid";
+import Skeleton from "@/components/ui/Skeleton";
+import DiarioOficialDestaque from "@/modules/home/components/DiarioOficialDestaque";
+import LicitacoesRecentes from "@/modules/home/components/LicitacoesRecentes";
+import NoticiasDestaque from "@/modules/home/components/NoticiasDestaque";
 import {
   MdAccountCircle,
   MdArticle,
@@ -39,6 +45,24 @@ export default function HomePage() {
             { title: 'Avisos', icon: <MdCampaign />, href: '/avisos' },
           ]}
         />
+
+        <div className="bg-white">
+          <Suspense fallback={<div className="max-w-6xl mx-auto px-4 py-10"><Skeleton className="h-80" /></div>}>
+            <NoticiasDestaque />
+          </Suspense>
+        </div>
+
+        <div className="bg-neutral-light">
+          <Suspense fallback={<div className="max-w-6xl mx-auto px-4 py-10"><Skeleton className="h-64" /></div>}>
+            <DiarioOficialDestaque />
+          </Suspense>
+        </div>
+
+        <div className="bg-white">
+          <Suspense fallback={<div className="max-w-6xl mx-auto px-4 py-10"><Skeleton className="h-64" /></div>}>
+            <LicitacoesRecentes />
+          </Suspense>
+        </div>
 
         {/* Destaques ou bloco informativo */}
         <section className="mt-6 py-12 bg-primary text-white text-center">
