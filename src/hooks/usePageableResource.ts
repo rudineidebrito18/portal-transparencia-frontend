@@ -11,6 +11,7 @@ type UsePageableResourceProps<T, F> = {
     sort?: string
   }) => Promise<Page<T>>
   initialFilters?: F
+  initialSort?: string
   size?: number
 }
 
@@ -20,6 +21,7 @@ export function usePageableResource<
 >({
   fetchFunction,
   initialFilters = {} as F,
+  initialSort = "dataPublicacao,desc",
   size = 10
 }: UsePageableResourceProps<T, F>) {
 
@@ -32,7 +34,7 @@ export function usePageableResource<
   const [totalElements, setTotalElements] = useState(0)
 
   const [filtros, setFiltros] = useState<F>(initialFilters)
-  const [ordenacao, setOrdenacao] = useState<string>("dataPublicacao,desc")
+  const [ordenacao, setOrdenacao] = useState<string>(initialSort)
 
   const debouncedFiltros = useDebounce(filtros, 500)
 

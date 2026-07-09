@@ -130,36 +130,37 @@ export default function Header() {
           {/* Nav */}
           <nav className="bg-primary text-light text-sm shadow">
             <ul className={`flex flex-col lg:flex-row flex-wrap gap-2 md:gap-2 justify-center items-center ${menuOpen ? 'flex' : 'hidden lg:flex'}`}>
-              <Link className="px-4 py-2 hover:bg-secondary" href="/"><MdHome /></Link>
+              <Link className="px-4 py-2 hover:bg-secondary" href="/" onClick={() => setMenuOpen(false)}><MdHome /></Link>
 
               <DropdownMenuItem label="A PREFEITURA">
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Gabinete do Prefeito</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Controladoria</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Procuradoria</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Gabinete do Prefeito</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Controladoria</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Procuradoria</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="O MUNICÍPIO">
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">História</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Símbolos</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>História</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Símbolos</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="SECRETARIAS">
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Saúde</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Educação</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Saúde</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Educação</Link>
               </DropdownMenuItem>
 
-              <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer">DIÁRIO OFICIAL</Link>
-              <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer">SERVIÇOS</Link>
-              <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer">TRANSPARÊNCIA</Link>
+              <Link href="/diario-oficial" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>DIÁRIO OFICIAL</Link>
+              <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>SERVIÇOS</Link>
+              <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer" onTouchEnd={() => setMenuOpen(false)}>TRANSPARÊNCIA</Link>
 
               <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Relatórios</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Prestação de Contas</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Relatórios</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Prestação de Contas</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="PUBLICAÇÕES">
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Notícias</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block">Editais</Link>
+                <Link href="/noticias" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Notícias</Link>
+                <Link href="/avisos" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Avisos</Link>
+                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Editais</Link>
               </DropdownMenuItem>
             </ul>
           </nav>

@@ -2,9 +2,12 @@ import Hero from "@/components/Hero";
 import AccessCardSection from "@/components/SectionCardGrid";
 import {
   MdAccountCircle,
+  MdArticle,
+  MdCampaign,
   MdDescription,
   MdGavel,
-  MdHandshake
+  MdHandshake,
+  MdNewspaper
 } from "react-icons/md";
 
 export default function HomePage() {
@@ -25,6 +28,15 @@ export default function HomePage() {
             { title: 'Licitações', icon: <MdGavel />, href: '/licitacoes' },
             { title: 'Aditivos De Contratos', icon: <MdHandshake />, href: '#' },
             { title: 'Contratos', icon: <MdDescription />, href: '#' },
+          ]}
+        />
+
+        <AccessCardSection
+          title="Publicações"
+          items={[
+            { title: 'Diário Oficial', icon: <MdArticle />, href: '/diario-oficial' },
+            { title: 'Notícias', icon: <MdNewspaper />, href: '/noticias' },
+            { title: 'Avisos', icon: <MdCampaign />, href: '/avisos' },
           ]}
         />
 
