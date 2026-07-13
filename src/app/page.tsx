@@ -1,49 +1,17 @@
 import { Suspense } from "react";
 
-import AccessCardSection from "@/components/SectionCardGrid";
 import Skeleton from "@/components/ui/Skeleton";
 import DiarioOficialDestaque from "@/modules/home/components/DiarioOficialDestaque";
 import LicitacoesRecentes from "@/modules/home/components/LicitacoesRecentes";
 import NoticiasDestaque from "@/modules/home/components/NoticiasDestaque";
-import {
-  MdAccountCircle,
-  MdArticle,
-  MdCampaign,
-  MdDescription,
-  MdGavel,
-  MdHandshake,
-  MdNewspaper
-} from "react-icons/md";
 
 export default function HomePage() {
-   return (
+  return (
     <div className="bg-[--color-neutral] min-h-screen flex flex-col">
       <main className="flex-1">
-        <AccessCardSection
-          title="Licitações e Contratos"
-          items={[
-            { title: 'Licitações Covid-19', icon: <MdGavel />, href: '#' },
-            { title: 'Fiscal De Contratos', icon: <MdAccountCircle />, href: '#' },
-            { title: 'Licitações', icon: <MdGavel />, href: '/licitacoes' },
-            { title: 'Aditivos De Contratos', icon: <MdHandshake />, href: '#' },
-            { title: 'Contratos', icon: <MdDescription />, href: '#' },
-          ]}
-        />
-
-        <AccessCardSection
-          title="Publicações"
-          items={[
-            { title: 'Diário Oficial', icon: <MdArticle />, href: '/diario-oficial' },
-            { title: 'Notícias', icon: <MdNewspaper />, href: '/noticias' },
-            { title: 'Avisos', icon: <MdCampaign />, href: '/avisos' },
-          ]}
-        />
-
-        <div className="bg-white">
-          <Suspense fallback={<div className="max-w-6xl mx-auto px-4 py-10"><Skeleton className="h-80" /></div>}>
-            <NoticiasDestaque />
-          </Suspense>
-        </div>
+        <Suspense fallback={<div className="bg-primary/10 py-20"><div className="max-w-4xl mx-auto px-4"><Skeleton className="h-48" /></div></div>}>
+          <NoticiasDestaque />
+        </Suspense>
 
         <div className="bg-neutral-light">
           <Suspense fallback={<div className="max-w-6xl mx-auto px-4 py-10"><Skeleton className="h-64" /></div>}>

@@ -7,7 +7,7 @@ type HeroProps = {
 export default function Hero({ title, subtitle, backgroundUrl }: HeroProps) {
   return (
     <section
-      className="py-24 text-center bg-cover bg-center bg-no-repeat"
+      className="py-10 text-center bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : undefined,
       }}
