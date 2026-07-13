@@ -37,7 +37,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
     <Card className="p-5 flex flex-col gap-4">
 
       {/* HEADER */}
-      <div className="flex justify-between items-start gap-3">
+      <div className="flex flex-wrap justify-between items-start gap-3">
         <h2 className="text-base font-bold text-primary leading-tight">
           {tipoLabel} {licitacao.numeroInstrumento}/{licitacao.ano}
         </h2>

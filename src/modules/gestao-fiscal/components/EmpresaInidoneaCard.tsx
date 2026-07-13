@@ -13,7 +13,7 @@ export default function EmpresaInidoneaCard({ empresa }: Props) {
   return (
     <Card className="p-5 flex flex-col gap-4">
 
-      <div className="flex justify-between items-start gap-3">
+      <div className="flex flex-wrap justify-between items-start gap-3">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-red-50 text-red-600">
             <MdWarning size={20} />
