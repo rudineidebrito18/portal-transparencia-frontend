@@ -120,7 +120,7 @@ export const licitacaoMock = {
       dados = dados.filter(l => l.ano === Number(filtros.ano))
     }
     if (filtros.covid !== undefined) {
-      dados = dados.filter(l => l.covid === Boolean(filtros.covid))
+      dados = dados.filter(l => l.covid === (String(filtros.covid) === 'true'))
     }
     if (filtros.dataAberturaInicio) {
       const inicio = new Date(String(filtros.dataAberturaInicio)).getTime()

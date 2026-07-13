@@ -1,4 +1,7 @@
+import { Suspense } from 'react'
+
 import Breadcrumbs from '@/components/Breadcrumbs'
+import Skeleton from '@/components/ui/Skeleton'
 import LicitacaoListView from '@/modules/licitacoes/components/LicitacaoListView'
 
 export default function Licitacoes() {
@@ -14,7 +17,9 @@ export default function Licitacoes() {
 
       <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
 
-      <LicitacaoListView />
+      <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} />)}</div>}>
+        <LicitacaoListView />
+      </Suspense>
     </div>
   )
 }

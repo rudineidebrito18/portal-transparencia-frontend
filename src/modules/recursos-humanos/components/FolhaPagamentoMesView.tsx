@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { MdGroups, MdPayments } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
@@ -14,10 +14,31 @@ import { useFolhaPorMes } from '../hooks/useFolhaPorMes'
 
 const anoAtual = new Date().getFullYear()
 const anos = Array.from({ length: 6 }, (_, i) => anoAtual - i)
+const mesAtual = new Date().getMonth() + 1
 
 export default function FolhaPagamentoMesView() {
-  const [mes, setMes] = useState(new Date().getMonth() + 1)
-  const [ano, setAno] = useState(anoAtual)
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const mes = Number(searchParams.get('mes') ?? mesAtual)
+  const ano = Number(searchParams.get('ano') ?? anoAtual)
+  const pagina = Number(searchParams.get('page') ?? 0)
+
+  function atualizarUrl(alteracoes: Record<string, string | number | undefined>) {
+    const novosParams = new URLSearchParams(searchParams.toString())
+
+    for (const [chave, valor] of Object.entries(alteracoes)) {
+      if (valor === undefined) {
+        novosParams.delete(chave)
+      } else {
+        novosParams.set(chave, String(valor))
+      }
+    }
+
+    const query = novosParams.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+  }
 
   const {
     data: folhas,
@@ -25,10 +46,8 @@ export default function FolhaPagamentoMesView() {
     totalFolha,
     loading,
     erro,
-    pagina,
-    totalPaginas,
-    setPagina
-  } = useFolhaPorMes(mes, ano)
+    totalPaginas
+  } = useFolhaPorMes(mes, ano, pagina)
 
   const inputClass =
     "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
@@ -46,7 +65,7 @@ export default function FolhaPagamentoMesView() {
             </label>
             <select
               value={mes}
-              onChange={(e) => setMes(Number(e.target.value))}
+              onChange={(e) => atualizarUrl({ mes: Number(e.target.value), page: undefined })}
               className={inputClass}
             >
               {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
@@ -61,7 +80,7 @@ export default function FolhaPagamentoMesView() {
             </label>
             <select
               value={ano}
-              onChange={(e) => setAno(Number(e.target.value))}
+              onChange={(e) => atualizarUrl({ ano: Number(e.target.value), page: undefined })}
               className={inputClass}
             >
               {anos.map(a => (
@@ -145,7 +164,11 @@ export default function FolhaPagamentoMesView() {
               </div>
 
               {/* PAGINAÇÃO */}
-              <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+              <Pagination
+                pagina={pagina}
+                totalPaginas={totalPaginas}
+                onChange={(novaPagina) => atualizarUrl({ page: novaPagina || undefined })}
+              />
             </>
           )}
         </>

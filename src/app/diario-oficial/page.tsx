@@ -1,4 +1,7 @@
+import { Suspense } from 'react'
+
 import Breadcrumbs from '@/components/Breadcrumbs'
+import Skeleton from '@/components/ui/Skeleton'
 import DiarioOficialListView from '@/modules/diario-oficial/components/DiarioOficialListView'
 
 export default function DiarioOficialPage() {
@@ -14,7 +17,9 @@ export default function DiarioOficialPage() {
 
       <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
 
-      <DiarioOficialListView />
+      <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
+        <DiarioOficialListView />
+      </Suspense>
     </div>
   )
 }

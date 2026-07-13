@@ -1,7 +1,8 @@
 'use client'
 
-import { ComponentType, useState } from 'react'
+import { ComponentType } from 'react'
 
+import { useUrlState } from '@/hooks/useUrlState'
 import EmpresasDividaAtivaListView from './EmpresasDividaAtivaListView'
 import EmpresasInidoneasListView from './EmpresasInidoneasListView'
 import RelatoriosExecucaoOrcamentariaListView from './RelatoriosExecucaoOrcamentariaListView'
@@ -32,7 +33,7 @@ const CONTEUDO: Record<Aba, ComponentType> = {
 }
 
 export default function GestaoFiscalView() {
-  const [aba, setAba] = useState<Aba>(CATEGORIAS[0].aba)
+  const [aba, setAba] = useUrlState<Aba>('categoria', CATEGORIAS[0].aba)
   const Conteudo = CONTEUDO[aba]
 
   return (

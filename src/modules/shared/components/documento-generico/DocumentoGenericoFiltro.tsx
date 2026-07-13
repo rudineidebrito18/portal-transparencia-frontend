@@ -6,6 +6,7 @@ import { MdFilterList, MdRestartAlt, MdSearch } from 'react-icons/md'
 import { FiltroDocumentoGenerico } from '../../types/DocumentoGenerico'
 
 interface Props {
+  valoresIniciais?: FiltroDocumentoGenerico
   onFiltrar: (filtros: FiltroDocumentoGenerico) => void
 }
 
@@ -15,8 +16,8 @@ const initialState: FiltroDocumentoGenerico = {
   dataFinal: ''
 }
 
-export default function DocumentoGenericoFiltro({ onFiltrar }: Props) {
-  const [filtros, setFiltros] = useState<FiltroDocumentoGenerico>(initialState)
+export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: Props) {
+  const [filtros, setFiltros] = useState<FiltroDocumentoGenerico>({ ...initialState, ...valoresIniciais })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target

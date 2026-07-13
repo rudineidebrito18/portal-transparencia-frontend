@@ -1,4 +1,7 @@
+import { Suspense } from 'react'
+
 import Breadcrumbs from '@/components/Breadcrumbs'
+import Skeleton from '@/components/ui/Skeleton'
 import GestaoFiscalView from '@/modules/gestao-fiscal/components/GestaoFiscalView'
 
 export default function GestaoFiscal() {
@@ -14,7 +17,9 @@ export default function GestaoFiscal() {
 
       <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
 
-      <GestaoFiscalView />
+      <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
+        <GestaoFiscalView />
+      </Suspense>
     </div>
   )
 }

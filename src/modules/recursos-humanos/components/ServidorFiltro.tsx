@@ -6,6 +6,7 @@ import { MdExpandLess, MdExpandMore, MdFilterList, MdRestartAlt, MdSearch } from
 import { FiltroServidor } from '../types'
 
 interface Props {
+  valoresIniciais?: FiltroServidor
   onFiltrar: (filtros: FiltroServidor) => void
 }
 
@@ -18,8 +19,8 @@ const initialState: FiltroServidor = {
   dataAdmissaoFim: ''
 }
 
-export default function ServidorFiltro({ onFiltrar }: Props) {
-  const [filtros, setFiltros] = useState<FiltroServidor>(initialState)
+export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
+  const [filtros, setFiltros] = useState<FiltroServidor>({ ...initialState, ...valoresIniciais })
   const [isExpanded, setIsExpanded] = useState(true)
 
   const filtrosAtivosCount = Object.entries(filtros).filter(

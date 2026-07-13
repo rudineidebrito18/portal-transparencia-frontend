@@ -7,11 +7,10 @@ import { FolhaPagamentoServidor } from '../types'
 
 const SIZE = 15
 
-export function useFolhaPorMes(mes: number, ano: number) {
+export function useFolhaPorMes(mes: number, ano: number, pagina: number) {
   const [registros, setRegistros] = useState<FolhaPagamentoServidor[]>([])
   const [loading, setLoading] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
-  const [pagina, setPagina] = useState(0)
 
   useEffect(() => {
     let ativo = true
@@ -19,7 +18,6 @@ export function useFolhaPorMes(mes: number, ano: number) {
     async function carregar() {
       setLoading(true)
       setErro(null)
-      setPagina(0)
 
       try {
         const dados = await folhaService.listarPorMes(mes, ano)
@@ -56,8 +54,6 @@ export function useFolhaPorMes(mes: number, ano: number) {
     totalFolha,
     loading,
     erro,
-    pagina,
-    totalPaginas,
-    setPagina
+    totalPaginas
   }
 }

@@ -19,21 +19,17 @@ export default function LicitacaoListView() {
     totalPaginas,
     totalElements,
     setPagina,
+    filtros,
     setFiltros,
     setOrdenacao,
     ordenacao
   } = useLicitacoes()
 
-  function handleFiltrar(novosFiltros: Parameters<typeof setFiltros>[0]) {
-    setFiltros(novosFiltros)
-    setPagina(0)
-  }
-
   return (
     <div className="space-y-6">
 
       {/* FILTRO */}
-      <LicitacaoFiltro onFiltrar={handleFiltrar} />
+      <LicitacaoFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">

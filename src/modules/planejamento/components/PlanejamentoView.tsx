@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-
+import { useUrlState } from '@/hooks/useUrlState'
 import { RecursoPlanejamento } from '../types'
 import DocumentoListView from './DocumentoListView'
 
@@ -12,7 +11,7 @@ const CATEGORIAS: { recurso: RecursoPlanejamento; label: string }[] = [
 ]
 
 export default function PlanejamentoView() {
-  const [aba, setAba] = useState<RecursoPlanejamento>(CATEGORIAS[0].recurso)
+  const [aba, setAba] = useUrlState<RecursoPlanejamento>('categoria', CATEGORIAS[0].recurso)
 
   return (
     <div>

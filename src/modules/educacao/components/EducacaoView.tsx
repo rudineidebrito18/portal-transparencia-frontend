@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-
+import { useUrlState } from '@/hooks/useUrlState'
 import { RecursoEducacao } from '../types'
 import DocumentoListView from './DocumentoListView'
 
@@ -13,7 +12,7 @@ const CATEGORIAS: { recurso: RecursoEducacao; label: string }[] = [
 ]
 
 export default function EducacaoView() {
-  const [aba, setAba] = useState<RecursoEducacao>(CATEGORIAS[0].recurso)
+  const [aba, setAba] = useUrlState<RecursoEducacao>('categoria', CATEGORIAS[0].recurso)
 
   return (
     <div>

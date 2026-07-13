@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-
+import { useUrlState } from '@/hooks/useUrlState'
 import { RecursoPrestacaoContas } from '../types'
 import DocumentoListView from './DocumentoListView'
 
@@ -14,7 +13,7 @@ const CATEGORIAS: { recurso: RecursoPrestacaoContas; label: string }[] = [
 ]
 
 export default function PrestacaoContasView() {
-  const [aba, setAba] = useState<RecursoPrestacaoContas>(CATEGORIAS[0].recurso)
+  const [aba, setAba] = useUrlState<RecursoPrestacaoContas>('categoria', CATEGORIAS[0].recurso)
 
   return (
     <div>

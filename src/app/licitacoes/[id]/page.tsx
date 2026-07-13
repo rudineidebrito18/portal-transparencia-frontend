@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 
 import Breadcrumbs from '@/components/Breadcrumbs'
 import { TipoProcedimentoDescricao, TipoProcedimentoLicitacao } from '@/modules/licitacoes/enums'
@@ -43,7 +44,9 @@ export default async function LicitacaoPage({
         <div className="h-1.5 w-16 bg-secondary mt-2 rounded-full" />
       </div>
 
-      <LicitacaoDetalhe id={numericId} licitacao={licitacao} />
+      <Suspense fallback={null}>
+        <LicitacaoDetalhe id={numericId} licitacao={licitacao} />
+      </Suspense>
     </div>
   )
 }

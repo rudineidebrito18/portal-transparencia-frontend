@@ -14,6 +14,7 @@ import { StatusLicitacao, StatusLicitacaoDescricao, TipoProcedimentoDescricao, T
 import { FiltroLicitacao } from '../types'
 
 interface Props {
+  valoresIniciais?: FiltroLicitacao
   onFiltrar: (filtros: FiltroLicitacao) => void
 }
 
@@ -33,8 +34,8 @@ const initialState: FiltroLicitacao = {
 const anoAtual = new Date().getFullYear()
 const anos = Array.from({ length: 21 }, (_, i) => anoAtual - i)
 
-export default function LicitacaoFiltro({ onFiltrar }: Props) {
-  const [filtros, setFiltros] = useState<FiltroLicitacao>(initialState)
+export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
+  const [filtros, setFiltros] = useState<FiltroLicitacao>({ ...initialState, ...valoresIniciais })
   const [isExpanded, setIsExpanded] = useState(true)
 
   const filtrosAtivosCount = Object.entries(filtros).filter(
