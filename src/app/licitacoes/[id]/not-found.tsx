@@ -7,6 +7,7 @@ export default function LicitacaoNaoEncontrada() {
     <div className="max-w-4xl mx-auto p-4">
       <Breadcrumbs
         items={[
+          { label: 'Transparência', href: '/transparencia' },
           { label: 'Licitações', href: '/licitacoes' },
           { label: 'Não encontrada' }
         ]}

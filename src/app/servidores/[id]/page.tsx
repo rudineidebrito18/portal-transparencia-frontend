@@ -26,6 +26,7 @@ export default async function ServidorPage({
     <div className="max-w-4xl mx-auto p-4">
       <Breadcrumbs
         items={[
+          { label: 'Transparência', href: '/transparencia' },
           { label: 'Servidores', href: '/servidores' },
           { label: servidor.name }
         ]}
