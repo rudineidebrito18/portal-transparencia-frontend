@@ -117,9 +117,9 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     titulo: 'Convênios e Transferências',
     icon: MdSwapHoriz,
     itens: [
-      { label: 'Transferências voluntárias recebidas', icon: MdCallReceived },
-      { label: 'Transferências voluntárias realizadas', icon: MdCallMade },
-      { label: 'Acordos firmados pelo órgão', icon: MdHandshake },
+      { label: 'Transferências voluntárias recebidas', icon: MdCallReceived, href: '/convenios?categoria=transferencias-recebidas' },
+      { label: 'Transferências voluntárias realizadas', icon: MdCallMade, href: '/convenios?categoria=transferencias-realizadas' },
+      { label: 'Acordos firmados pelo órgão', icon: MdHandshake, href: '/convenios?categoria=acordos-firmados' },
     ],
   },
   {
@@ -138,9 +138,9 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     titulo: 'Diárias',
     icon: MdFlightTakeoff,
     itens: [
-      { label: 'Diárias', icon: MdFlightTakeoff },
+      { label: 'Diárias', icon: MdFlightTakeoff, href: '/diarias' },
       { label: 'Diárias — legislação e valores', icon: MdMenuBook },
-      { label: 'Tabela de valores das diárias', icon: MdListAlt },
+      { label: 'Tabela de valores das diárias', icon: MdListAlt, href: '/tabela-valores' },
     ],
   },
   {
