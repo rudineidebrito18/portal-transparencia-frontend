@@ -151,7 +151,7 @@ export default function Header() {
 
               <Link href="/diario-oficial" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>DIÁRIO OFICIAL</Link>
               <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>SERVIÇOS</Link>
-              <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer" onTouchEnd={() => setMenuOpen(false)}>TRANSPARÊNCIA</Link>
+              <Link href="/transparencia" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>TRANSPARÊNCIA</Link>
 
               <DropdownMenuItem label="RECURSOS HUMANOS">
                 <Link href="/servidores" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Servidores</Link>
