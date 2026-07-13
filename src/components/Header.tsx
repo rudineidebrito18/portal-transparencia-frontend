@@ -18,25 +18,27 @@ import {
 import DropdownMenuItem from './DropdownMenuItem';
 
 export default function Header() {
-  const [headerHeight, setHeaderHeight] = useState(180);
+  const [navMedidaHeight, setNavMedidaHeight] = useState(48);
   const [menuOpen, setMenuOpen] = useState(false);
   const [offsetY, setOffsetY] = useState(0);
 
-  const headerRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
   const logoBackgroundRef = useRef<HTMLDivElement>(null);
 
-  // Observa o tamanho do Header para ajustar o padding do conteúdo dinamicamente
+  // Observa só a altura do <nav> (varia com o menu mobile aberto/fechado e quebras de
+  // linha responsivas). O restante do header (topbar + logo) tem altura previsível e é
+  // calculado direto do mesmo estado que anima a transição — evita reagir a cada frame
+  // intermediário da transição CSS do logo, que causava a "tremida" no espaçador abaixo.
   useEffect(() => {
-    if (!headerRef.current) return;
+    if (!navRef.current) return;
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        // Atualiza a altura total que o conteúdo precisa de padding
-        setHeaderHeight(entry.target.clientHeight);
+        setNavMedidaHeight(entry.target.clientHeight);
       }
     });
 
-    resizeObserver.observe(headerRef.current);
+    resizeObserver.observe(navRef.current);
     return () => resizeObserver.disconnect();
   }, []);
 
@@ -51,13 +53,11 @@ export default function Header() {
       } else {
         setOffsetY(threshold);
       }
-
-      // if (menuOpen) setMenuOpen(false);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [menuOpen]);
+  }, []);
 
   const topbarHeight = 28;
   const logoSectionHeight = 120;
@@ -75,9 +75,11 @@ export default function Header() {
     logoVisible = false;
   }
 
+  const headerHeight = topbarHeight + (logoVisible ? logoSectionHeight : fase1Max) + navMedidaHeight;
+
   return (
     <>
-      <div ref={headerRef} className="fixed top-0 left-0 w-full z-50">
+      <div className="fixed top-0 left-0 w-full z-50">
 
         {/* 1. Topbar */}
         <div
@@ -102,7 +104,6 @@ export default function Header() {
           className="w-full bg-light shadow"
           style={{
             transform: `translateY(${translateY}px)`,
-            transition: 'transform 0.3s ease',
           }}
         >
           {/* Logo Section */}
@@ -128,7 +129,7 @@ export default function Header() {
           </div>
 
           {/* Nav */}
-          <nav className="bg-primary text-light text-sm shadow">
+          <nav ref={navRef} className="bg-primary text-light text-sm shadow">
             <ul className={`flex flex-col lg:flex-row flex-wrap gap-2 md:gap-2 justify-center items-center ${menuOpen ? 'flex' : 'hidden lg:flex'}`}>
               <Link className="px-4 py-2 hover:bg-secondary" href="/" onClick={() => setMenuOpen(false)}><MdHome /></Link>
 
