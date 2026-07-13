@@ -3,20 +3,20 @@
 import { useState } from 'react'
 import { MdFilterList, MdRestartAlt, MdSearch } from 'react-icons/md'
 
-import { FiltroDocumentoPrestacaoContas } from '../types'
+import { FiltroDocumentoGenerico } from '../../types/DocumentoGenerico'
 
 interface Props {
-  onFiltrar: (filtros: FiltroDocumentoPrestacaoContas) => void
+  onFiltrar: (filtros: FiltroDocumentoGenerico) => void
 }
 
-const initialState: FiltroDocumentoPrestacaoContas = {
+const initialState: FiltroDocumentoGenerico = {
   descricao: '',
   dataInicial: '',
   dataFinal: ''
 }
 
-export default function DocumentoFiltro({ onFiltrar }: Props) {
-  const [filtros, setFiltros] = useState<FiltroDocumentoPrestacaoContas>(initialState)
+export default function DocumentoGenericoFiltro({ onFiltrar }: Props) {
+  const [filtros, setFiltros] = useState<FiltroDocumentoGenerico>(initialState)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
@@ -27,7 +27,7 @@ export default function DocumentoFiltro({ onFiltrar }: Props) {
     const cleanFilters = Object.fromEntries(
       Object.entries(filtros).filter(([, v]) => v !== undefined && v !== '')
     )
-    onFiltrar(cleanFilters as FiltroDocumentoPrestacaoContas)
+    onFiltrar(cleanFilters as FiltroDocumentoGenerico)
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {

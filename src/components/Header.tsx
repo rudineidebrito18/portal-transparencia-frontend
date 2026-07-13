@@ -160,6 +160,7 @@ export default function Header() {
               <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
                 <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Relatórios</Link>
                 <Link href="/prestacao-contas" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Prestação de Contas</Link>
+                <Link href="/planejamento" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Planejamento (LDO, LOA, PPA)</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="PUBLICAÇÕES">

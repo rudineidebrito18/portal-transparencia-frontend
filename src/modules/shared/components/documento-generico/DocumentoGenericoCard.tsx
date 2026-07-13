@@ -2,13 +2,13 @@ import { MdDescription, MdFileDownload } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { formatarData } from '@/utils/date'
-import { DocumentoPrestacaoContas } from '../types'
+import { DocumentoGenerico } from '../../types/DocumentoGenerico'
 
 interface Props {
-  documento: DocumentoPrestacaoContas
+  documento: DocumentoGenerico
 }
 
-export default function DocumentoCard({ documento }: Props) {
+export default function DocumentoGenericoCard({ documento }: Props) {
   return (
     <Card className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 

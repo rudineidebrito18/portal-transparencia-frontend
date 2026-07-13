@@ -1,15 +1,15 @@
 'use client'
 
 import DocumentoGenericoListPanel from '@/modules/shared/components/documento-generico/DocumentoGenericoListPanel'
-import { useDocumentosPrestacaoContas } from '../hooks/useDocumentosPrestacaoContas'
-import { RecursoPrestacaoContas } from '../types'
+import { useDocumentosPlanejamento } from '../hooks/useDocumentosPlanejamento'
+import { RecursoPlanejamento } from '../types'
 
 interface Props {
-  recurso: RecursoPrestacaoContas
+  recurso: RecursoPlanejamento
 }
 
 export default function DocumentoListView({ recurso }: Props) {
-  const resource = useDocumentosPrestacaoContas(recurso)
+  const resource = useDocumentosPlanejamento(recurso)
 
   return <DocumentoGenericoListPanel {...resource} />
 }
