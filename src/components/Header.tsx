@@ -152,6 +152,11 @@ export default function Header() {
               <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>SERVIÇOS</Link>
               <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer" onTouchEnd={() => setMenuOpen(false)}>TRANSPARÊNCIA</Link>
 
+              <DropdownMenuItem label="RECURSOS HUMANOS">
+                <Link href="/servidores" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Servidores</Link>
+                <Link href="/folha-pagamento" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Folha de Pagamento</Link>
+              </DropdownMenuItem>
+
               <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
                 <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Relatórios</Link>
                 <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Prestação de Contas</Link>

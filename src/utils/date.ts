@@ -35,6 +35,15 @@ export function formatarDataHora(data?: string | Date): string {
   })
 }
 
+const MESES = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+]
+
+export function nomeMes(mes: number): string {
+  return MESES[mes - 1] ?? String(mes)
+}
+
 export function dataDentroIntervalo(
   data: string | Date,
   inicio?: string,
