@@ -42,3 +42,5 @@ export interface FolhaPagamentoServidor {
   nomeServidor: string
   cpfServidor: string
 }
+
+export type RecursoDocumentoRH = 'estagiarios' | 'terceirizados'
