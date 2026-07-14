@@ -57,13 +57,15 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | LGPD e Governo Digital | `/lgpd` | página estática, cobre os 5 itens da seção | nenhum — conteúdo institucional genérico |
 | Radar da Transparência | link externo (`radardatransparencia.atricon.org.br`) | `ItemAcessoCard` abre em nova aba quando `href` começa com `http` | — |
 | RREO | `/gestao-fiscal?categoria=execucao-orcamentaria` | reaproveita aba já existente | `GET /gestao-fiscal/relatorio-execucao-orcamentaria` (só faltava o href) |
+| Tabela com Padrão Remuneratório | `/cargos` | bespoke, sem paginação, renderizado como `<table>` | `GET /recursos-humanos/cargos` |
 
 **Diário Oficial ganhou busca** (2026-07-14): `/edicoes/filtro` foi criado sob pedido nosso
 (endpoint novo, `GET /edicoes` sem filtro continua existindo). Filtros: `tipo` (enum),
 `numeroEdicao` (exato), `dataInicial`/`dataFinal` (intervalo de `dataPublicacao`), todos
 combináveis via AND. `diario-oficial.service.ts` agora sempre chama `/edicoes/filtro` (filtro
 vazio = mesmo resultado de `/edicoes`). Sem full-text search — o DTO não tem campo de texto.
-| Tabela com Padrão Remuneratório | `/cargos` | bespoke, sem paginação, renderizado como `<table>` | `GET /recursos-humanos/cargos` |
+Também ganhou um banner de "Última Edição Publicada" (`UltimaEdicaoDestaque.tsx`), com busca
+própria (`useUltimaEdicao`) independente dos filtros da listagem.
 
 ## 4. Como conferir o contrato real do backend
 
@@ -161,7 +163,42 @@ Sem endpoint no backend e sem decisão do usuário ainda: Audiências públicas.
   confirme com o usuário antes de matar um processo em `pts/N` que você não iniciou nesta
   sessão. Processos que você mesmo sobe via `nohup ... & disown` aparecem com TTY `?`.
 
-## 7. Como retomar
+## 7. Dashboard administrativo — decisão de arquitetura (2026-07-14, ainda não iniciado)
+
+Próxima frente grande do projeto: um dashboard pra funcionários da prefeitura fazerem CRUD
+nos dados que hoje o portal só lê (o backend já expõe `POST`/`PUT`/`DELETE` pra quase todo
+recurso — ver seção 4). **Decisão: mesmo app Next.js, não um projeto/deploy separado.**
+
+Raciocínio (discutido em conversa, não é definitivo — revisitar se o contexto mudar):
+
+- Cidade pequena, pouco tráfego, sem time de infra dedicado → dois deploys (dois processos,
+  dois certificados, duas pipelines) é custo operacional puro, sem ganho de performance que
+  vá ser sentido nessa escala.
+- Bundle inflado pelo admin não é problema real: o Next.js já faz code-splitting por rota,
+  então quem visita `/licitacoes` nunca baixa o JS do admin de qualquer forma.
+- O medo inicial era "rota de admin esquecida sem proteção = exposta publicamente". Mas o
+  backend usa Spring Security e barra `POST`/`PUT`/`DELETE` (e deveria barrar todo `GET`
+  sensível) sem sessão válida — **a proteção real já está no backend**, não depende do
+  frontend esconder a UI. Pior cenário de uma rota de admin sem gate no frontend: alguém vê
+  a casca de um formulário e recebe 401/403 ao tentar qualquer ação. Não é vazamento de dado
+  nem escrita indevida.
+- Portanto separar em dois apps não compra proteção adicional nenhuma nesse caso — só custo.
+
+**Plano quando for implementar:**
+- Rotas em `src/app/admin/*` (route group), protegidas por um `middleware.ts` que barra o
+  segmento inteiro por padrão (checa sessão antes de renderizar) — isso é por **UX** (não
+  mostrar formulário/erro feio pra visitante aleatório, não expor estrutura interna do admin
+  como reconhecimento), não é a barreira de segurança crítica.
+- **Pendência a confirmar antes de começar**: os `GET`s sensíveis do backend (não só
+  `POST`/`PUT`/`DELETE`) também estão atrás do Spring Security? Ex: os endpoints de
+  `/users/*` que aparecem no spec (`/users/test`, `/users/login`, `/users/signup`) — conferir
+  se `/users/test` e afins exigem autenticação, e se há algum `GET` de rascunho/dado
+  não-publicado que precise do mesmo tratamento.
+- Reaproveitar os `types.ts` de cada módulo já existente (Servidor, Licitação, ContratoLicitacao
+  etc.) pros formulários do admin — os DTOs de request geralmente são um subconjunto dos de
+  response já mapeados no frontend público.
+
+## 8. Como retomar
 
 ```bash
 npm run dev                                    # sobe o frontend em :3000
