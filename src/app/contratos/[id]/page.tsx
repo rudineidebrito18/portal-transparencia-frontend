@@ -31,7 +31,8 @@ export default async function ContratoPage({
     <div className="max-w-4xl mx-auto p-4">
       <Breadcrumbs
         items={[
-          { label: 'Contratos' },
+          { label: 'Transparência', href: '/transparencia' },
+          { label: 'Contratos administrativos', href: '/contratos' },
           { label: `Contrato Nº ${contrato.numeroContrato}/${contrato.exercicio}` }
         ]}
       />

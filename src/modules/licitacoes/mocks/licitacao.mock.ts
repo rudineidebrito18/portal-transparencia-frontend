@@ -92,6 +92,12 @@ export function buscarLicitacaoMockPorId(id: number): LicitacaoCompleta | undefi
   return licitacoes.find(l => l.id === id)
 }
 
+// Reaproveitado pelo mock de src/modules/contratos para simular a listagem "todos os
+// contratos de todas as licitações" (GET /licitacoes/contratos)
+export function listarTodasLicitacoesMock(): LicitacaoCompleta[] {
+  return licitacoes
+}
+
 export const licitacaoMock = {
   async listar(params: ListParams): Promise<Page<LicitacaoResumo>> {
     const { page = 0, size = 10, sort, ...filtros } = params

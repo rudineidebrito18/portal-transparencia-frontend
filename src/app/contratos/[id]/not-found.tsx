@@ -7,7 +7,8 @@ export default function ContratoNaoEncontrado() {
     <div className="max-w-4xl mx-auto p-4">
       <Breadcrumbs
         items={[
-          { label: 'Contratos' },
+          { label: 'Transparência', href: '/transparencia' },
+          { label: 'Contratos administrativos', href: '/contratos' },
           { label: 'Não encontrado' }
         ]}
       />
@@ -16,8 +17,8 @@ export default function ContratoNaoEncontrado() {
         Contrato não encontrado.
 
         <div className="mt-4">
-          <Link href="/licitacoes" className="text-primary underline text-sm font-semibold">
-            Voltar para Licitações
+          <Link href="/contratos" className="text-primary underline text-sm font-semibold">
+            Voltar para a listagem
           </Link>
         </div>
       </div>

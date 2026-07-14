@@ -29,6 +29,14 @@ export const contratoService = {
       .then(response => response.data)
   },
 
+  listarTodos(params: ListarParams): Promise<Page<ContratoLicitacao>> {
+    if (USE_MOCK) return contratoMock.listarTodos(params)
+
+    return api
+      .get<Page<ContratoLicitacao>>('/licitacoes/contratos', { params })
+      .then(response => response.data)
+  },
+
   listarDocumentos(contratoId: number): Promise<Documento[]> {
     if (USE_MOCK) return contratoMock.listarDocumentos(contratoId)
 

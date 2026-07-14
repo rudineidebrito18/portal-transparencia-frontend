@@ -1,6 +1,6 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
-import { buscarLicitacaoMockPorId, LicitacaoCompleta } from '@/modules/licitacoes/mocks/licitacao.mock'
+import { buscarLicitacaoMockPorId, listarTodasLicitacoesMock, LicitacaoCompleta } from '@/modules/licitacoes/mocks/licitacao.mock'
 import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Documento } from '@/modules/shared/types/Documento'
 import { Page } from '@/modules/shared/types/Page'
@@ -95,6 +95,20 @@ export const contratoMock = {
     ) as unknown as ContratoLicitacao[]
 
     return paginar(contratos, page, size)
+  },
+
+  async listarTodos(
+    params: { page?: number; size?: number; sort?: string }
+  ): Promise<Page<ContratoLicitacao>> {
+    const { page = 0, size = 10, sort } = params
+
+    const todosContratos = listarTodasLicitacoesMock().flatMap(gerarContratosDaLicitacao)
+    const ordenados = ordenar(
+      todosContratos as unknown as Record<string, unknown>[],
+      sort ?? 'dataPublicacao,desc'
+    ) as unknown as ContratoLicitacao[]
+
+    return paginar(ordenados, page, size)
   },
 
   async listarDocumentos(contratoId: number): Promise<Documento[]> {
