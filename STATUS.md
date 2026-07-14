@@ -57,6 +57,7 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | LGPD e Governo Digital | `/lgpd` | página estática, cobre os 5 itens da seção | nenhum — conteúdo institucional genérico |
 | Radar da Transparência | link externo (`radardatransparencia.atricon.org.br`) | `ItemAcessoCard` abre em nova aba quando `href` começa com `http` | — |
 | RREO | `/gestao-fiscal?categoria=execucao-orcamentaria` | reaproveita aba já existente | `GET /gestao-fiscal/relatorio-execucao-orcamentaria` (só faltava o href) |
+| Tabela com Padrão Remuneratório | `/cargos` | bespoke, sem paginação, renderizado como `<table>` | `GET /recursos-humanos/cargos` |
 
 ## 4. Como conferir o contrato real do backend
 
@@ -109,19 +110,16 @@ Todos os endpoints do formato documento genérico já confirmados foram implemen
 auditoria completa das tags do spec (2026-07-14) contra os itens sem `href` do hub encontrou
 mais alguns endpoints que existem mas ainda não têm código no frontend:
 
-1. **Tabela com padrão remuneratório** — `GET /recursos-humanos/cargos` (array simples: cargo,
-   quantidade, valorBruto, valorDesconto, valorLiquido, media). Mesmo padrão bespoke sem
-   paginação de `obras`/`concursos`.
-2. **Transferências disciplinadas pela EC nº 105** — `GET /execucao-orcamentaria/transferencia-voluntaria/filtro`,
+1. **Transferências disciplinadas pela EC nº 105** — `GET /execucao-orcamentaria/transferencia-voluntaria/filtro`,
    formato documento genérico. **Confiança moderada no mapeamento**: o nome do endpoint
    ("Transferência Voluntária") é genérico, não menciona EC 105 explicitamente — confirmar
    com quem administra o backend antes de assumir que é o recurso certo.
-3. **Ato de adesão** — não é endpoint novo: dá pra reaproveitar `/licitacoes` filtrando
+2. **Ato de adesão** — não é endpoint novo: dá pra reaproveitar `/licitacoes` filtrando
    `tipoProcedimentoLicitacao=AARP` (Adesão à Ata de Registro de Preços já é um valor do enum
    `TipoProcedimentoLicitacao`).
-4. **Dispensas e inexigibilidade** — mesma ideia, mas os tipos `DP`/`DEL`/`IN` exigiriam filtro
+3. **Dispensas e inexigibilidade** — mesma ideia, mas os tipos `DP`/`DEL`/`IN` exigiriam filtro
    multi-valor em `FiltroLicitacao.tipoProcedimentoLicitacao`, que hoje só aceita 1 valor por vez.
-5. **Detalhe de Obra Pública** — `/obras` já tem sub-recursos não usados no frontend: ARTs
+4. **Detalhe de Obra Pública** — `/obras` já tem sub-recursos não usados no frontend: ARTs
    (`/obras/{id}/arts`), Anexos (`/obras/{id}/anexos`) e Medições (`/obras/{id}/medicoes`).
    Não mapeia a nenhum card específico do hub, mas daria pra criar uma página de detalhe
    `/obras/[id]`.
@@ -152,6 +150,10 @@ Sem endpoint no backend e sem decisão do usuário ainda: Audiências públicas.
   encerrar tudo. Depois de cada rodada de teste, confirme com `ps aux | grep -i next` e mate
   os PIDs residuais explicitamente antes de subir um novo servidor — senão acabam dois
   processos disputando a porta 3000/3001 ao mesmo tempo.
+  **Cuidado**: um processo com TTY `pts/N` (em vez de `?`) pode ser um servidor que o próprio
+  usuário está rodando manualmente em outro terminal, não necessariamente sobra de teste — 
+  confirme com o usuário antes de matar um processo em `pts/N` que você não iniciou nesta
+  sessão. Processos que você mesmo sobe via `nohup ... & disown` aparecem com TTY `?`.
 
 ## 7. Como retomar
 
