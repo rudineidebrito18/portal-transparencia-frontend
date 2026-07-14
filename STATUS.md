@@ -50,6 +50,7 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | Plano Estratégico / RGA | `/planejamento` (4ª/5ª aba) | genérico | `/planejamento/{plano-estrategico,rga}/filtro` |
 | Contratos Administrativos | `/contratos` | bespoke paginado, sem filtro | `GET /licitacoes/contratos` (endpoint já existia, só faltava a lista no frontend) |
 | Emendas Parlamentares | `/emendas-parlamentares` | bespoke, filtro tipo/ano exclusivo | `GET /emendas-parlamentares` + `/tipo/{tipo}` + `/ano/{ano}` (endpoints separados) |
+| Concursos e Seleções Públicas | `/concursos` | bespoke, sem paginação, anexos aninhados | `GET /recursos-humanos/concursos` + `/concursos/{id}/anexos` |
 
 ## 4. Como conferir o contrato real do backend
 
@@ -89,13 +90,9 @@ Outras convenções a manter:
 
 ## 5. Próximos passos sugeridos (por prioridade / facilidade)
 
-Todos os endpoints confirmados no formato **documento genérico** já foram implementados (ver
-tabela da seção 3). Resta só 1 item **bespoke** (exige módulo próprio, mais trabalho):
-
-1. **Concursos e Seleções Públicas** — `GET /recursos-humanos/concursos` (array simples) +
-   anexos aninhados (`/concursos/{id}/anexos`). DTO bespoke: numero, ano, dataAbertura,
-   dataInscricoes, dataTerminoInscricoes, resumo. Precisa decidir se mostra os anexos na
-   mesma página ou não.
+Todos os endpoints já confirmados no spec (formato documento genérico e bespoke) foram
+implementados — ver tabela da seção 3. Não há mais nenhum item pendente que já tenha
+endpoint confirmado no backend.
 
 Sem nenhum endpoint no backend ainda (não dá pra fazer sem trabalho de backend primeiro):
 Estrutura organizacional, FAQ, Radar da transparência, Audiências públicas, Tabela com padrão
