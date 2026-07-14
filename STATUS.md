@@ -57,6 +57,12 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | LGPD e Governo Digital | `/lgpd` | página estática, cobre os 5 itens da seção | nenhum — conteúdo institucional genérico |
 | Radar da Transparência | link externo (`radardatransparencia.atricon.org.br`) | `ItemAcessoCard` abre em nova aba quando `href` começa com `http` | — |
 | RREO | `/gestao-fiscal?categoria=execucao-orcamentaria` | reaproveita aba já existente | `GET /gestao-fiscal/relatorio-execucao-orcamentaria` (só faltava o href) |
+
+**Diário Oficial ganhou busca** (2026-07-14): `/edicoes/filtro` foi criado sob pedido nosso
+(endpoint novo, `GET /edicoes` sem filtro continua existindo). Filtros: `tipo` (enum),
+`numeroEdicao` (exato), `dataInicial`/`dataFinal` (intervalo de `dataPublicacao`), todos
+combináveis via AND. `diario-oficial.service.ts` agora sempre chama `/edicoes/filtro` (filtro
+vazio = mesmo resultado de `/edicoes`). Sem full-text search — o DTO não tem campo de texto.
 | Tabela com Padrão Remuneratório | `/cargos` | bespoke, sem paginação, renderizado como `<table>` | `GET /recursos-humanos/cargos` |
 
 ## 4. Como conferir o contrato real do backend
