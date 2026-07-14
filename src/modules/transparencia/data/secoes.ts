@@ -131,7 +131,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
       { label: 'Tabela com padrão remuneratório', icon: MdTableChart },
       { label: 'Estagiários', icon: MdWorkOutline, href: '/recursos-humanos?categoria=estagiarios' },
       { label: 'Terceirizados', icon: MdBusinessCenter, href: '/recursos-humanos?categoria=terceirizados' },
-      { label: 'Concursos e seleções públicas', icon: MdAssignmentInd },
+      { label: 'Concursos e seleções públicas', icon: MdAssignmentInd, href: '/concursos' },
     ],
   },
   {
