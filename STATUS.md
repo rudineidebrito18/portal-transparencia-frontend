@@ -49,6 +49,7 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | Estagiários / Terceirizados | `/recursos-humanos` | genérico, 2 abas | `/recursos-humanos/{estagiarios,terceirizados}/filtro` |
 | Plano Estratégico / RGA | `/planejamento` (4ª/5ª aba) | genérico | `/planejamento/{plano-estrategico,rga}/filtro` |
 | Contratos Administrativos | `/contratos` | bespoke paginado, sem filtro | `GET /licitacoes/contratos` (endpoint já existia, só faltava a lista no frontend) |
+| Emendas Parlamentares | `/emendas-parlamentares` | bespoke, filtro tipo/ano exclusivo | `GET /emendas-parlamentares` + `/tipo/{tipo}` + `/ano/{ano}` (endpoints separados) |
 
 ## 4. Como conferir o contrato real do backend
 
@@ -89,13 +90,9 @@ Outras convenções a manter:
 ## 5. Próximos passos sugeridos (por prioridade / facilidade)
 
 Todos os endpoints confirmados no formato **documento genérico** já foram implementados (ver
-tabela da seção 3). Restam só os **bespoke** (exigem módulo próprio, mais trabalho):
+tabela da seção 3). Resta só 1 item **bespoke** (exige módulo próprio, mais trabalho):
 
-1. **Emendas Parlamentares** — `GET /emendas-parlamentares` (+ filtro por `/ano/{ano}` e
-   `/tipo/{tipo}`, paginado). Campos: numero, dataPublicacao, objeto, autoridade, origem,
-   tipo (enum), formaRepasse (enum), valorPrevisto, valorRepassado, linkDetalhes. Mapeia pro
-   item "Emendas parlamentares" na seção Renúncia de Receita.
-2. **Concursos e Seleções Públicas** — `GET /recursos-humanos/concursos` (array simples) +
+1. **Concursos e Seleções Públicas** — `GET /recursos-humanos/concursos` (array simples) +
    anexos aninhados (`/concursos/{id}/anexos`). DTO bespoke: numero, ano, dataAbertura,
    dataInscricoes, dataTerminoInscricoes, resumo. Precisa decidir se mostra os anexos na
    mesma página ou não.
