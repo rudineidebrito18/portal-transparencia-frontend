@@ -215,7 +215,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdReceiptLong,
     itens: [
       { label: 'Renúncias fiscais', icon: MdPercent, href: '/gestao-fiscal?categoria=renuncia-fiscal' },
-      { label: 'Emendas parlamentares', icon: MdEditNote },
+      { label: 'Emendas parlamentares', icon: MdEditNote, href: '/emendas-parlamentares' },
       { label: 'Transferências disciplinadas pela EC nº 105', icon: MdCompareArrows },
     ],
   },
