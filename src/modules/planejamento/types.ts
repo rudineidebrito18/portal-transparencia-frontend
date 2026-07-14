@@ -1,1 +1,1 @@
-export type RecursoPlanejamento = 'ldo' | 'loa' | 'ppa'
+export type RecursoPlanejamento = 'ldo' | 'loa' | 'ppa' | 'plano-estrategico' | 'rga'

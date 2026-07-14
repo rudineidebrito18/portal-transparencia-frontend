@@ -7,7 +7,9 @@ import DocumentoListView from './DocumentoListView'
 const CATEGORIAS: { recurso: RecursoPlanejamento; label: string }[] = [
   { recurso: 'ldo', label: 'LDO' },
   { recurso: 'loa', label: 'LOA' },
-  { recurso: 'ppa', label: 'PPA' }
+  { recurso: 'ppa', label: 'PPA' },
+  { recurso: 'plano-estrategico', label: 'Plano Estratégico' },
+  { recurso: 'rga', label: 'Relatórios de Gestão e Atividades' }
 ]
 
 export default function PlanejamentoView() {
