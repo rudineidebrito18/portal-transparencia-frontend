@@ -29,7 +29,7 @@ esqueci de linkar.
 ## 3. Módulos já implementados
 
 Pré-existentes (antes desta leva de trabalho): `home`, `institucional` (notícias/avisos),
-`diario-oficial`, `noticias`, `avisos`, `licitacoes`, `contratos` (só detalhe, sem lista),
+`diario-oficial`, `noticias`, `avisos`, `licitacoes`, `contratos` (detalhe),
 `servidores`, `folha-pagamento` (recursos-humanos), `gestao-fiscal` (5 abas), `educacao`
 (4 abas), `planejamento` (3 abas: ldo/loa/ppa), `prestacao-contas` (5 abas).
 
@@ -48,6 +48,7 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | Fiscal de Contrato | `/fiscal-contrato` | genérico, recurso único | `/licitacao/fiscal-contratos/filtro` |
 | Estagiários / Terceirizados | `/recursos-humanos` | genérico, 2 abas | `/recursos-humanos/{estagiarios,terceirizados}/filtro` |
 | Plano Estratégico / RGA | `/planejamento` (4ª/5ª aba) | genérico | `/planejamento/{plano-estrategico,rga}/filtro` |
+| Contratos Administrativos | `/contratos` | bespoke paginado, sem filtro | `GET /licitacoes/contratos` (endpoint já existia, só faltava a lista no frontend) |
 
 ## 4. Como conferir o contrato real do backend
 
@@ -98,9 +99,6 @@ tabela da seção 3). Restam só os **bespoke** (exigem módulo próprio, mais t
    anexos aninhados (`/concursos/{id}/anexos`). DTO bespoke: numero, ano, dataAbertura,
    dataInscricoes, dataTerminoInscricoes, resumo. Precisa decidir se mostra os anexos na
    mesma página ou não.
-3. **Contratos Administrativos** — o backend já tem `GET /licitacoes/contratos` (lista), mas o
-   frontend só tem a página de detalhe (`/contratos/[id]`), sem página de listagem. Dá pra
-   criar `/contratos` (lista) reaproveitando esse endpoint.
 
 Sem nenhum endpoint no backend ainda (não dá pra fazer sem trabalho de backend primeiro):
 Estrutura organizacional, FAQ, Radar da transparência, Audiências públicas, Tabela com padrão
