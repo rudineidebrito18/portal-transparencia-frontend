@@ -154,7 +154,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
       { label: 'Chamamento público', icon: MdCampaign },
       { label: 'Empresas inidôneas/suspensas', icon: MdBlock, href: '/gestao-fiscal?categoria=inidoneas' },
       { label: 'Contratos administrativos', icon: MdDescription },
-      { label: 'Fiscal de contrato', icon: MdFactCheck },
+      { label: 'Fiscal de contrato', icon: MdFactCheck, href: '/fiscal-contrato' },
       { label: 'Ordem cronológica', icon: MdSchedule },
       { label: 'Avisos — Lei nº 14.133', icon: MdAnnouncement, href: '/avisos' },
       { label: 'Ata de registro de preço', icon: MdReceipt },
