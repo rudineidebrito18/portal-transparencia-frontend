@@ -8,6 +8,7 @@ import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useEdicoesDiario } from '../hooks/useEdicoesDiario'
 import EdicaoCard from './EdicaoCard'
+import EdicaoDiarioFiltro from './EdicaoDiarioFiltro'
 
 export default function DiarioOficialListView() {
   const {
@@ -18,12 +19,17 @@ export default function DiarioOficialListView() {
     totalPaginas,
     totalElements,
     setPagina,
+    filtros,
+    setFiltros,
     setOrdenacao,
     ordenacao
   } = useEdicoesDiario()
 
   return (
     <div className="space-y-6">
+
+      {/* FILTRO */}
+      <EdicaoDiarioFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
@@ -69,7 +75,7 @@ export default function DiarioOficialListView() {
                 <EdicaoCard key={edicao.id} edicao={edicao} />
               ))
             ) : (
-              <EmptyState message="Nenhuma edição encontrada." />
+              <EmptyState message="Nenhuma edição encontrada com os filtros aplicados." />
             )}
           </div>
 

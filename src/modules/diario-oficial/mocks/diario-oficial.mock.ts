@@ -3,9 +3,9 @@ import { fakerPT_BR as faker } from '@faker-js/faker'
 import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Page } from '@/modules/shared/types/Page'
 import { TipoEdicaoDiario } from '../enums'
-import { EdicaoDiario } from '../types'
+import { EdicaoDiario, FiltroEdicaoDiario } from '../types'
 
-type ListParams = {
+type ListParams = FiltroEdicaoDiario & {
   page?: number
   size?: number
   sort?: string
@@ -29,9 +29,26 @@ const edicoes: EdicaoDiario[] = Array.from({ length: TOTAL_MOCK }, (_, i) => ger
 
 export const diarioOficialMock = {
   async listar(params: ListParams): Promise<Page<EdicaoDiario>> {
-    const { page = 0, size = 10, sort } = params
+    const { page = 0, size = 10, sort, tipo, numeroEdicao, dataInicial, dataFinal } = params
 
-    const ordenadas = ordenar(edicoes as unknown as Record<string, unknown>[], sort) as unknown as EdicaoDiario[]
+    let dados = edicoes
+
+    if (tipo) {
+      dados = dados.filter(e => e.tipo === tipo)
+    }
+    if (numeroEdicao !== undefined) {
+      dados = dados.filter(e => e.numeroEdicao === Number(numeroEdicao))
+    }
+    if (dataInicial) {
+      const inicio = new Date(String(dataInicial)).getTime()
+      dados = dados.filter(e => new Date(e.dataPublicacao).getTime() >= inicio)
+    }
+    if (dataFinal) {
+      const fim = new Date(String(dataFinal)).getTime()
+      dados = dados.filter(e => new Date(e.dataPublicacao).getTime() <= fim)
+    }
+
+    const ordenadas = ordenar(dados as unknown as Record<string, unknown>[], sort) as unknown as EdicaoDiario[]
 
     return paginar(ordenadas, page, size)
   }

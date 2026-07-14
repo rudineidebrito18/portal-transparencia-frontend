@@ -1,11 +1,11 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
 import { diarioOficialMock } from './mocks/diario-oficial.mock'
-import { EdicaoDiario } from './types'
+import { EdicaoDiario, FiltroEdicaoDiario } from './types'
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
-type ListarParams = {
+type ListarParams = FiltroEdicaoDiario & {
   page?: number
   size?: number
   sort?: string
@@ -16,7 +16,7 @@ export const diarioOficialService = {
     if (USE_MOCK) return diarioOficialMock.listar(params)
 
     return api
-      .get<Page<EdicaoDiario>>('/edicoes', { params })
+      .get<Page<EdicaoDiario>>('/edicoes/filtro', { params })
       .then(response => response.data)
   }
 }
