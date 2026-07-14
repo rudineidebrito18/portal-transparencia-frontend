@@ -52,6 +52,11 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | Emendas Parlamentares | `/emendas-parlamentares` | bespoke, filtro tipo/ano exclusivo | `GET /emendas-parlamentares` + `/tipo/{tipo}` + `/ano/{ano}` (endpoints separados) |
 | Concursos e Seleções Públicas | `/concursos` | bespoke, sem paginação, anexos aninhados | `GET /recursos-humanos/concursos` + `/concursos/{id}/anexos` |
 | Estrutura Organizacional / Organograma | `/estrutura-organizacional`, `/organograma` | PDF estático, sem backend | nenhum — `PdfViewer` aponta pra `/test.pdf` (placeholder, trocar quando houver o arquivo real) |
+| Diárias — legislação e valores | `/diarias-legislacao` | PDF estático, sem backend | nenhum — mesmo padrão acima |
+| FAQ | `/faq` | página estática (`<details>`/`<summary>`) | nenhum — conteúdo genérico, editar livremente |
+| LGPD e Governo Digital | `/lgpd` | página estática, cobre os 5 itens da seção | nenhum — conteúdo institucional genérico |
+| Radar da Transparência | link externo (`radardatransparencia.atricon.org.br`) | `ItemAcessoCard` abre em nova aba quando `href` começa com `http` | — |
+| RREO | `/gestao-fiscal?categoria=execucao-orcamentaria` | reaproveita aba já existente | `GET /gestao-fiscal/relatorio-execucao-orcamentaria` (só faltava o href) |
 
 ## 4. Como conferir o contrato real do backend
 
@@ -92,24 +97,43 @@ Outras convenções a manter:
 - Estado compartilhável (aba ativa, filtros, página) sempre na URL via `useUrlState` /
   `usePageableResource`, nunca em `useState` puro.
 - Breadcrumb de qualquer página alcançável a partir do hub: `Início > Transparência > ...`.
+- Item do hub que aponta pra outro site (não uma rota interna): `href` começa com `http` e o
+  `ItemAcessoCard` detecta isso sozinho — abre em nova aba com `rel="noopener noreferrer"` em
+  vez de `next/link`. Precedente: "Radar da transparência pública".
 - Não existe suíte de testes configurada no projeto (sem jest/vitest) — não há padrão a seguir
   aqui ainda.
 
 ## 5. Próximos passos sugeridos (por prioridade / facilidade)
 
-Todos os endpoints já confirmados no spec (formato documento genérico e bespoke) foram
-implementados — ver tabela da seção 3. Não há mais nenhum item pendente que já tenha
-endpoint confirmado no backend.
+Todos os endpoints do formato documento genérico já confirmados foram implementados. Uma
+auditoria completa das tags do spec (2026-07-14) contra os itens sem `href` do hub encontrou
+mais alguns endpoints que existem mas ainda não têm código no frontend:
 
-Sem nenhum endpoint no backend ainda (não dá pra fazer sem trabalho de backend primeiro, **exceto**
-os que forem só documento fixo — aí vale usar o padrão "PDF estático" da seção 4 em vez de
-esperar): FAQ, Radar da transparência, Audiências públicas, Tabela com padrão remuneratório,
-"Diárias — legislação e valores", Dispensas e inexigibilidade, Ato de adesão, PCA, Chamamento
-público, Ordem cronológica, Ata de registro de preço, RREO, Relatório circunstanciado,
-Regulamentação da LAI, Prazos de resposta SIC, Relatório anual estatístico, Documentos
-(des)classificados, Carta de serviços, **toda a seção LGPD e Governo Digital**, Transferências
-EC nº 105, Lista de espera de saúde, Estoque de medicamentos, Conselho de saúde, Conselho do
-FUNDEB, Conselho de assistência social.
+1. **Tabela com padrão remuneratório** — `GET /recursos-humanos/cargos` (array simples: cargo,
+   quantidade, valorBruto, valorDesconto, valorLiquido, media). Mesmo padrão bespoke sem
+   paginação de `obras`/`concursos`.
+2. **Transferências disciplinadas pela EC nº 105** — `GET /execucao-orcamentaria/transferencia-voluntaria/filtro`,
+   formato documento genérico. **Confiança moderada no mapeamento**: o nome do endpoint
+   ("Transferência Voluntária") é genérico, não menciona EC 105 explicitamente — confirmar
+   com quem administra o backend antes de assumir que é o recurso certo.
+3. **Ato de adesão** — não é endpoint novo: dá pra reaproveitar `/licitacoes` filtrando
+   `tipoProcedimentoLicitacao=AARP` (Adesão à Ata de Registro de Preços já é um valor do enum
+   `TipoProcedimentoLicitacao`).
+4. **Dispensas e inexigibilidade** — mesma ideia, mas os tipos `DP`/`DEL`/`IN` exigiriam filtro
+   multi-valor em `FiltroLicitacao.tipoProcedimentoLicitacao`, que hoje só aceita 1 valor por vez.
+5. **Detalhe de Obra Pública** — `/obras` já tem sub-recursos não usados no frontend: ARTs
+   (`/obras/{id}/arts`), Anexos (`/obras/{id}/anexos`) e Medições (`/obras/{id}/medicoes`).
+   Não mapeia a nenhum card específico do hub, mas daria pra criar uma página de detalhe
+   `/obras/[id]`.
+
+Decididos explicitamente pelo usuário em 2026-07-14 como **não prioritários por enquanto**
+(não implementar sem pedido explícito): PCA, Chamamento público, Ordem cronológica, Ata de
+registro de preço, Relatório circunstanciado, Regulamentação da LAI, Prazos de resposta SIC,
+Relatório anual estatístico, Documentos (des)classificados, Carta de serviços, Lista de espera
+de saúde, Estoque de medicamentos, Conselho de saúde, Conselho do FUNDEB, Conselho de
+assistência social.
+
+Sem endpoint no backend e sem decisão do usuário ainda: Audiências públicas.
 
 ## 6. Limitações conhecidas desta sessão
 
