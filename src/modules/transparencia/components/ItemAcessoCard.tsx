@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { MdArrowForward, MdOutlineHourglassEmpty } from 'react-icons/md'
+import { MdArrowForward, MdOpenInNew, MdOutlineHourglassEmpty } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { ItemAcesso } from '../data/secoes'
@@ -23,20 +23,41 @@ export default function ItemAcessoCard({ label, href, icon: Icon }: ItemAcesso) 
     )
   }
 
-  return (
-    <Link href={href} className="block h-full">
-      <Card className="p-4 h-full flex items-center gap-3 border-l-4 border-l-primary group">
-        <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
-          <Icon size={18} />
-        </span>
-        <span className="text-sm font-medium text-text-secondary flex-1 group-hover:text-primary transition-colors">
-          {label}
-        </span>
+  const externo = href.startsWith('http')
+
+  const conteudo = (
+    <Card className="p-4 h-full flex items-center gap-3 border-l-4 border-l-primary group">
+      <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+        <Icon size={18} />
+      </span>
+      <span className="text-sm font-medium text-text-secondary flex-1 group-hover:text-primary transition-colors">
+        {label}
+      </span>
+      {externo ? (
+        <MdOpenInNew
+          size={16}
+          className="text-primary shrink-0"
+        />
+      ) : (
         <MdArrowForward
           size={16}
           className="text-primary shrink-0 group-hover:translate-x-0.5 transition-transform"
         />
-      </Card>
+      )}
+    </Card>
+  )
+
+  if (externo) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="block h-full">
+        {conteudo}
+      </a>
+    )
+  }
+
+  return (
+    <Link href={href} className="block h-full">
+      {conteudo}
     </Link>
   )
 }
