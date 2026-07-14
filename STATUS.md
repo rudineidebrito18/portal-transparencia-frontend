@@ -47,6 +47,7 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | Tabela de Valores das Diárias | `/tabela-valores` | genérico + enum tipo | `GET /tabela-valores/buscar` |
 | Fiscal de Contrato | `/fiscal-contrato` | genérico, recurso único | `/licitacao/fiscal-contratos/filtro` |
 | Estagiários / Terceirizados | `/recursos-humanos` | genérico, 2 abas | `/recursos-humanos/{estagiarios,terceirizados}/filtro` |
+| Plano Estratégico / RGA | `/planejamento` (4ª/5ª aba) | genérico | `/planejamento/{plano-estrategico,rga}/filtro` |
 
 ## 4. Como conferir o contrato real do backend
 
@@ -86,27 +87,18 @@ Outras convenções a manter:
 
 ## 5. Próximos passos sugeridos (por prioridade / facilidade)
 
-Confirmei estes endpoints no spec — todos batem no formato **documento genérico**, então são
-o trabalho mais rápido (mesma receita dos módulos já feitos):
+Todos os endpoints confirmados no formato **documento genérico** já foram implementados (ver
+tabela da seção 3). Restam só os **bespoke** (exigem módulo próprio, mais trabalho):
 
-1. **Plano Estratégico Institucional** — `GET /planejamento/plano-estrategico/filtro`, mesmo
-   formato. Cabe como 4ª aba dentro do módulo `planejamento` já existente.
-2. **Relatórios de gestão e atividades** — `GET /planejamento/rga/filtro`
-   (`RelatorioGestaoAtividadeResponseDto`, mesmo formato genérico). RGA = "Relatório de Gestão
-   e Atividades", **não** confundir com RREO (que não existe no backend). Cabe como 5ª aba em
-   `planejamento`, ou like separado — a decidir.
-
-Endpoints confirmados mas **bespoke** (exigem módulo próprio, mais trabalho):
-
-3. **Emendas Parlamentares** — `GET /emendas-parlamentares` (+ filtro por `/ano/{ano}` e
+1. **Emendas Parlamentares** — `GET /emendas-parlamentares` (+ filtro por `/ano/{ano}` e
    `/tipo/{tipo}`, paginado). Campos: numero, dataPublicacao, objeto, autoridade, origem,
    tipo (enum), formaRepasse (enum), valorPrevisto, valorRepassado, linkDetalhes. Mapeia pro
    item "Emendas parlamentares" na seção Renúncia de Receita.
-4. **Concursos e Seleções Públicas** — `GET /recursos-humanos/concursos` (array simples) +
+2. **Concursos e Seleções Públicas** — `GET /recursos-humanos/concursos` (array simples) +
    anexos aninhados (`/concursos/{id}/anexos`). DTO bespoke: numero, ano, dataAbertura,
    dataInscricoes, dataTerminoInscricoes, resumo. Precisa decidir se mostra os anexos na
    mesma página ou não.
-5. **Contratos Administrativos** — o backend já tem `GET /licitacoes/contratos` (lista), mas o
+3. **Contratos Administrativos** — o backend já tem `GET /licitacoes/contratos` (lista), mas o
    frontend só tem a página de detalhe (`/contratos/[id]`), sem página de listagem. Dá pra
    criar `/contratos` (lista) reaproveitando esse endpoint.
 
