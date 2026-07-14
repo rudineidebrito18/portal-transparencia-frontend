@@ -51,6 +51,7 @@ Criados nesta sessão, todos confirmados contra o OpenAPI real:
 | Contratos Administrativos | `/contratos` | bespoke paginado, sem filtro | `GET /licitacoes/contratos` (endpoint já existia, só faltava a lista no frontend) |
 | Emendas Parlamentares | `/emendas-parlamentares` | bespoke, filtro tipo/ano exclusivo | `GET /emendas-parlamentares` + `/tipo/{tipo}` + `/ano/{ano}` (endpoints separados) |
 | Concursos e Seleções Públicas | `/concursos` | bespoke, sem paginação, anexos aninhados | `GET /recursos-humanos/concursos` + `/concursos/{id}/anexos` |
+| Estrutura Organizacional / Organograma | `/estrutura-organizacional`, `/organograma` | PDF estático, sem backend | nenhum — `PdfViewer` aponta pra `/test.pdf` (placeholder, trocar quando houver o arquivo real) |
 
 ## 4. Como conferir o contrato real do backend
 
@@ -76,6 +77,12 @@ Dois formatos de DTO já em uso — decida qual usar **antes** de codar:
 - **Info singleton** — `GET` retorna um objeto único (não lista, não paginado).
   Também usa `useAsyncData`, mas com `valorInicial: null` e sem loop de cards.
   Precedentes: `esic`, `ouvidoria`.
+- **PDF estático, sem backend** — pra itens que são só um documento publicado esporadicamente
+  (sem CRUD, sem listagem), não vale a pena esperar endpoint de backend. Usa o componente
+  `src/components/ui/PdfViewer.tsx` (iframe + botão de baixar) direto no `page.tsx`, com o
+  caminho do arquivo como constante local marcada `// TODO`. Precedentes: `estrutura-organizacional`,
+  `organograma`. Bom candidato pra outros itens da lista "sem endpoint" da seção 5 que também
+  sejam documentos fixos (ex: Carta de serviços, Regulamentação da LAI).
 
 Outras convenções a manter:
 - Rota do frontend (`src/app/<rota>`) espelha o basePath do backend 1:1.
@@ -94,14 +101,15 @@ Todos os endpoints já confirmados no spec (formato documento genérico e bespok
 implementados — ver tabela da seção 3. Não há mais nenhum item pendente que já tenha
 endpoint confirmado no backend.
 
-Sem nenhum endpoint no backend ainda (não dá pra fazer sem trabalho de backend primeiro):
-Estrutura organizacional, FAQ, Radar da transparência, Audiências públicas, Tabela com padrão
-remuneratório, "Diárias — legislação e valores", Dispensas e inexigibilidade, Ato de adesão,
-PCA, Chamamento público, Ordem cronológica, Ata de registro de preço, RREO, Relatório
-circunstanciado, Regulamentação da LAI, Prazos de resposta SIC, Relatório anual estatístico,
-Documentos (des)classificados, Carta de serviços, **toda a seção LGPD e Governo Digital**,
-Transferências EC nº 105, Lista de espera de saúde, Estoque de medicamentos, Conselho de
-saúde, Conselho do FUNDEB, Conselho de assistência social.
+Sem nenhum endpoint no backend ainda (não dá pra fazer sem trabalho de backend primeiro, **exceto**
+os que forem só documento fixo — aí vale usar o padrão "PDF estático" da seção 4 em vez de
+esperar): FAQ, Radar da transparência, Audiências públicas, Tabela com padrão remuneratório,
+"Diárias — legislação e valores", Dispensas e inexigibilidade, Ato de adesão, PCA, Chamamento
+público, Ordem cronológica, Ata de registro de preço, RREO, Relatório circunstanciado,
+Regulamentação da LAI, Prazos de resposta SIC, Relatório anual estatístico, Documentos
+(des)classificados, Carta de serviços, **toda a seção LGPD e Governo Digital**, Transferências
+EC nº 105, Lista de espera de saúde, Estoque de medicamentos, Conselho de saúde, Conselho do
+FUNDEB, Conselho de assistência social.
 
 ## 6. Limitações conhecidas desta sessão
 
@@ -115,6 +123,11 @@ saúde, Conselho do FUNDEB, Conselho de assistência social.
 - `/obras` não tem filtro nem paginação no backend; "Obras Paralisadas" filtra client-side
   sobre a lista inteira já carregada (foge do padrão "filtro sempre no backend" só porque o
   backend não oferece outra opção pra esse recurso específico).
+- `nohup npm run dev & disown` neste ambiente às vezes não solta de vez o TTY (processo continua
+  com controlling terminal em vez de "?"), então um `pkill -f "next dev"` simples pode não
+  encerrar tudo. Depois de cada rodada de teste, confirme com `ps aux | grep -i next` e mate
+  os PIDs residuais explicitamente antes de subir um novo servidor — senão acabam dois
+  processos disputando a porta 3000/3001 ao mesmo tempo.
 
 ## 7. Como retomar
 
