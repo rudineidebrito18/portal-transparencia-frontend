@@ -13,6 +13,7 @@ import {
   MdLocalHospital,
   MdSchool,
   MdAccountTree,
+  MdHub,
   MdArticle,
   MdHelpOutline,
   MdRadar,
@@ -97,7 +98,8 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     titulo: 'Informações Institucionais',
     icon: MdAccountBalance,
     itens: [
-      { label: 'Estrutura organizacional', icon: MdAccountTree },
+      { label: 'Estrutura organizacional', icon: MdAccountTree, href: '/estrutura-organizacional' },
+      { label: 'Organograma', icon: MdHub, href: '/organograma' },
       { label: 'Atos normativos próprios', icon: MdArticle, href: '/legislacao' },
       { label: 'Perguntas frequentes (FAQ)', icon: MdHelpOutline },
       { label: 'Radar da transparência pública', icon: MdRadar },
