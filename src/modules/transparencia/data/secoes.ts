@@ -130,7 +130,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     itens: [
       { label: 'Relação nominal de servidores', icon: MdBadge, href: '/servidores' },
       { label: 'Remuneração nominal dos servidores', icon: MdPayments, href: '/folha-pagamento' },
-      { label: 'Tabela com padrão remuneratório', icon: MdTableChart },
+      { label: 'Tabela com padrão remuneratório', icon: MdTableChart, href: '/cargos' },
       { label: 'Estagiários', icon: MdWorkOutline, href: '/recursos-humanos?categoria=estagiarios' },
       { label: 'Terceirizados', icon: MdBusinessCenter, href: '/recursos-humanos?categoria=terceirizados' },
       { label: 'Concursos e seleções públicas', icon: MdAssignmentInd, href: '/concursos' },
