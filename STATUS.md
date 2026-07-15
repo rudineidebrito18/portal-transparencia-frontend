@@ -241,55 +241,45 @@ citado acima:
   criar/listar/alterar role/excluir, com auto-proteção (não pode alterar/excluir a própria
   conta — botão desabilitado com tooltip) e mensagens de erro 400/409 mostradas verbatim.
 
-### 7.2 Bugs de backend encontrados durante a verificação (não corrigidos — fora deste repo)
+### 7.2 Bugs de backend encontrados na verificação — **corrigidos em 2026-07-15**
 
-**1. Leitura instável dos módulos do padrão genérico** (`GET {base}/filtro`, `GET {base}/{id}`):
-falha intermitentemente com `500 {"errors":["No default constructor for entity 'X'"]}`.
-Comportamento observado ao testar contra o backend real (`portal-transparencia-pref`, mesma
-instância viva o tempo todo):
-- Num teste isolado logo após subir o backend, quase todos os ~27 módulos respondiam `200`
-  normalmente (com ou sem `sort`) — só `gestao-fiscal/renuncia-fiscal` e `legislacao/lei`
-  falhavam desde a primeira tentativa.
-- Repetindo os testes mais tarde na mesma instância (sem reiniciar o backend), módulos que
-  antes respondiam `200` (`saude/unidade`, `planejamento/ppa`, `recursos-humanos/estagiarios`,
-  `recursos-humanos/terceirizados`) passaram a **também** falhar com o mesmo erro — inclusive
-  em `GET {base}/{id}` **sem** `sort` nem paginação envolvida.
-- Uma vez que um módulo começa a falhar, falha de forma consistente e permanente pro resto
-  da vida daquele processo do backend (reiniciar "limpa" o problema temporariamente, mas ele
-  volta a aparecer, às vezes em módulos diferentes, conforme mais módulos são exercitados).
-- `POST` (criar) continua funcionando normalmente mesmo em módulos cuja leitura já quebrou
-  (confirmado criando um registro em `recursos-humanos/estagiarios` depois do `GET` já estar
-  500) — o problema parece restrito ao caminho de leitura/hidratação do Hibernate, não à
-  entidade em si nem à escrita.
+Dois bugs foram encontrados testando o painel admin contra o backend real e reportados pro
+time do `portal-transparencia-pref`. Ambos corrigidos no commit `1db822a`
+("fix(generic-crud): corrige 500 em GET após dados existirem e PUT exigindo arquivo") e
+reverificados aqui contra o backend corrigido — ver seção 7.2.1.
 
-Isso não parece ser um problema isolado de 1-2 entidades sem `@NoArgsConstructor` (ainda que
-seja possível que `renuncia-fiscal`/`lei` tenham esse problema à parte, já que falharam desde
-a primeira tentativa) — o padrão de "funciona, depois para de funcionar, conforme mais
-módulos diferentes são acessados no mesmo processo" sugere algo compartilhado/com estado
-ficando corrompido (ex: um cache de proxy/enhancement do Hibernate, ou um bean singleton com
-campo mutável que deveria ser sem estado) num mecanismo genérico do backend que lida com
-`Class<T>` dinamicamente pra essas ~27 entidades. **Isso é bug do backend
-(`portal-transparencia-pref`), não do código deste repo** — o frontend manda exatamente os
-parâmetros documentados na seção 6.7 do prompt. Recomendo reportar pro time de backend com
-prioridade: **na prática, isso pode impedir editar/excluir qualquer registro de um módulo
-afetado**, porque a tela de edição/exclusão do painel admin só aparece depois que a listagem
-carrega — se a listagem 500, não tem como chegar no botão "Editar"/"Excluir" pela UI (criar
-continua funcionando às cegas).
+**1. Leitura instável dos módulos do padrão genérico** (`GET {base}/filtro`, `GET {base}/{id}`
+retornavam `500 {"errors":["No default constructor for entity 'X'"]}` de forma intermitente).
+**Causa raiz real**: `@SuperBuilder` do Lombok sem `@NoArgsConstructor` nas subclasses de
+entidade — não era corrupção de estado compartilhado como eu tinha hipotetizado a partir do
+padrão observado (funcionava, depois parava de funcionar conforme mais módulos eram
+exercitados). **Correção**: `@NoArgsConstructor` adicionado nas 26 entidades afetadas (as 25
+do padrão genérico + `AnexoObraPublica`, achado extra que eu não tinha reportado).
 
-**2. `PUT {base}/{id}` exige a parte `arquivo`, apesar do prompt do admin dizer que é
-opcional na edição.** Testado direto (`curl`/fetch autenticado) contra
-`recursos-humanos/estagiarios/{id}`: enviar só `dados` sem `arquivo` retorna
-`500 {"errors":["Required part 'arquivo' is not present."]}` — uma mensagem exata do Spring
-(`@RequestPart` sem `required=false`), não um erro genérico. **Reação no frontend**: o form de
-edição em `GenericCrudPage.tsx` passou a exigir arquivo também ao editar (input marcado
-`required`, label atualizado) — diferente do que o prompt document documenta, mas alinhado
-com o que o backend realmente aceita hoje. Reverter isso se o backend for corrigido pra
-aceitar `arquivo` de fato opcional no PUT.
+**2. `PUT {base}/{id}` exigia a parte `arquivo`** mesmo o prompt do admin dizendo que é
+opcional na edição (`500 "Required part 'arquivo' is not present"` quando omitida).
+**Correção**: `PUT` agora aceita omitir `arquivo` (mantém o `caminhoArquivo` existente) e
+continua substituindo corretamente quando um arquivo novo é enviado. O workaround que eu
+tinha posto no frontend (exigir arquivo também na edição, em `GenericCrudPage.tsx`) foi
+**revertido** — o form volta a tratar arquivo como opcional na edição, como o prompt sempre
+disse.
+
+#### 7.2.1 Reverificação pós-fix (2026-07-15)
+
+Contra o backend com o fix aplicado (H2 em memória, reiniciado do zero):
+- `POST` → `GET /{id}` logo em seguida → `GET /filtro?sort=data,desc`: todos `200` (antes,
+  em uma sessão anterior, isso quebrava depois de alguns módulos serem exercitados).
+- `PUT` sem a parte `arquivo`: `200`, mantém o `caminhoArquivo` anterior. `PUT` com arquivo
+  novo: substitui corretamente. Ambos os caminhos testados via clique real na UI
+  (`/admin/modulos/estagiarios`: criar → editar sem reenviar PDF → excluir, ciclo completo
+  refletido na tabela).
+- Módulo `lei` (que antes do fix tinha ficado com leitura quebrada numa sessão anterior)
+  carrega normalmente agora.
 
 Também vale registrar: o backend (`portal-transparencia-pref`) não sobe com `./mvnw
 spring-boot:run` direto — os testes têm erros de compilação pré-existentes (`FiscalContratos`,
-`ServidorServiceImplTest`, assinaturas desatualizadas). Precisa `-DskipTests
--Dmaven.test.skip=true` pra só rodar a aplicação sem compilar os testes.
+`ServidorServiceImplTest`, assinaturas desatualizadas, não relacionado aos bugs acima).
+Precisa `-DskipTests -Dmaven.test.skip=true` pra só rodar a aplicação sem compilar os testes.
 
 ### 7.3 Próximos passos (módulos bespoke, não implementados ainda)
 

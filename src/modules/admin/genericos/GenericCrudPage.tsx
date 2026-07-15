@@ -102,14 +102,10 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
     }
 
     try {
-      // O backend exige a parte "arquivo" também no PUT (testado contra o
-      // real: 500 "Required part 'arquivo' is not present" quando omitida),
-      // apesar do prompt do admin documentar como opcional na edição.
-      if (!arquivo) throw new Error('Selecione um arquivo PDF.')
-
       if (form.id) {
         await service.atualizar(form.id, dados, arquivo)
       } else {
+        if (!arquivo) throw new Error('Selecione um arquivo PDF.')
         await service.criar(dados, arquivo)
       }
 
@@ -218,12 +214,11 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Arquivo PDF {form.id && '(reenvie o arquivo mesmo pra manter o registro — o backend exige essa parte também ao editar)'}
+                Arquivo PDF {form.id && '(opcional — mantém o atual se vazio)'}
               </label>
               <input
                 type="file"
                 accept="application/pdf"
-                required
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}
                 className="text-sm"
               />
