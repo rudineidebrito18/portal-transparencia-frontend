@@ -1,4 +1,4 @@
-import PublicLayout from '@/layouts/PublicLayout'
+import RootLayoutSwitch from '@/layouts/RootLayoutSwitch'
 import './globals.css'
 import { ReactNode } from 'react'
 
@@ -11,9 +11,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <body className="font-sans text-gray-800">
-        <PublicLayout>
+        <RootLayoutSwitch>
           {children}
-        </PublicLayout>
+        </RootLayoutSwitch>
       </body>
     </html>
   )

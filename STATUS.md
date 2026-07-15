@@ -163,7 +163,7 @@ Sem endpoint no backend e sem decisão do usuário ainda: Audiências públicas.
   confirme com o usuário antes de matar um processo em `pts/N` que você não iniciou nesta
   sessão. Processos que você mesmo sobe via `nohup ... & disown` aparecem com TTY `?`.
 
-## 7. Dashboard administrativo — decisão de arquitetura (2026-07-14, ainda não iniciado)
+## 7. Dashboard administrativo — fase 1 implementada (2026-07-15)
 
 Próxima frente grande do projeto: um dashboard pra funcionários da prefeitura fazerem CRUD
 nos dados que hoje o portal só lê (o backend já expõe `POST`/`PUT`/`DELETE` pra quase todo
@@ -189,21 +189,137 @@ Raciocínio (discutido em conversa, não é definitivo — revisitar se o contex
   segmento inteiro por padrão (checa sessão antes de renderizar) — isso é por **UX** (não
   mostrar formulário/erro feio pra visitante aleatório, não expor estrutura interna do admin
   como reconhecimento), não é a barreira de segurança crítica.
-- **Pendência a confirmar antes de começar**: os `GET`s sensíveis do backend (não só
-  `POST`/`PUT`/`DELETE`) também estão atrás do Spring Security? Ex: os endpoints de
-  `/users/*` que aparecem no spec (`/users/test`, `/users/login`, `/users/signup`) — conferir
-  se `/users/test` e afins exigem autenticação, e se há algum `GET` de rascunho/dado
-  não-publicado que precise do mesmo tratamento.
-- Reaproveitar os `types.ts` de cada módulo já existente (Servidor, Licitação, ContratoLicitacao
-  etc.) pros formulários do admin — os DTOs de request geralmente são um subconjunto dos de
-  response já mapeados no frontend público.
+- **Pendência resolvida**: `GET /api/**` é público em quase tudo, exceto `/api/admin/**`
+  (sempre exige `ROLE_ADMINISTRATOR`, mesmo pra leitura). Confirmado contra o spec real e
+  contra o contrato completo entregue pelo backend em
+  `/home/rudinei/Documentos/prompt-frontend-dashboard-admin.md` (não versionado neste repo,
+  fica no home do usuário — vale reconferir se ele existir numa sessão futura).
+
+### 7.1 O que foi implementado nesta sessão
+
+Fundação completa + motor de CRUD genérico + gestão de usuários, seguindo o prompt do backend
+citado acima:
+
+- **Auth** (`src/modules/auth/`): login via `POST /users/login` (fora do prefixo `/api` —
+  `next.config.ts` ganhou um segundo rewrite só pra isso, e existe `src/services/authApi.ts`
+  como instância irmã de `src/services/api.ts` com baseURL diferente). Token JWT salvo em
+  cookie `admin_token` (não-httpOnly — só pro `middleware.ts` conseguir ler; a barreira real
+  continua sendo o backend).
+- **Descoberta importante sobre o JWT**: o token emitido só carrega `{iss, iat, exp, sub}` —
+  **não tem claim de roles nem de id**, e não existe endpoint `/users/me`. Solução adotada:
+  `detectarPapeisEId` (`src/modules/auth/auth.service.ts`) usa `GET /api/admin/users` como
+  sonda — 200 = `ROLE_ADMINISTRATOR` (e a própria lista retornada revela o próprio `id`,
+  casando pelo e-mail do token, usado pra desabilitar "alterar role"/"excluir" na própria
+  linha em `/admin/usuarios`); 403 = `ROLE_MANAGER` (único outro papel que consegue logar).
+- **RBAC** (`src/modules/auth/permissoes.ts`): `temPapel`/`isAdministrador` com hierarquia
+  (`ROLE_ADMINISTRATOR` ⊇ `ROLE_MANAGER`). Módulos genéricos guardam o próprio
+  `papelMinimoEdicao` direto na config (não um grupo genérico) porque a tabela da seção 6.7
+  do prompt já diz manager/admin-only por módulo — mais confiável que re-derivar da tabela
+  mais grosseira da seção 5 (ex: Renúncia Fiscal é "fiscal" mas fica em `ROLE_MANAGER` porque
+  não está na lista nomeada da seção 5 pro grupo Fiscal/Orçamentário).
+- **`middleware.ts`** (raiz do projeto): barra `/admin/*` sem cookie, exceto `/admin/login`.
+- **`src/services/api.ts`**: interceptor de request anexa `Authorization: Bearer` do cookie;
+  interceptor de response parseia o formato real de erro (`{errors: string[]}`, não
+  `{message}` como estava antes) via `src/services/apiError.ts` (compartilhado com
+  `authApi.ts`). Só força logout automático em 401 — um 403 é tratado como mensagem de
+  permissão insuficiente, não sessão expirada (a própria sonda de papel depende de um 403
+  "normal" aqui).
+- **Layout do admin**: `src/app/admin/login/page.tsx` (sem shell) +
+  `src/app/admin/(painel)/layout.tsx` (sidebar + topbar, `src/modules/admin/shared/AdminSidebar.tsx`).
+  O layout raiz (`src/app/layout.tsx`) envolvia tudo em `PublicLayout` (header/footer do site
+  público) — criei `src/layouts/RootLayoutSwitch.tsx` (client, checa `usePathname`) pra pular
+  isso em `/admin/*` sem precisar duplicar `<html>/<body>` com route groups.
+- **Motor de CRUD genérico** (`src/modules/admin/genericos/`): cobre os ~27 módulos do
+  "padrão genérico" (seção 6.7 do prompt, 2 variantes: simples e com intervalo de data) via
+  `criarServicoAdminDocumentoGenerico` + `GenericCrudPage.tsx` (lista com filtro/paginação
+  reaproveitando `usePageableResource`, form de criar/editar com upload de PDF, excluir com
+  confirm) + `registry.ts` (config de cada módulo) + rota dinâmica única
+  `src/app/admin/(painel)/modulos/[slug]/page.tsx` (evita 27 arquivos de página quase
+  idênticos — diferente do site público, que precisa de rota própria por SEO/breadcrumb;
+  aqui é ferramenta interna).
+- **Gestão de usuários** (`src/modules/admin/usuarios/`, `/admin/usuarios`, admin-only):
+  criar/listar/alterar role/excluir, com auto-proteção (não pode alterar/excluir a própria
+  conta — botão desabilitado com tooltip) e mensagens de erro 400/409 mostradas verbatim.
+
+### 7.2 Bugs de backend encontrados durante a verificação (não corrigidos — fora deste repo)
+
+**1. Leitura instável dos módulos do padrão genérico** (`GET {base}/filtro`, `GET {base}/{id}`):
+falha intermitentemente com `500 {"errors":["No default constructor for entity 'X'"]}`.
+Comportamento observado ao testar contra o backend real (`portal-transparencia-pref`, mesma
+instância viva o tempo todo):
+- Num teste isolado logo após subir o backend, quase todos os ~27 módulos respondiam `200`
+  normalmente (com ou sem `sort`) — só `gestao-fiscal/renuncia-fiscal` e `legislacao/lei`
+  falhavam desde a primeira tentativa.
+- Repetindo os testes mais tarde na mesma instância (sem reiniciar o backend), módulos que
+  antes respondiam `200` (`saude/unidade`, `planejamento/ppa`, `recursos-humanos/estagiarios`,
+  `recursos-humanos/terceirizados`) passaram a **também** falhar com o mesmo erro — inclusive
+  em `GET {base}/{id}` **sem** `sort` nem paginação envolvida.
+- Uma vez que um módulo começa a falhar, falha de forma consistente e permanente pro resto
+  da vida daquele processo do backend (reiniciar "limpa" o problema temporariamente, mas ele
+  volta a aparecer, às vezes em módulos diferentes, conforme mais módulos são exercitados).
+- `POST` (criar) continua funcionando normalmente mesmo em módulos cuja leitura já quebrou
+  (confirmado criando um registro em `recursos-humanos/estagiarios` depois do `GET` já estar
+  500) — o problema parece restrito ao caminho de leitura/hidratação do Hibernate, não à
+  entidade em si nem à escrita.
+
+Isso não parece ser um problema isolado de 1-2 entidades sem `@NoArgsConstructor` (ainda que
+seja possível que `renuncia-fiscal`/`lei` tenham esse problema à parte, já que falharam desde
+a primeira tentativa) — o padrão de "funciona, depois para de funcionar, conforme mais
+módulos diferentes são acessados no mesmo processo" sugere algo compartilhado/com estado
+ficando corrompido (ex: um cache de proxy/enhancement do Hibernate, ou um bean singleton com
+campo mutável que deveria ser sem estado) num mecanismo genérico do backend que lida com
+`Class<T>` dinamicamente pra essas ~27 entidades. **Isso é bug do backend
+(`portal-transparencia-pref`), não do código deste repo** — o frontend manda exatamente os
+parâmetros documentados na seção 6.7 do prompt. Recomendo reportar pro time de backend com
+prioridade: **na prática, isso pode impedir editar/excluir qualquer registro de um módulo
+afetado**, porque a tela de edição/exclusão do painel admin só aparece depois que a listagem
+carrega — se a listagem 500, não tem como chegar no botão "Editar"/"Excluir" pela UI (criar
+continua funcionando às cegas).
+
+**2. `PUT {base}/{id}` exige a parte `arquivo`, apesar do prompt do admin dizer que é
+opcional na edição.** Testado direto (`curl`/fetch autenticado) contra
+`recursos-humanos/estagiarios/{id}`: enviar só `dados` sem `arquivo` retorna
+`500 {"errors":["Required part 'arquivo' is not present."]}` — uma mensagem exata do Spring
+(`@RequestPart` sem `required=false`), não um erro genérico. **Reação no frontend**: o form de
+edição em `GenericCrudPage.tsx` passou a exigir arquivo também ao editar (input marcado
+`required`, label atualizado) — diferente do que o prompt document documenta, mas alinhado
+com o que o backend realmente aceita hoje. Reverter isso se o backend for corrigido pra
+aceitar `arquivo` de fato opcional no PUT.
+
+Também vale registrar: o backend (`portal-transparencia-pref`) não sobe com `./mvnw
+spring-boot:run` direto — os testes têm erros de compilação pré-existentes (`FiscalContratos`,
+`ServidorServiceImplTest`, assinaturas desatualizadas). Precisa `-DskipTests
+-Dmaven.test.skip=true` pra só rodar a aplicação sem compilar os testes.
+
+### 7.3 Próximos passos (módulos bespoke, não implementados ainda)
+
+Nesta ordem sugerida (do mais isolado/simples pro mais complexo):
+1. **Institucional** (avisos/notícias — CRUD já teria form pronto no site público, só faltando
+   a versão admin) e **fornecedores/unidades/tabela de valores de diária**.
+2. **ESIC e Ouvidoria** — só PUT de config + leitura de formulários recebidos (sem DELETE
+   ainda, não construir esse botão).
+3. **RH bespoke**: servidor, folha de pagamento, cargos, diárias (todas paginadas, sem usar o
+   padrão genérico) e concursos (⚠️ upload de anexo de concurso está quebrado no backend —
+   não construir essa tela ainda).
+4. **Convênios e Emendas Parlamentares** (bespoke, com sub-recursos).
+5. **Obras Públicas e Repasses** (obra + medições + anexos + ART, ART não é admin-only).
+6. **Licitações** (licitação + contratos + aditivos + fiscal-contratos, com o aviso de upload
+   de documento de contrato com assinatura ambígua no backend — testar antes de confiar).
+7. **Diário Oficial** — o mais complexo: fluxo de publicação com aprovação humana e assinatura
+   digital (stepper de status `RECEBIDO → ... → PUBLICADO`, com `FALHOU`/retomar).
 
 ## 8. Como retomar
 
 ```bash
-npm run dev                                    # sobe o frontend em :3000
-curl -s http://localhost:8080/v3/api-docs       # confirma o backend e pega o spec atualizado
+npm run dev                                                                       # frontend :3000
+cd /home/rudinei/Documentos/portal-transparencia-pref && \
+  ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev -DskipTests -Dmaven.test.skip=true  # backend :8080 (perfil dev, H2 em memória, reseta a cada restart)
+curl -s http://localhost:8080/v3/api-docs                                        # confirma o backend e pega o spec atualizado
 ```
 
+Login de dev pro painel admin: `admin@prefeitura.dev` / `admin123` (criado automaticamente
+no primeiro start).
+
 Antes de criar qualquer módulo novo: puxar o spec de novo (pode ter mudado), achar o DTO no
-`components.schemas`, comparar com os 4 formatos da seção 4, e só then escrever código.
+`components.schemas`, comparar com os 4 formatos da seção 4 (site público) ou os padrões da
+seção 7.1 (admin), e só then escrever código.
