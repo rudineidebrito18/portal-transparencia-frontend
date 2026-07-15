@@ -220,8 +220,14 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
                 type="file"
                 accept="application/pdf"
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}
-                className="text-sm"
+                className="block w-full text-sm text-text-secondary/70
+                  file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0
+                  file:text-sm file:font-semibold file:bg-primary file:text-white
+                  hover:file:bg-primary-dark file:cursor-pointer file:transition-all"
               />
+              {arquivo && (
+                <p className="text-xs text-text-secondary/70 mt-1">Selecionado: {arquivo.name}</p>
+              )}
             </div>
 
             {erroForm && <ErrorState message={erroForm} />}
