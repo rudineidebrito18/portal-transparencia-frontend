@@ -4,6 +4,7 @@ export interface UsuarioAdmin {
   id: number
   email: string
   roles: Papel[]
+  ativo: boolean
 }
 
 export interface CriarUsuarioRequest {

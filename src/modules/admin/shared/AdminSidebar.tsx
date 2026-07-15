@@ -62,6 +62,15 @@ export default function AdminSidebar() {
           </Link>
         )}
 
+        {isAdministrador(usuario) && (
+          <Link
+            href="/admin/auditoria"
+            className={`block px-3 py-2 rounded-lg font-semibold transition ${pathname === '/admin/auditoria' ? 'bg-white/15' : 'hover:bg-white/10'}`}
+          >
+            Auditoria
+          </Link>
+        )}
+
         {[...grupos.entries()].map(([categoria, modulos]) => (
           <div key={categoria}>
             <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">

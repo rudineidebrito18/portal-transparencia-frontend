@@ -16,7 +16,13 @@ export const usuariosService = {
     return api.patch<UsuarioAdmin>(`${BASE}/${id}/role`, dados).then(r => r.data)
   },
 
-  excluir(id: number): Promise<void> {
+  // DELETE aqui é soft delete no backend: desativa a conta (não consegue mais
+  // logar), não apaga o registro — preserva a referência pro log de auditoria.
+  desativar(id: number): Promise<void> {
     return api.delete(`${BASE}/${id}`).then(() => undefined)
+  },
+
+  reativar(id: number): Promise<UsuarioAdmin> {
+    return api.patch<UsuarioAdmin>(`${BASE}/${id}/reativar`).then(r => r.data)
   }
 }

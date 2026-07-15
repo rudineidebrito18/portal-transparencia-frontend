@@ -66,14 +66,23 @@ export default function UsuariosPage() {
     }
   }
 
-  async function handleExcluir(u: UsuarioAdmin) {
-    if (!confirm(`Excluir o usuário ${u.email}?`)) return
+  async function handleDesativar(u: UsuarioAdmin) {
+    if (!confirm(`Desativar o usuário ${u.email}? Ele deixa de conseguir logar, mas o registro é mantido (não é excluído de fato).`)) return
 
     try {
-      await usuariosService.excluir(u.id)
+      await usuariosService.desativar(u.id)
       carregar()
     } catch (e: unknown) {
-      alert(e instanceof Error ? e.message : 'Erro ao excluir usuário')
+      alert(e instanceof Error ? e.message : 'Erro ao desativar usuário')
+    }
+  }
+
+  async function handleReativar(u: UsuarioAdmin) {
+    try {
+      await usuariosService.reativar(u.id)
+      carregar()
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erro ao reativar usuário')
     }
   }
 
@@ -135,6 +144,7 @@ export default function UsuariosPage() {
               <tr>
                 <th className="p-3">E-mail</th>
                 <th className="p-3">Papel</th>
+                <th className="p-3">Status</th>
                 <th className="p-3 text-right">Ações</th>
               </tr>
             </thead>
@@ -149,6 +159,11 @@ export default function UsuariosPage() {
                         {u.roles.includes('ROLE_ADMINISTRATOR') ? 'Administrador' : 'Gerente'}
                       </Badge>
                     </td>
+                    <td className="p-3">
+                      <Badge className={u.ativo ? 'bg-success/10 text-success' : 'bg-text-secondary/10 text-text-secondary'}>
+                        {u.ativo ? 'Ativo' : 'Inativo'}
+                      </Badge>
+                    </td>
                     <td className="p-3 text-right space-x-2">
                       <button
                         title={propriaConta ? 'Não é possível alterar a própria conta' : undefined}
@@ -160,14 +175,23 @@ export default function UsuariosPage() {
                       >
                         {u.roles.includes('ROLE_ADMINISTRATOR') ? 'Rebaixar p/ Gerente' : 'Promover a Admin'}
                       </button>
-                      <button
-                        title={propriaConta ? 'Não é possível excluir a própria conta' : undefined}
-                        disabled={propriaConta}
-                        onClick={() => handleExcluir(u)}
-                        className="text-error hover:underline disabled:text-text-secondary/40 disabled:cursor-not-allowed disabled:no-underline"
-                      >
-                        Excluir
-                      </button>
+                      {u.ativo ? (
+                        <button
+                          title={propriaConta ? 'Não é possível desativar a própria conta' : undefined}
+                          disabled={propriaConta}
+                          onClick={() => handleDesativar(u)}
+                          className="text-error hover:underline disabled:text-text-secondary/40 disabled:cursor-not-allowed disabled:no-underline"
+                        >
+                          Desativar
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleReativar(u)}
+                          className="text-success hover:underline"
+                        >
+                          Reativar
+                        </button>
+                      )}
                     </td>
                   </tr>
                 )

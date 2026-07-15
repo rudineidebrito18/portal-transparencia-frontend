@@ -289,7 +289,40 @@ spring-boot:run` direto — os testes têm erros de compilação pré-existentes
 `ServidorServiceImplTest`, assinaturas desatualizadas, não relacionado aos bugs acima).
 Precisa `-DskipTests -Dmaven.test.skip=true` pra só rodar a aplicação sem compilar os testes.
 
-### 7.3 Próximos passos (módulos bespoke, não implementados ainda)
+### 7.3 Desativação de usuário (soft delete) e auditoria (2026-07-15)
+
+Duas features novas no backend, implementadas no frontend nesta sessão:
+
+- **`DELETE /api/admin/users/{id}` agora desativa em vez de excluir** (mesmo contrato,
+  `204`/`200`). Usuário desativado não consegue mais logar (`POST /users/login` retorna
+  `401 {"errors":["Usuário desabilitado"]}`) e um token que ele já tivesse também para de
+  funcionar na próxima requisição (confirmado: `GET /users/test` com token antigo passou a
+  dar `403` depois da desativação).
+- **`PATCH /api/admin/users/{id}/reativar`** (admin-only, sem body) reativa mantendo a role
+  que já tinha, devolve `UserResponseDto`.
+- **`UserResponseDto` ganhou `ativo: boolean`.** Refletido em `/admin/usuarios`
+  (`src/app/admin/(painel)/usuarios/page.tsx`): coluna de status (badge Ativo/Inativo) e o
+  botão da linha vira "Reativar" quando `ativo === false` (antes era só "Excluir"). Renomeei
+  `usuariosService.excluir` pra `desativar` e adicionei `reativar` em
+  `src/modules/admin/usuarios/usuarios.service.ts` pra refletir o que a chamada realmente faz.
+- **Tela de auditoria nova** (`src/modules/admin/auditoria/`, rota `/admin/auditoria`,
+  admin-only): lista `GET /api/admin/auditoria` com filtro por usuário/módulo/intervalo de
+  data-hora + paginação (reaproveita `usePageableResource`, mesmo padrão dos módulos
+  genéricos). **Cobertura parcial**: só os módulos do padrão genérico (seção 6.7) e a gestão
+  de usuários geram registro — licitações, obras, RH específico, diário oficial etc. ainda
+  não. Isso está avisado na própria tela (não construí um filtro de módulo em dropdown que
+  desse a entender cobertura total — é um campo de texto livre).
+- **Limitação conhecida, não resolvida**: se um usuário for desativado *enquanto* está com
+  sessão ativa no navegador, as chamadas dele passam a devolver `403` (não `401`) — e o
+  interceptor de `api.ts` só força logout automático em `401` (decisão deliberada: um `403`
+  normalmente é só "essa ação específica não é permitida pro seu papel", não "sua sessão
+  morreu", e tratar todo `403` como sessão inválida faria um `ROLE_MANAGER` ser deslogado só
+  por tentar uma ação admin-only). Resultado prático: o usuário desativado no meio da sessão
+  só percebe que algo está errado porque tudo passa a falhar, sem uma mensagem clara — não
+  constrói detecção especial pra esse caso agora (cenário raro, sem risco de segurança real,
+  já que o backend já bloqueia tudo mesmo sem o frontend perceber).
+
+### 7.4 Próximos passos (módulos bespoke, não implementados ainda)
 
 Nesta ordem sugerida (do mais isolado/simples pro mais complexo):
 1. **Institucional** (avisos/notícias — CRUD já teria form pronto no site público, só faltando
