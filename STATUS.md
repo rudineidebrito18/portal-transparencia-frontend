@@ -276,6 +276,14 @@ Contra o backend com o fix aplicado (H2 em memória, reiniciado do zero):
 - Módulo `lei` (que antes do fix tinha ficado com leitura quebrada numa sessão anterior)
   carrega normalmente agora.
 
+Reconfirmado depois, já contra o **perfil `postgres`** (dados fictícios persistentes, ver
+seção 8): módulo `estagiarios` já tinha um registro fictício real na listagem
+("Estágio - Curso de Administração") — criei um segundo registro de teste ao lado dele,
+editei sem reenviar arquivo, e excluí só o de teste, tudo via clique real na UI. O registro
+fictício original permaneceu intacto na tabela depois. `renuncia-fiscal` e `lei` (os dois que
+falhavam desde a primeira tentativa antes do fix) responderam `200` normalmente contra o
+Postgres também.
+
 Também vale registrar: o backend (`portal-transparencia-pref`) não sobe com `./mvnw
 spring-boot:run` direto — os testes têm erros de compilação pré-existentes (`FiscalContratos`,
 `ServidorServiceImplTest`, assinaturas desatualizadas, não relacionado aos bugs acima).
@@ -300,15 +308,29 @@ Nesta ordem sugerida (do mais isolado/simples pro mais complexo):
 
 ## 8. Como retomar
 
+**Pro painel admin, prefira o perfil `postgres`, não o `dev`** — banco real (Postgres via
+Docker), dados persistem entre restarts, e já vem populado com fixtures criadas via chamadas
+reais à API (licitação, obra pública, convênio, emenda parlamentar, servidor, cargo, diária,
+aviso, notícia, ESIC, ouvidoria, lei, tabela de valores, diário oficial). O perfil `dev` (H2
+em memória) só tem o admin bootstrap — some tudo a cada restart, então não há nada pra
+listar/testar além do que você mesmo criar na hora.
+
 ```bash
-npm run dev                                                                       # frontend :3000
-cd /home/rudinei/Documentos/portal-transparencia-pref && \
-  ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev -DskipTests -Dmaven.test.skip=true  # backend :8080 (perfil dev, H2 em memória, reseta a cada restart)
-curl -s http://localhost:8080/v3/api-docs                                        # confirma o backend e pega o spec atualizado
+npm run dev                                                                          # frontend :3000
+
+cd /home/rudinei/Documentos/portal-transparencia-pref
+docker compose up -d postgres meilisearch                                           # precisa docker (sudo se seu usuário não estiver no grupo docker)
+./mvnw spring-boot:run -Dspring-boot.run.profiles=postgres -DskipTests -Dmaven.test.skip=true  # backend :8080, dados persistentes
+
+curl -s http://localhost:8080/v3/api-docs                                           # confirma o backend e pega o spec atualizado
 ```
 
+Perfil `dev` (H2, reseta a cada restart) continua disponível se só precisar testar algo
+isolado sem depender de fixture: troque `postgres` por `dev` no comando acima e pule o
+`docker compose up`.
+
 Login de dev pro painel admin: `admin@prefeitura.dev` / `admin123` (criado automaticamente
-no primeiro start).
+no primeiro start, nos dois perfis).
 
 Antes de criar qualquer módulo novo: puxar o spec de novo (pode ter mudado), achar o DTO no
 `components.schemas`, comparar com os 4 formatos da seção 4 (site público) ou os padrões da
