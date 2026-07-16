@@ -495,23 +495,35 @@ existiam via padrão genérico desde a sessão 1. O que faltava era o recurso **
   `/api/convenios/**` e `/api/emendas-parlamentares/**` estão na mesma lista
   `ENDPOINTS_EDICAO_RESTRITA` que `/api/obras/**`.
 
-**Bug real encontrado e reportado** (não é erro de uso — root cause identificado lendo o
-código do backend, não só a API por fora): `PUT`/`DELETE /api/convenios/{id}` retornam
-**403 vazio** mesmo com token `ROLE_ADMINISTRATOR` válido — `GET`/`POST` no mesmo recurso
-funcionam normal, e o mesmíssimo padrão de rota (`ENDPOINTS_EDICAO_RESTRITA` +
-`hasRole("ADMINISTRATOR")`) funciona pra outros recursos na mesma lista (testado
-`DELETE /api/recursos-humanos/servidor/{id}`, `204` normal, mesmo token). `DELETE` num id
-inexistente (`/api/convenios/999`) devolve `404` normal — ou seja, a request passa pelo
-filtro de segurança e chega no service, só falha (403, sem corpo JSON — típico de
-`AccessDeniedException` interceptada pelo `ExceptionTranslationFilter` do Spring Security
-antes do `GlobalExceptionHandler` da aplicação) quando o registro existe de verdade. Não
-achei `@PreAuthorize`/`@Secured`/`throw new AccessDeniedException` em lugar nenhum do código
-— o `SecurityConfiguration.java` por si só parece correto (mesmo padrão que funciona pros
-outros recursos). Root cause exato não identificado (precisa de quem tem acesso a debugger
-no backend) — texto do bug pronto pra copiar, ver conversa. **Efeito colateral**: como não dá
-pra excluir, sobraram 2 convênios de teste (`Teste Convenente` nº 9001, `Teste2` nº 9002) no
-banco `postgres` que não consegui limpar — remover manualmente quando o bug for corrigido, ou
-truncar a tabela `convenio` direto se for mais rápido.
+**Bug real, root cause confirmado em 2026-07-16 lendo o código-fonte do backend** (a
+hipótese original de "problema de RBAC/RoleHierarchy" estava errada — descartada depois de
+confirmar que a conta de teste é `ROLE_ADMINISTRATOR` de verdade via `GET /api/admin/users` e
+reproduzir o mesmo 403 num `PUT` bem-sucedido minutos antes): **não é bug de permissão, é um
+`NullPointerException` não tratado em `FileStorageServiceImpl.deleteFile()`**.
+`ConvenioServiceImpl.deletar()` chama `fileStorageService.deleteFile(entity.getCaminhoPdf())`
+incondicionalmente, e `atualizar()` faz o mesmo sempre que um novo PDF é enviado (pra apagar o
+PDF antigo antes de salvar o novo) — mas `caminhoPdf` é opcional na criação (`POST
+/api/convenios` aceita `pdf` ausente) e `deleteFile()` faz `Paths.get(filePath)` sem checar
+null, o que lança `NullPointerException` na hora. Confirmado com reprodução controlada: `PUT`
+sem trocar o PDF funciona (`200`) porque não entra no bloco que chama `deleteFile`; `PUT`
+enviando um PDF novo pra um convênio com `caminhoPdf: null` reproduz o mesmo 403; criei um
+convênio de teste **com** PDF e o `DELETE` nele funcionou normal (`204`) — confirmando que o
+problema é especificamente a ausência de PDF, não o método HTTP nem a role. Tem ainda um
+**segundo bug** no tratamento de erro que mascara o primeiro: o catch-all
+`GlobalExceptionHandler.handleInternalServerError` tenta `buildResponse(500,
+ex.getMessage())`, mas a `NullPointerException` do JDK aqui tem `getMessage() == null`, e
+`buildResponse` faz `List.of(message)` — que rejeita elemento `null` — lançando uma *segunda*
+NPE dentro do próprio exception handler. O Spring desiste de resolver a exceção original, ela
+sobe sem tratamento pela cadeia de filtros do Spring Security, e o cliente recebe o 403 vazio
+característico de segurança em vez de um 500 com corpo JSON explicando o erro real — daí o
+sintoma enganoso de "parece permissão". Stack trace completo capturado no log do backend
+durante a reprodução, disponível se for útil pra quem for corrigir. Fix sugerido: (1) guard
+`if (entity.getCaminhoPdf() != null) fileStorageService.deleteFile(...)` nos dois lugares de
+`ConvenioServiceImpl`, e (2) `buildResponse` não deveria quebrar quando a mensagem da exceção
+é `null` (fallback pra uma string genérica). **Efeito colateral**: os 2 convênios de teste
+(`Teste Convenente` nº 9001 id=2, `Teste2` nº 9002 id=3) continuam sem poder ser excluídos
+via API — ambos têm `caminhoPdf: null`, então caem direto na NPE — ficam pro backend limpar
+direto no banco, ou remover assim que o guard de null for adicionado.
 - `atualizar`/`excluir` do `convenioService` estão implementados certos pro contrato (não é
   código quebrado, só não usado ainda) — quando o backend corrigir, é só adicionar os botões
   de editar/excluir na página, mesmo padrão das outras telas.
