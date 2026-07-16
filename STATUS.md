@@ -338,7 +338,9 @@ restrição admin-only pra editar/excluir, diferente da maioria dos módulos ant
   `/admin/geral/{fornecedores,unidades}`): JSON puro, **sem paginação nem filtro no backend**
   (`GET` devolve array direto) — mesmo padrão bespoke de `/admin/usuarios`. Componente único
   `GeralSimplesCrudPage.tsx` genérico por lista de campos (`nome`+`cnpj` pra fornecedor, só
-  `nome` pra unidade).
+  `nome` pra unidade). **Desatualizado em 2026-07-16**: Unidades saiu desse padrão (virou
+  multipart com campos novos) — ver seção 7.8. `GeralSimplesCrudPage` agora só serve
+  Fornecedores.
 - **Tabela de Valores de Diária** (`/admin/geral/tabela-valores`): multipart (`dados`+
   `arquivo`, igual ao padrão genérico), paginado, filtro por `descricao`/`tipoViagem`
   (`NACIONAL`/`INTERNACIONAL`)/intervalo de data via `GET /tabela-valores/buscar`.
@@ -437,6 +439,39 @@ já existiam via padrão genérico, não fazem parte desta leva):
 - Sidebar: os 5 links novos foram mesclados dentro do cabeçalho "Recursos Humanos" que já
   existia pro Terceirizados/Estagiários (evita duplicar o título da seção) — ver
   `LINKS_RH_BESPOKE` em `AdminSidebar.tsx`.
+
+### 7.8 Fix de breaking change: `/api/geral/unidades` virou multipart (2026-07-16)
+
+O time do backend avisou (via `prompt-frontend-dashboard-admin.md`, canal já estabelecido)
+que `Unidade` virou a base de um futuro módulo público "Secretarias" e o contrato mudou:
+`POST`/`PUT` passaram a exigir `multipart/form-data` (parte `dados` JSON + parte `foto`
+opcional, igual ao padrão de `tabela-valores.service.ts`) e `UnidadeResponseDto` ganhou
+`cnpj, telefone, email, horarioAtendimento, endereco, atribuicoes, gestorNome, gestorCargo,
+gestorVerificado, gestorFotoCaminho`. O aviso já veio com os 4 arquivos exatos afetados no
+frontend, todos corrigidos:
+
+- **`geral.service.ts`**: `unidadesService` saiu de `criarServicoAdminSimples` (fábrica JSON
+  genérica) e ganhou implementação própria com `FormData`/`Blob` — `criarServicoAdminSimples`
+  continua intacta, ainda serve `fornecedoresService`. `listar()` ganhou parâmetro opcional
+  `nome` (novo filtro de busca livre do backend).
+- **`geral/types.ts`**: `Unidade`/`UnidadeRequest` ganharam os campos novos.
+- **`/admin/geral/unidades/page.tsx`**: reescrita do zero, saiu do `GeralSimplesCrudPage`
+  (não suporta upload nem boolean) — form próprio com todos os campos, checkbox de
+  `gestorVerificado`, input de foto (opcional na edição, mantém a atual se vazio) e busca por
+  nome.
+- **`rh/types.ts`**: o `Unidade` duplicado virou `import { Unidade } from
+  '@/modules/admin/geral/types'`, com `Servidor.unidade` tipado como `Pick<Unidade, 'id' |
+  'nome'>` — o `GET /recursos-humanos/servidor` só devolve esse subconjunto mesmo, então
+  importar o tipo completo sem o `Pick` seria impreciso (sugeriria campos que não vêm nessa
+  resposta).
+- `src/app/admin/(painel)/rh/servidores/page.tsx`, `esic/config`, `ouvidoria/config` não
+  precisaram de mudança — só chamam `unidadesService.listar()` sem filtro e leem `id`/`nome`,
+  que continuam presentes.
+- Testado via Playwright contra o backend real (perfil `postgres`, os 2 registros de Unidade
+  antigos com campos novos `null`): listar com dados antigos, criar unidade nova com foto
+  (imagem real), editar sem reenviar foto (mantém a atual), busca por nome, excluir, e
+  reconfirmado que os 3 dropdowns dependentes (Servidores, E-SIC config, Ouvidoria config)
+  continuam populando normalmente. Zero erro de console.
 
 ## 8. Como retomar
 

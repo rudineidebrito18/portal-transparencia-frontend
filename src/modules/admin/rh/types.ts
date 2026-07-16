@@ -1,14 +1,15 @@
-export interface Unidade {
-  id: number
-  nome: string
-}
+import { Unidade } from '@/modules/admin/geral/types'
 
 export interface Servidor {
   id: number
   cpf: string
   name: string
   cargo: string
-  unidade?: Unidade
+  // GET /recursos-humanos/servidor só devolve {id, nome} aninhado, não a Unidade
+  // completa (que ganhou campos novos em 2026-07-16) — importa o tipo canônico
+  // de geral/types em vez de duplicar, mas só usa o subconjunto que o backend
+  // realmente manda aqui.
+  unidade?: Pick<Unidade, 'id' | 'nome'>
   dataAdmissao: string
   cargaHoraria: number
 }
