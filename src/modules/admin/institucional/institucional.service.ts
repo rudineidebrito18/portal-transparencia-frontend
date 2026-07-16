@@ -16,8 +16,9 @@ type ListarParams = {
   sort?: string
 }
 
-// Avisos e Notícias (seção 6.9 do prompt do admin) têm exatamente a mesma
-// forma — JSON puro, sem arquivo, ROLE_MANAGER pode tudo.
+// Avisos (seção 6.9 do prompt do admin) é JSON puro, sem arquivo, ROLE_MANAGER
+// pode tudo. Notícias saiu desse padrão em 2026-07-16 — ver noticiaAdminService
+// abaixo — não reaproveitar esta fábrica pra ela.
 function criarServicoAdminInstitucional(recurso: RecursoInstitucional) {
   const base = `/institucional/${recurso}`
 
@@ -41,4 +42,37 @@ function criarServicoAdminInstitucional(recurso: RecursoInstitucional) {
 }
 
 export const avisoAdminService = criarServicoAdminInstitucional('avisos')
-export const noticiaAdminService = criarServicoAdminInstitucional('noticias')
+
+const NOTICIAS_BASE = '/institucional/noticias'
+
+// Notícias passou a aceitar imagem opcional (PNG/JPEG) em 2026-07-16 — o
+// backend exige multipart/form-data (parte "dados" + "imagem" opcional) pra
+// criar/atualizar, mesmo padrão de unidadesService em geral.service.ts.
+function montarFormData(dados: ConteudoInstitucionalRequest, imagem?: File | null): FormData {
+  const formData = new FormData()
+  formData.append('dados', new Blob([JSON.stringify(dados)], { type: 'application/json' }))
+  if (imagem) formData.append('imagem', imagem)
+  return formData
+}
+
+export const noticiaAdminService = {
+  listar(params: ListarParams): Promise<Page<ConteudoInstitucional>> {
+    return api.get<Page<ConteudoInstitucional>>(NOTICIAS_BASE, { params }).then(r => r.data)
+  },
+
+  criar(dados: ConteudoInstitucionalRequest, imagem?: File | null): Promise<ConteudoInstitucional> {
+    return api
+      .post<ConteudoInstitucional>(NOTICIAS_BASE, montarFormData(dados, imagem), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then(r => r.data)
+  },
+
+  atualizar(id: number, dados: ConteudoInstitucionalRequest, imagem?: File | null): Promise<ConteudoInstitucional> {
+    return api
+      .put<ConteudoInstitucional>(`${NOTICIAS_BASE}/${id}`, montarFormData(dados, imagem), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then(r => r.data)
+  },
+
+  excluir(id: number): Promise<void> {
+    return api.delete(`${NOTICIAS_BASE}/${id}`).then(() => undefined)
+  }
+}

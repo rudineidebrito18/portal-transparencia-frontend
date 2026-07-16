@@ -580,6 +580,47 @@ Convênios.
 - Sidebar: "Obras Públicas" entrou no grupo "Convênios e Repasses" (mesma lógica dos outros
   bespoke — o prompt agrupa os três sob a seção 6.5), removido de "Em breve".
 
+### 7.11 Fix de breaking change: `POST`/`PUT /api/institucional/noticias` viraram multipart (2026-07-16)
+
+Backend passou a aceitar imagem opcional (PNG/JPEG) em Notícias, seguindo o mesmo padrão de
+Unidade/ART/Convênios: `POST`/`PUT` deixaram de aceitar `@RequestBody` JSON puro e agora
+exigem multipart (`dados` + `imagem` opcional). Resposta ganhou `imagemUrl` (nulo se não
+houver imagem), servido por `GET /api/institucional/noticias/{id}/imagem` (público, sem
+autenticação). `GET`/`DELETE` não mudaram.
+
+- **`noticiaAdminService`** (`institucional.service.ts`) saiu da fábrica JSON genérica
+  `criarServicoAdminInstitucional` — que agora só serve Avisos — e ganhou implementação
+  própria com `FormData`/`Blob`, mesmo padrão de `unidadesService`.
+- **`/admin/institucional/noticias/page.tsx`**: reescrita do zero, saiu do
+  `InstitucionalCrudPage` genérico (não suporta upload) — form próprio com preview da imagem
+  atual na edição ("mantém a atual se vazio", mesma UX de Unidades) e coluna de thumbnail na
+  listagem. `InstitucionalCrudPage` continua servindo só Avisos.
+- **`ConteudoInstitucional`** (tipo compartilhado com Avisos) ganhou `imagemUrl?: string |
+  null` opcional — populado só em Notícias, undefined em Avisos, sem precisar de um tipo
+  `Noticia` separado.
+- **Bônus de baixo custo, não pedido explicitamente mas óbvio dado o motivo do backend ter
+  criado o endpoint de imagem** ("upload sem forma de exibir depois seria inútil"):
+  `ConteudoInstitucionalCard.tsx` (usado no site público `/noticias`) agora mostra a imagem
+  quando presente — `item.imagemUrl &&` guarda o caso de Avisos/notícias sem imagem, não
+  quebra nada existente.
+- Testado via Playwright contra o backend real: criar notícia com imagem (PNG) → criar sem
+  imagem → editar a primeira trocando a imagem (JPEG) → editar a segunda sem enviar imagem
+  (mantém sem imagem, só muda o texto) → conferido os bytes servidos por
+  `GET .../imagem` batem com o arquivo mais recente (troca de PNG vermelho pra JPEG verde
+  confirmada por pixel, não só por não dar erro). Zero erro de console. **Nota**: um
+  thumbnail apareceu com a cor antiga (vermelho) logo após a troca na mesma sessão do
+  navegador — não é bug de dado (confirmado via API que o backend já servia o JPEG novo
+  correto) nem de cache HTTP (backend manda `Cache-Control: no-cache, no-store`) — é o cache
+  de imagem decodificada do Chromium pra uma URL já vista na mesma aba; sessão nova mostrou a
+  cor certa de primeira. Não fiz nada a respeito (não é bug real).
+- **Sobraram 2 notícias de teste** ("Notícia de teste com imagem" id=2, "Notícia de teste sem
+  imagem" id=3) no banco `postgres` — mesmo acordo das outras sessões, fica pro usuário
+  limpar manualmente.
+- Site público usa `NEXT_PUBLIC_USE_MOCK=true` em `.env.local` (mock não tem `imagemUrl` —
+  não quebra nada, só não mostra imagem em dev com mock ligado) — não testei a exibição da
+  imagem no `/noticias` público contra dado real porque exigiria desligar o mock e reiniciar
+  o dev server; o código é o mesmo `<img src>` condicional já confirmado funcionando no admin.
+
 ## 8. Como retomar
 
 **Pro painel admin, prefira o perfil `postgres`, não o `dev`** — banco real (Postgres via

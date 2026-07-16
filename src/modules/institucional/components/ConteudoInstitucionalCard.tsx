@@ -16,6 +16,15 @@ export default function ConteudoInstitucionalCard({ item, variant }: Props) {
   return (
     <Card className="p-5 flex flex-col gap-3">
 
+      {item.imagemUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={item.imagemUrl}
+          alt={item.titulo}
+          className="w-full h-40 object-cover rounded-lg -mt-1"
+        />
+      )}
+
       <div className="flex items-start gap-3">
         <div className={`p-2 rounded-lg ${iconStyle}`}>
           <Icon size={20} />
