@@ -29,6 +29,7 @@ export type GrupoModulo =
   | 'esic-ouvidoria'
   | 'usuarios'
   | 'institucional'
+  | 'geral'
 
 const EDITAR_ADMIN_ONLY: Set<GrupoModulo> = new Set([
   'licitacoes',

@@ -17,8 +17,15 @@ const GRUPOS_PENDENTES = [
   'Convênios e Emendas Parlamentares',
   'RH: Servidor, Folha, Cargos, Diárias, Concursos',
   'Anticorrupção (dívida ativa, empresas inidôneas)',
-  'ESIC e Ouvidoria',
-  'Institucional (avisos, notícias, fornecedores, unidades)'
+  'ESIC e Ouvidoria'
+]
+
+const LINKS_INSTITUCIONAL_GERAL = [
+  { href: '/admin/institucional/avisos', label: 'Avisos' },
+  { href: '/admin/institucional/noticias', label: 'Notícias' },
+  { href: '/admin/geral/fornecedores', label: 'Fornecedores' },
+  { href: '/admin/geral/unidades', label: 'Unidades' },
+  { href: '/admin/geral/tabela-valores', label: 'Tabela de Valores de Diária' }
 ]
 
 function agruparPorCategoria() {
@@ -70,6 +77,21 @@ export default function AdminSidebar() {
             Auditoria
           </Link>
         )}
+
+        <div>
+          <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+            Institucional e Geral
+          </p>
+          {LINKS_INSTITUCIONAL_GERAL.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
 
         {[...grupos.entries()].map(([categoria, modulos]) => (
           <div key={categoria}>

@@ -322,21 +322,55 @@ Duas features novas no backend, implementadas no frontend nesta sessão:
   constrói detecção especial pra esse caso agora (cenário raro, sem risco de segurança real,
   já que o backend já bloqueia tudo mesmo sem o frontend perceber).
 
-### 7.4 Próximos passos (módulos bespoke, não implementados ainda)
+### 7.4 Institucional e Geral: Avisos, Notícias, Fornecedores, Unidades, Tabela de Valores (2026-07-16)
+
+Seção 6.9 do prompt do admin ("manager pode tudo"), 5 recursos JSON simples — nenhum tem
+restrição admin-only pra editar/excluir, diferente da maioria dos módulos anteriores:
+
+- **Avisos e Notícias** (`src/modules/admin/institucional/`, rotas
+  `/admin/institucional/{avisos,noticias}`): JSON puro (`{titulo, texto, data, ativo}`),
+  paginado, filtro só por `ativo` (backend não tem busca por texto — não adicionei um campo de
+  busca client-side pra não violar o padrão de filtro-no-backend). Reaproveita o tipo
+  `ConteudoInstitucional` que já existia em `src/modules/institucional/types.ts` (site
+  público) — mesmo formato de request/response, só que o público só faz `GET`. Componente
+  único `InstitucionalCrudPage.tsx` parametrizado por serviço, usado pelas duas rotas.
+- **Fornecedores e Unidades** (`src/modules/admin/geral/`, rotas
+  `/admin/geral/{fornecedores,unidades}`): JSON puro, **sem paginação nem filtro no backend**
+  (`GET` devolve array direto) — mesmo padrão bespoke de `/admin/usuarios`. Componente único
+  `GeralSimplesCrudPage.tsx` genérico por lista de campos (`nome`+`cnpj` pra fornecedor, só
+  `nome` pra unidade).
+- **Tabela de Valores de Diária** (`/admin/geral/tabela-valores`): multipart (`dados`+
+  `arquivo`, igual ao padrão genérico), paginado, filtro por `descricao`/`tipoViagem`
+  (`NACIONAL`/`INTERNACIONAL`)/intervalo de data via `GET /tabela-valores/buscar`.
+  **Achado no spec**: o OpenAPI documenta o `POST`/`PUT` desse endpoint como
+  `application/json` em vez de `multipart/form-data` (mesma assinatura suspeita do bug real de
+  upload de documento de contrato de licitação, seção 6.2) — testei direto via `curl` antes de
+  confiar (`POST`/`PUT` com/sem arquivo/`GET /buscar`, tudo `200`) e é só anotação errada do
+  springdoc pra esse controller específico, o endpoint funciona normal como multipart de
+  verdade. Documentado no código (`tabela-valores.service.ts`) pra não gerar dúvida de novo.
+- Novo grupo `GrupoModulo = 'geral'` em `permissoes.ts` (cobre fornecedores/unidades/tabela de
+  valores) — e finalmente usei os helpers `podeCriar`/`podeEditar`/`podeExcluir` que já
+  existiam ali desde a sessão 1 mas nunca tinham sido chamados em lugar nenhum (os módulos do
+  padrão genérico usam `temPapel` direto com `papelMinimoEdicao` da própria config).
+- Testado via clique real na UI (não só leitura): criar → editar → excluir, ciclo completo,
+  nos 4 tipos de tela (Avisos representando o padrão paginado JSON, Fornecedores/Unidades o
+  não-paginado, Tabela de Valores o multipart com upload de PDF real) — sem erro de console em
+  nenhum. Sidebar ganhou grupo "Institucional e Geral" com os 5 links, removido da lista "Em
+  breve".
+
+### 7.5 Próximos passos (módulos bespoke, não implementados ainda)
 
 Nesta ordem sugerida (do mais isolado/simples pro mais complexo):
-1. **Institucional** (avisos/notícias — CRUD já teria form pronto no site público, só faltando
-   a versão admin) e **fornecedores/unidades/tabela de valores de diária**.
-2. **ESIC e Ouvidoria** — só PUT de config + leitura de formulários recebidos (sem DELETE
+1. **ESIC e Ouvidoria** — só PUT de config + leitura de formulários recebidos (sem DELETE
    ainda, não construir esse botão).
-3. **RH bespoke**: servidor, folha de pagamento, cargos, diárias (todas paginadas, sem usar o
+2. **RH bespoke**: servidor, folha de pagamento, cargos, diárias (todas paginadas, sem usar o
    padrão genérico) e concursos (⚠️ upload de anexo de concurso está quebrado no backend —
    não construir essa tela ainda).
-4. **Convênios e Emendas Parlamentares** (bespoke, com sub-recursos).
-5. **Obras Públicas e Repasses** (obra + medições + anexos + ART, ART não é admin-only).
-6. **Licitações** (licitação + contratos + aditivos + fiscal-contratos, com o aviso de upload
+3. **Convênios e Emendas Parlamentares** (bespoke, com sub-recursos).
+4. **Obras Públicas e Repasses** (obra + medições + anexos + ART, ART não é admin-only).
+5. **Licitações** (licitação + contratos + aditivos + fiscal-contratos, com o aviso de upload
    de documento de contrato com assinatura ambígua no backend — testar antes de confiar).
-7. **Diário Oficial** — o mais complexo: fluxo de publicação com aprovação humana e assinatura
+6. **Diário Oficial** — o mais complexo: fluxo de publicação com aprovação humana e assinatura
    digital (stepper de status `RECEBIDO → ... → PUBLICADO`, com `FALHOU`/retomar).
 
 ## 8. Como retomar
