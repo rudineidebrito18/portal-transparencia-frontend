@@ -362,9 +362,7 @@ restrição admin-only pra editar/excluir, diferente da maioria dos módulos ant
 
 Nesta ordem sugerida (do mais isolado/simples pro mais complexo):
 1. ~~**ESIC e Ouvidoria**~~ — feito em 2026-07-16, ver seção 7.6.
-2. **RH bespoke**: servidor, folha de pagamento, cargos, diárias (todas paginadas, sem usar o
-   padrão genérico) e concursos (upload de anexo de concurso **corrigido no backend em
-   2026-07-16** — não é mais bloqueio, ver seção 7.6).
+2. ~~**RH bespoke**~~ — feito em 2026-07-16, ver seção 7.7.
 3. **Convênios e Emendas Parlamentares** (bespoke, com sub-recursos).
 4. **Obras Públicas e Repasses** (obra + medições + anexos + ART, ART não é admin-only).
 5. **Licitações** (licitação + contratos + aditivos + fiscal-contratos; o upload de documento
@@ -403,6 +401,42 @@ Módulo admin novo, `src/modules/admin/esic-ouvidoria/`, 3 rotas:
   configurado" → preencher → salvar → recarregar e confirmar persistência), e o filtro por
   tipo em formulários recebidos. Sem erro de console além dos 404 esperados (e duplicados pelo
   double-invoke do React StrictMode em dev) das checagens de "config ainda não existe".
+
+### 7.7 RH bespoke: Servidores, Cargos, Diárias, Folha de Pagamento, Concursos (2026-07-16)
+
+Módulo `src/modules/admin/rh/`, um `.service.ts` por recurso, 5 rotas (Estagiários/Terceirizados
+já existiam via padrão genérico, não fazem parte desta leva):
+
+- **`/admin/rh/servidores`** (bespoke paginado, `GET {base}/buscar`) — filtro por
+  cpf/nome/cargo/unidade/intervalo de admissão. **Achado**: `POST`/`PUT` de `ServidorDto`
+  aceitam `unidade: {id}` sozinho (sem `nome`) e o backend resolve a FK — confirmado via curl
+  antes de fixar o formato no `ServidorRequest`.
+- **`/admin/rh/cargos`** (JSON não-paginado, mesmo padrão de `GeralSimplesCrudPage` mas com
+  campos numéricos) — `valorLiquido`/`media` são calculados pelo backend, só exibidos.
+- **`/admin/rh/diarias`** (bespoke paginado, `GET /diarias/buscar`).
+- **`/admin/rh/folha`** (`src/app/admin/(painel)/rh/folha/page.tsx`) — **sem `PUT`/`DELETE`
+  no backend**, cada lançamento é definitivo. Duas abas (`?categoria=servidor|mes` via
+  `useUrlState`): "Por servidor" (escolhe um servidor num `<select>` alimentado por
+  `servidorService.listar({size:200})`, lista as folhas já lançadas e permite lançar uma nova —
+  `salarioLiquido` é calculado no frontend como `bruto - desconto` e enviado já pronto, já que o
+  DTO de request inclui esse campo explicitamente); "Por mês" (somente leitura, todos os
+  servidores daquele mês/ano).
+- **`/admin/rh/concursos`** (JSON não-paginado) **+ `/admin/rh/concursos/[id]`** (anexos) —
+  **grupo de permissão `'padrao'`, não `'rh'`**: diferente de servidor/cargos/diárias/folha
+  (admin-only pra editar/excluir), Concursos segue a regra geral de `ROLE_MANAGER` (mesma
+  linha da tabela de permissões do prompt que agrupa Concursos com ART/Renúncia Fiscal/RGA/
+  Plano Estratégico/institucional). O upload de anexo (`POST {base}/{concursoId}/anexos`,
+  multipart `dados`+`arquivo`) é o mesmo endpoint que tínhamos corrigido antes (bug de
+  `@PostMapping(name=...)` em vez de `value=...`) — confirmado funcionando de novo aqui.
+- Testado via Playwright headless contra o backend real (perfil `postgres`): criar/editar/
+  excluir um servidor de teste, listar cargos/diárias já existentes, lançar e visualizar folha
+  (ficou um registro de teste real — servidor "Maria da Silva Souza", maio/2026 — sem como
+  remover, não há `DELETE` de folha), criar um concurso de teste, subir um anexo PDF real,
+  excluir o anexo e depois o concurso (limpeza completa, sem `DELETE` pendente aí). Zero erro
+  de console.
+- Sidebar: os 5 links novos foram mesclados dentro do cabeçalho "Recursos Humanos" que já
+  existia pro Terceirizados/Estagiários (evita duplicar o título da seção) — ver
+  `LINKS_RH_BESPOKE` em `AdminSidebar.tsx`.
 
 ## 8. Como retomar
 

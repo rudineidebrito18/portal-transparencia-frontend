@@ -15,8 +15,18 @@ const GRUPOS_PENDENTES = [
   'Licitações, Contratos e Aditivos',
   'Obras Públicas e Repasses',
   'Convênios e Emendas Parlamentares',
-  'RH: Servidor, Folha, Cargos, Diárias, Concursos',
   'Anticorrupção (dívida ativa, empresas inidôneas)'
+]
+
+// RH bespoke (servidor/cargos/diárias/folha/concursos) — mescla com a
+// categoria "Recursos Humanos" do registry genérico (que só tem
+// Estagiários/Terceirizados), pra não duplicar o cabeçalho da seção.
+const LINKS_RH_BESPOKE = [
+  { href: '/admin/rh/servidores', label: 'Servidores' },
+  { href: '/admin/rh/cargos', label: 'Cargos' },
+  { href: '/admin/rh/diarias', label: 'Diárias' },
+  { href: '/admin/rh/folha', label: 'Folha de Pagamento' },
+  { href: '/admin/rh/concursos', label: 'Concursos' }
 ]
 
 const LINKS_INSTITUCIONAL_GERAL = [
@@ -130,6 +140,15 @@ export default function AdminSidebar() {
                 </Link>
               )
             })}
+            {categoria === 'Recursos Humanos' && LINKS_RH_BESPOKE.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         ))}
 
