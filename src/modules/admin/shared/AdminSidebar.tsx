@@ -14,7 +14,6 @@ const GRUPOS_PENDENTES = [
   'Diário Oficial (publicação e aprovação)',
   'Licitações, Contratos e Aditivos',
   'Obras Públicas e Repasses',
-  'Convênios e Emendas Parlamentares',
   'Anticorrupção (dívida ativa, empresas inidôneas)'
 ]
 
@@ -27,6 +26,14 @@ const LINKS_RH_BESPOKE = [
   { href: '/admin/rh/diarias', label: 'Diárias' },
   { href: '/admin/rh/folha', label: 'Folha de Pagamento' },
   { href: '/admin/rh/concursos', label: 'Concursos' }
+]
+
+// Convênios (base) e Emendas Parlamentares — mesclam com a categoria "Convênios e
+// Repasses" do registry genérico (acordos firmados / transferências), mesmo motivo
+// do LINKS_RH_BESPOKE acima.
+const LINKS_CONVENIOS_BESPOKE = [
+  { href: '/admin/convenios', label: 'Convênios' },
+  { href: '/admin/emendas-parlamentares', label: 'Emendas Parlamentares' }
 ]
 
 const LINKS_INSTITUCIONAL_GERAL = [
@@ -141,6 +148,15 @@ export default function AdminSidebar() {
               )
             })}
             {categoria === 'Recursos Humanos' && LINKS_RH_BESPOKE.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {categoria === 'Convênios e Repasses' && LINKS_CONVENIOS_BESPOKE.map(link => (
               <Link
                 key={link.href}
                 href={link.href}

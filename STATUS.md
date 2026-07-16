@@ -365,7 +365,8 @@ restrição admin-only pra editar/excluir, diferente da maioria dos módulos ant
 Nesta ordem sugerida (do mais isolado/simples pro mais complexo):
 1. ~~**ESIC e Ouvidoria**~~ — feito em 2026-07-16, ver seção 7.6.
 2. ~~**RH bespoke**~~ — feito em 2026-07-16, ver seção 7.7.
-3. **Convênios e Emendas Parlamentares** (bespoke, com sub-recursos).
+3. ~~**Convênios e Emendas Parlamentares**~~ — feito em 2026-07-16, ver seção 7.9 (Convênios
+   com edição/exclusão bloqueadas por bug real no backend, reportado).
 4. **Obras Públicas e Repasses** (obra + medições + anexos + ART, ART não é admin-only).
 5. **Licitações** (licitação + contratos + aditivos + fiscal-contratos; o upload de documento
    de contrato também foi **corrigido no backend em 2026-07-16**, ver seção 7.6 — deixou de
@@ -472,6 +473,50 @@ frontend, todos corrigidos:
   (imagem real), editar sem reenviar foto (mantém a atual), busca por nome, excluir, e
   reconfirmado que os 3 dropdowns dependentes (Servidores, E-SIC config, Ouvidoria config)
   continuam populando normalmente. Zero erro de console.
+
+### 7.9 Convênios e Emendas Parlamentares (2026-07-16)
+
+As 3 sub-recursos de Convênios (Acordo Firmado, Transferência Realizada/Recebida) já
+existiam via padrão genérico desde a sessão 1. O que faltava era o recurso **base**
+`/api/convenios` (não aparece no site público, só o admin) e **Emendas Parlamentares**:
+
+- **`/admin/convenios`** (`src/modules/admin/convenios/`) — multipart com nomes de parte
+  diferentes do padrão (`dto`+`pdf`, não `dados`+`arquivo` — confirmado no controller real).
+  **Só Create + List estão ligados na UI.** Motivo: ver bug abaixo.
+- **`/admin/emendas-parlamentares`** (`src/modules/admin/emendas-parlamentares/`) — CRUD
+  completo, JSON paginado. Filtro por tipo OU ano (endpoints separados
+  `/emendas-parlamentares/tipo/{tipo}` e `/ano/{ano}`, sem combinação — mesma regra e mesmo
+  padrão de UI do módulo público, reaproveitando os enums `TipoEmenda`/`FormaRepasseEmenda`
+  de `src/modules/emendas-parlamentares/enums.ts` em vez de duplicar).
+- Grupo de permissão: `'obras-repasses'` pros dois (admin-only editar/excluir) — não um grupo
+  novo, porque o próprio prompt do admin agrupa "Convênios e repasses" dentro da seção 6.5
+  (Obras Públicas e Repasses), e o `SecurityConfiguration.java` do backend confirma:
+  `/api/convenios/**` e `/api/emendas-parlamentares/**` estão na mesma lista
+  `ENDPOINTS_EDICAO_RESTRITA` que `/api/obras/**`.
+
+**Bug real encontrado e reportado** (não é erro de uso — root cause identificado lendo o
+código do backend, não só a API por fora): `PUT`/`DELETE /api/convenios/{id}` retornam
+**403 vazio** mesmo com token `ROLE_ADMINISTRATOR` válido — `GET`/`POST` no mesmo recurso
+funcionam normal, e o mesmíssimo padrão de rota (`ENDPOINTS_EDICAO_RESTRITA` +
+`hasRole("ADMINISTRATOR")`) funciona pra outros recursos na mesma lista (testado
+`DELETE /api/recursos-humanos/servidor/{id}`, `204` normal, mesmo token). `DELETE` num id
+inexistente (`/api/convenios/999`) devolve `404` normal — ou seja, a request passa pelo
+filtro de segurança e chega no service, só falha (403, sem corpo JSON — típico de
+`AccessDeniedException` interceptada pelo `ExceptionTranslationFilter` do Spring Security
+antes do `GlobalExceptionHandler` da aplicação) quando o registro existe de verdade. Não
+achei `@PreAuthorize`/`@Secured`/`throw new AccessDeniedException` em lugar nenhum do código
+— o `SecurityConfiguration.java` por si só parece correto (mesmo padrão que funciona pros
+outros recursos). Root cause exato não identificado (precisa de quem tem acesso a debugger
+no backend) — texto do bug pronto pra copiar, ver conversa. **Efeito colateral**: como não dá
+pra excluir, sobraram 2 convênios de teste (`Teste Convenente` nº 9001, `Teste2` nº 9002) no
+banco `postgres` que não consegui limpar — remover manualmente quando o bug for corrigido, ou
+truncar a tabela `convenio` direto se for mais rápido.
+- `atualizar`/`excluir` do `convenioService` estão implementados certos pro contrato (não é
+  código quebrado, só não usado ainda) — quando o backend corrigir, é só adicionar os botões
+  de editar/excluir na página, mesmo padrão das outras telas.
+- Testado via Playwright contra o backend real: lista + aviso do bug em Convênios; em Emendas
+  Parlamentares, criar → editar → filtrar por tipo (confirmando que selecionar tipo limpa o
+  filtro de ano) → excluir, ciclo completo. Zero erro de console.
 
 ## 8. Como retomar
 
