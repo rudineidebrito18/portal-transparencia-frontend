@@ -23,11 +23,6 @@ export const convenioService = {
       .then(r => r.data)
   },
 
-  // ⚠️ Bug conhecido no backend (2026-07-16): PUT/DELETE aqui retornam 403 mesmo com
-  // ROLE_ADMINISTRATOR válido (GET/POST funcionam normal, e o mesmo padrão de rota
-  // funciona pra outros recursos admin-only, ex. servidor). Métodos implementados
-  // corretos pro contrato documentado, mas não ligados a nenhum botão na UI até o
-  // backend corrigir — ver STATUS.md seção 7.9.
   atualizar(id: number, dados: ConvenioRequest, pdf?: File | null): Promise<Convenio> {
     return api
       .put<Convenio>(`${BASE}/${id}`, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })

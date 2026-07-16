@@ -7,11 +7,12 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
-import { podeCriar } from '@/modules/auth/permissoes'
+import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { convenioService } from '@/modules/admin/convenios/convenio.service'
 import { Convenio, ConvenioRequest } from '@/modules/admin/convenios/types'
 
 interface FormState {
+  id: number | null
   numero: number
   convenente: string
   objeto: string
@@ -25,6 +26,7 @@ interface FormState {
 }
 
 const FORM_VAZIO: FormState = {
+  id: null,
   numero: 1,
   convenente: '',
   objeto: '',
@@ -71,6 +73,35 @@ export default function ConveniosAdminPage() {
     setForm(FORM_VAZIO)
   }
 
+  function abrirEdicao(c: Convenio) {
+    setErroForm(null)
+    setPdf(null)
+    setForm({
+      id: c.id,
+      numero: c.numero,
+      convenente: c.convenente,
+      objeto: c.objeto,
+      internveniente: c.internveniente,
+      dataAssinatura: c.dataAssinatura,
+      inicioVigencia: c.inicioVigencia,
+      fimVigencia: c.fimVigencia,
+      valorConvenio: c.valorConvenio,
+      valorContrapartida: c.valorContrapartida,
+      valorConcedente: c.valorConcedente
+    })
+  }
+
+  async function excluir(id: number) {
+    if (!confirm('Excluir este convênio? Essa ação não pode ser desfeita.')) return
+
+    try {
+      await convenioService.excluir(id)
+      carregar()
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    }
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!form) return
@@ -78,10 +109,15 @@ export default function ConveniosAdminPage() {
     setSalvando(true)
     setErroForm(null)
 
-    const dados: ConvenioRequest = form
+    const { id, ...dados } = form
+    const request: ConvenioRequest = dados
 
     try {
-      await convenioService.criar(dados, pdf)
+      if (id) {
+        await convenioService.atualizar(id, request, pdf)
+      } else {
+        await convenioService.criar(request, pdf)
+      }
       setForm(null)
       setPdf(null)
       carregar()
@@ -107,17 +143,10 @@ export default function ConveniosAdminPage() {
         )}
       </div>
 
-      <Card className="p-4 bg-warning/10 border-warning/30 text-sm" hoverable={false}>
-        Edição e exclusão estão temporariamente indisponíveis nesta tela: o backend retorna erro
-        de permissão (403) nesses dois casos mesmo para conta de administrador, embora criar e
-        listar funcionem normalmente. Já reportado ao time do backend — assim que corrigido, os
-        botões de editar/excluir entram aqui.
-      </Card>
-
       {form && (
         <Card className="p-4" hoverable={false}>
           <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">Novo convênio</h2>
+            <h2 className="font-semibold text-sm">{form.id ? 'Editar convênio' : 'Novo convênio'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
@@ -236,7 +265,9 @@ export default function ConveniosAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">PDF do convênio (opcional)</label>
+              <label className="block text-sm font-medium mb-1">
+                PDF do convênio (opcional{form.id && ' — mantém o atual se vazio'})
+              </label>
               <input
                 type="file"
                 accept="application/pdf"
@@ -285,6 +316,7 @@ export default function ConveniosAdminPage() {
                 <th className="p-3">Vigência</th>
                 <th className="p-3">Valor total</th>
                 <th className="p-3">PDF</th>
+                <th className="p-3 text-right">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -301,6 +333,18 @@ export default function ConveniosAdminPage() {
                       </a>
                     ) : (
                       <span className="text-text-secondary/50">-</span>
+                    )}
+                  </td>
+                  <td className="p-3 text-right space-x-2">
+                    {podeEditar(usuario, 'obras-repasses') && (
+                      <button onClick={() => abrirEdicao(c)} className="text-primary hover:underline">
+                        Editar
+                      </button>
+                    )}
+                    {podeExcluir(usuario, 'obras-repasses') && (
+                      <button onClick={() => excluir(c.id)} className="text-error hover:underline">
+                        Excluir
+                      </button>
                     )}
                   </td>
                 </tr>

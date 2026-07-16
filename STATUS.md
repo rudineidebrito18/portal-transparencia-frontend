@@ -531,6 +531,16 @@ direto no banco, ou remover assim que o guard de null for adicionado.
   Parlamentares, criar → editar → filtrar por tipo (confirmando que selecionar tipo limpa o
   filtro de ano) → excluir, ciclo completo. Zero erro de console.
 
+**Atualização 2026-07-16 (mesmo dia, backend corrigido)**: os dois bugs acima (NPE em
+`deleteFile` + exception handler quebrando ao mascarar a mensagem null) foram corrigidos no
+backend e confirmados via API real. Botões de editar/excluir reabilitados em
+`/admin/convenios` (removido o aviso `bg-warning`, `podeEditar`/`podeExcluir` com grupo
+`'obras-repasses'`, mesmo padrão das outras telas). Reconfirmado via Playwright exatamente o
+cenário que quebrava antes: criar convênio **sem PDF** → editar → excluir, ciclo completo sem
+erro. `convenioService.atualizar`/`excluir` não precisaram de nenhuma mudança (já estavam
+implementados certos pro contrato, só não tinham botão). Comentário de bug conhecido removido
+de `convenio.service.ts`.
+
 ### 7.10 Obras Públicas e Repasses (2026-07-16)
 
 `/admin/obras` (`src/modules/admin/obras/`) — lista + CRUD da obra em si, e
