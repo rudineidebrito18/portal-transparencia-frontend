@@ -631,6 +631,55 @@ autenticação). `GET`/`DELETE` não mudaram.
   imagem no `/noticias` público contra dado real porque exigiria desligar o mock e reiniciar
   o dev server; o código é o mesmo `<img src>` condicional já confirmado funcionando no admin.
 
+### 7.12 Secretarias (módulo `Unidade` completo — 6 sub-recursos) (2026-07-16)
+
+Unidade (que já existia no admin desde a seção 7.8, só com os dados institucionais base)
+ganhou os 5 sub-recursos que faltavam — decretos, documentos tipados, ex-gestores,
+ordenadores de despesa, setores — e virou a base do primeiro módulo **público** de
+Secretarias (`/secretarias`), não só admin.
+
+- **Correção de path descoberta lendo o código-fonte, não confiando na descrição em prosa
+  do prompt**: os paths de exclusão de ex-gestor/ordenador/setor têm `/unidades/` no meio
+  (`DELETE /api/geral/unidades/ex-gestores/{id}`, não `/api/geral/ex-gestores/{id}`) — os 3
+  controllers desses sub-recursos compartilham o mesmo `@RequestMapping("/api/geral/unidades")`
+  de base que `UnidadeController`, `DecretoUnidadeController` e `DocumentoUnidadeController`.
+  A mensagem original só mencionava essa correção pra decretos/documentos; conferi os 3
+  controllers restantes direto no backend e o padrão se repete igual.
+- **Tipo canônico `Unidade`** (e os 5 sub-recursos) mudou de dono: saiu de
+  `src/modules/admin/geral/types.ts` pra `src/modules/secretarias/types.ts` — mesmo padrão
+  de `ObraPublica` em `modules/obras/types.ts`, já que Unidade virou a base de um módulo
+  público de verdade agora, não só uma promessa em comentário. O admin reexporta de lá pra
+  não quebrar `rh/types.ts` (`Pick<Unidade, 'id' | 'nome'>`).
+- **Admin** (`/admin/geral/unidades`): formulário ganhou `dataInicio`/`dataFim` (vigência do
+  órgão, validado no front já que o backend não valida `dataInicio <= dataFim`) e filtro por
+  vigência na listagem. Nova página de detalhe `/admin/geral/unidades/[id]` com 5 abas
+  (Decretos, Documentos, Ex-gestores, Ordenadores, Setores) — igual ao padrão de Obras
+  (seção 7.10), mas grupo de permissão `'geral'` em vez de `'obras-repasses'`, porque este
+  módulo não é admin-only (`MANAGER` pode tudo). Documentos tipados são 3 slots fixos
+  (Termo/EDTC/Declaração E-SIC), não uma lista livre — reenviar substitui, sem botão de
+  "adicionar" genérico.
+- **Público** (`/secretarias` + `/secretarias/[id]`): primeiro módulo público criado do zero
+  nesta sessão. Lista usa client component com busca por nome + filtro de vigência (padrão
+  `useUrlState`, igual `usePageableResource`). Detalhe é Server Component com `notFound()` +
+  `not-found.tsx` (padrão de `licitacoes/[id]`, não o padrão client-hook usado no admin) —
+  faz as 6 chamadas em paralelo (`Promise.all`) já que o backend não agrega sub-recursos na
+  resposta da unidade. Decretos e documentos tipados reaproveitam o componente
+  `DocumentList` já existente (mapeando pro shape `Documento` genérico) em vez de criar um
+  componente novo. Link "Todas as Secretarias" adicionado ao dropdown "SECRETARIAS" do
+  Header público (que já existia, só com 2 links hardcoded pra Saúde/Educação).
+- **Descoberta real ao testar limpeza dos dados de teste**: `DELETE /api/geral/unidades/{id}`
+  devolve `409` se a unidade tiver qualquer sub-recurso vinculado (sem cascade delete no
+  banco) — precisa excluir os 5 sub-recursos primeiro. Não é bug, é proteção contra perda de
+  dado; a mensagem de erro crua do Postgres aparece no `alert()` do front (mesmo
+  comportamento non-tratado que outros módulos já têm pra erros 409/500 — não criei
+  tratamento especial só pra este caso).
+- Testado via Playwright contra o backend real, ciclo completo: criar unidade com foto e
+  vigência → abrir detalhe → criar decreto (upload PDF) → enviar documento tipado (slot
+  Termo) → criar ex-gestor → criar ordenador → criar setor → conferir tudo aparecendo no
+  `/secretarias` público (busca por nome + navegação pro detalhe, todas as 5 seções
+  renderizando) → limpar os 5 sub-recursos → excluir a unidade de teste. Zero erro de
+  console em todas as etapas, dados de teste não deixados no banco desta vez.
+
 ## 8. Como retomar
 
 **Pro painel admin, prefira o perfil `postgres`, não o `dev`** — banco real (Postgres via

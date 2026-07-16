@@ -40,8 +40,13 @@ function montarFormData(dados: UnidadeRequest, foto?: File | null): FormData {
 }
 
 export const unidadesService = {
-  listar(nome?: string): Promise<Unidade[]> {
-    return api.get<Unidade[]>(UNIDADES_BASE, { params: nome ? { nome } : undefined }).then(r => r.data)
+  listar(nome?: string, vigencia?: string): Promise<Unidade[]> {
+    const params = { nome: nome || undefined, vigencia: vigencia || undefined }
+    return api.get<Unidade[]>(UNIDADES_BASE, { params }).then(r => r.data)
+  },
+
+  buscarPorId(id: number): Promise<Unidade> {
+    return api.get<Unidade>(`${UNIDADES_BASE}/${id}`).then(r => r.data)
   },
 
   criar(dados: UnidadeRequest, foto?: File | null): Promise<Unidade> {

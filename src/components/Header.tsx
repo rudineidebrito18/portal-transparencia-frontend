@@ -145,6 +145,7 @@ export default function Header() {
               </DropdownMenuItem>
 
               <DropdownMenuItem label="SECRETARIAS">
+                <Link href="/secretarias" className="px-4 py-2 hover:bg-neutral-dark block font-semibold" onClick={() => setMenuOpen(false)}>Todas as Secretarias</Link>
                 <Link href="/saude" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Saúde</Link>
                 <Link href="/educacao" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Educação</Link>
               </DropdownMenuItem>

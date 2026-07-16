@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useEffect, useState } from 'react'
+import Link from 'next/link'
 
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
@@ -24,6 +25,8 @@ interface FormState {
   gestorNome: string
   gestorCargo: string
   gestorVerificado: boolean
+  dataInicio: string
+  dataFim: string
 }
 
 const FORM_VAZIO: FormState = {
@@ -37,7 +40,9 @@ const FORM_VAZIO: FormState = {
   atribuicoes: '',
   gestorNome: '',
   gestorCargo: '',
-  gestorVerificado: false
+  gestorVerificado: false,
+  dataInicio: '',
+  dataFim: ''
 }
 
 export default function UnidadesAdminPage() {
@@ -45,14 +50,15 @@ export default function UnidadesAdminPage() {
 
   const [lista, setLista] = useState<Unidade[]>([])
   const [busca, setBusca] = useState('')
+  const [vigencia, setVigencia] = useState('')
   const [loading, setLoading] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
 
-  function carregar(nome?: string) {
+  function carregar(nome?: string, vigenciaFiltro?: string) {
     setLoading(true)
     setErro(null)
     unidadesService
-      .listar(nome || undefined)
+      .listar(nome || undefined, vigenciaFiltro || undefined)
       .then(setLista)
       .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
       .finally(() => setLoading(false))
@@ -85,7 +91,9 @@ export default function UnidadesAdminPage() {
       atribuicoes: u.atribuicoes ?? '',
       gestorNome: u.gestorNome ?? '',
       gestorCargo: u.gestorCargo ?? '',
-      gestorVerificado: u.gestorVerificado ?? false
+      gestorVerificado: u.gestorVerificado ?? false,
+      dataInicio: u.dataInicio ?? '',
+      dataFim: u.dataFim ?? ''
     })
   }
 
@@ -94,7 +102,7 @@ export default function UnidadesAdminPage() {
 
     try {
       await unidadesService.excluir(id)
-      carregar(busca)
+      carregar(busca, vigencia)
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
     }
@@ -104,11 +112,20 @@ export default function UnidadesAdminPage() {
     e.preventDefault()
     if (!form) return
 
+    if (form.dataInicio && form.dataFim && form.dataInicio > form.dataFim) {
+      setErroForm('A data de criação não pode ser depois da data de extinção.')
+      return
+    }
+
     setSalvando(true)
     setErroForm(null)
 
     const { id, ...dados } = form
-    const request: UnidadeRequest = dados
+    const request: UnidadeRequest = {
+      ...dados,
+      dataInicio: dados.dataInicio || undefined,
+      dataFim: dados.dataFim || undefined
+    }
 
     try {
       if (id) {
@@ -119,7 +136,7 @@ export default function UnidadesAdminPage() {
 
       setForm(null)
       setFoto(null)
-      carregar(busca)
+      carregar(busca, vigencia)
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
     } finally {
@@ -142,19 +159,45 @@ export default function UnidadesAdminPage() {
         )}
       </div>
 
-      <Card className="p-4" hoverable={false}>
-        <input
-          placeholder="Buscar por nome..."
-          defaultValue={busca}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              const valor = (e.target as HTMLInputElement).value
-              setBusca(valor)
-              carregar(valor)
-            }
-          }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm w-full md:w-80"
-        />
+      <Card className="p-4 flex flex-wrap gap-3 items-end" hoverable={false}>
+        <div>
+          <label className="block text-xs font-medium mb-1">Buscar por nome</label>
+          <input
+            placeholder="Buscar por nome..."
+            defaultValue={busca}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const valor = (e.target as HTMLInputElement).value
+                setBusca(valor)
+                carregar(valor, vigencia)
+              }
+            }}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm w-full md:w-80"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium mb-1">Vigente em</label>
+          <input
+            type="date"
+            value={vigencia}
+            onChange={e => {
+              setVigencia(e.target.value)
+              carregar(busca, e.target.value)
+            }}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+        {vigencia && (
+          <button
+            onClick={() => {
+              setVigencia('')
+              carregar(busca, '')
+            }}
+            className="text-sm text-primary hover:underline pb-2"
+          >
+            Limpar filtro de vigência
+          </button>
+        )}
       </Card>
 
       {form && (
@@ -258,6 +301,32 @@ export default function UnidadesAdminPage() {
               Cadastro do gestor verificado
             </label>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Data de criação do órgão (opcional)
+                </label>
+                <input
+                  type="date"
+                  value={form.dataInicio}
+                  onChange={e => setForm({ ...form, dataInicio: e.target.value })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Data de extinção do órgão (opcional)
+                </label>
+                <input
+                  type="date"
+                  min={form.dataInicio || undefined}
+                  value={form.dataFim}
+                  onChange={e => setForm({ ...form, dataFim: e.target.value })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-1">
                 Foto do gestor {form.id && '(opcional — mantém a atual se vazio)'}
@@ -327,6 +396,9 @@ export default function UnidadesAdminPage() {
                   </td>
                   <td className="p-3">{u.telefone || u.email || '-'}</td>
                   <td className="p-3 text-right space-x-2">
+                    <Link href={`/admin/geral/unidades/${u.id}`} className="text-primary hover:underline">
+                      Detalhes
+                    </Link>
                     {podeEditar(usuario, 'geral') && (
                       <button onClick={() => abrirEdicao(u)} className="text-primary hover:underline">
                         Editar
