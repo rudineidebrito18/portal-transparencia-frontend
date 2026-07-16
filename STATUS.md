@@ -361,17 +361,48 @@ restrição admin-only pra editar/excluir, diferente da maioria dos módulos ant
 ### 7.5 Próximos passos (módulos bespoke, não implementados ainda)
 
 Nesta ordem sugerida (do mais isolado/simples pro mais complexo):
-1. **ESIC e Ouvidoria** — só PUT de config + leitura de formulários recebidos (sem DELETE
-   ainda, não construir esse botão).
+1. ~~**ESIC e Ouvidoria**~~ — feito em 2026-07-16, ver seção 7.6.
 2. **RH bespoke**: servidor, folha de pagamento, cargos, diárias (todas paginadas, sem usar o
-   padrão genérico) e concursos (⚠️ upload de anexo de concurso está quebrado no backend —
-   não construir essa tela ainda).
+   padrão genérico) e concursos (upload de anexo de concurso **corrigido no backend em
+   2026-07-16** — não é mais bloqueio, ver seção 7.6).
 3. **Convênios e Emendas Parlamentares** (bespoke, com sub-recursos).
 4. **Obras Públicas e Repasses** (obra + medições + anexos + ART, ART não é admin-only).
-5. **Licitações** (licitação + contratos + aditivos + fiscal-contratos, com o aviso de upload
-   de documento de contrato com assinatura ambígua no backend — testar antes de confiar).
+5. **Licitações** (licitação + contratos + aditivos + fiscal-contratos; o upload de documento
+   de contrato também foi **corrigido no backend em 2026-07-16**, ver seção 7.6 — deixou de
+   ser bloqueio).
 6. **Diário Oficial** — o mais complexo: fluxo de publicação com aprovação humana e assinatura
    digital (stepper de status `RECEBIDO → ... → PUBLICADO`, com `FALHOU`/retomar).
+
+### 7.6 ESIC e Ouvidoria (2026-07-16)
+
+Módulo admin novo, `src/modules/admin/esic-ouvidoria/`, 3 rotas:
+
+- **`/admin/esic/config`** (`GET`/`PUT /esic/infos`) — form singleton com select de unidade
+  responsável (reaproveita `unidadesService` de `admin/geral`). **Achado**: `GET /esic/infos`
+  também devolve `404` antes da primeira configuração, igual `/ouvidoria/info` — não assumir
+  que só o endpoint de ouvidoria faz upsert/404. Tratado como "ainda não configurado" nos dois.
+  **Achado 2**: o backend devolve `LocalTime` como `"HH:mm:ss"`; os campos são truncados pra
+  `"HH:mm"` ao popular o form (`<input type="time">` espera esse formato sem segundos).
+- **`/admin/esic/formularios`** (`GET /esic/formulario`, filtro por tipo via
+  `GET /esic/formulario/tipo?tipo=`) — somente leitura, array não paginado. Não há
+  criar/editar/excluir no admin pra esse recurso (o `POST` é o formulário público do cidadão).
+- **`/admin/ouvidoria/config`** (`GET`/`PUT /ouvidoria/info`) — mesmo padrão de config
+  singleton. **Sem tela de formulários recebidos**: o controller de ouvidoria não tem
+  `GET`/listar nem `DELETE`, só `POST` público (confirmado no spec e no
+  `prompt-frontend-dashboard-admin.md`, seção 6.8) — não há o que construir aí ainda.
+  **Achado 3**: `InfosOuvidoriaResponseDto` devolve `unidadeNome`, não `unidadeId` — o form de
+  edição casa pelo nome contra a lista de unidades pra pré-selecionar o `<select>`; se o nome
+  não bater (unidade renomeada/excluída), fica em branco e o admin escolhe de novo ao salvar.
+- Grupo `esic-ouvidoria` em `permissoes.ts` já existia desde a sessão da fundação do admin
+  (`podeEditar` = `ROLE_MANAGER`, `podeExcluir` = admin-only) — só reaproveitado, nenhum botão
+  de excluir construído (nenhum dos dois controllers tem `DELETE` implementado ainda).
+- Testado via Playwright headless (`channel: 'chrome'`, usando o Google Chrome já instalado no
+  ambiente — `npm install --no-save playwright` funciona sem baixar browser) contra o backend
+  real, perfil `postgres`: login, as 3 páginas carregando dados reais, salvar config do E-SIC
+  (persistindo e recarregando), criar a config da Ouvidoria do zero (fluxo "ainda não
+  configurado" → preencher → salvar → recarregar e confirmar persistência), e o filtro por
+  tipo em formulários recebidos. Sem erro de console além dos 404 esperados (e duplicados pelo
+  double-invoke do React StrictMode em dev) das checagens de "config ainda não existe".
 
 ## 8. Como retomar
 

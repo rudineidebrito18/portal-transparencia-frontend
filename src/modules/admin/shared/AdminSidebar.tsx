@@ -16,8 +16,7 @@ const GRUPOS_PENDENTES = [
   'Obras Públicas e Repasses',
   'Convênios e Emendas Parlamentares',
   'RH: Servidor, Folha, Cargos, Diárias, Concursos',
-  'Anticorrupção (dívida ativa, empresas inidôneas)',
-  'ESIC e Ouvidoria'
+  'Anticorrupção (dívida ativa, empresas inidôneas)'
 ]
 
 const LINKS_INSTITUCIONAL_GERAL = [
@@ -26,6 +25,12 @@ const LINKS_INSTITUCIONAL_GERAL = [
   { href: '/admin/geral/fornecedores', label: 'Fornecedores' },
   { href: '/admin/geral/unidades', label: 'Unidades' },
   { href: '/admin/geral/tabela-valores', label: 'Tabela de Valores de Diária' }
+]
+
+const LINKS_ESIC_OUVIDORIA = [
+  { href: '/admin/esic/config', label: 'E-SIC — Configuração' },
+  { href: '/admin/esic/formularios', label: 'E-SIC — Formulários Recebidos' },
+  { href: '/admin/ouvidoria/config', label: 'Ouvidoria — Configuração' }
 ]
 
 function agruparPorCategoria() {
@@ -83,6 +88,21 @@ export default function AdminSidebar() {
             Institucional e Geral
           </p>
           {LINKS_INSTITUCIONAL_GERAL.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        <div>
+          <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+            ESIC e Ouvidoria
+          </p>
+          {LINKS_ESIC_OUVIDORIA.map(link => (
             <Link
               key={link.href}
               href={link.href}
