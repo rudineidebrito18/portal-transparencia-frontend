@@ -539,27 +539,32 @@ Convênios.
   então fica `0` até esse módulo existir. O card de detalhe mostra `valorTotal` (o campo
   digitado) como "Valor total" e os campos calculados como "Total medido"/"Total pago"/"Saldo",
   sem misturar os dois.
-- **Bug real encontrado no backend, não reportado ainda formalmente** (achado lendo
-  `MedicaoObraServiceImpl.salvar/atualizar/deletar`, não só testando por fora): esses métodos
-  só chamam `medicaoObraRepository.save/deleteById` na entidade filha `MedicaoObra` — nunca
-  tocam a entidade pai `ObraPublica`. Só que o recálculo de `totalMedicao`, `saldoObra`,
+- **Bug real encontrado no backend, reportado e corrigido no mesmo dia**: `MedicaoObraServiceImpl.salvar/atualizar/deletar`
+  só chamavam `medicaoObraRepository.save/deleteById` na entidade filha `MedicaoObra` — nunca
+  tocavam a entidade pai `ObraPublica`, e o recálculo de `totalMedicao`, `saldoObra`,
   `saldoConta`, `percentualObra` e `percentualFinanceiro` mora no `@PrePersist`/`@PreUpdate`
   `calcularCamposAutomaticos()` da própria `ObraPublica` — então criar/editar/excluir uma
-  medição nunca atualiza esses totais na obra; eles ficam travados no valor de quando a obra
-  foi salva por último (tipicamente tudo zero). Confirmado via API real: criei uma medição de
-  R$ 15.000 numa obra nova e `GET /api/obras/{id}` continuou devolvendo `totalMedicao: 0.0`.
-  Texto do bug pronto pra copiar quando for reportar (mesmo padrão do bug de Convênios acima).
-  O frontend já busca a obra de novo (`aoAtualizar`) depois de criar/editar/excluir uma
-  medição — não resolve o problema (o backend que não recalcula), mas garante que a tela
-  mostra o dado mais atual assim que o backend for corrigido.
+  medição nunca atualizava esses totais na obra. Confirmado via API real antes do fix (medição
+  de R$ 15.000 numa obra nova, `GET /api/obras/{id}` continuava com `totalMedicao: 0.0`) e
+  depois do fix (mesmo teste, `totalMedicao` refletiu os R$ 15.000 corretamente). O backend
+  agora chama `recalcularTotaisDaObra(obra)` (que roda `calcularCamposAutomaticos()` +
+  `save`) depois de salvar/atualizar/excluir a medição. O frontend já buscava a obra de novo
+  (`aoAtualizar`) depois de criar/editar/excluir uma medição — isso é o que fez o fix aparecer
+  imediatamente na tela sem precisar de mudança nenhuma no frontend.
+- **Nuance esperada, não é bug**: com `totalObra` ainda em `0` (depende de contratos
+  vinculados, módulo Licitações não implementado no admin), qualquer medição cadastrada deixa
+  `saldoObra` negativo (`0 - totalMedicao`) e `percentualObra` em `0%` (guard contra divisão
+  por zero no backend). É matemática correta dado que falta o módulo de contratos — vai se
+  resolver sozinho quando Licitações for implementado (item 5 da lista da seção 7.5).
 - Testado via Playwright contra o backend real: criar obra → abrir detalhe → criar medição →
   editar medição → criar anexo (upload PDF real) → criar ART (upload PDF real) → excluir
   medição, ciclo completo pelas 3 abas. Zero erro de console (incluindo depois do fix do
   `formatarMoeda` crashando em campo calculado `null` e do `formatarData` quebrando em
   `ultimaAtualizacao`, que é `LocalDateTime` — não `LocalDate` como os outros campos de data).
-  **Sobraram 5 obras de teste (`numero` 9001, IDs 1–5) no banco `postgres`**, com suas
-  medições/anexos/ART — o usuário disse que vai limpar manualmente, não precisa fazer nada
-  automático aqui.
+  Usuário limpou manualmente o primeiro lote de obras de teste (`numero` 9001). Depois do fix
+  do backend (ver bug acima), um reteste rápido criou **mais 1 obra de teste** (`numero` 9001,
+  local "Praça Central de Teste") pra confirmar que `totalMedicao` recalcula — ainda não
+  removida, fica pro usuário limpar junto com o resto.
 - Sidebar: "Obras Públicas" entrou no grupo "Convênios e Repasses" (mesma lógica dos outros
   bespoke — o prompt agrupa os três sob a seção 6.5), removido de "Em breve".
 
