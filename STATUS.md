@@ -367,7 +367,8 @@ Nesta ordem sugerida (do mais isolado/simples pro mais complexo):
 2. ~~**RH bespoke**~~ — feito em 2026-07-16, ver seção 7.7.
 3. ~~**Convênios e Emendas Parlamentares**~~ — feito em 2026-07-16, ver seção 7.9 (Convênios
    com edição/exclusão bloqueadas por bug real no backend, reportado).
-4. **Obras Públicas e Repasses** (obra + medições + anexos + ART, ART não é admin-only).
+4. ~~**Obras Públicas e Repasses**~~ (obra + medições + anexos + ART, ART não é admin-only)
+   — feito em 2026-07-16, ver seção 7.10.
 5. **Licitações** (licitação + contratos + aditivos + fiscal-contratos; o upload de documento
    de contrato também foi **corrigido no backend em 2026-07-16**, ver seção 7.6 — deixou de
    ser bloqueio).
@@ -517,6 +518,50 @@ truncar a tabela `convenio` direto se for mais rápido.
 - Testado via Playwright contra o backend real: lista + aviso do bug em Convênios; em Emendas
   Parlamentares, criar → editar → filtrar por tipo (confirmando que selecionar tipo limpa o
   filtro de ano) → excluir, ciclo completo. Zero erro de console.
+
+### 7.10 Obras Públicas e Repasses (2026-07-16)
+
+`/admin/obras` (`src/modules/admin/obras/`) — lista + CRUD da obra em si, e
+`/admin/obras/[id]` com 3 abas (Medições, Anexos, ART) pros sub-recursos
+`/obras/{id}/medicoes`, `/obras/{id}/anexos` (multipart `anexo`+`arquivo`) e
+`/obras/{id}/arts` (multipart `dto`+`pdf`). `GET /obras` não é paginado, mesmo padrão de
+Convênios.
+
+- **Grupo de permissão**: `'obras-repasses'` (admin-only editar/excluir) pra obra, medições e
+  anexos — **exceto ART**, que segundo o prompt (`### 6.5`) não é admin-only: `MANAGER` pode
+  criar/editar/excluir. A aba de ART usa o grupo `'padrao'` em vez de `'obras-repasses'` nas
+  chamadas de `podeCriar`/`podeExcluir` só por isso (mesma função, grupo diferente — não é
+  código duplicado por engano).
+- **Campos calculados da obra** (`totalObra, totalMedicao, totalMedicaoPaga, saldoObra,
+  saldoConta, percentualObra, percentualFinanceiro`) vêm do backend e **não são o mesmo que o
+  `valorTotal`** que o usuário digita no formulário — `totalObra` é somado a partir dos
+  `contratos`/aditivos vinculados à obra (módulo Licitações, ainda não implementado no admin),
+  então fica `0` até esse módulo existir. O card de detalhe mostra `valorTotal` (o campo
+  digitado) como "Valor total" e os campos calculados como "Total medido"/"Total pago"/"Saldo",
+  sem misturar os dois.
+- **Bug real encontrado no backend, não reportado ainda formalmente** (achado lendo
+  `MedicaoObraServiceImpl.salvar/atualizar/deletar`, não só testando por fora): esses métodos
+  só chamam `medicaoObraRepository.save/deleteById` na entidade filha `MedicaoObra` — nunca
+  tocam a entidade pai `ObraPublica`. Só que o recálculo de `totalMedicao`, `saldoObra`,
+  `saldoConta`, `percentualObra` e `percentualFinanceiro` mora no `@PrePersist`/`@PreUpdate`
+  `calcularCamposAutomaticos()` da própria `ObraPublica` — então criar/editar/excluir uma
+  medição nunca atualiza esses totais na obra; eles ficam travados no valor de quando a obra
+  foi salva por último (tipicamente tudo zero). Confirmado via API real: criei uma medição de
+  R$ 15.000 numa obra nova e `GET /api/obras/{id}` continuou devolvendo `totalMedicao: 0.0`.
+  Texto do bug pronto pra copiar quando for reportar (mesmo padrão do bug de Convênios acima).
+  O frontend já busca a obra de novo (`aoAtualizar`) depois de criar/editar/excluir uma
+  medição — não resolve o problema (o backend que não recalcula), mas garante que a tela
+  mostra o dado mais atual assim que o backend for corrigido.
+- Testado via Playwright contra o backend real: criar obra → abrir detalhe → criar medição →
+  editar medição → criar anexo (upload PDF real) → criar ART (upload PDF real) → excluir
+  medição, ciclo completo pelas 3 abas. Zero erro de console (incluindo depois do fix do
+  `formatarMoeda` crashando em campo calculado `null` e do `formatarData` quebrando em
+  `ultimaAtualizacao`, que é `LocalDateTime` — não `LocalDate` como os outros campos de data).
+  **Sobraram 5 obras de teste (`numero` 9001, IDs 1–5) no banco `postgres`**, com suas
+  medições/anexos/ART — o usuário disse que vai limpar manualmente, não precisa fazer nada
+  automático aqui.
+- Sidebar: "Obras Públicas" entrou no grupo "Convênios e Repasses" (mesma lógica dos outros
+  bespoke — o prompt agrupa os três sob a seção 6.5), removido de "Em breve".
 
 ## 8. Como retomar
 

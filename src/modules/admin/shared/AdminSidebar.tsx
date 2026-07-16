@@ -13,7 +13,6 @@ import { REGISTRY_MODULOS_GENERICOS } from '@/modules/admin/genericos/registry'
 const GRUPOS_PENDENTES = [
   'Diário Oficial (publicação e aprovação)',
   'Licitações, Contratos e Aditivos',
-  'Obras Públicas e Repasses',
   'Anticorrupção (dívida ativa, empresas inidôneas)'
 ]
 
@@ -33,7 +32,8 @@ const LINKS_RH_BESPOKE = [
 // do LINKS_RH_BESPOKE acima.
 const LINKS_CONVENIOS_BESPOKE = [
   { href: '/admin/convenios', label: 'Convênios' },
-  { href: '/admin/emendas-parlamentares', label: 'Emendas Parlamentares' }
+  { href: '/admin/emendas-parlamentares', label: 'Emendas Parlamentares' },
+  { href: '/admin/obras', label: 'Obras Públicas' }
 ]
 
 const LINKS_INSTITUCIONAL_GERAL = [
