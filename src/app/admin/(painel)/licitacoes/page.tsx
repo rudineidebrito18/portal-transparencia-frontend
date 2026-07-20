@@ -11,7 +11,7 @@ import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
-import { podeCriar, podeExcluir } from '@/modules/auth/permissoes'
+import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { licitacaoService } from '@/modules/admin/licitacoes/licitacao.service'
 import {
   FiltroLicitacao,
@@ -21,8 +21,12 @@ import {
   StatusLicitacaoDescricao,
   StatusLicitacaoStyle,
   TipoProcedimentoDescricao,
-  TipoProcedimentoLicitacao
+  TipoProcedimentoLicitacao,
+  normalizarStatus,
+  normalizarTipoProcedimento
 } from '@/modules/admin/licitacoes/types'
+
+type LicitacaoFormState = { id: number | null } & LicitacaoRequest
 
 const FORM_VAZIO: LicitacaoRequest = {
   numeroInstrumento: '',
@@ -49,14 +53,6 @@ function formatarMoeda(valor?: number) {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-// statusDescricao vem do backend como texto livre (ex: "EM ABERTO"), não a chave do
-// enum (ex: "EM_ABERTO") — normaliza pra achar o estilo, mesmo padrão do LicitacaoCard
-// público (src/modules/licitacoes/components/LicitacaoCard.tsx).
-function normalizarStatus(valor: string): StatusLicitacao | undefined {
-  const chave = valor.toUpperCase().replace(/\s+/g, '_') as StatusLicitacao
-  return chave in StatusLicitacaoDescricao ? chave : undefined
-}
-
 export default function LicitacoesAdminPage() {
   const { usuario } = useAuth()
 
@@ -73,9 +69,54 @@ export default function LicitacoesAdminPage() {
     FiltroLicitacao
   >({ fetchFunction, initialSort: 'dataAbertura,desc' })
 
-  const [form, setForm] = useState<LicitacaoRequest | null>(null)
+  const [form, setForm] = useState<LicitacaoFormState | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [carregandoEdicao, setCarregandoEdicao] = useState<number | null>(null)
+
+  function abrirCriacao() {
+    setErroForm(null)
+    setForm({ id: null, ...FORM_VAZIO })
+  }
+
+  async function abrirEdicao(id: number) {
+    setErroForm(null)
+    setCarregandoEdicao(id)
+    try {
+      const l = await licitacaoService.buscarPorId(id)
+      setForm({
+        id,
+        numeroInstrumento: l.numeroInstrumento,
+        ano: l.ano,
+        numeroProcesso: l.numeroProcesso,
+        dataPublicacao: l.dataPublicacao,
+        dataSessao: l.dataSessao,
+        dataAbertura: l.dataAbertura,
+        dataHomologacao: l.dataHomologacao,
+        valorEstimado: l.valorEstimado,
+        valorAdjudicado: l.valorAdjudicado,
+        valorDotacao: l.valorDotacao,
+        tipoProcedimentoLicitacao: normalizarTipoProcedimento(l.tipoProcedimentoLicitacao) ?? TipoProcedimentoLicitacao.PE,
+        status: normalizarStatus(l.status) ?? StatusLicitacao.EM_ABERTO,
+        tipoCriterio: l.tipoCriterio,
+        regimeExecucao: l.regimeExecucao,
+        finalidade: l.finalidade,
+        tipoResultado: l.tipoResultado,
+        naturezaDespesa: l.naturezaDespesa,
+        origemRecurso: l.origemRecurso,
+        unidade: l.unidade,
+        nomeAutoridade: l.nomeAutoridade,
+        sistemaEletronico: l.sistemaEletronico,
+        lei: l.lei,
+        covid: l.covid,
+        objeto: l.objeto
+      })
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erro ao carregar licitação')
+    } finally {
+      setCarregandoEdicao(null)
+    }
+  }
 
   async function excluir(id: number) {
     if (!confirm('Excluir esta licitação? Essa ação não pode ser desfeita.')) return
@@ -94,8 +135,14 @@ export default function LicitacoesAdminPage() {
     setSalvando(true)
     setErroForm(null)
 
+    const { id, ...dados } = form
+
     try {
-      await licitacaoService.criar(form)
+      if (id) {
+        await licitacaoService.atualizar(id, dados)
+      } else {
+        await licitacaoService.criar(dados)
+      }
       setForm(null)
       recarregar()
     } catch (e: unknown) {
@@ -112,7 +159,7 @@ export default function LicitacoesAdminPage() {
 
         {podeCriar(usuario, 'licitacoes') && !form && (
           <button
-            onClick={() => { setErroForm(null); setForm(FORM_VAZIO) }}
+            onClick={abrirCriacao}
             className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
           >
             + Nova licitação
@@ -165,7 +212,7 @@ export default function LicitacoesAdminPage() {
       {form && (
         <Card className="p-4" hoverable={false}>
           <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">Nova licitação</h2>
+            <h2 className="font-semibold text-sm">{form.id ? 'Editar licitação' : 'Nova licitação'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
@@ -431,6 +478,15 @@ export default function LicitacoesAdminPage() {
                     <Link href={`/admin/licitacoes/${l.id}`} className="text-primary hover:underline">
                       Ver
                     </Link>
+                    {podeEditar(usuario, 'licitacoes') && (
+                      <button
+                        onClick={() => abrirEdicao(l.id)}
+                        disabled={carregandoEdicao === l.id}
+                        className="text-primary hover:underline disabled:opacity-60"
+                      >
+                        {carregandoEdicao === l.id ? 'Carregando...' : 'Editar'}
+                      </button>
+                    )}
                     {podeExcluir(usuario, 'licitacoes') && (
                       <button onClick={() => excluir(l.id)} className="text-error hover:underline">
                         Excluir

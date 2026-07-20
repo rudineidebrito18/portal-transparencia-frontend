@@ -18,7 +18,7 @@ export interface ModuloGenericoConfig {
 export const REGISTRY_MODULOS_GENERICOS: ModuloGenericoConfig[] = [
   // Forma padrão: { descricao, data }
   { slug: 'renuncia-fiscal', label: 'Renúncia Fiscal', categoria: 'Fiscal e Orçamentário', basePath: '/gestao-fiscal/renuncia-fiscal', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
-  { slug: 'fiscal-contratos', label: 'Fiscal de Contratos', categoria: 'Licitações', basePath: '/licitacao/fiscal-contratos', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
+  { slug: 'fiscal-contratos', label: 'Fiscal de Contratos', categoria: 'Licitações', basePath: '/licitacoes/fiscal-contratos', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'terceirizados', label: 'Terceirizados', categoria: 'Recursos Humanos', basePath: '/recursos-humanos/terceirizados', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'estagiarios', label: 'Estagiários', categoria: 'Recursos Humanos', basePath: '/recursos-humanos/estagiarios', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'ppa', label: 'PPA', categoria: 'Planejamento', basePath: '/planejamento/ppa', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },

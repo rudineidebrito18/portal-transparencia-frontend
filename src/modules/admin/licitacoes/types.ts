@@ -4,6 +4,7 @@ import { StatusLicitacao, TipoProcedimentoLicitacao } from '@/modules/licitacoes
 export type { LicitacaoResumo, LicitacaoDetalhe, FiltroLicitacao } from '@/modules/licitacoes/types'
 export { StatusLicitacao, StatusLicitacaoDescricao, StatusLicitacaoStyle, TipoProcedimentoLicitacao, TipoProcedimentoDescricao } from '@/modules/licitacoes/enums'
 export type { ContratoLicitacao, Aditivo } from '@/modules/contratos/types'
+export { normalizarStatus, normalizarTipoProcedimento } from './enumMapping'
 
 export interface LicitacaoRequest {
   numeroInstrumento: string
@@ -60,6 +61,5 @@ export interface AditivoRequest {
   dataAssinatura: string
   objeto: string
   fornecedorId: number
-  caminhoPdf?: string
   contratoLicitacaoId: number
 }

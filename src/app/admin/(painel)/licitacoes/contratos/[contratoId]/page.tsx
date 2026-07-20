@@ -9,7 +9,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
-import { podeCriar, podeExcluir } from '@/modules/auth/permissoes'
+import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { fornecedoresService } from '@/modules/admin/geral/geral.service'
 import { Fornecedor } from '@/modules/admin/geral/types'
 import { ContratoLicitacao, Aditivo } from '@/modules/contratos/types'
@@ -291,7 +291,8 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
   )
 }
 
-const ADITIVO_VAZIO = { dataAssinatura: '', objeto: '', fornecedorId: 0, caminhoPdf: '' }
+const ADITIVO_VAZIO = { dataAssinatura: '', objeto: '', fornecedorId: 0 }
+type AditivoFormState = { id: number | null } & typeof ADITIVO_VAZIO
 
 function AbaAditivos({ contratoId }: { contratoId: number }) {
   const { usuario } = useAuth()
@@ -317,9 +318,22 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
     fornecedoresService.listar().then(setFornecedores).catch(() => {})
   }, [])
 
-  const [form, setForm] = useState<typeof ADITIVO_VAZIO | null>(null)
+  const [form, setForm] = useState<AditivoFormState | null>(null)
+  const [arquivo, setArquivo] = useState<File | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+
+  function abrirCriacao() {
+    setErroForm(null)
+    setArquivo(null)
+    setForm({ id: null, ...ADITIVO_VAZIO })
+  }
+
+  function abrirEdicao(a: Aditivo) {
+    setErroForm(null)
+    setArquivo(null)
+    setForm({ id: a.id, dataAssinatura: a.dataAssinatura, objeto: a.objeto, fornecedorId: a.fornecedorId ?? 0 })
+  }
 
   async function excluir(id: number) {
     if (!confirm('Excluir este aditivo? Essa ação não pode ser desfeita.')) return
@@ -342,13 +356,17 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
       dataAssinatura: form.dataAssinatura,
       objeto: form.objeto,
       fornecedorId: form.fornecedorId,
-      caminhoPdf: form.caminhoPdf || undefined,
       contratoLicitacaoId: contratoId
     }
 
     try {
-      await aditivoService.criar(dados)
+      if (form.id) {
+        await aditivoService.atualizar(form.id, dados, arquivo)
+      } else {
+        await aditivoService.criar(dados, arquivo)
+      }
       setForm(null)
+      setArquivo(null)
       carregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
@@ -361,7 +379,7 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
     <div className="space-y-4">
       {podeCriar(usuario, 'licitacoes') && !form && (
         <button
-          onClick={() => { setErroForm(null); setForm(ADITIVO_VAZIO) }}
+          onClick={abrirCriacao}
           className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
         >
           + Novo aditivo
@@ -371,7 +389,7 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
       {form && (
         <Card className="p-4" hoverable={false}>
           <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">Novo aditivo</h2>
+            <h2 className="font-semibold text-sm">{form.id ? 'Editar aditivo' : 'Novo aditivo'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
@@ -412,16 +430,15 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Caminho do PDF</label>
+              <label className="block text-sm font-medium mb-1">
+                Arquivo (PDF) {form.id && <span className="font-normal text-text-secondary/60">— opcional, mantém o atual se não enviar um novo</span>}
+              </label>
               <input
-                value={form.caminhoPdf}
-                onChange={e => setForm({ ...form, caminhoPdf: e.target.value })}
-                placeholder="/documentos/aditivos/exemplo.pdf"
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                type="file"
+                accept="application/pdf"
+                onChange={e => setArquivo(e.target.files?.[0] ?? null)}
+                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold"
               />
-              <p className="text-xs text-text-secondary/60 mt-1">
-                O backend ainda não tem upload de arquivo pra aditivo — esse campo salva só o texto do caminho, não faz upload.
-              </p>
             </div>
 
             {erroForm && <ErrorState message={erroForm} />}
@@ -468,8 +485,19 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
                   <td className="p-3">{formatarData(a.dataAssinatura)}</td>
                   <td className="p-3">{a.objeto}</td>
                   <td className="p-3">{a.fornecedorNome}</td>
-                  <td className="p-3">{a.caminhoPdf || '—'}</td>
-                  <td className="p-3 text-right">
+                  <td className="p-3">
+                    {a.caminhoPdf ? (
+                      <a href={a.caminhoPdf} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        Abrir
+                      </a>
+                    ) : '—'}
+                  </td>
+                  <td className="p-3 text-right space-x-2">
+                    {podeEditar(usuario, 'licitacoes') && (
+                      <button onClick={() => abrirEdicao(a)} className="text-primary hover:underline">
+                        Editar
+                      </button>
+                    )}
                     {podeExcluir(usuario, 'licitacoes') && (
                       <button onClick={() => excluir(a.id)} className="text-error hover:underline">
                         Excluir

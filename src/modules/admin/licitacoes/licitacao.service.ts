@@ -31,6 +31,10 @@ export const licitacaoService = {
     return api.post<LicitacaoResumo>(BASE, dados).then(r => r.data)
   },
 
+  atualizar(id: number, dados: LicitacaoRequest): Promise<LicitacaoDetalhe> {
+    return api.put<LicitacaoDetalhe>(`${BASE}/${id}`, dados).then(r => r.data)
+  },
+
   excluir(id: number): Promise<void> {
     return api.delete(`${BASE}/${id}`).then(() => undefined)
   },

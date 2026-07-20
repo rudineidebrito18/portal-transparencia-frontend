@@ -11,7 +11,7 @@ import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
-import { podeCriar, podeExcluir } from '@/modules/auth/permissoes'
+import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { LicitacaoDetalhe } from '@/modules/licitacoes/types'
 import { ContratoLicitacao } from '@/modules/contratos/types'
 import { licitacaoService } from '@/modules/admin/licitacoes/licitacao.service'
@@ -24,7 +24,8 @@ import {
   StatusLicitacaoDescricao,
   StatusLicitacaoStyle,
   TipoProcedimentoDescricao,
-  TipoProcedimentoLicitacao
+  TipoProcedimentoLicitacao,
+  normalizarStatus
 } from '@/modules/admin/licitacoes/types'
 
 function formatarData(data?: string) {
@@ -37,12 +38,8 @@ function formatarMoeda(valor?: number) {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-function normalizarStatus(valor: string): StatusLicitacao | undefined {
-  const chave = valor.toUpperCase().replace(/\s+/g, '_') as StatusLicitacao
-  return chave in StatusLicitacaoDescricao ? chave : undefined
-}
-
 type Aba = 'documentos' | 'contratos'
+type ContratoFormState = { id: number | null } & ContratoLicitacaoRequest
 
 const CONTRATO_VAZIO: ContratoLicitacaoRequest = {
   numeroContrato: 0,
@@ -366,9 +363,44 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
 
   useEffect(carregar, [licitacaoId, pagina])
 
-  const [form, setForm] = useState<ContratoLicitacaoRequest | null>(null)
+  const [form, setForm] = useState<ContratoFormState | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+
+  function abrirCriacao() {
+    setErroForm(null)
+    setForm({ id: null, ...CONTRATO_VAZIO })
+  }
+
+  function abrirEdicao(c: ContratoLicitacao) {
+    setErroForm(null)
+    setForm({
+      id: c.id,
+      numeroContrato: c.numeroContrato,
+      exercicio: c.exercicio,
+      fornecedor: c.fornecedor,
+      dataAssinatura: c.dataAssinatura,
+      dataPublicacao: c.dataPublicacao,
+      dataInicio: c.dataInicio,
+      dataTermino: c.dataTermino,
+      unidade: c.unidade,
+      gestorContrato: c.gestorContrato,
+      meioPublicacao: c.meioPublicacao,
+      valorContrato: c.valorContrato,
+      status: normalizarStatus(c.status) ?? StatusLicitacao.EM_ANDAMENTO,
+      objeto: c.objeto
+    })
+  }
+
+  async function excluir(id: number) {
+    if (!confirm('Excluir este contrato? Essa ação também remove documentos e aditivos vinculados, e não pode ser desfeita.')) return
+    try {
+      await contratoService.excluir(id)
+      carregar()
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -377,8 +409,14 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
     setSalvando(true)
     setErroForm(null)
 
+    const { id, ...dados } = form
+
     try {
-      await contratoService.criar(licitacaoId, form)
+      if (id) {
+        await contratoService.atualizar(id, dados)
+      } else {
+        await contratoService.criar(licitacaoId, dados)
+      }
       setForm(null)
       carregar()
     } catch (e: unknown) {
@@ -392,7 +430,7 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
     <div className="space-y-4">
       {podeCriar(usuario, 'licitacoes') && !form && (
         <button
-          onClick={() => { setErroForm(null); setForm(CONTRATO_VAZIO) }}
+          onClick={abrirCriacao}
           className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
         >
           + Novo contrato
@@ -402,10 +440,7 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
       {form && (
         <Card className="p-4" hoverable={false}>
           <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">Novo contrato</h2>
-            <p className="text-xs text-text-secondary/60">
-              O backend hoje só permite criar e consultar contratos — editar/excluir ainda não está disponível na API.
-            </p>
+            <h2 className="font-semibold text-sm">{form.id ? 'Editar contrato' : 'Novo contrato'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
@@ -599,10 +634,20 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                   <td className="p-3">{formatarData(c.dataInicio)} — {formatarData(c.dataTermino)}</td>
                   <td className="p-3">{formatarMoeda(c.valorContrato)}</td>
                   <td className="p-3">{c.status}</td>
-                  <td className="p-3 text-right">
+                  <td className="p-3 text-right space-x-2">
                     <Link href={`/admin/licitacoes/contratos/${c.id}?licitacaoId=${licitacaoId}`} className="text-primary hover:underline">
                       Ver
                     </Link>
+                    {podeEditar(usuario, 'licitacoes') && (
+                      <button onClick={() => abrirEdicao(c)} className="text-primary hover:underline">
+                        Editar
+                      </button>
+                    )}
+                    {podeExcluir(usuario, 'licitacoes') && (
+                      <button onClick={() => excluir(c.id)} className="text-error hover:underline">
+                        Excluir
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

@@ -27,6 +27,14 @@ export const contratoService = {
     return api.get<ContratoLicitacao>(`${BASE}/contratos/${contratoId}`).then(r => r.data)
   },
 
+  atualizar(contratoId: number, dados: ContratoLicitacaoRequest): Promise<ContratoLicitacao> {
+    return api.put<ContratoLicitacao>(`${BASE}/contratos/${contratoId}`, dados).then(r => r.data)
+  },
+
+  excluir(contratoId: number): Promise<void> {
+    return api.delete(`${BASE}/contratos/${contratoId}`).then(() => undefined)
+  },
+
   listarPorLicitacao(licitacaoId: number, params: ListarParams): Promise<Page<ContratoLicitacao>> {
     return api.get<Page<ContratoLicitacao>>(`${BASE}/${licitacaoId}/contratos`, { params }).then(r => r.data)
   },
