@@ -31,8 +31,10 @@ export type GrupoModulo =
   | 'institucional'
   | 'geral'
 
+// 'licitacoes' fica de fora daqui de propósito — editar (status, dados da licitação) é
+// MANAGER, só excluir é admin-only (decisão de produto, diverge do agrupamento padrão da
+// seção 5 do prompt-frontend-dashboard-admin.md pra esse módulo específico).
 const EDITAR_ADMIN_ONLY: Set<GrupoModulo> = new Set([
-  'licitacoes',
   'fiscal-orcamentario',
   'anticorrupcao',
   'obras-repasses',

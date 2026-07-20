@@ -71,7 +71,7 @@ válida). RBAC em `src/modules/auth/permissoes.ts` (`podeCriar`/`podeEditar`/`po
 | Convênios | `/admin/convenios` | `obras-repasses` | multipart (`dto`+`pdf`) |
 | Emendas Parlamentares | `/admin/emendas-parlamentares` | `obras-repasses` | JSON paginado, filtro por tipo OU ano (não combinável) |
 | Obras Públicas | `/admin/obras` + `/admin/obras/[id]` (Medições/Anexos/ART) | `obras-repasses`, **exceto ART = `padrao`** | campos calculados da obra (`totalMedicao`, `saldoObra` etc.) dependem do módulo Licitações (contratos), ainda não implementado — ficam em 0/negativo até lá, não é bug |
-| Licitações (Licitação + Contratos + Aditivos) | `/admin/licitacoes` + `/admin/licitacoes/[id]` (Documentos/Contratos) + `/admin/licitacoes/contratos/[contratoId]` (Documento/Aditivos) | `licitacoes` | 3 níveis (licitação → contrato → aditivo/documento); **Licitação e Contrato não têm `PUT` no backend** (só criar/ler/listar/excluir — licitação tem DELETE, contrato não); **Aditivo não tem `PUT`**; ver pendências de backend abaixo |
+| Licitações (Licitação + Contratos + Aditivos) | `/admin/licitacoes` + `/admin/licitacoes/[id]` (Documentos/Contratos) + `/admin/licitacoes/contratos/[contratoId]` (Documento/Aditivos) | `licitacoes` | 3 níveis (licitação → contrato → aditivo/documento); **nenhum dos três tem `PUT` no backend** (só licitação tem DELETE); regra de RBAC combinada com o usuário: editar (quando existir) é `MANAGER`, excluir é admin-only — `licitacoes` já saiu do `EDITAR_ADMIN_ONLY` em `permissoes.ts`, só continua no `EXCLUIR_ADMIN_ONLY`; ver pendências de backend abaixo |
 
 Estagiários/Terceirizados e Fiscal de Contratos usam o motor de CRUD genérico (não têm entrada
 própria na tabela acima). Pendente: o fluxo de publicação/assinatura do Diário Oficial — o único
@@ -79,11 +79,28 @@ módulo bespoke complexo ainda sem UI de admin.
 
 **Lacunas de backend a repassar** (frontend já cobre o que a API permite, resto fica bloqueado
 até o backend expor):
+- Licitação também não tem `PUT` — não dá pra atualizar status nem nenhum outro campo depois de
+  criada, só excluir e recriar. Quando o backend adicionar, a regra de RBAC é `MANAGER` pode
+  editar (não precisa ser admin), só `ADMINISTRATOR` pode excluir — o Spring Security do `PUT`
+  precisa aceitar `MANAGER`, não só `ADMINISTRATOR` (`podeEditar(usuario, 'licitacoes')` no
+  frontend já foi ajustado pra essa regra).
 - Contrato de Licitação não tem `PUT` nem `DELETE` — só `POST`/`GET`. Uma vez criado, um
   contrato não pode ser editado nem removido pela API.
 - Aditivo Contratual não tem `PUT`. O campo `caminhoPdf` é string livre no JSON — não existe
   upload de arquivo real pra aditivo (diferente de Contrato/Fiscal, que têm PDF de verdade). O
   formulário do admin expõe um input de texto pra esse campo, sem upload.
+- Bug: `GET /api/licitacoes/{licitacaoId}/contratos/filter` recebe `licitacaoId` na URL mas o
+  controller não usa esse valor no filtro — a busca aplica `ContratoLicitacaoSpecification` sem
+  cláusula de licitação, ou seja retorna contratos de **todas** as licitações, ignorando o path
+  variable. O frontend não usa esse endpoint (usa `/{licitacaoId}/contratos` direto, que filtra
+  certo), mas o endpoint `/filter` fica quebrado pra quem for usar.
+- Fiscal de Contratos (`/api/licitacao/fiscal-contratos`) não tem nenhum vínculo (FK) com
+  Contrato nem Licitação — é um cadastro de documento avulso genérico (`{descricao, data,
+  caminhoArquivo}`), apesar do nome sugerir que seria ligado a um contrato específico. Hoje não
+  dá pra saber, pela API, qual contrato um "fiscal" está fiscalizando.
+- Inconsistência de nomenclatura: o path de Fiscal de Contratos é `/api/licitacao/...`
+  (singular), enquanto Licitação/Contrato/Aditivo usam `/api/licitacoes/...` (plural). Não afeta
+  funcionamento, só destoa do padrão dos outros três controllers do mesmo módulo.
 
 ## 3. Como decidir o padrão de um módulo novo
 
