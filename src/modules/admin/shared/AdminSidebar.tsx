@@ -12,7 +12,6 @@ import { REGISTRY_MODULOS_GENERICOS } from '@/modules/admin/genericos/registry'
 // hub público (ItemAcessoCard). Ver STATUS.md pra ordem de prioridade.
 const GRUPOS_PENDENTES = [
   'Diário Oficial (publicação e aprovação)',
-  'Licitações, Contratos e Aditivos',
   'Anticorrupção (dívida ativa, empresas inidôneas)'
 ]
 
@@ -34,6 +33,12 @@ const LINKS_CONVENIOS_BESPOKE = [
   { href: '/admin/convenios', label: 'Convênios' },
   { href: '/admin/emendas-parlamentares', label: 'Emendas Parlamentares' },
   { href: '/admin/obras', label: 'Obras Públicas' }
+]
+
+// Licitações, Contratos e Aditivos (bespoke) — mescla com a categoria "Licitações" do
+// registry genérico (que só tem Fiscal de Contratos), mesmo motivo do LINKS_RH_BESPOKE.
+const LINKS_LICITACOES_BESPOKE = [
+  { href: '/admin/licitacoes', label: 'Licitações' }
 ]
 
 const LINKS_INSTITUCIONAL_GERAL = [
@@ -148,6 +153,15 @@ export default function AdminSidebar() {
               )
             })}
             {categoria === 'Recursos Humanos' && LINKS_RH_BESPOKE.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {categoria === 'Licitações' && LINKS_LICITACOES_BESPOKE.map(link => (
               <Link
                 key={link.href}
                 href={link.href}

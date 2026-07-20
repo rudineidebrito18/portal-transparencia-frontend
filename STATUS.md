@@ -71,11 +71,19 @@ válida). RBAC em `src/modules/auth/permissoes.ts` (`podeCriar`/`podeEditar`/`po
 | Convênios | `/admin/convenios` | `obras-repasses` | multipart (`dto`+`pdf`) |
 | Emendas Parlamentares | `/admin/emendas-parlamentares` | `obras-repasses` | JSON paginado, filtro por tipo OU ano (não combinável) |
 | Obras Públicas | `/admin/obras` + `/admin/obras/[id]` (Medições/Anexos/ART) | `obras-repasses`, **exceto ART = `padrao`** | campos calculados da obra (`totalMedicao`, `saldoObra` etc.) dependem do módulo Licitações (contratos), ainda não implementado — ficam em 0/negativo até lá, não é bug |
+| Licitações (Licitação + Contratos + Aditivos) | `/admin/licitacoes` + `/admin/licitacoes/[id]` (Documentos/Contratos) + `/admin/licitacoes/contratos/[contratoId]` (Documento/Aditivos) | `licitacoes` | 3 níveis (licitação → contrato → aditivo/documento); **Licitação e Contrato não têm `PUT` no backend** (só criar/ler/listar/excluir — licitação tem DELETE, contrato não); **Aditivo não tem `PUT`**; ver pendências de backend abaixo |
 
-Estagiários/Terceirizados usam o motor de CRUD genérico (não têm entrada própria na tabela
-acima). Pendente: Licitações (contratos + aditivos + fiscal-contratos) e o fluxo de
-publicação/assinatura do Diário Oficial — os dois módulos bespoke mais complexos, ainda sem UI
-de admin.
+Estagiários/Terceirizados e Fiscal de Contratos usam o motor de CRUD genérico (não têm entrada
+própria na tabela acima). Pendente: o fluxo de publicação/assinatura do Diário Oficial — o único
+módulo bespoke complexo ainda sem UI de admin.
+
+**Lacunas de backend a repassar** (frontend já cobre o que a API permite, resto fica bloqueado
+até o backend expor):
+- Contrato de Licitação não tem `PUT` nem `DELETE` — só `POST`/`GET`. Uma vez criado, um
+  contrato não pode ser editado nem removido pela API.
+- Aditivo Contratual não tem `PUT`. O campo `caminhoPdf` é string livre no JSON — não existe
+  upload de arquivo real pra aditivo (diferente de Contrato/Fiscal, que têm PDF de verdade). O
+  formulário do admin expõe um input de texto pra esse campo, sem upload.
 
 ## 3. Como decidir o padrão de um módulo novo
 
