@@ -42,6 +42,7 @@ function gerarLicitacao(id: number): LicitacaoCompleta {
 
   return {
     id,
+    numeroSequencial: id,
     numeroInstrumento: faker.string.numeric(3).padStart(3, '0'),
     ano,
     numeroProcesso: `${faker.number.int({ min: 100, max: 999 })}/${ano}`,
@@ -66,7 +67,8 @@ function gerarLicitacao(id: number): LicitacaoCompleta {
     lei: 'Lei 14.133/2021',
     covid: faker.datatype.boolean({ probability: 0.1 }),
     objeto: faker.lorem.paragraph(1),
-    documentos: gerarDocumentos(id, 3)
+    documentos: gerarDocumentos(id, 3),
+    visivel: true
   }
 }
 
@@ -76,6 +78,7 @@ const licitacoes: LicitacaoCompleta[] = Array.from({ length: TOTAL_MOCK }, (_, i
 function paraResumo(licitacao: LicitacaoCompleta): LicitacaoResumo {
   return {
     id: licitacao.id,
+    numeroSequencial: licitacao.numeroSequencial,
     numeroInstrumento: licitacao.numeroInstrumento,
     ano: licitacao.ano,
     dataAbertura: licitacao.dataAbertura,
@@ -83,7 +86,8 @@ function paraResumo(licitacao: LicitacaoCompleta): LicitacaoResumo {
     statusDescricao: licitacao.status,
     valorTotalDespesa: licitacao.valorEstimado,
     unidade: licitacao.unidade,
-    objeto: licitacao.objeto
+    objeto: licitacao.objeto,
+    visivel: licitacao.visivel
   }
 }
 

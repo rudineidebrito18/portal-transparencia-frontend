@@ -2,6 +2,7 @@ import { Documento } from '@/modules/shared/types/Documento'
 
 export interface LicitacaoResumo {
   id: number
+  numeroSequencial: number
   numeroInstrumento: string
   ano: number
   dataAbertura: string
@@ -10,9 +11,11 @@ export interface LicitacaoResumo {
   valorTotalDespesa?: number
   unidade?: string
   objeto: string
+  visivel: boolean
 }
 
 export interface LicitacaoDetalhe {
+  numeroSequencial: number
   numeroInstrumento: string
   ano: number
   numeroProcesso: string
@@ -38,6 +41,7 @@ export interface LicitacaoDetalhe {
   covid: boolean
   objeto: string
   documentos?: Documento[]
+  visivel: boolean
 }
 
 export interface FiltroLicitacao {

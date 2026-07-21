@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useState } from 'react'
 import Link from 'next/link'
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
 import Badge from '@/components/ui/Badge'
@@ -11,10 +12,10 @@ import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
-import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
+import { isAdministrador, podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { licitacaoService } from '@/modules/admin/licitacoes/licitacao.service'
 import {
-  FiltroLicitacao,
+  FiltroLicitacaoAdmin,
   LicitacaoRequest,
   LicitacaoResumo,
   StatusLicitacao,
@@ -59,14 +60,14 @@ export default function LicitacoesAdminPage() {
   const [versao, setVersao] = useState(0)
   const recarregar = () => setVersao(v => v + 1)
   const fetchFunction = useCallback(
-    (params: FiltroLicitacao & { page?: number; size?: number; sort?: string }) => licitacaoService.listar(params),
+    (params: FiltroLicitacaoAdmin & { page?: number; size?: number; sort?: string }) => licitacaoService.listar(params),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [versao]
   )
 
   const { data, loading, erro, pagina, totalPaginas, filtros, setFiltros, setPagina } = usePageableResource<
     LicitacaoResumo,
-    FiltroLicitacao
+    FiltroLicitacaoAdmin
   >({ fetchFunction, initialSort: 'dataAbertura,desc' })
 
   const [form, setForm] = useState<LicitacaoFormState | null>(null)
@@ -118,13 +119,23 @@ export default function LicitacoesAdminPage() {
     }
   }
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir esta licitação? Essa ação não pode ser desfeita.')) return
+  const [alterandoVisibilidade, setAlterandoVisibilidade] = useState<number | null>(null)
+
+  async function alternarVisibilidade(l: LicitacaoResumo) {
+    const tornarVisivel = !l.visivel
+    const mensagem = tornarVisivel
+      ? 'Tornar esta licitação visível de novo na consulta pública?'
+      : 'Ocultar esta licitação da consulta pública? Ela deixa de aparecer pra quem não é admin (não é exclusão — dá pra reverter depois).'
+    if (!confirm(mensagem)) return
+
+    setAlterandoVisibilidade(l.id)
     try {
-      await licitacaoService.excluir(id)
+      await licitacaoService.alterarVisibilidade(l.id, tornarVisivel)
       recarregar()
     } catch (e: unknown) {
-      alert(e instanceof Error ? e.message : 'Erro ao excluir')
+      alert(e instanceof Error ? e.message : 'Erro ao alterar visibilidade')
+    } finally {
+      setAlterandoVisibilidade(null)
     }
   }
 
@@ -207,6 +218,16 @@ export default function LicitacoesAdminPage() {
             <option key={t} value={t}>{TipoProcedimentoDescricao[t]}</option>
           ))}
         </select>
+        {isAdministrador(usuario) && (
+          <select
+            value={filtros.visivel === false ? 'ocultas' : 'visiveis'}
+            onChange={e => setFiltros({ ...filtros, visivel: e.target.value === 'ocultas' ? false : undefined })}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          >
+            <option value="visiveis">Visíveis</option>
+            <option value="ocultas">Ocultas</option>
+          </select>
+        )}
       </Card>
 
       {form && (
@@ -447,6 +468,7 @@ export default function LicitacoesAdminPage() {
           <table className="w-full text-sm">
             <thead className="bg-neutral-light text-left">
               <tr>
+                <th className="p-3">Nº TCE</th>
                 <th className="p-3">Instrumento</th>
                 <th className="p-3">Tipo</th>
                 <th className="p-3">Status</th>
@@ -459,17 +481,21 @@ export default function LicitacoesAdminPage() {
             <tbody>
               {data.map(l => (
                 <tr key={l.id} className="border-t border-border/20">
-                  <td className="p-3 font-semibold">{l.numeroInstrumento}/{l.ano}</td>
+                  <td className="p-3 font-semibold">{l.numeroSequencial}</td>
+                  <td className="p-3">{l.numeroInstrumento}/{l.ano}</td>
                   <td className="p-3">{l.tipoProcedimentoLicitacao}</td>
                   <td className="p-3">
-                    {(() => {
-                      const statusKey = normalizarStatus(l.statusDescricao)
-                      return (
-                        <Badge className={statusKey ? StatusLicitacaoStyle[statusKey] : 'bg-gray-100 text-gray-600'}>
-                          {statusKey ? StatusLicitacaoDescricao[statusKey] : l.statusDescricao}
-                        </Badge>
-                      )
-                    })()}
+                    <div className="flex items-center gap-1.5">
+                      {(() => {
+                        const statusKey = normalizarStatus(l.statusDescricao)
+                        return (
+                          <Badge className={statusKey ? StatusLicitacaoStyle[statusKey] : 'bg-gray-100 text-gray-600'}>
+                            {statusKey ? StatusLicitacaoDescricao[statusKey] : l.statusDescricao}
+                          </Badge>
+                        )
+                      })()}
+                      {!l.visivel && <Badge className="bg-gray-100 text-gray-500">Oculta</Badge>}
+                    </div>
                   </td>
                   <td className="p-3">{l.unidade ?? '—'}</td>
                   <td className="p-3">{formatarData(l.dataAbertura)}</td>
@@ -488,8 +514,13 @@ export default function LicitacoesAdminPage() {
                       </button>
                     )}
                     {podeExcluir(usuario, 'licitacoes') && (
-                      <button onClick={() => excluir(l.id)} className="text-error hover:underline">
-                        Excluir
+                      <button
+                        onClick={() => alternarVisibilidade(l)}
+                        disabled={alterandoVisibilidade === l.id}
+                        className="text-primary hover:underline disabled:opacity-60 inline-flex items-center gap-1"
+                      >
+                        {l.visivel ? <MdVisibilityOff /> : <MdVisibility />}
+                        {alterandoVisibilidade === l.id ? 'Aguarde...' : l.visivel ? 'Ocultar' : 'Mostrar'}
                       </button>
                     )}
                   </td>

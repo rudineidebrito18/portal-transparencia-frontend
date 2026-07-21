@@ -1,10 +1,17 @@
 import { Documento } from '@/modules/shared/types/Documento'
 import { StatusLicitacao, TipoProcedimentoLicitacao } from '@/modules/licitacoes/enums'
+import { FiltroLicitacao } from '@/modules/licitacoes/types'
 
 export type { LicitacaoResumo, LicitacaoDetalhe, FiltroLicitacao } from '@/modules/licitacoes/types'
 export { StatusLicitacao, StatusLicitacaoDescricao, StatusLicitacaoStyle, TipoProcedimentoLicitacao, TipoProcedimentoDescricao } from '@/modules/licitacoes/enums'
 export type { ContratoLicitacao, Aditivo } from '@/modules/contratos/types'
 export { normalizarStatus, normalizarTipoProcedimento } from './enumMapping'
+
+// visivel é admin-only no backend (403 pra MANAGER) — fora do FiltroLicitacao público de
+// propósito, pra site público nunca poder mandar esse parâmetro sem querer.
+export interface FiltroLicitacaoAdmin extends FiltroLicitacao {
+  visivel?: boolean
+}
 
 export interface LicitacaoRequest {
   numeroInstrumento: string

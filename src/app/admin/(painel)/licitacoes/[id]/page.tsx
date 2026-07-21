@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
@@ -58,6 +59,7 @@ const CONTRATO_VAZIO: ContratoLicitacaoRequest = {
 }
 
 export default function LicitacaoDetalheAdminPage() {
+  const { usuario } = useAuth()
   const params = useParams<{ id: string }>()
   const licitacaoId = Number(params.id)
 
@@ -78,6 +80,26 @@ export default function LicitacaoDetalheAdminPage() {
   useEffect(carregar, [licitacaoId])
 
   const [aba, setAba] = useState<Aba>('documentos')
+  const [alterandoVisibilidade, setAlterandoVisibilidade] = useState(false)
+
+  async function alternarVisibilidade() {
+    if (!licitacao) return
+    const tornarVisivel = !licitacao.visivel
+    const mensagem = tornarVisivel
+      ? 'Tornar esta licitação visível de novo na consulta pública?'
+      : 'Ocultar esta licitação da consulta pública? Ela deixa de aparecer pra quem não é admin (não é exclusão — dá pra reverter depois).'
+    if (!confirm(mensagem)) return
+
+    setAlterandoVisibilidade(true)
+    try {
+      await licitacaoService.alterarVisibilidade(licitacaoId, tornarVisivel)
+      carregar()
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erro ao alterar visibilidade')
+    } finally {
+      setAlterandoVisibilidade(false)
+    }
+  }
 
   if (loading) return <Skeleton className="h-64" />
   if (erro) return <ErrorState message={erro} />
@@ -95,12 +117,26 @@ export default function LicitacaoDetalheAdminPage() {
           <div>
             <h1 className="text-lg font-bold text-primary">
               Licitação nº {licitacao.numeroInstrumento}/{licitacao.ano}
+              <span className="text-sm font-normal text-text-secondary/60 ml-2">Nº TCE {licitacao.numeroSequencial}</span>
             </h1>
             <p className="text-sm text-text-secondary/70">{licitacao.objeto}</p>
           </div>
-          <Badge className={statusKey ? StatusLicitacaoStyle[statusKey] : 'bg-gray-100 text-gray-600'}>
-            {statusKey ? StatusLicitacaoDescricao[statusKey] : licitacao.status}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={statusKey ? StatusLicitacaoStyle[statusKey] : 'bg-gray-100 text-gray-600'}>
+              {statusKey ? StatusLicitacaoDescricao[statusKey] : licitacao.status}
+            </Badge>
+            {!licitacao.visivel && <Badge className="bg-gray-100 text-gray-500">Oculta</Badge>}
+            {podeExcluir(usuario, 'licitacoes') && (
+              <button
+                onClick={alternarVisibilidade}
+                disabled={alterandoVisibilidade}
+                className="px-3 py-1.5 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all disabled:opacity-60 inline-flex items-center gap-1"
+              >
+                {licitacao.visivel ? <MdVisibilityOff /> : <MdVisibility />}
+                {alterandoVisibilidade ? 'Aguarde...' : licitacao.visivel ? 'Ocultar' : 'Mostrar'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

@@ -1,11 +1,11 @@
 import { api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
-import { FiltroLicitacao, LicitacaoDetalhe, LicitacaoResumo } from '@/modules/licitacoes/types'
-import { DocumentoUploadRequest, Documento, LicitacaoRequest } from './types'
+import { LicitacaoDetalhe, LicitacaoResumo } from '@/modules/licitacoes/types'
+import { DocumentoUploadRequest, Documento, FiltroLicitacaoAdmin, LicitacaoRequest } from './types'
 
 const BASE = '/licitacoes'
 
-type ListarParams = FiltroLicitacao & {
+type ListarParams = FiltroLicitacaoAdmin & {
   page?: number
   size?: number
   sort?: string
@@ -35,8 +35,10 @@ export const licitacaoService = {
     return api.put<LicitacaoDetalhe>(`${BASE}/${id}`, dados).then(r => r.data)
   },
 
-  excluir(id: number): Promise<void> {
-    return api.delete(`${BASE}/${id}`).then(() => undefined)
+  // Não existe mais DELETE de licitação — exigência do TCE (preserva sequência e histórico).
+  // Ocultar da consulta pública substitui excluir.
+  alterarVisibilidade(id: number, visivel: boolean): Promise<void> {
+    return api.patch(`${BASE}/${id}/visibilidade`, { visivel }).then(() => undefined)
   },
 
   listarDocumentos(id: number): Promise<Documento[]> {
