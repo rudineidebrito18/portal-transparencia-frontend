@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# claude code (config local da máquina — launch.json aponta pra script com PATH
+# hardcoded, settings.local.json é allowlist de permissão da sessão)
+.claude/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
