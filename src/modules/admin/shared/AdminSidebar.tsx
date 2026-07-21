@@ -11,7 +11,6 @@ import { REGISTRY_MODULOS_GENERICOS } from '@/modules/admin/genericos/registry'
 // admin) — aparecem como "em breve" pra dar visão do todo, mesmo padrão do
 // hub público (ItemAcessoCard). Ver STATUS.md pra ordem de prioridade.
 const GRUPOS_PENDENTES = [
-  'Diário Oficial (publicação e aprovação)',
   'Anticorrupção (dívida ativa, empresas inidôneas)'
 ]
 
@@ -53,6 +52,11 @@ const LINKS_ESIC_OUVIDORIA = [
   { href: '/admin/esic/config', label: 'E-SIC — Configuração' },
   { href: '/admin/esic/formularios', label: 'E-SIC — Formulários Recebidos' },
   { href: '/admin/ouvidoria/config', label: 'Ouvidoria — Configuração' }
+]
+
+const LINKS_DIARIO_OFICIAL = [
+  { href: '/admin/diario-oficial/config', label: 'Diário Oficial — Configuração' },
+  { href: '/admin/diario-oficial/publicacoes', label: 'Diário Oficial — Publicações' }
 ]
 
 function agruparPorCategoria() {
@@ -125,6 +129,21 @@ export default function AdminSidebar() {
             ESIC e Ouvidoria
           </p>
           {LINKS_ESIC_OUVIDORIA.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        <div>
+          <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+            Diário Oficial
+          </p>
+          {LINKS_DIARIO_OFICIAL.map(link => (
             <Link
               key={link.href}
               href={link.href}

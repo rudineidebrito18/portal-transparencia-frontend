@@ -30,6 +30,7 @@ export type GrupoModulo =
   | 'usuarios'
   | 'institucional'
   | 'geral'
+  | 'diario-oficial'
 
 // 'licitacoes' fica de fora daqui de propósito — editar (status, dados da licitação) é
 // MANAGER, só excluir é admin-only (decisão de produto, diverge do agrupamento padrão da

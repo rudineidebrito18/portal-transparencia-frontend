@@ -20,8 +20,7 @@ export default function AdminDashboardPage() {
       <Card className="p-5">
         <p className="text-sm text-text-secondary">
           {REGISTRY_MODULOS_GENERICOS.length} módulos disponíveis pra gestão de conteúdo na barra
-          lateral. Diário Oficial (fluxo de publicação/assinatura) e Anticorrupção ainda estão em
-          construção — ver seção &quot;Em breve&quot;.
+          lateral. Anticorrupção ainda está em construção — ver seção &quot;Em breve&quot;.
         </p>
       </Card>
     </div>
