@@ -220,7 +220,7 @@ export default function LicitacoesAdminPage() {
         </select>
         {isAdministrador(usuario) && (
           <select
-            value={filtros.visivel === false ? 'ocultas' : 'visiveis'}
+            value={String(filtros.visivel) === 'false' ? 'ocultas' : 'visiveis'}
             onChange={e => setFiltros({ ...filtros, visivel: e.target.value === 'ocultas' ? false : undefined })}
             className="border border-border/30 rounded-lg px-3 py-2 text-sm"
           >
