@@ -77,7 +77,7 @@ export default function AdminSidebar() {
   const grupos = agruparPorCategoria()
 
   return (
-    <aside className="w-72 shrink-0 bg-primary-dark text-white min-h-screen flex flex-col">
+    <aside className="w-72 shrink-0 bg-primary-dark text-white h-screen flex flex-col">
       <div className="p-5 border-b border-white/10">
         <p className="font-bold text-sm">Painel Administrativo</p>
         <p className="text-xs text-white/60">Portal da Transparência</p>

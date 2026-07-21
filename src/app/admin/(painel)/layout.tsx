@@ -23,9 +23,9 @@ function PainelGuard({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral">
+    <div className="flex h-screen bg-neutral overflow-hidden">
       <AdminSidebar />
-      <main className="flex-1 p-6 overflow-x-hidden">{children}</main>
+      <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden">{children}</main>
     </div>
   )
 }
