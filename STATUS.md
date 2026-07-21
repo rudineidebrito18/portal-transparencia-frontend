@@ -7,7 +7,8 @@
 
 Frontend Next.js (App Router) que consome um backend Spring Boot local
 (`http://localhost:8080/api`, spec OpenAPI em `http://localhost:8080/v3/api-docs`).
-Repositório do backend: `~/Documentos/portal-transparencia-pref`.
+Repositório do backend: `~/Documentos/ProjetoPref/portal-transparencia-pref` (repare no
+`ProjetoPref/` no meio do caminho — já apareceu documentado errado sem esse segmento).
 
 `.env.local`:
 ```
@@ -40,8 +41,8 @@ Módulos com padrão bespoke (fogem do CRUD genérico, vale saber antes de mexer
   backend não agrega isso na resposta da unidade.
 - `/estrutura-organizacional`, `/organograma`, `/diarias-legislacao` — PDF estático via
   `PdfViewer`, sem backend (`/test.pdf` placeholder).
-- `/diario-oficial` — fluxo de publicação mais simples (busca com filtros); o fluxo de
-  aprovação/assinatura ainda não tem UI de admin (ver pendências).
+- `/diario-oficial` — fluxo de publicação mais simples (busca com filtros); o site público só
+  lê `EdicaoDiario` já publicada. O fluxo de aprovação/assinatura em si é admin (seção seguinte).
 
 ### Painel administrativo (`/admin/*`)
 
@@ -51,6 +52,13 @@ Login via `POST /users/login` (fora do prefixo `/api`). JWT não carrega roles n
 só por UX — a proteção real é o backend (Spring Security barra `POST`/`PUT`/`DELETE` sem sessão
 válida). RBAC em `src/modules/auth/permissoes.ts` (`podeCriar`/`podeEditar`/`podeExcluir` por
 `GrupoModulo`).
+
+Layout (`src/app/admin/(painel)/layout.tsx` + `AdminSidebar.tsx`): container `h-screen
+overflow-hidden`, `<main>` com `overflow-y-auto` — só o conteúdo rola, a sidebar fica travada na
+altura da tela (o menu interno dela já tinha `overflow-y-auto` próprio, mas só passou a
+funcionar de verdade depois dessa mudança). Manter esse padrão em qualquer ajuste de layout do
+painel — não voltar pro `min-h-screen` na raiz, que faz a página inteira crescer e arrasta a
+sidebar junto no scroll.
 
 | Área | Rota | Grupo de permissão | Observação relevante |
 |---|---|---|---|
@@ -140,6 +148,19 @@ Outras convenções:
 - Antes de assumir que um contrato multipart está certo, teste os campos opcionais (arquivo
   ausente, PDF ausente) via `curl` direto — pelo menos 3 módulos diferentes já tiveram bug real
   de backend especificamente no caminho "sem arquivo".
+- **Enum vindo do backend pode ser a chave (`"EM_ANDAMENTO"`) ou a descrição textual (`"Em
+  andamento"`/`"EM ANDAMENTO"`)** dependendo se a entidade Java tem `getDescricao()` custom ou
+  deixa o Jackson serializar o enum puro — não dá pra assumir, sempre teste via `curl` antes de
+  montar o `<select>` de edição. Quando é descrição, `<select value={form.campo}>` só casa a
+  opção certa se você reverter a descrição de volta pra chave antes de popular o form (senão o
+  form abre em branco/errado mesmo com o dado certo por baixo). Precedente resolvido em
+  `src/modules/admin/licitacoes/enumMapping.ts` (`normalizarStatus`/`normalizarTipoProcedimento`)
+  — mesma ideia serve pra qualquer módulo novo que caia nesse caso.
+- Cuidado com comparação de tipo em filtro que vem da URL: `usePageableResource` guarda todo
+  filtro como **string** (lido de `URLSearchParams`), mesmo que o tipo declarado em `FiltroX`
+  seja `boolean`/`number`. Comparar direto com `=== false`/`=== 0` nunca bate (é sempre a string
+  `"false"`/`"0"`) — já causou um bug real (filtro de visibilidade de Licitação travava em
+  "ocultas", só saía com reload). Compare com `String(filtros.campo) === 'false'` ou similar.
 
 ## 4. Como retomar (rodar o ambiente)
 
@@ -149,7 +170,7 @@ entre restarts, já vem populado com fixtures.
 ```bash
 npm run dev                                                                          # frontend :3000
 
-cd ~/Documentos/portal-transparencia-pref
+cd ~/Documentos/ProjetoPref/portal-transparencia-pref
 docker compose up -d postgres meilisearch                                           # precisa docker
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=postgres -DskipTests -Dmaven.test.skip=true  # backend :8080
 
@@ -165,3 +186,51 @@ perfis).
 Playwright está disponível no ambiente (`node_modules/.bin/playwright`) — rodar um script de
 teste precisa de `NODE_PATH=<repo>/node_modules node script.js` se o script morar fora do
 projeto (ex: no scratchpad da sessão), senão a resolução de módulo não encontra o pacote.
+
+### Pegadinhas específicas deste sandbox (2026-07)
+
+- **Node.js não está no PATH por padrão** neste ambiente (é gerenciado via nvm, mas o shell não
+  sourced o nvm automaticamente pra sessões de ferramenta/ci). Antes de rodar `npm`/`npx`,
+  confirme com `ls ~/.nvm/versions/node/` e prefixe: `export
+  PATH="$HOME/.nvm/versions/node/<versão>/bin:$PATH"`. Pra rodar o dev server via ferramenta de
+  preview (que não herda esse `export`), já existe um workaround em `.claude/` (não commitado de
+  propósito, é específico da máquina):
+  - `.claude/launch.json` aponta `runtimeExecutable` pra `.claude/dev-with-node.sh`.
+  - `.claude/dev-with-node.sh` só exporta o PATH certo e faz `exec npm run dev`.
+  Se `node_modules` não existir ainda, rode `npm install` primeiro (uma vez).
+- **`/opt/portal` (raiz de upload padrão do backend, perfis `postgres`/`dev`) não é gravável**
+  pelo usuário `pc` neste sandbox (é do `root`). Sem sudo disponível, suba o backend com um
+  override pra um diretório que você tenha permissão de escrita, ex:
+  `-Dspring-boot.run.arguments="--app.root.dir=$HOME/portal-uploads-dev"` (crie a pasta antes).
+- O backend roda com **`spring-boot-devtools`** — reinicia sozinho quando detecta classe
+  recompilada. Durante testes manuais isso pode causar um `ECONNREFUSED` de alguns segundos no
+  meio de uma sequência de requests; não é bug do frontend nem do seu teste, só espere e repita.
+- Há um **job de reconciliação** no pipeline do Diário Oficial que retoma sozinho solicitações
+  travadas há mais de ~15min — pode mexer em dados de teste/fixture sem você ter feito nada (já
+  vimos isso mudar o status de uma licitação de teste no meio de uma sessão). Não é bug seu, mas
+  pode confundir se você não souber que existe.
+
+### Testando no navegador via ferramenta de preview (Claude Browser)
+
+- `computer{action:"left_click", ref:...}` às vezes simplesmente não dispara o evento de clique
+  em alguns botões (nenhum erro, só nenhuma request nova aparece em `read_network_requests`) —
+  não é bug do app. Workaround confiável: `javascript_tool` com
+  `document.querySelectorAll('button')` filtrando pelo texto e chamando `.click()` direto no
+  elemento. Depois de um clique via JS, dê uma folga (`computer{action:"wait"}`, não `sleep` do
+  Bash) antes de reler a página — o ciclo request→setState→render às vezes demora mais que o
+  esperado num ambiente com HMR ativo.
+- `computer{action:"screenshot"}` consistentemente dá timeout neste ambiente — não é confiável
+  pra verificação visual. Prefira `get_page_text`, `read_page` (árvore de acessibilidade) e
+  `javascript_tool` (ex.: `getBoundingClientRect()`, `scrollTop`, `innerText`) pra confirmar
+  comportamento — inclusive dá pra provar coisas como "a sidebar não rola junto" de forma mais
+  precisa que uma screenshot.
+- Diálogos nativos de `confirm()` (usados antes de excluir/ocultar) **travam a automação** — o
+  clique no botão que dispara o `confirm()` nunca retorna. Pra testar esses fluxos, ou aceite
+  que não dá pra automatizar esse clique específico (valide só que o handler dispara a request
+  certa via outro caminho), ou limpe/reverta o dado de teste direto no backend depois.
+- Sem `DELETE` em vários recursos agora (Licitação por exigência do TCE; Diário Oficial nunca
+  teve), dado de teste criado durante verificação manual só sai do banco via SQL direto:
+  `docker exec portal-prefeitura-postgres psql -U portal -d portal_prefeitura -c "DELETE FROM
+  <tabela> WHERE id IN (...)"`. Sempre confirme via `curl` antes/depois de mexer direto no banco,
+  e cuidado pra não apagar fixture de verdade (numeração baixa, tipicamente 1-4) — só limpar o
+  que você mesmo criou na sessão.
