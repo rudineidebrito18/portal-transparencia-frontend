@@ -18,6 +18,14 @@ export interface EmpresaDividaAtivaRequest {
   valor: number
 }
 
+export interface FiltroEmpresaDividaAtiva {
+  nome?: string
+  razaoSocial?: string
+  cnpj?: string
+  dataInicial?: string
+  dataFinal?: string
+}
+
 export interface EmpresaInidonea {
   id: number
   empresa: string
@@ -34,4 +42,12 @@ export interface EmpresaInidoneaRequest {
   descricao: string
   status: string
   data: string
+}
+
+export interface FiltroEmpresaInidonea {
+  empresa?: string
+  cnpj?: string
+  status?: string
+  dataInicial?: string
+  dataFinal?: string
 }

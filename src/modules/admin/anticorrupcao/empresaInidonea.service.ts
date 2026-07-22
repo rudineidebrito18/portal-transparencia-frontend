@@ -1,7 +1,10 @@
 import { api } from '@/services/api'
-import { EmpresaInidonea, EmpresaInidoneaRequest } from './types'
+import { Page } from '@/modules/shared/types/Page'
+import { EmpresaInidonea, EmpresaInidoneaRequest, FiltroEmpresaInidonea } from './types'
 
 const BASE = '/gestao-fiscal/empresas-inidoneas'
+
+type ListarParams = FiltroEmpresaInidonea & { page?: number; size?: number; sort?: string }
 
 function montarFormData(dados: EmpresaInidoneaRequest, pdf?: File | null): FormData {
   const formData = new FormData()
@@ -12,8 +15,8 @@ function montarFormData(dados: EmpresaInidoneaRequest, pdf?: File | null): FormD
 
 // Sem PUT no backend — só criar/listar/excluir.
 export const empresaInidoneaService = {
-  listar(): Promise<EmpresaInidonea[]> {
-    return api.get<EmpresaInidonea[]>(BASE).then(r => r.data)
+  listar(params: ListarParams): Promise<Page<EmpresaInidonea>> {
+    return api.get<Page<EmpresaInidonea>>(`${BASE}/filtro`, { params }).then(r => r.data)
   },
 
   criar(dados: EmpresaInidoneaRequest, pdf?: File | null): Promise<EmpresaInidonea> {

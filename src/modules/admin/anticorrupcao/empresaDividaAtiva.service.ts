@@ -1,7 +1,10 @@
 import { api } from '@/services/api'
-import { EmpresaDividaAtiva, EmpresaDividaAtivaRequest } from './types'
+import { Page } from '@/modules/shared/types/Page'
+import { EmpresaDividaAtiva, EmpresaDividaAtivaRequest, FiltroEmpresaDividaAtiva } from './types'
 
 const BASE = '/gestao-fiscal/empresas-divida-ativa'
+
+type ListarParams = FiltroEmpresaDividaAtiva & { page?: number; size?: number; sort?: string }
 
 function montarFormData(dados: EmpresaDividaAtivaRequest, pdf?: File | null): FormData {
   const formData = new FormData()
@@ -11,8 +14,8 @@ function montarFormData(dados: EmpresaDividaAtivaRequest, pdf?: File | null): Fo
 }
 
 export const empresaDividaAtivaService = {
-  listar(): Promise<EmpresaDividaAtiva[]> {
-    return api.get<EmpresaDividaAtiva[]>(BASE).then(r => r.data)
+  listar(params: ListarParams): Promise<Page<EmpresaDividaAtiva>> {
+    return api.get<Page<EmpresaDividaAtiva>>(`${BASE}/filtro`, { params }).then(r => r.data)
   },
 
   criar(dados: EmpresaDividaAtivaRequest, pdf?: File | null): Promise<EmpresaDividaAtiva> {

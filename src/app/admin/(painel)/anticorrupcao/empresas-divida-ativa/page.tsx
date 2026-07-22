@@ -1,15 +1,17 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useState } from 'react'
 
+import { usePageableResource } from '@/hooks/usePageableResource'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { empresaDividaAtivaService } from '@/modules/admin/anticorrupcao/empresaDividaAtiva.service'
-import { EmpresaDividaAtiva, EmpresaDividaAtivaRequest } from '@/modules/admin/anticorrupcao/types'
+import { EmpresaDividaAtiva, EmpresaDividaAtivaRequest, FiltroEmpresaDividaAtiva } from '@/modules/admin/anticorrupcao/types'
 
 interface FormState {
   id: number | null
@@ -43,21 +45,18 @@ function formatarData(data?: string) {
 export default function EmpresasDividaAtivaAdminPage() {
   const { usuario } = useAuth()
 
-  const [lista, setLista] = useState<EmpresaDividaAtiva[]>([])
-  const [loading, setLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
+  const [versao, setVersao] = useState(0)
+  const recarregar = () => setVersao(v => v + 1)
+  const fetchFunction = useCallback(
+    (params: FiltroEmpresaDividaAtiva & { page?: number; size?: number; sort?: string }) => empresaDividaAtivaService.listar(params),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [versao]
+  )
 
-  function carregar() {
-    setLoading(true)
-    setErro(null)
-    empresaDividaAtivaService
-      .listar()
-      .then(setLista)
-      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(carregar, [])
+  const { data, loading, erro, pagina, totalPaginas, setPagina, filtros, setFiltros } = usePageableResource<
+    EmpresaDividaAtiva,
+    FiltroEmpresaDividaAtiva
+  >({ fetchFunction, initialSort: 'data,desc' })
 
   const [form, setForm] = useState<FormState | null>(null)
   const [pdf, setPdf] = useState<File | null>(null)
@@ -89,7 +88,7 @@ export default function EmpresasDividaAtivaAdminPage() {
 
     try {
       await empresaDividaAtivaService.excluir(id)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
     }
@@ -113,7 +112,7 @@ export default function EmpresasDividaAtivaAdminPage() {
       }
       setForm(null)
       setPdf(null)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
     } finally {
@@ -135,6 +134,45 @@ export default function EmpresasDividaAtivaAdminPage() {
           </button>
         )}
       </div>
+
+      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+        <input
+          placeholder="Nome..."
+          defaultValue={filtros.nome ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, nome: (e.target as HTMLInputElement).value || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        />
+        <input
+          placeholder="Razão social..."
+          defaultValue={filtros.razaoSocial ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, razaoSocial: (e.target as HTMLInputElement).value || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        />
+        <input
+          placeholder="CNPJ..."
+          defaultValue={filtros.cnpj ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, cnpj: (e.target as HTMLInputElement).value || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        />
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-text-secondary/60">De:</span>
+          <input
+            type="date"
+            value={filtros.dataInicial ?? ''}
+            onChange={e => setFiltros({ ...filtros, dataInicial: e.target.value || undefined })}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-text-secondary/60">Até:</span>
+          <input
+            type="date"
+            value={filtros.dataFinal ?? ''}
+            onChange={e => setFiltros({ ...filtros, dataFinal: e.target.value || undefined })}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+      </Card>
 
       {form && (
         <Card className="p-4" hoverable={false}>
@@ -247,9 +285,9 @@ export default function EmpresasDividaAtivaAdminPage() {
 
       {loading && <Skeleton className="h-40" />}
       {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhuma empresa cadastrada." />}
+      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhuma empresa cadastrada." />}
 
-      {!loading && !erro && lista.length > 0 && (
+      {!loading && !erro && data.length > 0 && (
         <Card className="overflow-x-auto" hoverable={false}>
           <table className="w-full text-sm">
             <thead className="bg-neutral-light text-left">
@@ -263,7 +301,7 @@ export default function EmpresasDividaAtivaAdminPage() {
               </tr>
             </thead>
             <tbody>
-              {lista.map(e => (
+              {data.map(e => (
                 <tr key={e.id} className="border-t border-border/20">
                   <td className="p-3 font-semibold">{e.nome}</td>
                   <td className="p-3">{e.cnpj}</td>
@@ -296,6 +334,8 @@ export default function EmpresasDividaAtivaAdminPage() {
           </table>
         </Card>
       )}
+
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }
