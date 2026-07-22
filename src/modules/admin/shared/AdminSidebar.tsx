@@ -7,13 +7,6 @@ import { useAuth } from '@/modules/auth/AuthContext'
 import { isAdministrador } from '@/modules/auth/permissoes'
 import { REGISTRY_MODULOS_GENERICOS } from '@/modules/admin/genericos/registry'
 
-// Grupos ainda não implementados (módulos bespoke da seção 6 do prompt do
-// admin) — aparecem como "em breve" pra dar visão do todo, mesmo padrão do
-// hub público (ItemAcessoCard). Ver STATUS.md pra ordem de prioridade.
-const GRUPOS_PENDENTES = [
-  'Anticorrupção (dívida ativa, empresas inidôneas)'
-]
-
 // RH bespoke (servidor/cargos/diárias/folha/concursos) — mescla com a
 // categoria "Recursos Humanos" do registry genérico (que só tem
 // Estagiários/Terceirizados), pra não duplicar o cabeçalho da seção.
@@ -38,6 +31,15 @@ const LINKS_CONVENIOS_BESPOKE = [
 // registry genérico (que só tem Fiscal de Contratos), mesmo motivo do LINKS_RH_BESPOKE.
 const LINKS_LICITACOES_BESPOKE = [
   { href: '/admin/licitacoes', label: 'Licitações' }
+]
+
+// Anticorrupção (dívida ativa, empresas inidôneas) — mescla com a categoria "Fiscal e
+// Orçamentário" do registry genérico (que só tem Renúncia Fiscal), mesmo motivo do
+// LINKS_RH_BESPOKE. Grupo de permissão é 'anticorrupcao' (admin-only pra editar/excluir),
+// não 'fiscal-orcamentario' — só a categoria visual da sidebar é compartilhada.
+const LINKS_ANTICORRUPCAO_BESPOKE = [
+  { href: '/admin/anticorrupcao/empresas-divida-ativa', label: 'Empresas em Dívida Ativa' },
+  { href: '/admin/anticorrupcao/empresas-inidoneas', label: 'Empresas Inidôneas ou Suspensas' }
 ]
 
 const LINKS_INSTITUCIONAL_GERAL = [
@@ -198,19 +200,17 @@ export default function AdminSidebar() {
                 {link.label}
               </Link>
             ))}
+            {categoria === 'Fiscal e Orçamentário' && LINKS_ANTICORRUPCAO_BESPOKE.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         ))}
-
-        <div>
-          <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
-            Em breve
-          </p>
-          {GRUPOS_PENDENTES.map(nome => (
-            <p key={nome} className="px-3 py-1.5 text-white/35 cursor-not-allowed">
-              {nome}
-            </p>
-          ))}
-        </div>
       </nav>
 
       <div className="p-4 border-t border-white/10 text-xs">
