@@ -9,11 +9,16 @@ import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
-import { podeCriar, podeExcluir } from '@/modules/auth/permissoes'
+import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { empresaInidoneaService } from '@/modules/admin/anticorrupcao/empresaInidonea.service'
 import { EmpresaInidonea, EmpresaInidoneaRequest, FiltroEmpresaInidonea } from '@/modules/admin/anticorrupcao/types'
 
-const FORM_VAZIO: EmpresaInidoneaRequest = {
+interface FormState extends EmpresaInidoneaRequest {
+  id: number | null
+}
+
+const FORM_VAZIO: FormState = {
+  id: null,
   empresa: '',
   cnpj: '',
   descricao: '',
@@ -42,10 +47,23 @@ export default function EmpresasInidoneasAdminPage() {
     FiltroEmpresaInidonea
   >({ fetchFunction, initialSort: 'data,desc' })
 
-  const [form, setForm] = useState<EmpresaInidoneaRequest | null>(null)
+  const [form, setForm] = useState<FormState | null>(null)
   const [pdf, setPdf] = useState<File | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+
+  function abrirEdicao(e: EmpresaInidonea) {
+    setErroForm(null)
+    setPdf(null)
+    setForm({
+      id: e.id,
+      empresa: e.empresa,
+      cnpj: e.cnpj,
+      descricao: e.descricao,
+      status: e.status,
+      data: e.data
+    })
+  }
 
   async function excluir(id: number) {
     if (!confirm('Excluir este registro? Essa ação não pode ser desfeita.')) return
@@ -65,8 +83,15 @@ export default function EmpresasInidoneasAdminPage() {
     setSalvando(true)
     setErroForm(null)
 
+    const { id, ...dados } = form
+    const request: EmpresaInidoneaRequest = dados
+
     try {
-      await empresaInidoneaService.criar(form, pdf)
+      if (id) {
+        await empresaInidoneaService.atualizar(id, request, pdf)
+      } else {
+        await empresaInidoneaService.criar(request, pdf)
+      }
       setForm(null)
       setPdf(null)
       recarregar()
@@ -134,7 +159,7 @@ export default function EmpresasInidoneasAdminPage() {
       {form && (
         <Card className="p-4" hoverable={false}>
           <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">Nova empresa</h2>
+            <h2 className="font-semibold text-sm">{form.id ? 'Editar empresa' : 'Nova empresa'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
@@ -190,7 +215,9 @@ export default function EmpresasInidoneasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">PDF (opcional)</label>
+              <label className="block text-sm font-medium mb-1">
+                PDF (opcional{form.id && ' — mantém o atual se vazio'})
+              </label>
               <input
                 type="file"
                 accept="application/pdf"
@@ -258,7 +285,12 @@ export default function EmpresasInidoneasAdminPage() {
                       <span className="text-text-secondary/50">-</span>
                     )}
                   </td>
-                  <td className="p-3 text-right">
+                  <td className="p-3 text-right space-x-2">
+                    {podeEditar(usuario, 'anticorrupcao') && (
+                      <button onClick={() => abrirEdicao(e)} className="text-primary hover:underline">
+                        Editar
+                      </button>
+                    )}
                     {podeExcluir(usuario, 'anticorrupcao') && (
                       <button onClick={() => excluir(e.id)} className="text-error hover:underline">
                         Excluir

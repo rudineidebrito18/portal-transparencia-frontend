@@ -13,7 +13,6 @@ function montarFormData(dados: EmpresaInidoneaRequest, pdf?: File | null): FormD
   return formData
 }
 
-// Sem PUT no backend — só criar/listar/excluir.
 export const empresaInidoneaService = {
   listar(params: ListarParams): Promise<Page<EmpresaInidonea>> {
     return api.get<Page<EmpresaInidonea>>(`${BASE}/filtro`, { params }).then(r => r.data)
@@ -22,6 +21,12 @@ export const empresaInidoneaService = {
   criar(dados: EmpresaInidoneaRequest, pdf?: File | null): Promise<EmpresaInidonea> {
     return api
       .post<EmpresaInidonea>(BASE, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then(r => r.data)
+  },
+
+  atualizar(id: number, dados: EmpresaInidoneaRequest, pdf?: File | null): Promise<EmpresaInidonea> {
+    return api
+      .put<EmpresaInidonea>(`${BASE}/${id}`, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
       .then(r => r.data)
   },
 
