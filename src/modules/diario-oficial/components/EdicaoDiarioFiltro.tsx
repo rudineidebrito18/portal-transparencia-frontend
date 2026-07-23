@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { MdFilterList, MdRestartAlt, MdSearch } from 'react-icons/md'
+import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import FiltroCard from '@/components/ui/FiltroCard'
 import { TipoEdicaoDiario, TipoEdicaoDiarioDescricao } from '../enums'
 import { FiltroEdicaoDiario } from '../types'
 
@@ -18,6 +19,8 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
   )
   const [dataInicial, setDataInicial] = useState(valoresIniciais?.dataInicial ?? '')
   const [dataFinal, setDataFinal] = useState(valoresIniciais?.dataFinal ?? '')
+
+  const filtrosAtivosCount = [tipo, numeroEdicao, dataInicial, dataFinal].filter(v => v !== '').length
 
   const inputClass =
     'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all'
@@ -47,15 +50,7 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
   }
 
   return (
-    <div className="bg-white border border-border/30 rounded-2xl shadow-sm mb-8 px-6 py-5">
-
-      <div className="flex items-center gap-3 mb-4">
-        <div className="bg-primary/10 p-2 rounded-lg text-primary">
-          <MdFilterList size={20} />
-        </div>
-        <h2 className="text-sm font-bold text-primary">Filtros de Busca</h2>
-      </div>
-
+    <FiltroCard subtituloPadrao="Refine por tipo, número e datas" filtrosAtivosCount={filtrosAtivosCount}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
 
         <div>
@@ -131,6 +126,6 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
         </div>
 
       </div>
-    </div>
+    </FiltroCard>
   )
 }

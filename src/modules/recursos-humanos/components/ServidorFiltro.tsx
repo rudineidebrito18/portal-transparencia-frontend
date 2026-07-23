@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { MdExpandLess, MdExpandMore, MdFilterList, MdRestartAlt, MdSearch } from 'react-icons/md'
+import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import FiltroCard from '@/components/ui/FiltroCard'
 import { FiltroServidor } from '../types'
 
 interface Props {
@@ -21,7 +22,6 @@ const initialState: FiltroServidor = {
 
 export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
   const [filtros, setFiltros] = useState<FiltroServidor>({ ...initialState, ...valoresIniciais })
-  const [isExpanded, setIsExpanded] = useState(true)
 
   const filtrosAtivosCount = Object.entries(filtros).filter(
     ([, v]) => v !== undefined && v !== ''
@@ -66,43 +66,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
     "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
 
   return (
-    <div className="bg-white border border-border/30 rounded-2xl shadow-sm mb-8 overflow-hidden">
-
-      {/* HEADER */}
-      <div
-        className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-neutral-light/40 transition-colors"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/10 p-2 rounded-lg text-primary">
-            <MdFilterList size={20} />
-          </div>
-
-          <div>
-            <h2 className="text-sm font-bold text-primary">
-              Filtros de Busca
-            </h2>
-            <p className="text-xs text-text-secondary">
-              {filtrosAtivosCount > 0
-                ? `${filtrosAtivosCount} filtro(s) aplicado(s)`
-                : 'Refine por nome, CPF, cargo e mais'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {filtrosAtivosCount > 0 && !isExpanded && (
-            <span className="bg-primary text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">
-              {filtrosAtivosCount}
-            </span>
-          )}
-          {isExpanded ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
-        </div>
-      </div>
-
-      {/* BODY */}
-      {isExpanded && (
-        <div className="px-6 pb-6 pt-2 border-t border-border/20 animate-in fade-in zoom-in-95 duration-200">
+    <FiltroCard subtituloPadrao="Refine por nome, CPF, cargo e mais" filtrosAtivosCount={filtrosAtivosCount}>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
@@ -222,8 +186,6 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
           </div>
 
-        </div>
-      )}
-    </div>
+    </FiltroCard>
   )
 }

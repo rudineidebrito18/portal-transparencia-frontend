@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { MdFilterList, MdRestartAlt, MdSearch } from 'react-icons/md'
+import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import FiltroCard from '@/components/ui/FiltroCard'
 import { FiltroDocumentoGenerico } from '../../types/DocumentoGenerico'
 
 interface Props {
@@ -18,6 +19,10 @@ const initialState: FiltroDocumentoGenerico = {
 
 export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: Props) {
   const [filtros, setFiltros] = useState<FiltroDocumentoGenerico>({ ...initialState, ...valoresIniciais })
+
+  const filtrosAtivosCount = Object.entries(filtros).filter(
+    ([, v]) => v !== undefined && v !== ''
+  ).length
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
@@ -47,12 +52,7 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
     "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
 
   return (
-    <div className="bg-white border border-border/30 rounded-2xl shadow-sm p-6 mb-6">
-      <div className="flex items-center gap-2 mb-4 text-primary">
-        <MdFilterList size={18} />
-        <h2 className="text-sm font-bold">Filtros de Busca</h2>
-      </div>
-
+    <FiltroCard subtituloPadrao="Refine por descrição e datas" filtrosAtivosCount={filtrosAtivosCount}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
         <div className="md:col-span-2">
@@ -114,6 +114,6 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
           Aplicar
         </button>
       </div>
-    </div>
+    </FiltroCard>
   )
 }
