@@ -16,6 +16,7 @@ import {
   MdSettings
 } from 'react-icons/md';
 import DropdownMenuItem from './DropdownMenuItem';
+import SecretariasDropdownItems from './SecretariasDropdownItems';
 
 export default function Header() {
   const [navMedidaHeight, setNavMedidaHeight] = useState(48);
@@ -145,9 +146,7 @@ export default function Header() {
               </DropdownMenuItem>
 
               <DropdownMenuItem label="SECRETARIAS">
-                <Link href="/secretarias" className="px-4 py-2 hover:bg-neutral-dark block font-semibold" onClick={() => setMenuOpen(false)}>Todas as Secretarias</Link>
-                <Link href="/saude" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Saúde</Link>
-                <Link href="/educacao" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Educação</Link>
+                <SecretariasDropdownItems onNavigate={() => setMenuOpen(false)} />
               </DropdownMenuItem>
 
               <Link href="/diario-oficial" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>DIÁRIO OFICIAL</Link>

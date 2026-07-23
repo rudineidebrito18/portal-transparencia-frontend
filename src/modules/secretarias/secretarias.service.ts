@@ -8,7 +8,7 @@ export const secretariasService = {
   // Backend pagina esse GET, mas a tela pública não tem UI de paginação (lista de
   // secretarias é naturalmente pequena) — pede uma página grande e usa só .content,
   // mesmo padrão de gestao-fiscal/aditivos.
-  listar(params?: { nome?: string; vigencia?: string }): Promise<Unidade[]> {
+  listar(params?: { nome?: string; vigencia?: string; sort?: string }): Promise<Unidade[]> {
     return api
       .get<Page<Unidade>>(BASE, { params: { ...params, size: 200 } })
       .then(r => r.data.content)

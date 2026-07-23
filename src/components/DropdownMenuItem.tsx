@@ -41,6 +41,7 @@ export default function DropdownMenuItem({ label, children }: DropdownMenuItemPr
       <ul
         className={`
           absolute left-0 top-full w-48 rounded bg-white text-black shadow-md z-50
+          max-h-96 overflow-y-auto
           md:invisible md:group-hover:visible
           ${isOpen ? 'block md:hidden' : 'hidden md:group-hover:block'}
         `}
