@@ -1,5 +1,6 @@
 import { ApiError, api } from '@/services/api'
-import { EsicInfo, EsicInfoRequest, FormularioEsic, OuvidoriaInfo, OuvidoriaInfoRequest, TipoSolicitacaoEsic } from './types'
+import { Page } from '@/modules/shared/types/Page'
+import { EsicInfo, EsicInfoRequest, FiltroFormularioEsic, FormularioEsic, OuvidoriaInfo, OuvidoriaInfoRequest } from './types'
 
 export const esicInfoService = {
   // GET devolve 404 antes da primeira configuração (PUT faz upsert), igual ouvidoria.
@@ -18,10 +19,11 @@ export const esicInfoService = {
   }
 }
 
+type ListarFormularioParams = FiltroFormularioEsic & { page?: number; size?: number; sort?: string }
+
 export const esicFormularioService = {
-  listar(tipo?: TipoSolicitacaoEsic): Promise<FormularioEsic[]> {
-    if (tipo) return api.get<FormularioEsic[]>('/esic/formulario/tipo', { params: { tipo } }).then(r => r.data)
-    return api.get<FormularioEsic[]>('/esic/formulario').then(r => r.data)
+  listar(params: ListarFormularioParams): Promise<Page<FormularioEsic>> {
+    return api.get<Page<FormularioEsic>>('/esic/formulario/filtro', { params }).then(r => r.data)
   }
 }
 

@@ -9,6 +9,11 @@ export interface FornecedorRequest {
   cnpj: string
 }
 
+export interface FiltroFornecedor {
+  nome?: string
+  cnpj?: string
+}
+
 // Tipo canônico de Unidade (e dos 5 sub-recursos) mora no módulo público
 // "Secretarias" — mesmo padrão de ObraPublica em modules/obras/types.ts — porque o
 // módulo admin de Unidades virou a base dele em 2026-07-16. Reexporta aqui só pra
@@ -23,6 +28,11 @@ export type {
 export { TipoDocumentoUnidade, TipoDocumentoUnidadeDescricao } from '@/modules/secretarias/types'
 
 import { TipoDocumentoUnidade } from '@/modules/secretarias/types'
+
+export interface FiltroUnidade {
+  nome?: string
+  vigencia?: string
+}
 
 export interface UnidadeRequest {
   nome: string

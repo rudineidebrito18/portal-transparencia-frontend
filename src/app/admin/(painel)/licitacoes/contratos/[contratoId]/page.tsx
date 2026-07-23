@@ -315,7 +315,7 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
 
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
   useEffect(() => {
-    fornecedoresService.listar().then(setFornecedores).catch(() => {})
+    fornecedoresService.listar({ size: 200, sort: 'nome,asc' }).then(p => setFornecedores(p.content)).catch(() => {})
   }, [])
 
   const [form, setForm] = useState<AditivoFormState | null>(null)

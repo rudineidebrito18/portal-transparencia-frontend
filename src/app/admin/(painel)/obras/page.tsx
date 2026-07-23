@@ -1,12 +1,14 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 
+import { usePageableResource } from '@/hooks/usePageableResource'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
@@ -14,7 +16,7 @@ import { unidadesService } from '@/modules/admin/geral/geral.service'
 import { fornecedoresService } from '@/modules/admin/geral/geral.service'
 import { Unidade, Fornecedor } from '@/modules/admin/geral/types'
 import { obraService } from '@/modules/admin/obras/obra.service'
-import { ObraPublica, ObraRequest, TipoObra, TipoObraDescricao, StatusObra, StatusObraDescricao, StatusObraStyle } from '@/modules/admin/obras/types'
+import { FiltroObraPublica, ObraPublica, ObraRequest, TipoObra, TipoObraDescricao, StatusObra, StatusObraDescricao, StatusObraStyle } from '@/modules/admin/obras/types'
 
 interface FormState {
   id: number | null
@@ -57,27 +59,24 @@ function formatarMoeda(valor: number) {
 export default function ObrasAdminPage() {
   const { usuario } = useAuth()
 
-  const [lista, setLista] = useState<ObraPublica[]>([])
-  const [loading, setLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
+  const [versao, setVersao] = useState(0)
+  const recarregar = () => setVersao(v => v + 1)
+  const fetchFunction = useCallback(
+    (params: FiltroObraPublica & { page?: number; size?: number; sort?: string }) => obraService.listar(params),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [versao]
+  )
 
-  function carregar() {
-    setLoading(true)
-    setErro(null)
-    obraService
-      .listar()
-      .then(setLista)
-      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(carregar, [])
+  const { data, loading, erro, pagina, totalPaginas, setPagina, filtros, setFiltros } = usePageableResource<
+    ObraPublica,
+    FiltroObraPublica
+  >({ fetchFunction, initialSort: 'numero,desc' })
 
   const [unidades, setUnidades] = useState<Unidade[]>([])
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
   useEffect(() => {
-    unidadesService.listar().then(setUnidades).catch(() => {})
-    fornecedoresService.listar().then(setFornecedores).catch(() => {})
+    unidadesService.listar({ size: 200, sort: 'nome,asc' }).then(p => setUnidades(p.content)).catch(() => {})
+    fornecedoresService.listar({ size: 200, sort: 'nome,asc' }).then(p => setFornecedores(p.content)).catch(() => {})
   }, [])
 
   const [form, setForm] = useState<FormState | null>(null)
@@ -114,7 +113,7 @@ export default function ObrasAdminPage() {
 
     try {
       await obraService.excluir(id)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
     }
@@ -151,7 +150,7 @@ export default function ObrasAdminPage() {
       }
 
       setForm(null)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
     } finally {
@@ -173,6 +172,64 @@ export default function ObrasAdminPage() {
           </button>
         )}
       </div>
+
+      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+        <input
+          type="number"
+          placeholder="Número..."
+          defaultValue={filtros.numero ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, numero: Number((e.target as HTMLInputElement).value) || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm w-32"
+        />
+        <select
+          value={filtros.status ?? ''}
+          onChange={e => setFiltros({ ...filtros, status: (e.target.value as StatusObra) || undefined })}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">Todos os status</option>
+          {Object.values(StatusObra).map(s => (
+            <option key={s} value={s}>{StatusObraDescricao[s]}</option>
+          ))}
+        </select>
+        <select
+          value={filtros.tipo ?? ''}
+          onChange={e => setFiltros({ ...filtros, tipo: (e.target.value as TipoObra) || undefined })}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">Todos os tipos</option>
+          {Object.values(TipoObra).map(t => (
+            <option key={t} value={t}>{TipoObraDescricao[t]}</option>
+          ))}
+        </select>
+        <select
+          value={filtros.unidadeId ?? ''}
+          onChange={e => setFiltros({ ...filtros, unidadeId: Number(e.target.value) || undefined })}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">Todas as unidades</option>
+          {unidades.map(u => (
+            <option key={u.id} value={u.id}>{u.nome}</option>
+          ))}
+        </select>
+        <select
+          value={filtros.fornecedorId ?? ''}
+          onChange={e => setFiltros({ ...filtros, fornecedorId: Number(e.target.value) || undefined })}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">Todos os fornecedores</option>
+          {fornecedores.map(f => (
+            <option key={f.id} value={f.id}>{f.nome}</option>
+          ))}
+        </select>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={filtros.paralisada ?? false}
+            onChange={e => setFiltros({ ...filtros, paralisada: e.target.checked || undefined })}
+          />
+          Só paralisadas
+        </label>
+      </Card>
 
       {form && (
         <Card className="p-4" hoverable={false}>
@@ -360,9 +417,9 @@ export default function ObrasAdminPage() {
 
       {loading && <Skeleton className="h-40" />}
       {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhuma obra encontrada." />}
+      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhuma obra encontrada." />}
 
-      {!loading && !erro && lista.length > 0 && (
+      {!loading && !erro && data.length > 0 && (
         <Card className="overflow-x-auto" hoverable={false}>
           <table className="w-full text-sm">
             <thead className="bg-neutral-light text-left">
@@ -377,7 +434,7 @@ export default function ObrasAdminPage() {
               </tr>
             </thead>
             <tbody>
-              {lista.map(o => (
+              {data.map(o => (
                 <tr key={o.id} className="border-t border-border/20">
                   <td className="p-3 font-semibold">{o.numero}</td>
                   <td className="p-3">
@@ -412,6 +469,8 @@ export default function ObrasAdminPage() {
           </table>
         </Card>
       )}
+
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

@@ -43,6 +43,15 @@ export interface FormularioEsic {
   anonima: boolean
   nome: string
   email: string
+  criadoEm: string
+}
+
+export interface FiltroFormularioEsic {
+  tipoSolicitacao?: TipoSolicitacaoEsic
+  nome?: string
+  email?: string
+  dataInicial?: string
+  dataFinal?: string
 }
 
 export interface OuvidoriaInfo {

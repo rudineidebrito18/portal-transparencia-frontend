@@ -1,29 +1,28 @@
 import { api } from '@/services/api'
-import { Fornecedor, FornecedorRequest, Unidade, UnidadeRequest } from './types'
+import { Page } from '@/modules/shared/types/Page'
+import { FiltroFornecedor, FiltroUnidade, Fornecedor, FornecedorRequest, Unidade, UnidadeRequest } from './types'
 
-// Fornecedores (seção 6.9 do prompt do admin) é JSON puro, sem paginação nem
-// filtro no backend — mesma forma do padrão de usuariosService.
-function criarServicoAdminSimples<T, Req>(basePath: string) {
-  return {
-    listar(): Promise<T[]> {
-      return api.get<T[]>(basePath).then(r => r.data)
-    },
+const FORNECEDORES_BASE = '/geral/fornecedores'
 
-    criar(dados: Req): Promise<T> {
-      return api.post<T>(basePath, dados).then(r => r.data)
-    },
+type ListarFornecedoresParams = FiltroFornecedor & { page?: number; size?: number; sort?: string }
 
-    atualizar(id: number, dados: Req): Promise<T> {
-      return api.put<T>(`${basePath}/${id}`, dados).then(r => r.data)
-    },
+export const fornecedoresService = {
+  listar(params: ListarFornecedoresParams): Promise<Page<Fornecedor>> {
+    return api.get<Page<Fornecedor>>(`${FORNECEDORES_BASE}/filtro`, { params }).then(r => r.data)
+  },
 
-    excluir(id: number): Promise<void> {
-      return api.delete(`${basePath}/${id}`).then(() => undefined)
-    }
+  criar(dados: FornecedorRequest): Promise<Fornecedor> {
+    return api.post<Fornecedor>(FORNECEDORES_BASE, dados).then(r => r.data)
+  },
+
+  atualizar(id: number, dados: FornecedorRequest): Promise<Fornecedor> {
+    return api.put<Fornecedor>(`${FORNECEDORES_BASE}/${id}`, dados).then(r => r.data)
+  },
+
+  excluir(id: number): Promise<void> {
+    return api.delete(`${FORNECEDORES_BASE}/${id}`).then(() => undefined)
   }
 }
-
-export const fornecedoresService = criarServicoAdminSimples<Fornecedor, FornecedorRequest>('/geral/fornecedores')
 
 const UNIDADES_BASE = '/geral/unidades'
 
@@ -39,10 +38,11 @@ function montarFormData(dados: UnidadeRequest, foto?: File | null): FormData {
   return formData
 }
 
+type ListarUnidadesParams = FiltroUnidade & { page?: number; size?: number; sort?: string }
+
 export const unidadesService = {
-  listar(nome?: string, vigencia?: string): Promise<Unidade[]> {
-    const params = { nome: nome || undefined, vigencia: vigencia || undefined }
-    return api.get<Unidade[]>(UNIDADES_BASE, { params }).then(r => r.data)
+  listar(params: ListarUnidadesParams): Promise<Page<Unidade>> {
+    return api.get<Page<Unidade>>(UNIDADES_BASE, { params }).then(r => r.data)
   },
 
   buscarPorId(id: number): Promise<Unidade> {

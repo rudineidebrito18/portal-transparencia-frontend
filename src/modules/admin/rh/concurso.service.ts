@@ -1,11 +1,14 @@
 import { api } from '@/services/api'
-import { AnexoConcurso, AnexoConcursoRequest, Concurso, ConcursoRequest } from './types'
+import { Page } from '@/modules/shared/types/Page'
+import { AnexoConcurso, AnexoConcursoRequest, Concurso, ConcursoRequest, FiltroConcurso } from './types'
 
 const BASE = '/recursos-humanos/concursos'
 
+type ListarParams = FiltroConcurso & { page?: number; size?: number; sort?: string }
+
 export const concursoService = {
-  listar(): Promise<Concurso[]> {
-    return api.get<Concurso[]>(BASE).then(r => r.data)
+  listar(params: ListarParams): Promise<Page<Concurso>> {
+    return api.get<Page<Concurso>>(`${BASE}/filtro`, { params }).then(r => r.data)
   },
 
   buscarPorId(id: number): Promise<Concurso> {

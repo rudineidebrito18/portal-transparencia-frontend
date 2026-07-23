@@ -43,8 +43,9 @@ export default function EsicConfigAdminPage() {
     setLoading(true)
     setErro(null)
 
-    Promise.all([esicInfoService.buscar(), unidadesService.listar()])
-      .then(([info, listaUnidades]) => {
+    Promise.all([esicInfoService.buscar(), unidadesService.listar({ size: 200, sort: 'nome,asc' })])
+      .then(([info, paginaUnidades]) => {
+        const listaUnidades = paginaUnidades.content
         setUnidades(listaUnidades)
 
         if (!info) {

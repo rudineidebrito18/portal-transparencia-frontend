@@ -1,11 +1,14 @@
 import { api } from '@/services/api'
-import { ObraPublica, ObraRequest } from './types'
+import { Page } from '@/modules/shared/types/Page'
+import { FiltroObraPublica, ObraPublica, ObraRequest } from './types'
 
 const BASE = '/obras'
 
+type ListarParams = FiltroObraPublica & { page?: number; size?: number; sort?: string }
+
 export const obraService = {
-  listar(): Promise<ObraPublica[]> {
-    return api.get<ObraPublica[]>(BASE).then(r => r.data)
+  listar(params: ListarParams): Promise<Page<ObraPublica>> {
+    return api.get<Page<ObraPublica>>(`${BASE}/filtro`, { params }).then(r => r.data)
   },
 
   buscarPorId(id: number): Promise<ObraPublica> {

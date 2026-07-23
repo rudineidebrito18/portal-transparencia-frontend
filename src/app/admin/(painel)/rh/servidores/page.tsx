@@ -45,7 +45,7 @@ export default function ServidoresAdminPage() {
 
   const [unidades, setUnidades] = useState<Unidade[]>([])
   useEffect(() => {
-    unidadesService.listar().then(setUnidades).catch(() => {})
+    unidadesService.listar({ size: 200, sort: 'nome,asc' }).then(p => setUnidades(p.content)).catch(() => {})
   }, [])
 
   const [form, setForm] = useState<FormState | null>(null)

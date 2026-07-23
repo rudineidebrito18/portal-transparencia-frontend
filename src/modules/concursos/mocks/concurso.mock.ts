@@ -1,7 +1,8 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
+import { Page } from '@/modules/shared/types/Page'
 import { criarErroNaoEncontrado } from '@/modules/shared/mocks/mockUtils'
-import { AnexoConcurso, Concurso } from '../types'
+import { AnexoConcurso, Concurso, FiltroConcurso } from '../types'
 
 const RESUMOS = [
   'Concurso público para provimento de vagas no quadro efetivo da Prefeitura.',
@@ -47,9 +48,24 @@ function gerarAnexos(concursoId: number): AnexoConcurso[] {
 
 const CONCURSOS = Array.from({ length: 12 }, (_, i) => gerarConcurso(i + 1))
 
+type ListarParams = FiltroConcurso & { page?: number; size?: number; sort?: string }
+
 export const concursoMock = {
-  async listar(): Promise<Concurso[]> {
-    return CONCURSOS
+  async listar(params: ListarParams): Promise<Page<Concurso>> {
+    const { page = 0, size = 10, numero, ano, descricao, dataAberturaInicial, dataAberturaFinal } = params
+
+    let dados = CONCURSOS
+    if (numero) dados = dados.filter(c => c.numero === numero)
+    if (ano) dados = dados.filter(c => c.ano === ano)
+    if (descricao) dados = dados.filter(c => c.descricao.toLowerCase().includes(descricao.toLowerCase()))
+    if (dataAberturaInicial) dados = dados.filter(c => c.dataAbertura >= dataAberturaInicial)
+    if (dataAberturaFinal) dados = dados.filter(c => c.dataAbertura <= dataAberturaFinal)
+
+    const totalElements = dados.length
+    const totalPages = Math.max(1, Math.ceil(totalElements / size))
+    const content = dados.slice(page * size, page * size + size)
+
+    return { content, totalElements, totalPages, number: page, size }
   },
 
   async listarAnexos(concursoId: number): Promise<AnexoConcurso[]> {

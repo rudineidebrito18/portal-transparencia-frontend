@@ -1,35 +1,35 @@
 'use client'
 
 import AsyncList from '@/components/ui/AsyncList'
-import { useUrlState } from '@/hooks/useUrlState'
+import Pagination from '@/components/ui/Pagination'
 import { useObras } from '../hooks/useObras'
 import ObraCard from './ObraCard'
 
-type Filtro = 'todas' | 'paralisadas'
+type Aba = 'todas' | 'paralisadas'
 
-const FILTROS: { valor: Filtro; label: string }[] = [
+const ABAS: { valor: Aba; label: string }[] = [
   { valor: 'todas', label: 'Todas as Obras' },
   { valor: 'paralisadas', label: 'Obras Paralisadas' }
 ]
 
-// Backend não expõe filtro por query param pra esse recurso (GET /obras retorna
-// tudo de uma vez), então "Paralisadas" filtra em cima da lista já carregada.
 export default function ObrasListView() {
-  const [filtro, setFiltro] = useUrlState<Filtro>('status', 'todas')
-  const { data, loading, erro } = useObras()
+  const { data, loading, erro, pagina, totalPaginas, setPagina, filtros, setFiltros } = useObras()
+  const aba: Aba = filtros.paralisada ? 'paralisadas' : 'todas'
 
-  const obras = filtro === 'paralisadas' ? data.filter(obra => obra.paralisada) : data
+  function selecionarAba(novaAba: Aba) {
+    setFiltros({ ...filtros, paralisada: novaAba === 'paralisadas' ? true : undefined })
+  }
 
   return (
     <div>
       {/* TABS */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {FILTROS.map(item => (
+        {ABAS.map(item => (
           <button
             key={item.valor}
-            onClick={() => setFiltro(item.valor)}
+            onClick={() => selecionarAba(item.valor)}
             className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
-              ${filtro === item.valor
+              ${aba === item.valor
                 ? 'bg-primary text-white shadow-md'
                 : 'bg-neutral-light text-text-secondary hover:bg-primary/10'
               }`}
@@ -40,12 +40,14 @@ export default function ObrasListView() {
       </div>
 
       <AsyncList
-        data={obras}
+        data={data}
         loading={loading}
         erro={erro}
-        emptyMessage={filtro === 'paralisadas' ? 'Nenhuma obra paralisada no momento.' : 'Nenhuma obra encontrada.'}
+        emptyMessage={aba === 'paralisadas' ? 'Nenhuma obra paralisada no momento.' : 'Nenhuma obra encontrada.'}
         renderItem={obra => <ObraCard key={obra.id} obra={obra} />}
       />
+
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
     </div>
   )
 }

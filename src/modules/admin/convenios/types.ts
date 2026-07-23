@@ -14,3 +14,10 @@ export interface Convenio {
 }
 
 export type ConvenioRequest = Omit<Convenio, 'id' | 'caminhoPdf'>
+
+export interface FiltroConvenio {
+  numero?: number
+  convenente?: string
+  dataAssinaturaInicial?: string
+  dataAssinaturaFinal?: string
+}

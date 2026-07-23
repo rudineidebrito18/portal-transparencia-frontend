@@ -63,23 +63,23 @@ sidebar junto no scroll.
 | Área | Rota | Grupo de permissão | Observação relevante |
 |---|---|---|---|
 | Motor de CRUD genérico (~27 módulos "padrão", seção 6.7 do prompt do backend) | `/admin/modulos/[slug]` | por módulo (`registry.ts`) | rota dinâmica única, evita duplicar página por recurso |
-| Gestão de usuários | `/admin/usuarios` | admin-only | soft-delete (desativar/reativar, não exclui de verdade); auto-proteção pra própria conta |
+| Gestão de usuários | `/admin/usuarios` | admin-only | soft-delete (desativar/reativar, não exclui de verdade); auto-proteção pra própria conta; bespoke paginado (sem `/filtro` dedicado). **`GET /api/admin/users` também é usado como sonda de detecção de papel** (ver `src/modules/auth/auth.service.ts` `detectarPapeisEId` — não existe endpoint `/me`, então o frontend testa se o usuário consegue listar usuários pra inferir `ROLE_ADMINISTRATOR`) — se esse endpoint mudar de contrato de novo, quebra a detecção de admin em todo o painel silenciosamente (ver "bug crítico" na seção 2.1 abaixo) |
 | Auditoria | `/admin/auditoria` | admin-only | cobertura parcial: só módulos genéricos + gestão de usuários geram registro |
 | Avisos | `/admin/institucional/avisos` | `institucional` | JSON puro, `InstitucionalCrudPage` genérico |
 | Notícias | `/admin/institucional/noticias` | `institucional` | multipart (`dados`+`imagem` opcional), form próprio (não usa o genérico) |
-| Fornecedores | `/admin/geral/fornecedores` | `geral` | JSON puro, sem paginação |
-| Secretarias (Unidade + 5 sub-recursos) | `/admin/geral/unidades` + `/admin/geral/unidades/[id]` | `geral` | multipart na unidade; detalhe com abas pros 5 sub-recursos; Documentos tipados são 3 slots fixos (Termo/EDTC/Declaração E-SIC), reenviar substitui; excluir a unidade dá `409` se tiver sub-recurso vinculado (sem cascade) — excluir os 5 primeiro |
+| Fornecedores | `/admin/geral/fornecedores` | `geral` | bespoke paginado (`usePageableResource`), filtro via `GET .../filtro` (`nome`, `cnpj`); `GeralSimplesCrudPage.tsx` genérico foi removido (só Fornecedores usava, virou página própria) |
+| Secretarias (Unidade + 5 sub-recursos) | `/admin/geral/unidades` + `/admin/geral/unidades/[id]` | `geral` | multipart na unidade; agora bespoke paginado (`GET` base já aceita `nome`/`vigencia` como query params direto, sem `/filtro` separado); detalhe com abas pros 5 sub-recursos; Documentos tipados são 3 slots fixos (Termo/EDTC/Declaração E-SIC), reenviar substitui; excluir a unidade dá `409` se tiver sub-recurso vinculado (sem cascade) — excluir os 5 primeiro |
 | Tabela de Valores de Diária | `/admin/geral/tabela-valores` | `geral` | multipart; **o OpenAPI documenta esse endpoint como JSON por engano, é multipart de verdade** |
 | E-SIC — Configuração | `/admin/esic/config` | `esic-ouvidoria` | singleton (upsert, 404 antes de configurado) |
-| E-SIC — Formulários recebidos | `/admin/esic/formularios` | `esic-ouvidoria` | somente leitura |
+| E-SIC — Formulários recebidos | `/admin/esic/formularios` | `esic-ouvidoria` | somente leitura; bespoke paginado, filtro via `GET .../filtro` (`tipoSolicitacao`, `nome`, `email`, `dataInicial`, `dataFinal`) — `GET .../tipo` foi removido pelo backend, não usar mais |
 | Ouvidoria — Configuração | `/admin/ouvidoria/config` | `esic-ouvidoria` | singleton; **sem tela de formulários recebidos** — backend não expõe listagem pra esse recurso |
 | Servidores, Cargos, Diárias | `/admin/rh/{servidores,cargos,diarias}` | `rh` | bespoke paginado (servidores/diárias) ou lista simples (cargos) |
-| Folha de Pagamento | `/admin/rh/folha` | `rh` | **sem `PUT`/`DELETE`** — lançamento é definitivo |
-| Concursos | `/admin/rh/concursos` + `[id]` (anexos) | `padrao` (não `rh`!) | única exceção do grupo RH — segue a regra geral de MANAGER |
-| Convênios | `/admin/convenios` | `obras-repasses` | multipart (`dto`+`pdf`) |
+| Folha de Pagamento | `/admin/rh/folha` | `rh` | **sem `PUT`/`DELETE`** — lançamento é definitivo. **Pendente**: aba "Por mês" (`folha.service.ts` `listarPorMes`) ainda lê o `GET` como array puro — backend paginou esse endpoint (`GET .../folha/por-mes?mes=&ano=`) e isso vai quebrar a aba; não corrigido ainda, ver seção 4 |
+| Concursos | `/admin/rh/concursos` + `[id]` (anexos) | `padrao` (não `rh`!) | única exceção do grupo RH — segue a regra geral de MANAGER; bespoke paginado (admin + público), filtro via `GET .../filtro` (`numero`, `ano`, `descricao`, `dataAberturaInicial`, `dataAberturaFinal` — sem `status`); anexos por concurso continuam array simples (não paginado, é sub-listagem naturalmente pequena) |
+| Convênios | `/admin/convenios` | `obras-repasses` | multipart (`dto`+`pdf`); bespoke paginado, filtro via `GET .../filtro` (`numero`, `convenente`, `dataAssinaturaInicial`, `dataAssinaturaFinal`) — não confundir com o módulo público de Convênios (Transferências/Acordos), que é outro recurso e já estava correto |
 | Emendas Parlamentares | `/admin/emendas-parlamentares` | `obras-repasses` | JSON paginado, filtro por tipo OU ano (não combinável) |
-| Obras Públicas | `/admin/obras` + `/admin/obras/[id]` (Medições/Anexos/ART) | `obras-repasses`, **exceto ART = `padrao`** | campos calculados da obra (`totalMedicao`, `saldoObra` etc.) dependem do módulo Licitações (contratos), ainda não implementado — ficam em 0/negativo até lá, não é bug |
-| Licitações (Licitação + Contratos + Aditivos) | `/admin/licitacoes` + `/admin/licitacoes/[id]` (Documentos/Contratos) + `/admin/licitacoes/contratos/[contratoId]` (Documento/Aditivos) | `licitacoes` | 3 níveis (licitação → contrato → aditivo/documento); editar/excluir Contrato na própria aba; Aditivo edita com reenvio opcional de PDF; RBAC combinada: editar é `MANAGER`, excluir é admin-only (`licitacoes` fora do `EDITAR_ADMIN_ONLY`, dentro do `EXCLUIR_ADMIN_ONLY` em `permissoes.ts`); status/tipo de procedimento vêm do backend como texto (não a chave do enum) — `enumMapping.ts` reverte pra popular `<select>` de edição e colorir o Badge. **Licitação não tem mais `DELETE`** (exigência do TCE, preserva sequência/histórico) — troca por `PATCH .../visibilidade` (ocultar/mostrar da consulta pública, admin-only, botão com ícone de olho); toda licitação tem `numeroSequencial` (nº oficial do TCE, mostrado em destaque na lista e no detalhe) e `visivel`; filtro `visivel` em `/buscar` é admin-only (403 pra MANAGER) — só aparece na UI pra quem é `ROLE_ADMINISTRATOR` (`FiltroLicitacaoAdmin`, separado do `FiltroLicitacao` público de propósito) |
+| Obras Públicas | `/admin/obras` + `/admin/obras/[id]` (Medições/Anexos/ART) | `obras-repasses`, **exceto ART = `padrao`** | campos calculados da obra (`totalMedicao`, `saldoObra` etc.) dependem do módulo Licitações (contratos), ainda não implementado — ficam em 0/negativo até lá, não é bug. Bespoke paginado (admin + público), filtro via `GET .../filtro` (`numero`, `status`, `tipo`, `unidadeId`, `fornecedorId`, `paralisada`) — público migrou de "sem paginação"/filtro em memória pra filtro real no backend; Medições/Anexos/ART continuam array simples (sub-recurso pequeno, sem paginação) |
+| Licitações (Licitação + Contratos + Aditivos) | `/admin/licitacoes` + `/admin/licitacoes/[id]` (Documentos/Contratos) + `/admin/licitacoes/contratos/[contratoId]` (Documento/Aditivos) | `licitacoes` | 3 níveis (licitação → contrato → aditivo/documento); editar/excluir Contrato na própria aba; Aditivo edita com reenvio opcional de PDF; RBAC combinada: editar é `MANAGER`, excluir é admin-only (`licitacoes` fora do `EDITAR_ADMIN_ONLY`, dentro do `EXCLUIR_ADMIN_ONLY` em `permissoes.ts`); status/tipo de procedimento vêm do backend como texto (não a chave do enum) — `enumMapping.ts` reverte pra popular `<select>` de edição e colorir o Badge. **Licitação não tem mais `DELETE`** (exigência do TCE, preserva sequência/histórico) — troca por `PATCH .../visibilidade` (ocultar/mostrar da consulta pública, admin-only, botão com ícone de olho); toda licitação tem `numeroSequencial` (nº oficial do TCE, mostrado em destaque na lista e no detalhe) e `visivel`; filtro `visivel` em `/buscar` é admin-only (403 pra MANAGER) — só aparece na UI pra quem é `ROLE_ADMINISTRATOR` (`FiltroLicitacaoAdmin`, separado do `FiltroLicitacao` público de propósito). `GET /licitacoes/contratos/aditivos` (listagem por contrato) também virou sempre paginado — como aditivos por contrato são poucos, o service só pede uma página grande (`size: 100`) e devolve `.content`, sem UI de paginação |
 | Diário Oficial — Configuração | `/admin/diario-oficial/config` | `diario-oficial` | singleton multipart; **brasão e logo são partes obrigatórias sempre** — não tem como editar só texto sem reenviar as duas imagens (backend, não é bug do front) |
 | Diário Oficial — Publicações | `/admin/diario-oficial/publicacoes` (fila paginada com filtro por status + criar) + `/admin/diario-oficial/publicacoes/[id]` (status + timeline de logs + aprovar/rejeitar/retomar) | `diario-oficial` | pipeline assíncrono real (validação → composição do documento oficial com cabeçalho/rodapé/QR code → aguarda aprovação humana → assinatura digital ICP-Brasil de verdade via DSS → publica → indexa no Meilisearch); página de detalhe faz polling a cada 3s enquanto o processamento automático está rodando; existe um job de reconciliação no backend que retoma sozinho solicitações travadas há +15min — já vimos ele falhar de verdade numa fixture por não conseguir alcançar o TSA externo (freetsa.org) a partir do ambiente local, não é bug do front |
 | Anticorrupção (Empresas em Dívida Ativa + Empresas Inidôneas/Suspensas) | `/admin/anticorrupcao/empresas-divida-ativa` (CRUD completo) + `/admin/anticorrupcao/empresas-inidoneas` (CRUD completo) | `anticorrupcao` (admin-only edit/exclude) | bespoke paginado (`usePageableResource`, filtro via `GET .../filtro` com `nome`/`razaoSocial`/`cnpj` ou `empresa`/`cnpj`/`status` + `dataInicial`/`dataFinal`), multipart `dados`+`pdf` (pdf sempre opcional, nome da parte é `pdf`, não `arquivo`); aparece na sidebar mesclado na categoria "Fiscal e Orçamentário" (mesma UI da Renúncia Fiscal), mas o grupo de permissão é `anticorrupcao`, não `fiscal-orcamentario` — só a categoria visual é compartilhada |
@@ -130,6 +130,63 @@ atualizado e testado contra elas):
 - Fiscal de Contratos continua sem vínculo (FK) com Contrato/Licitação — é um cadastro de
   documento avulso genérico (`{descricao, data, caminhoArquivo}`), apesar do nome sugerir que
   seria ligado a um contrato específico. Só vira trabalho se virar requisito de produto.
+
+## 2.1 Rodada de paginação em massa (2026-07-23) — em andamento
+
+O backend rodou uma auditoria grande e adicionou paginação/filtro em ~12 módulos que antes
+devolviam `List` inteira, além de mudanças pontuais em Licitações e Diário Oficial (changelog
+completo recebido do agente do backend, resumido aqui). Cada `GET` afetado passou de array puro
+(`[...]`) pra `Page<T>` (`{content, totalElements, totalPages, number, size, ...}`) — qualquer
+tela que lia a resposta como array quebra (`.length`/`.map` num objeto não bate, geralmente sem
+erro visível: a tela só fica sem tabela nem mensagem de vazio).
+
+**Já corrigido e testado nesta sessão** (commits a seguir neste log): e-SIC Formulários,
+Fornecedor, Unidade, Convênio (admin), Obra Pública (admin + público), Aditivo de Contrato
+(admin + público), Concurso (admin + público), Usuários (admin) — ver observações de cada um na
+tabela de módulos acima.
+
+**Bug crítico encontrado e corrigido no meio do caminho**: `src/modules/auth/auth.service.ts`
+(`detectarPapeisEId`) descobre se quem logou é admin chamando `usuariosService.listar()` e
+testando se a chamada teve sucesso (só admin pode listar usuários) — e fazia `.find(...)` direto
+no retorno esperando um array. Como `GET /api/admin/users` também virou `Page<T>`, `.find` falhava
+(`Page` não tem `.find`), a exceção caía no `catch` e **todo login de admin era silenciosamente
+rebaixado pra permissão de Gerente** (perdia botões de editar/excluir em qualquer grupo
+admin-only, tela `/admin` mostrava "Gerente" pro usuário admin). Corrigido pra ler `pagina.content`
+com `size: 500`. Se em algum teste futuro os botões de admin sumirem sem motivo aparente, checar
+esse arquivo primeiro.
+
+**Ainda pendente** (não corrigido, próxima sessão deve começar por aqui):
+- **Folha de Pagamento — aba "Por mês"** (`src/modules/recursos-humanos/folha.service.ts`
+  `listarPorMes`, consumida em `AbaPorMes` dentro de
+  `src/app/admin/(painel)/rh/folha/page.tsx`): `GET .../folha/por-mes?mes=&ano=` também virou
+  paginado, sem filtro novo (só ganhou paginação). Precisa desembrulhar `.content` — como
+  `mes`/`ano` já são obrigatórios, não precisa de UI de paginação, só pedir `size` grande (padrão
+  já usado: `{ size: 200 }`) igual foi feito com Aditivo de Contrato.
+- **Relatório de Gestão Fiscal e Relatório de Execução Orçamentária**
+  (`src/modules/gestao-fiscal/gestaoFiscal.service.ts`, consumidos via `useAsyncData` em
+  `RelatoriosGestaoFiscalListView`/`RelatoriosExecucaoOrcamentariaListView`): só existe consumo
+  público (não achei CRUD admin pra esses dois — pode já existir em outro lugar não localizado,
+  ou ainda não foi implementado). Confirmar com `curl` se o backend realmente pagina esses dois
+  GETs antes de mexer (não confirmado ainda nesta sessão) e, se sim, portar pro padrão
+  `usePageableResource` como os outros públicos (`useObras`, `useConcursos`).
+- **Diário Oficial — dois endpoints novos, sem breaking change, só feature faltando**:
+  - `DELETE /api/edicoes/publicacoes/{id}` (admin-only) — remove uma solicitação da fila; só
+    aceita se status for `FALHOU` ou `PUBLICADO` (bloqueia se estiver em processamento ativo ou
+    aguardando aprovação). Adicionar botão "Excluir" na tela de detalhe
+    (`/admin/diario-oficial/publicacoes/[id]`), condicionado a esses dois status.
+  - `DELETE /api/edicoes/{numero}` (admin-only) — apaga edição já publicada (registro + PDF +
+    índice no Meilisearch). Adicionar em algum ponto da tela de publicações (a decidir onde faz
+    mais sentido na UI — não existe tela de "edições publicadas" separada hoje, só a fila).
+
+**Confirmado que NÃO precisa de ação**: `GET /api/licitacoes` (bare, sem filtro) foi removido pelo
+backend, mas nenhum arquivo do frontend chamava esse path — tanto o service público quanto o
+admin já usavam `GET /licitacoes/buscar` (`Page<LicitacaoResumo>` + `usePageableResource`) desde
+antes desta rodada.
+
+Ver também a pegadinha de sandbox sobre páginas públicas com `<Suspense>` travando na ferramenta
+de preview (seção 4) — isso limitou a verificação visual do lado público de Obras/Concursos nesta
+sessão; a correção foi validada por leitura de código + `tsc`/`eslint` limpos + teste do lado
+admin (mesmo hook, mesmo padrão de service).
 
 ## 3. Como decidir o padrão de um módulo novo
 
@@ -228,6 +285,17 @@ projeto (ex: no scratchpad da sessão), senão a resolução de módulo não enc
   travadas há mais de ~15min — pode mexer em dados de teste/fixture sem você ter feito nada (já
   vimos isso mudar o status de uma licitação de teste no meio de uma sessão). Não é bug seu, mas
   pode confundir se você não souber que existe.
+- **Páginas públicas que usam `<Suspense>` envolvendo um client component com
+  `usePageableResource`/`useAsyncData`** (ex.: `/obras`, `/licitacoes`, `/avisos`) **travam pra
+  sempre no fallback do Suspense** quando abertas pela ferramenta de preview (Claude Browser) —
+  confirmado em 3 rotas diferentes, inclusive páginas nunca tocadas na sessão, com bundle correto
+  (`NEXT_PUBLIC_USE_MOCK` compilado certo, código do serviço/mock presente) e zero erro no
+  console/servidor mesmo depois de reiniciar o dev server e esperar 10s+. Páginas públicas sem
+  esse padrão (ex.: `/transparencia`) carregam normal. É uma limitação da ferramenta de preview
+  neste sandbox, não um bug do app — telas **admin** equivalentes (que são `'use client'` direto
+  na página, sem `<Suspense>`) funcionam normalmente na mesma ferramenta. Pra validar mudança em
+  view pública com esse padrão, confie na leitura do código + `tsc`/`eslint` limpos e na
+  verificação do lado admin (mesmo hook, mesmo service) em vez de insistir no preview.
 
 ### Testando no navegador via ferramenta de preview (Claude Browser)
 

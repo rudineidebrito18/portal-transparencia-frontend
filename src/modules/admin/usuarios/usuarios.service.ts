@@ -1,11 +1,14 @@
 import { api } from '@/services/api'
+import { Page } from '@/modules/shared/types/Page'
 import { AlterarRoleRequest, CriarUsuarioRequest, UsuarioAdmin } from './types'
 
 const BASE = '/admin/users'
 
+type ListarParams = { page?: number; size?: number; sort?: string }
+
 export const usuariosService = {
-  listar(): Promise<UsuarioAdmin[]> {
-    return api.get<UsuarioAdmin[]>(BASE).then(r => r.data)
+  listar(params: ListarParams = {}): Promise<Page<UsuarioAdmin>> {
+    return api.get<Page<UsuarioAdmin>>(BASE, { params }).then(r => r.data)
   },
 
   criar(dados: CriarUsuarioRequest): Promise<UsuarioAdmin> {

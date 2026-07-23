@@ -1,17 +1,19 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useState } from 'react'
 import Link from 'next/link'
 
+import { usePageableResource } from '@/hooks/usePageableResource'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { unidadesService } from '@/modules/admin/geral/geral.service'
-import { Unidade, UnidadeRequest } from '@/modules/admin/geral/types'
+import { FiltroUnidade, Unidade, UnidadeRequest } from '@/modules/admin/geral/types'
 
 interface FormState {
   id: number | null
@@ -48,23 +50,18 @@ const FORM_VAZIO: FormState = {
 export default function UnidadesAdminPage() {
   const { usuario } = useAuth()
 
-  const [lista, setLista] = useState<Unidade[]>([])
-  const [busca, setBusca] = useState('')
-  const [vigencia, setVigencia] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
+  const [versao, setVersao] = useState(0)
+  const recarregar = () => setVersao(v => v + 1)
+  const fetchFunction = useCallback(
+    (params: FiltroUnidade & { page?: number; size?: number; sort?: string }) => unidadesService.listar(params),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [versao]
+  )
 
-  function carregar(nome?: string, vigenciaFiltro?: string) {
-    setLoading(true)
-    setErro(null)
-    unidadesService
-      .listar(nome || undefined, vigenciaFiltro || undefined)
-      .then(setLista)
-      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(() => carregar(), [])
+  const { data, loading, erro, pagina, totalPaginas, setPagina, filtros, setFiltros } = usePageableResource<
+    Unidade,
+    FiltroUnidade
+  >({ fetchFunction, initialSort: 'nome,asc' })
 
   const [form, setForm] = useState<FormState | null>(null)
   const [foto, setFoto] = useState<File | null>(null)
@@ -102,7 +99,7 @@ export default function UnidadesAdminPage() {
 
     try {
       await unidadesService.excluir(id)
-      carregar(busca, vigencia)
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
     }
@@ -136,7 +133,7 @@ export default function UnidadesAdminPage() {
 
       setForm(null)
       setFoto(null)
-      carregar(busca, vigencia)
+      recarregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
     } finally {
@@ -164,14 +161,8 @@ export default function UnidadesAdminPage() {
           <label className="block text-xs font-medium mb-1">Buscar por nome</label>
           <input
             placeholder="Buscar por nome..."
-            defaultValue={busca}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const valor = (e.target as HTMLInputElement).value
-                setBusca(valor)
-                carregar(valor, vigencia)
-              }
-            }}
+            defaultValue={filtros.nome ?? ''}
+            onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, nome: (e.target as HTMLInputElement).value || undefined }) }}
             className="border border-border/30 rounded-lg px-3 py-2 text-sm w-full md:w-80"
           />
         </div>
@@ -179,20 +170,14 @@ export default function UnidadesAdminPage() {
           <label className="block text-xs font-medium mb-1">Vigente em</label>
           <input
             type="date"
-            value={vigencia}
-            onChange={e => {
-              setVigencia(e.target.value)
-              carregar(busca, e.target.value)
-            }}
+            value={filtros.vigencia ?? ''}
+            onChange={e => setFiltros({ ...filtros, vigencia: e.target.value || undefined })}
             className="border border-border/30 rounded-lg px-3 py-2 text-sm"
           />
         </div>
-        {vigencia && (
+        {filtros.vigencia && (
           <button
-            onClick={() => {
-              setVigencia('')
-              carregar(busca, '')
-            }}
+            onClick={() => setFiltros({ ...filtros, vigencia: undefined })}
             className="text-sm text-primary hover:underline pb-2"
           >
             Limpar filtro de vigência
@@ -367,9 +352,9 @@ export default function UnidadesAdminPage() {
 
       {loading && <Skeleton className="h-40" />}
       {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhuma unidade encontrada." />}
+      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhuma unidade encontrada." />}
 
-      {!loading && !erro && lista.length > 0 && (
+      {!loading && !erro && data.length > 0 && (
         <Card className="overflow-x-auto" hoverable={false}>
           <table className="w-full text-sm">
             <thead className="bg-neutral-light text-left">
@@ -381,7 +366,7 @@ export default function UnidadesAdminPage() {
               </tr>
             </thead>
             <tbody>
-              {lista.map(u => (
+              {data.map(u => (
                 <tr key={u.id} className="border-t border-border/20">
                   <td className="p-3 font-semibold">{u.nome}</td>
                   <td className="p-3">
@@ -416,6 +401,8 @@ export default function UnidadesAdminPage() {
           </table>
         </Card>
       )}
+
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

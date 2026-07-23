@@ -45,11 +45,13 @@ export const contratoService = {
       .then(response => response.data)
   },
 
+  // Backend agora sempre pagina esse GET — pedimos uma página grande porque
+  // aditivos de um contrato são naturalmente poucos, não vale a pena paginar a UI.
   listarAditivos(contratoId: number): Promise<Aditivo[]> {
     if (USE_MOCK) return contratoMock.listarAditivos(contratoId)
 
     return api
-      .get<Aditivo[]>('/licitacoes/contratos/aditivos', { params: { contratoLicitacaoId: contratoId } })
-      .then(response => response.data)
+      .get<Page<Aditivo>>('/licitacoes/contratos/aditivos', { params: { contratoLicitacaoId: contratoId, size: 100 } })
+      .then(response => response.data.content)
   }
 }

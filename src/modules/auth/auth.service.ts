@@ -16,8 +16,8 @@ export function login(credenciais: LoginRequest): Promise<LoginResponse> {
 // "alterar role"/"excluir" na própria linha em /admin/usuarios.
 export async function detectarPapeisEId(email: string): Promise<{ roles: Papel[]; id: number | null }> {
   try {
-    const usuarios = await usuariosService.listar()
-    const proprio = usuarios.find(u => u.email === email)
+    const pagina = await usuariosService.listar({ size: 500 })
+    const proprio = pagina.content.find(u => u.email === email)
     return { roles: ['ROLE_ADMINISTRATOR'], id: proprio?.id ?? null }
   } catch {
     return { roles: ['ROLE_MANAGER'], id: null }

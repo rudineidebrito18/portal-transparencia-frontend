@@ -1,6 +1,7 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
-import { ObraPublica, StatusObra, TipoObra } from '../types'
+import { Page } from '@/modules/shared/types/Page'
+import { FiltroObraPublica, ObraPublica, StatusObra, TipoObra } from '../types'
 
 const OBJETOS = [
   'Pavimentação asfáltica de vias urbanas',
@@ -65,8 +66,30 @@ function gerarObra(id: number): ObraPublica {
 
 const OBRAS = Array.from({ length: 18 }, (_, i) => gerarObra(i + 1))
 
+type ListarParams = FiltroObraPublica & { page?: number; size?: number; sort?: string }
+
 export const obraMock = {
-  async listar(): Promise<ObraPublica[]> {
-    return OBRAS
+  async listar(params: ListarParams): Promise<Page<ObraPublica>> {
+    const { page = 0, size = 10, numero, status, tipo, unidadeId, fornecedorId, paralisada } = params
+
+    let dados = OBRAS
+    if (numero) dados = dados.filter(o => o.numero === numero)
+    if (status) dados = dados.filter(o => o.status === status)
+    if (tipo) dados = dados.filter(o => o.tipo === tipo)
+    if (unidadeId) dados = dados.filter(o => o.unidadeId === unidadeId)
+    if (fornecedorId) dados = dados.filter(o => o.fornecedorId === fornecedorId)
+    if (paralisada !== undefined) dados = dados.filter(o => o.paralisada === paralisada)
+
+    const totalElements = dados.length
+    const totalPages = Math.max(1, Math.ceil(totalElements / size))
+    const content = dados.slice(page * size, page * size + size)
+
+    return {
+      content,
+      totalElements,
+      totalPages,
+      number: page,
+      size
+    }
   }
 }

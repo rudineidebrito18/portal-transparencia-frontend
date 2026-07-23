@@ -39,8 +39,9 @@ export default function OuvidoriaConfigAdminPage() {
     setLoading(true)
     setErro(null)
 
-    Promise.all([ouvidoriaInfoService.buscar(), unidadesService.listar()])
-      .then(([info, listaUnidades]) => {
+    Promise.all([ouvidoriaInfoService.buscar(), unidadesService.listar({ size: 200, sort: 'nome,asc' })])
+      .then(([info, paginaUnidades]) => {
+        const listaUnidades = paginaUnidades.content
         setUnidades(listaUnidades)
 
         if (!info) {

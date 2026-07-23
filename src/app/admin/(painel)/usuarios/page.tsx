@@ -1,9 +1,11 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useState } from 'react'
 
+import { usePageableResource } from '@/hooks/usePageableResource'
 import Card from '@/components/ui/Card'
 import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import Badge from '@/components/ui/Badge'
 import { useAuth } from '@/modules/auth/AuthContext'
@@ -17,25 +19,22 @@ const FORM_VAZIO = { email: '', password: '', role: 'ROLE_MANAGER' as Papel }
 export default function UsuariosPage() {
   const { usuario } = useAuth()
 
-  const [lista, setLista] = useState<UsuarioAdmin[]>([])
-  const [loading, setLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
+  const [versao, setVersao] = useState(0)
+  const recarregar = () => setVersao(v => v + 1)
+  const fetchFunction = useCallback(
+    (params: { page?: number; size?: number; sort?: string }) => usuariosService.listar(params),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [versao]
+  )
+
+  const { data, loading, erro, pagina, totalPaginas, setPagina } = usePageableResource<UsuarioAdmin>({
+    fetchFunction,
+    initialSort: 'email,asc'
+  })
 
   const [form, setForm] = useState(FORM_VAZIO)
   const [criando, setCriando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
-
-  function carregar() {
-    setLoading(true)
-    setErro(null)
-    usuariosService
-      .listar()
-      .then(setLista)
-      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar usuários'))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(carregar, [])
 
   if (!isAdministrador(usuario)) {
     return <ErrorState title="Acesso restrito" message="Apenas administradores podem gerenciar usuários." />
@@ -49,7 +48,7 @@ export default function UsuariosPage() {
     try {
       await usuariosService.criar(form)
       setForm(FORM_VAZIO)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao criar usuário')
     } finally {
@@ -60,7 +59,7 @@ export default function UsuariosPage() {
   async function handleAlterarRole(u: UsuarioAdmin, novaRole: Papel) {
     try {
       await usuariosService.alterarRole(u.id, { role: novaRole })
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao alterar papel')
     }
@@ -71,7 +70,7 @@ export default function UsuariosPage() {
 
     try {
       await usuariosService.desativar(u.id)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao desativar usuário')
     }
@@ -80,7 +79,7 @@ export default function UsuariosPage() {
   async function handleReativar(u: UsuarioAdmin) {
     try {
       await usuariosService.reativar(u.id)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao reativar usuário')
     }
@@ -149,7 +148,7 @@ export default function UsuariosPage() {
               </tr>
             </thead>
             <tbody>
-              {lista.map(u => {
+              {data.map(u => {
                 const propriaConta = u.id === usuario?.id
                 return (
                   <tr key={u.id} className="border-t border-border/20">
@@ -200,6 +199,8 @@ export default function UsuariosPage() {
           </table>
         </Card>
       )}
+
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

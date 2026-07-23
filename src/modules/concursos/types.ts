@@ -12,6 +12,14 @@ export interface Concurso {
   resumo: string
 }
 
+export interface FiltroConcurso {
+  numero?: number
+  ano?: number
+  descricao?: string
+  dataAberturaInicial?: string
+  dataAberturaFinal?: string
+}
+
 export interface AnexoConcurso {
   id: number
   descricao: string

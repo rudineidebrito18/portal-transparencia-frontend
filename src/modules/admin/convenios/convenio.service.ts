@@ -1,7 +1,10 @@
 import { api } from '@/services/api'
-import { Convenio, ConvenioRequest } from './types'
+import { Page } from '@/modules/shared/types/Page'
+import { Convenio, ConvenioRequest, FiltroConvenio } from './types'
 
 const BASE = '/convenios'
+
+type ListarParams = FiltroConvenio & { page?: number; size?: number; sort?: string }
 
 // Nomes de parte diferentes do padrão genérico ("dto"+"pdf", não "dados"+"arquivo") —
 // confirmado no controller real (ConvenioController).
@@ -13,8 +16,8 @@ function montarFormData(dados: ConvenioRequest, pdf?: File | null): FormData {
 }
 
 export const convenioService = {
-  listar(): Promise<Convenio[]> {
-    return api.get<Convenio[]>(BASE).then(r => r.data)
+  listar(params: ListarParams): Promise<Page<Convenio>> {
+    return api.get<Page<Convenio>>(`${BASE}/filtro`, { params }).then(r => r.data)
   },
 
   criar(dados: ConvenioRequest, pdf?: File | null): Promise<Convenio> {

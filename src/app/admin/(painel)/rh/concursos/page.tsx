@@ -1,16 +1,18 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useState } from 'react'
 import Link from 'next/link'
 
+import { usePageableResource } from '@/hooks/usePageableResource'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { concursoService } from '@/modules/admin/rh/concurso.service'
-import { Concurso, ConcursoRequest } from '@/modules/admin/rh/types'
+import { Concurso, ConcursoRequest, FiltroConcurso } from '@/modules/admin/rh/types'
 
 interface FormState {
   id: number | null
@@ -40,21 +42,18 @@ const FORM_VAZIO: FormState = {
 export default function ConcursosAdminPage() {
   const { usuario } = useAuth()
 
-  const [lista, setLista] = useState<Concurso[]>([])
-  const [loading, setLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
+  const [versao, setVersao] = useState(0)
+  const recarregar = () => setVersao(v => v + 1)
+  const fetchFunction = useCallback(
+    (params: FiltroConcurso & { page?: number; size?: number; sort?: string }) => concursoService.listar(params),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [versao]
+  )
 
-  function carregar() {
-    setLoading(true)
-    setErro(null)
-    concursoService
-      .listar()
-      .then(setLista)
-      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(carregar, [])
+  const { data, loading, erro, pagina, totalPaginas, setPagina, filtros, setFiltros } = usePageableResource<
+    Concurso,
+    FiltroConcurso
+  >({ fetchFunction, initialSort: 'dataAbertura,desc' })
 
   const [form, setForm] = useState<FormState | null>(null)
   const [salvando, setSalvando] = useState(false)
@@ -75,7 +74,7 @@ export default function ConcursosAdminPage() {
 
     try {
       await concursoService.excluir(id)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
     }
@@ -99,7 +98,7 @@ export default function ConcursosAdminPage() {
       }
 
       setForm(null)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
     } finally {
@@ -121,6 +120,47 @@ export default function ConcursosAdminPage() {
           </button>
         )}
       </div>
+
+      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+        <input
+          type="number"
+          placeholder="Número..."
+          defaultValue={filtros.numero ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, numero: Number((e.target as HTMLInputElement).value) || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm w-32"
+        />
+        <input
+          type="number"
+          placeholder="Ano..."
+          defaultValue={filtros.ano ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, ano: Number((e.target as HTMLInputElement).value) || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm w-32"
+        />
+        <input
+          placeholder="Descrição..."
+          defaultValue={filtros.descricao ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, descricao: (e.target as HTMLInputElement).value || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        />
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-text-secondary/60">Abertura de:</span>
+          <input
+            type="date"
+            value={filtros.dataAberturaInicial ?? ''}
+            onChange={e => setFiltros({ ...filtros, dataAberturaInicial: e.target.value || undefined })}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-text-secondary/60">até:</span>
+          <input
+            type="date"
+            value={filtros.dataAberturaFinal ?? ''}
+            onChange={e => setFiltros({ ...filtros, dataAberturaFinal: e.target.value || undefined })}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+      </Card>
 
       {form && (
         <Card className="p-4" hoverable={false}>
@@ -242,9 +282,9 @@ export default function ConcursosAdminPage() {
 
       {loading && <Skeleton className="h-40" />}
       {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum concurso encontrado." />}
+      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhum concurso encontrado." />}
 
-      {!loading && !erro && lista.length > 0 && (
+      {!loading && !erro && data.length > 0 && (
         <Card className="overflow-x-auto" hoverable={false}>
           <table className="w-full text-sm">
             <thead className="bg-neutral-light text-left">
@@ -257,7 +297,7 @@ export default function ConcursosAdminPage() {
               </tr>
             </thead>
             <tbody>
-              {lista.map(c => (
+              {data.map(c => (
                 <tr key={c.id} className="border-t border-border/20">
                   <td className="p-3 font-semibold">{c.descricao}</td>
                   <td className="p-3">{c.numero}/{c.ano}</td>
@@ -284,6 +324,8 @@ export default function ConcursosAdminPage() {
           </table>
         </Card>
       )}
+
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

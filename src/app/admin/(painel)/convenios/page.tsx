@@ -1,15 +1,17 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useState } from 'react'
 
+import { usePageableResource } from '@/hooks/usePageableResource'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { convenioService } from '@/modules/admin/convenios/convenio.service'
-import { Convenio, ConvenioRequest } from '@/modules/admin/convenios/types'
+import { Convenio, ConvenioRequest, FiltroConvenio } from '@/modules/admin/convenios/types'
 
 interface FormState {
   id: number | null
@@ -46,21 +48,18 @@ function formatarMoeda(valor: number) {
 export default function ConveniosAdminPage() {
   const { usuario } = useAuth()
 
-  const [lista, setLista] = useState<Convenio[]>([])
-  const [loading, setLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
+  const [versao, setVersao] = useState(0)
+  const recarregar = () => setVersao(v => v + 1)
+  const fetchFunction = useCallback(
+    (params: FiltroConvenio & { page?: number; size?: number; sort?: string }) => convenioService.listar(params),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [versao]
+  )
 
-  function carregar() {
-    setLoading(true)
-    setErro(null)
-    convenioService
-      .listar()
-      .then(setLista)
-      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(carregar, [])
+  const { data, loading, erro, pagina, totalPaginas, setPagina, filtros, setFiltros } = usePageableResource<
+    Convenio,
+    FiltroConvenio
+  >({ fetchFunction, initialSort: 'dataAssinatura,desc' })
 
   const [form, setForm] = useState<FormState | null>(null)
   const [pdf, setPdf] = useState<File | null>(null)
@@ -96,7 +95,7 @@ export default function ConveniosAdminPage() {
 
     try {
       await convenioService.excluir(id)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
     }
@@ -120,7 +119,7 @@ export default function ConveniosAdminPage() {
       }
       setForm(null)
       setPdf(null)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
     } finally {
@@ -142,6 +141,40 @@ export default function ConveniosAdminPage() {
           </button>
         )}
       </div>
+
+      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+        <input
+          type="number"
+          placeholder="Número..."
+          defaultValue={filtros.numero ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, numero: Number((e.target as HTMLInputElement).value) || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm w-32"
+        />
+        <input
+          placeholder="Convenente..."
+          defaultValue={filtros.convenente ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, convenente: (e.target as HTMLInputElement).value || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        />
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-text-secondary/60">Assinado de:</span>
+          <input
+            type="date"
+            value={filtros.dataAssinaturaInicial ?? ''}
+            onChange={e => setFiltros({ ...filtros, dataAssinaturaInicial: e.target.value || undefined })}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-text-secondary/60">até:</span>
+          <input
+            type="date"
+            value={filtros.dataAssinaturaFinal ?? ''}
+            onChange={e => setFiltros({ ...filtros, dataAssinaturaFinal: e.target.value || undefined })}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+      </Card>
 
       {form && (
         <Card className="p-4" hoverable={false}>
@@ -304,9 +337,9 @@ export default function ConveniosAdminPage() {
 
       {loading && <Skeleton className="h-40" />}
       {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum convênio encontrado." />}
+      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhum convênio encontrado." />}
 
-      {!loading && !erro && lista.length > 0 && (
+      {!loading && !erro && data.length > 0 && (
         <Card className="overflow-x-auto" hoverable={false}>
           <table className="w-full text-sm">
             <thead className="bg-neutral-light text-left">
@@ -320,7 +353,7 @@ export default function ConveniosAdminPage() {
               </tr>
             </thead>
             <tbody>
-              {lista.map(c => (
+              {data.map(c => (
                 <tr key={c.id} className="border-t border-border/20">
                   <td className="p-3 font-semibold">{c.numero}</td>
                   <td className="p-3">{c.convenente}</td>
@@ -353,6 +386,8 @@ export default function ConveniosAdminPage() {
           </table>
         </Card>
       )}
+
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

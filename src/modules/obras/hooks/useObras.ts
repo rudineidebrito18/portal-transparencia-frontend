@@ -1,8 +1,13 @@
 'use client'
 
-import { useAsyncData } from '@/hooks/useAsyncData'
+import { usePageableResource } from '@/hooks/usePageableResource'
 import { obraService } from '../obra.service'
+import { FiltroObraPublica, ObraPublica } from '../types'
 
 export function useObras() {
-  return useAsyncData(() => obraService.listar(), [], [])
+  return usePageableResource<ObraPublica, FiltroObraPublica>({
+    fetchFunction: obraService.listar,
+    initialSort: 'numero,desc',
+    size: 10
+  })
 }

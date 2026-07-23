@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { Page } from '@/modules/shared/types/Page'
 import { Aditivo } from '@/modules/contratos/types'
 import { AditivoRequest } from './types'
 
@@ -24,8 +25,12 @@ export const aditivoService = {
       .then(r => r.data)
   },
 
+  // Backend agora sempre pagina esse GET — pedimos uma página grande porque
+  // aditivos de um contrato são naturalmente poucos, não vale a pena paginar a UI.
   listarPorContrato(contratoLicitacaoId: number): Promise<Aditivo[]> {
-    return api.get<Aditivo[]>(BASE, { params: { contratoLicitacaoId } }).then(r => r.data)
+    return api
+      .get<Page<Aditivo>>(BASE, { params: { contratoLicitacaoId, size: 100 } })
+      .then(r => r.data.content)
   },
 
   excluir(id: number): Promise<void> {

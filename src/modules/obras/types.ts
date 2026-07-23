@@ -62,3 +62,12 @@ export interface ObraPublica {
   percentualObra: number
   percentualFinanceiro: number
 }
+
+export interface FiltroObraPublica {
+  numero?: number
+  status?: StatusObra
+  tipo?: TipoObra
+  unidadeId?: number
+  fornecedorId?: number
+  paralisada?: boolean
+}

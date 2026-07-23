@@ -1,6 +1,6 @@
-import { ObraPublica, TipoObra, StatusObra } from '@/modules/obras/types'
+import { FiltroObraPublica, ObraPublica, TipoObra, StatusObra } from '@/modules/obras/types'
 
-export type { ObraPublica }
+export type { ObraPublica, FiltroObraPublica }
 export { TipoObra, StatusObra, TipoObraDescricao, StatusObraDescricao, StatusObraStyle } from '@/modules/obras/types'
 
 export interface ObraRequest {

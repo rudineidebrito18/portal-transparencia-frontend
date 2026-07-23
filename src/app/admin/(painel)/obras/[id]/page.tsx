@@ -83,7 +83,7 @@ export default function ObraDetalheAdminPage() {
 
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
   useEffect(() => {
-    fornecedoresService.listar().then(setFornecedores).catch(() => {})
+    fornecedoresService.listar({ size: 200, sort: 'nome,asc' }).then(p => setFornecedores(p.content)).catch(() => {})
   }, [])
 
   if (loading) return <Skeleton className="h-64" />

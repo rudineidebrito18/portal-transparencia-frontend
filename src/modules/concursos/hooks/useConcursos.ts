@@ -1,8 +1,13 @@
 'use client'
 
-import { useAsyncData } from '@/hooks/useAsyncData'
+import { usePageableResource } from '@/hooks/usePageableResource'
 import { concursoService } from '../concurso.service'
+import { Concurso, FiltroConcurso } from '../types'
 
 export function useConcursos() {
-  return useAsyncData(() => concursoService.listar(), [], [])
+  return usePageableResource<Concurso, FiltroConcurso>({
+    fetchFunction: concursoService.listar,
+    initialSort: 'dataAbertura,desc',
+    size: 10
+  })
 }
