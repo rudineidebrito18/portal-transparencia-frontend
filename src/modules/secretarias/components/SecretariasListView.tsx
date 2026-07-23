@@ -63,6 +63,7 @@ export default function SecretariasListView() {
         loading={loading}
         erro={erro}
         emptyMessage="Nenhuma secretaria encontrada."
+        gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         renderItem={unidade => <SecretariaCard key={unidade.id} unidade={unidade} />}
       />
     </div>

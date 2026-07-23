@@ -32,13 +32,49 @@ já está implementada seguindo os padrões da seção 3. Itens sem `href` no hu
 (endpoint ainda não existe no backend ou não foi priorizado — não é esquecimento).
 
 Módulos com padrão bespoke (fogem do CRUD genérico, vale saber antes de mexer):
-- `/obras` — sem filtro/paginação no backend; "Obras Paralisadas" filtra client-side.
+- `/obras` — bespoke paginado (`usePageableResource`), filtro real via `GET /obras/filtro`
+  (`numero`, `status`, `tipo`, `unidadeId`, `fornecedorId`, `paralisada`); aba "Paralisadas"
+  virou filtro de verdade, não mais client-side.
 - `/licitacoes`, `/contratos`, `/servidores` — detalhe em Server Component (`[id]/page.tsx`
   async, `notFound()` + `not-found.tsx`), não hook client-side.
 - `/secretarias` + `/secretarias/[id]` — lista client-side com busca/filtro de vigência via
   `useUrlState`; detalhe é Server Component que faz 6 chamadas em paralelo (unidade + 5
   sub-recursos: decretos, documentos tipados, ex-gestores, ordenadores, setores) porque o
-  backend não agrega isso na resposta da unidade.
+  backend não agrega isso na resposta da unidade. Detalhe reorganizado em abas (Informações
+  do Órgão / Ex-Gestores / Ordenadores / Setores / Decretos, via `useUrlState` — mesmo padrão
+  pill-button de `GestaoFiscalView.tsx`), com os 3 documentos tipados (Termo/EDTC/Declaração
+  E-SIC) como botões de download acima das abas (desabilitado com "não disponível" se aquele
+  tipo não foi cadastrado). Card da lista (`SecretariaCard.tsx`) mostra e-mail/telefone/
+  horário/endereço com ícone em vez de atribuições truncadas, com CTA "Mais informações".
+  Selo de "gestor verificado" é só o ícone `MdVerified` verde, sem texto
+  (`SelinhoVerificado.tsx`, reaproveitado no card e no detalhe) — só no site público, o
+  badge de texto do admin não foi mexido (fora do escopo pedido). Grid da lista em 3 colunas
+  (`sm:grid-cols-2 lg:grid-cols-3`) via novo prop `gridClassName` em `AsyncList` (default
+  inalterado, não afeta as outras páginas públicas que usam o componente). **`[id]/loading.tsx`
+  novo fez o Next.js envolver a rota num `<Suspense>` implícito — reproduziu a pegadinha de
+  Suspense-trava-no-preview (ver abaixo) numa rota que antes não tinha esse problema
+  (Server Component sem Suspense explícito antes); confirmado correto via `curl` direto no
+  servidor (HTML final com o conteúdo certo), não via preview.** **Bug real encontrado pelo
+  usuário no navegador de verdade (não a pegadinha de preview)**: `secretariasService.listar()`
+  (público) nunca tinha sido migrado quando a paginação de `GET /geral/unidades` foi
+  corrigida no admin, mais cedo nesta mesma sessão — ficou esquecido por não estar na lista
+  de módulos daquela rodada. Quebrava com `data.map is not a function` assim que alguém
+  abria `/secretarias` de verdade. Corrigido do mesmo jeito que os outros casos "sem UI de
+  paginação": pede `size: 200` e usa só `.content`. Os 5 sub-recursos (decretos, documentos,
+  ex-gestores, ordenadores, setores) seguem array puro, não foram afetados (confirmado via
+  `curl` direto no backend). **Foto do gestor trocada de `<img>` puro pra `next/image`**
+  (`SecretariaCard.tsx`, `SecretariaDetalhe.tsx`) — usuário reportou "qualidade baixa" na
+  foto; investigação confirmou que não é downgrade no upload (`FileStorageServiceImpl.salvar`
+  no backend só faz `Files.copy()`, sem nenhuma lib de imagem — o arquivo original é salvo e
+  servido sem alteração), é o front pedindo pro navegador espremer um JPEG de ~9.3MB/
+  4912×7360px num avatar de 40–96px via CSS puro. `next/image` funciona direto com a URL
+  relativa (`/api/geral/unidades/{id}/foto`) porque `next.config.ts` já reescreve `/api/*`
+  pro backend — não precisou configurar `images.remotePatterns`. Confirmado via `curl` no
+  endpoint `/_next/image`: mesma foto cai pra ~11KB/256×384 já otimizada. Esse é o primeiro
+  uso de `next/image` no projeto (resto do site usa `<img>` cru, warning do eslint
+  `@next/next/no-img-element` aceito/ignorado nos outros lugares) — se o mesmo problema
+  aparecer no card de outros módulos (Obras, Fornecedor etc.) ou na tela de detalhe do admin
+  de Unidades, o mesmo padrão serve.
 - `/estrutura-organizacional`, `/organograma`, `/diarias-legislacao` — PDF estático via
   `PdfViewer`, sem backend (`/test.pdf` placeholder).
 - `/diario-oficial` — fluxo de publicação mais simples (busca com filtros); o site público só
@@ -287,6 +323,12 @@ projeto (ex: no scratchpad da sessão), senão a resolução de módulo não enc
   na página, sem `<Suspense>`) funcionam normalmente na mesma ferramenta. Pra validar mudança em
   view pública com esse padrão, confie na leitura do código + `tsc`/`eslint` limpos e na
   verificação do lado admin (mesmo hook, mesmo service) em vez de insistir no preview.
+  **Também acontece com Server Components puros** se a rota ganhar um `loading.tsx` — Next.js
+  passa a envolver a página num `<Suspense>` implícito mesmo sem nenhum client component
+  fazendo fetch (confirmado em `/secretarias/[id]` depois de adicionar `[id]/loading.tsx`,
+  rota que antes renderizava sem problema). Nesse caso, `curl` direto no servidor (sem passar
+  pela ferramenta de preview) mostra o HTML final correto — use isso pra validar em vez do
+  navegador quando a rota trava no fallback.
 
 ### Testando no navegador via ferramenta de preview (Claude Browser)
 

@@ -12,6 +12,7 @@ interface Props<T> {
   emptyMessage: string
   skeletonCount?: number
   skeletonClassName?: string
+  gridClassName?: string
 }
 
 export default function AsyncList<T>({
@@ -21,11 +22,12 @@ export default function AsyncList<T>({
   renderItem,
   emptyMessage,
   skeletonCount = 4,
-  skeletonClassName = 'h-24'
+  skeletonClassName = 'h-24',
+  gridClassName = 'grid gap-4'
 }: Props<T>) {
   if (loading) {
     return (
-      <div className="grid gap-4">
+      <div className={gridClassName}>
         {Array.from({ length: skeletonCount }).map((_, i) => (
           <Skeleton key={i} className={skeletonClassName} />
         ))}
@@ -37,5 +39,5 @@ export default function AsyncList<T>({
 
   if (data.length === 0) return <EmptyState message={emptyMessage} />
 
-  return <div className="grid gap-4">{data.map(renderItem)}</div>
+  return <div className={gridClassName}>{data.map(renderItem)}</div>
 }
