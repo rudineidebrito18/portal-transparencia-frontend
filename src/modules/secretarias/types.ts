@@ -15,6 +15,11 @@ export interface Unidade {
   dataFim: string | null
 }
 
+export interface FiltroSecretaria {
+  nome?: string
+  vigencia?: string
+}
+
 export interface Decreto {
   id: number
   descricao: string
