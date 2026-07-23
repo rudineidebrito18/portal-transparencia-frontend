@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import ErrorState from '@/components/ui/ErrorState'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
-import { podeCriar } from '@/modules/auth/permissoes'
+import { podeCriar, podeExcluir } from '@/modules/auth/permissoes'
 import EmptyState from '@/components/ui/EmptyState'
 import { publicacaoService } from '@/modules/admin/diario-oficial/publicacao.service'
 import {
@@ -34,6 +34,7 @@ function formatarDataHora(data?: string) {
 
 export default function PublicacaoDetalheAdminPage() {
   const { usuario } = useAuth()
+  const router = useRouter()
   const params = useParams<{ id: string }>()
   const id = Number(params.id)
 
@@ -111,6 +112,37 @@ export default function PublicacaoDetalheAdminPage() {
     } catch (e: unknown) {
       setErroAcao(e instanceof Error ? e.message : 'Erro ao retomar')
     } finally {
+      setProcessando(false)
+    }
+  }
+
+  async function excluirDaFila() {
+    if (!confirm('Excluir esta solicitação da fila? Essa ação não pode ser desfeita.')) return
+
+    setProcessando(true)
+    setErroAcao(null)
+    try {
+      await publicacaoService.excluir(id)
+      router.push('/admin/diario-oficial/publicacoes')
+    } catch (e: unknown) {
+      setErroAcao(e instanceof Error ? e.message : 'Erro ao excluir')
+      setProcessando(false)
+    }
+  }
+
+  async function excluirEdicaoPublicada() {
+    if (!solicitacao) return
+    if (!confirm(
+      `Excluir a Edição ${solicitacao.numeroEdicao} publicada? Isso apaga o PDF e o registro de verdade — diferente de excluir da fila. Essa ação não pode ser desfeita.`
+    )) return
+
+    setProcessando(true)
+    setErroAcao(null)
+    try {
+      await publicacaoService.excluirEdicaoPublicada(solicitacao.numeroEdicao)
+      router.push('/admin/diario-oficial/publicacoes')
+    } catch (e: unknown) {
+      setErroAcao(e instanceof Error ? e.message : 'Erro ao excluir a edição publicada')
       setProcessando(false)
     }
   }
@@ -240,6 +272,35 @@ export default function PublicacaoDetalheAdminPage() {
             {processando ? 'Processando...' : 'Retomar processamento'}
           </button>
           {erroAcao && <ErrorState message={erroAcao} />}
+        </Card>
+      )}
+
+      {podeExcluir(usuario, 'diario-oficial') &&
+        (solicitacao.status === StatusPublicacaoDiario.FALHOU || solicitacao.status === StatusPublicacaoDiario.PUBLICADO) && (
+        <Card className="p-4 space-y-3 border-l-4 border-error" hoverable={false}>
+          <p className="text-sm font-semibold">Excluir (admin)</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={excluirDaFila}
+              disabled={processando}
+              className="px-4 py-2 rounded-lg border border-error text-error text-sm font-semibold hover:bg-error/10 transition-all disabled:opacity-60"
+            >
+              Excluir da fila
+            </button>
+            {solicitacao.status === StatusPublicacaoDiario.PUBLICADO && (
+              <button
+                onClick={excluirEdicaoPublicada}
+                disabled={processando}
+                className="px-4 py-2 rounded-lg bg-error text-white text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-60"
+              >
+                Excluir edição publicada
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-text-secondary/60">
+            &quot;Excluir da fila&quot; só remove essa solicitação da lista de processamento.
+            &quot;Excluir edição publicada&quot; apaga o PDF e o registro de verdade — não pode ser desfeito.
+          </p>
         </Card>
       )}
 

@@ -48,5 +48,17 @@ export const publicacaoService = {
 
   retomar(id: number): Promise<SolicitacaoPublicacao> {
     return api.post<SolicitacaoPublicacao>(`${BASE}/${id}/retomar`).then(r => r.data)
+  },
+
+  // Admin-only. Só aceita se a solicitação estiver FALHOU ou PUBLICADO — bloqueia se
+  // estiver em qualquer etapa ativa de processamento ou aguardando aprovação humana.
+  excluir(id: number): Promise<void> {
+    return api.delete(`${BASE}/${id}`).then(() => undefined)
+  },
+
+  // Admin-only. Apaga a edição já publicada de verdade (registro + PDF físico + índice
+  // no Meilisearch) — diferente de excluir(), que só tira a solicitação da fila.
+  excluirEdicaoPublicada(numeroEdicao: number): Promise<void> {
+    return api.delete(`/edicoes/${numeroEdicao}`).then(() => undefined)
   }
 }

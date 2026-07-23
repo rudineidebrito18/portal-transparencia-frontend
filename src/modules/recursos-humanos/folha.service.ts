@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { Page } from '@/modules/shared/types/Page'
 import { folhaMock } from './mocks/folha.mock'
 import { FolhaPagamento, FolhaPagamentoServidor } from './types'
 
@@ -13,11 +14,13 @@ export const folhaService = {
       .then(response => response.data)
   },
 
+  // Backend agora pagina esse GET — pedimos uma página grande porque o hook consumidor
+  // (useFolhaPorMes) soma o total da folha do mês inteiro e pagina em memória.
   listarPorMes(mes: number, ano: number): Promise<FolhaPagamentoServidor[]> {
     if (USE_MOCK) return folhaMock.listarPorMes(mes, ano)
 
     return api
-      .get<FolhaPagamentoServidor[]>('/recursos-humanos/folha/por-mes', { params: { mes, ano } })
-      .then(response => response.data)
+      .get<Page<FolhaPagamentoServidor>>('/recursos-humanos/folha/por-mes', { params: { mes, ano, size: 1000 } })
+      .then(response => response.data.content)
   }
 }

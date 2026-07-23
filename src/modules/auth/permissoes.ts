@@ -50,7 +50,8 @@ const EXCLUIR_ADMIN_ONLY: Set<GrupoModulo> = new Set([
   'obras-repasses',
   'rh',
   'esic-ouvidoria',
-  'usuarios'
+  'usuarios',
+  'diario-oficial'
 ])
 
 export function podeCriar(usuario: Usuario | null, grupo: GrupoModulo): boolean {
