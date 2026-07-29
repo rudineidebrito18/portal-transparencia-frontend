@@ -1,5 +1,6 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
+import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Page } from '@/modules/shared/types/Page'
 import {
   EmpresaDividaAtiva,
@@ -11,14 +12,6 @@ import {
   RelatorioExecucaoOrcamentaria,
   RelatorioGestaoFiscal
 } from '../types'
-
-function paginar<T>(dados: T[], page = 0, size = 10): Page<T> {
-  const totalElements = dados.length
-  const totalPages = Math.max(1, Math.ceil(totalElements / size))
-  const content = dados.slice(page * size, page * size + size)
-
-  return { content, totalElements, totalPages, number: page, size }
-}
 
 function gerarEmpresasDividaAtiva(): EmpresaDividaAtiva[] {
   faker.seed(501)
@@ -109,7 +102,7 @@ type ListarParams<F> = F & { page?: number; size?: number; sort?: string }
 
 export const gestaoFiscalMock = {
   async listarEmpresasDividaAtiva(params: ListarParams<FiltroEmpresaDividaAtiva>): Promise<Page<EmpresaDividaAtiva>> {
-    const { page, size, nome, razaoSocial, cnpj, dataInicial, dataFinal } = params
+    const { page, size, sort, nome, razaoSocial, cnpj, dataInicial, dataFinal } = params
 
     let dados = gerarEmpresasDividaAtiva()
     if (nome) dados = dados.filter(e => e.nome.toLowerCase().includes(nome.toLowerCase()))
@@ -118,11 +111,16 @@ export const gestaoFiscalMock = {
     if (dataInicial) dados = dados.filter(e => e.data >= dataInicial)
     if (dataFinal) dados = dados.filter(e => e.data <= dataFinal)
 
-    return paginar(dados, page, size)
+    const ordenados = ordenar(
+      dados as unknown as Record<string, unknown>[],
+      sort ?? 'data,desc'
+    ) as unknown as EmpresaDividaAtiva[]
+
+    return paginar(ordenados, page, size)
   },
 
   async listarEmpresasInidoneas(params: ListarParams<FiltroEmpresaInidonea>): Promise<Page<EmpresaInidonea>> {
-    const { page, size, empresa, cnpj, status, dataInicial, dataFinal } = params
+    const { page, size, sort, empresa, cnpj, status, dataInicial, dataFinal } = params
 
     let dados = gerarEmpresasInidoneas()
     if (empresa) dados = dados.filter(e => e.empresa.toLowerCase().includes(empresa.toLowerCase()))
@@ -131,27 +129,42 @@ export const gestaoFiscalMock = {
     if (dataInicial) dados = dados.filter(e => e.data >= dataInicial)
     if (dataFinal) dados = dados.filter(e => e.data <= dataFinal)
 
-    return paginar(dados, page, size)
+    const ordenados = ordenar(
+      dados as unknown as Record<string, unknown>[],
+      sort ?? 'data,desc'
+    ) as unknown as EmpresaInidonea[]
+
+    return paginar(ordenados, page, size)
   },
 
   async listarRelatoriosExecucaoOrcamentaria(params: ListarParams<FiltroRelatorioExecucaoOrcamentaria>): Promise<Page<RelatorioExecucaoOrcamentaria>> {
-    const { page, size, ano, bimestre, descricao } = params
+    const { page, size, sort, ano, bimestre, descricao } = params
 
     let dados = gerarRelatoriosExecucaoOrcamentaria()
     if (ano) dados = dados.filter(r => r.ano === ano)
     if (bimestre) dados = dados.filter(r => r.bimestre === bimestre)
     if (descricao) dados = dados.filter(r => r.descricao.toLowerCase().includes(descricao.toLowerCase()))
 
-    return paginar(dados, page, size)
+    const ordenados = ordenar(
+      dados as unknown as Record<string, unknown>[],
+      sort ?? 'ano,desc'
+    ) as unknown as RelatorioExecucaoOrcamentaria[]
+
+    return paginar(ordenados, page, size)
   },
 
   async listarRelatoriosGestaoFiscal(params: ListarParams<FiltroRelatorioGestaoFiscal>): Promise<Page<RelatorioGestaoFiscal>> {
-    const { page, size, ano, periodo } = params
+    const { page, size, sort, ano, periodo } = params
 
     let dados = gerarRelatoriosGestaoFiscal()
     if (ano) dados = dados.filter(r => r.ano === ano)
     if (periodo) dados = dados.filter(r => r.periodo.toLowerCase().includes(periodo.toLowerCase()))
 
-    return paginar(dados, page, size)
+    const ordenados = ordenar(
+      dados as unknown as Record<string, unknown>[],
+      sort ?? 'ano,desc'
+    ) as unknown as RelatorioGestaoFiscal[]
+
+    return paginar(ordenados, page, size)
   }
 }

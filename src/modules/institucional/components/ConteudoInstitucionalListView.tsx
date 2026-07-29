@@ -1,5 +1,7 @@
 'use client'
 
+import { MdSwapVert } from 'react-icons/md'
+
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
@@ -13,7 +15,10 @@ interface Props {
   erro: string | null
   pagina: number
   totalPaginas: number
+  totalElements: number
   setPagina: (pagina: number) => void
+  ordenacao: string
+  setOrdenacao: (ordenacao: string) => void
   variant: 'noticia' | 'aviso'
   emptyMessage: string
 }
@@ -24,7 +29,10 @@ export default function ConteudoInstitucionalListView({
   erro,
   pagina,
   totalPaginas,
+  totalElements,
   setPagina,
+  ordenacao,
+  setOrdenacao,
   variant,
   emptyMessage
 }: Props) {
@@ -45,6 +53,31 @@ export default function ConteudoInstitucionalListView({
 
   return (
     <div className="space-y-6">
+
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
+        <span className="text-sm text-text-secondary">
+          <strong className="text-primary">{totalElements}</strong>{' '}
+          {variant === 'aviso' ? 'avisos encontrados' : 'notícias encontradas'}
+        </span>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-text-secondary text-sm">
+            <MdSwapVert />
+            Ordenar
+          </div>
+
+          <select
+            value={ordenacao || 'data,desc'}
+            onChange={(e) => setOrdenacao(e.target.value)}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none"
+          >
+            <option value="data,desc">Mais recentes</option>
+            <option value="data,asc">Mais antigos</option>
+            <option value="titulo,asc">Título (A-Z)</option>
+          </select>
+        </div>
+      </div>
 
       <div className="grid gap-4">
         {data.length > 0 ? (

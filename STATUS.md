@@ -291,6 +291,27 @@ reais:
 
 Não fica pendência de "auditar o resto" pra próxima sessão — já foi feito.
 
+**Complemento — header "N encontrados + Ordenar" (mesmo dia)**: `usePageableResource`
+sempre devolveu `totalElements`/`ordenacao`/`setOrdenacao`, mas nem todo `*ListView.tsx`
+renderizava esse header (só `DocumentoGenericoListPanel.tsx`, Diárias, Licitações,
+Servidores, Tabela de Valores e Contratos já tinham). Adicionado nos que faltavam:
+Concursos, Obras, os 4 itens de Gestão Fiscal, Avisos/Notícias (precisou passar
+`totalElements`/`ordenacao`/`setOrdenacao` como prop nova em
+`ConteudoInstitucionalListView.tsx`, compartilhado pelos dois) e o `<select>` de
+ordenação em Emendas Parlamentares (que já tinha a contagem, só faltava o dropdown).
+Sem mudança de tipo/service/backend — é só UI consumindo dado que o hook já calculava.
+
+**Bug real encontrado pelo usuário nessa mesma rodada**: `obra.mock.ts` e
+`concurso.mock.ts` (migrados pra `usePageableResource` mais cedo hoje) filtravam e
+paginavam mas **ignoravam completamente o parâmetro `sort`** — o `<select>` de Ordenar
+não fazia nada em dev (`NEXT_PUBLIC_USE_MOCK=true`), só contra o backend real. O
+`gestaoFiscal.mock.ts` novo copiou esse mesmo padrão quebrado. Existe um helper
+compartilhado pra isso desde antes (`ordenar()`/`paginar()` em
+`src/modules/shared/mocks/mockUtils.ts`, já usado certo em `institucional.mock.ts` e
+`emendaParlamentar.mock.ts`) — os 3 mocks quebrados foram migrados pra usá-lo. Vale
+conferir qualquer mock novo/futuro que pagine em memória usa esse helper em vez de
+reimplementar paginação na mão sem ordenar.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

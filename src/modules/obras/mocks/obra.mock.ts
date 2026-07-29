@@ -1,5 +1,6 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
+import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Page } from '@/modules/shared/types/Page'
 import { FiltroObraPublica, ObraPublica, StatusObra, TipoObra } from '../types'
 
@@ -70,7 +71,7 @@ type ListarParams = FiltroObraPublica & { page?: number; size?: number; sort?: s
 
 export const obraMock = {
   async listar(params: ListarParams): Promise<Page<ObraPublica>> {
-    const { page = 0, size = 10, numero, status, tipo, unidadeId, fornecedorId, paralisada } = params
+    const { page = 0, size = 10, sort, numero, status, tipo, unidadeId, fornecedorId, paralisada } = params
 
     let dados = OBRAS
     if (numero) dados = dados.filter(o => o.numero === numero)
@@ -80,16 +81,11 @@ export const obraMock = {
     if (fornecedorId) dados = dados.filter(o => o.fornecedorId === fornecedorId)
     if (paralisada !== undefined) dados = dados.filter(o => o.paralisada === paralisada)
 
-    const totalElements = dados.length
-    const totalPages = Math.max(1, Math.ceil(totalElements / size))
-    const content = dados.slice(page * size, page * size + size)
+    const ordenados = ordenar(
+      dados as unknown as Record<string, unknown>[],
+      sort ?? 'numero,desc'
+    ) as unknown as ObraPublica[]
 
-    return {
-      content,
-      totalElements,
-      totalPages,
-      number: page,
-      size
-    }
+    return paginar(ordenados, page, size)
   }
 }

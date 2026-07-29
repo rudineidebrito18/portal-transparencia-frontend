@@ -1,5 +1,7 @@
 'use client'
 
+import { MdSwapVert } from 'react-icons/md'
+
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
@@ -18,7 +20,9 @@ export default function EmendaParlamentarListView() {
     totalElements,
     setPagina,
     filtros,
-    setFiltros
+    setFiltros,
+    ordenacao,
+    setOrdenacao
   } = useEmendasParlamentares()
 
   return (
@@ -28,10 +32,28 @@ export default function EmendaParlamentarListView() {
       <EmendaParlamentarFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
 
       {/* HEADER */}
-      <div className="flex items-center justify-between bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> resultados encontrados
         </span>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-text-secondary text-sm">
+            <MdSwapVert />
+            Ordenar
+          </div>
+
+          <select
+            value={ordenacao || 'dataPublicacao,desc'}
+            onChange={(e) => setOrdenacao(e.target.value)}
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none"
+          >
+            <option value="dataPublicacao,desc">Mais recentes</option>
+            <option value="dataPublicacao,asc">Mais antigas</option>
+            <option value="valorRepassado,desc">Maior valor repassado</option>
+            <option value="valorRepassado,asc">Menor valor repassado</option>
+          </select>
+        </div>
       </div>
 
       {/* ERRO */}

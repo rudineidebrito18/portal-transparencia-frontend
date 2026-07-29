@@ -1,7 +1,7 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
 import { Page } from '@/modules/shared/types/Page'
-import { criarErroNaoEncontrado } from '@/modules/shared/mocks/mockUtils'
+import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { AnexoConcurso, Concurso, FiltroConcurso } from '../types'
 
 const RESUMOS = [
@@ -52,7 +52,7 @@ type ListarParams = FiltroConcurso & { page?: number; size?: number; sort?: stri
 
 export const concursoMock = {
   async listar(params: ListarParams): Promise<Page<Concurso>> {
-    const { page = 0, size = 10, numero, ano, descricao, dataAberturaInicial, dataAberturaFinal } = params
+    const { page = 0, size = 10, sort, numero, ano, descricao, dataAberturaInicial, dataAberturaFinal } = params
 
     let dados = CONCURSOS
     if (numero) dados = dados.filter(c => c.numero === numero)
@@ -61,11 +61,12 @@ export const concursoMock = {
     if (dataAberturaInicial) dados = dados.filter(c => c.dataAbertura >= dataAberturaInicial)
     if (dataAberturaFinal) dados = dados.filter(c => c.dataAbertura <= dataAberturaFinal)
 
-    const totalElements = dados.length
-    const totalPages = Math.max(1, Math.ceil(totalElements / size))
-    const content = dados.slice(page * size, page * size + size)
+    const ordenados = ordenar(
+      dados as unknown as Record<string, unknown>[],
+      sort ?? 'dataAbertura,desc'
+    ) as unknown as Concurso[]
 
-    return { content, totalElements, totalPages, number: page, size }
+    return paginar(ordenados, page, size)
   },
 
   async listarAnexos(concursoId: number): Promise<AnexoConcurso[]> {
