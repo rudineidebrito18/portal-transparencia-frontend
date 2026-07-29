@@ -279,9 +279,12 @@ reais:
 - **`/cargos`** — `GET /recursos-humanos/cargos` não tem parâmetro nenhum, nem paginação
   (lacuna nova, descoberta nesta auditoria) — adicionado como 3ª seção no mesmo arquivo de
   pedido de backend.
-- **`/folha-pagamento`** — só filtra por `mes`/`ano` no backend, e a tela já expõe esse
-  seletor (não é `FiltroCard`, mas já usa a única dimensão de filtro disponível); não
-  virou pedido de backend por ser baixo valor (não bloqueia nada).
+- **`/folha-pagamento`** — só filtra por `mes`/`ano` no backend; a tela já expunha esse
+  seletor mas fora do padrão visual — `FolhaPagamentoMesView.tsx` migrado pro `FiltroCard`
+  (mês/ano continuam aplicando na hora, sem botão Aplicar — não é um filtro opcional tipo
+  busca, é sempre um período selecionado; ganhou botão "Voltar pro mês atual" em vez de um
+  Limpar tradicional). Não virou pedido de backend por ser baixo valor (não bloqueia nada,
+  já usa a única dimensão de filtro que existe).
 - `/esic`, `/ouvidoria` são páginas de informação (objeto único), filtro não se aplica;
   `/diarias-legislacao`, `/estrutura-organizacional`, `/organograma`, `/faq`, `/lgpd` são
   estáticas, sem backend.

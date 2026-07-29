@@ -1,11 +1,12 @@
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { MdGroups, MdPayments } from 'react-icons/md'
+import { MdGroups, MdPayments, MdRestartAlt } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import FiltroCard from '@/components/ui/FiltroCard'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarMoeda } from '@/utils/currency'
@@ -52,11 +53,14 @@ export default function FolhaPagamentoMesView() {
   const inputClass =
     "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
 
+  const filtrosAtivosCount = mes !== mesAtual || ano !== anoAtual ? 1 : 0
+
   return (
     <div className="space-y-6">
 
       {/* FILTROS */}
-      <div className="bg-white border border-border/30 rounded-2xl shadow-sm p-6">
+      <FiltroCard subtituloPadrao={`Exibindo ${nomeMes(mesAtual)} de ${anoAtual}`} filtrosAtivosCount={filtrosAtivosCount}>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
           <div>
@@ -90,7 +94,18 @@ export default function FolhaPagamentoMesView() {
           </div>
 
         </div>
-      </div>
+
+        <div className="flex items-center justify-end mt-6 pt-4 border-t border-border/20">
+          <button
+            onClick={() => atualizarUrl({ mes: undefined, ano: undefined, page: undefined })}
+            className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
+          >
+            <MdRestartAlt />
+            Voltar pro mês atual
+          </button>
+        </div>
+
+      </FiltroCard>
 
       {/* ERRO */}
       {erro && <ErrorState message={erro} />}
