@@ -38,6 +38,14 @@ Módulos com padrão bespoke (fogem do CRUD genérico, vale saber antes de mexer
 - `/concursos` — bespoke paginado (`usePageableResource`), filtro real via `GET
   /concursos/filtro` (`numero`, `ano`, `descricao`, `dataAberturaInicial`,
   `dataAberturaFinal`), `ConcursoFiltro.tsx` no padrão `FiltroCard`.
+- `/gestao-fiscal` — segue com abas client-side (`GestaoFiscalView.tsx`, `useUrlState`,
+  usuário pediu explicitamente pra manter assim em vez de virar 5 rotas). As 4 abas que
+  não tinham filtro (Execução Orçamentária, RGF, Empresas em Dívida Ativa, Empresas
+  Inidôneas/Suspensas) viraram bespoke paginado de verdade, filtro via `GET
+  /gestao-fiscal/{recurso}/filtro` (cada uma com seu próprio `*Filtro.tsx` no padrão
+  `FiltroCard`) — antes pediam `size: 500` fixo e devolviam array puro, sem paginação nem
+  filtro nenhum. A 5ª aba (Renúncia Fiscal) já tinha filtro desde a migração pro
+  `FiltroCard` (Grupo B).
 - `/licitacoes`, `/contratos`, `/servidores` — detalhe em Server Component (`[id]/page.tsx`
   async, `notFound()` + `not-found.tsx`), não hook client-side.
 - `/secretarias` + `/secretarias/[id]` — lista client-side com busca/filtro de vigência via
@@ -113,7 +121,7 @@ sidebar junto no scroll.
 | E-SIC — Formulários recebidos | `/admin/esic/formularios` | `esic-ouvidoria` | somente leitura; bespoke paginado, filtro via `GET .../filtro` (`tipoSolicitacao`, `nome`, `email`, `dataInicial`, `dataFinal`) — `GET .../tipo` foi removido pelo backend, não usar mais |
 | Ouvidoria — Configuração | `/admin/ouvidoria/config` | `esic-ouvidoria` | singleton; **sem tela de formulários recebidos** — backend não expõe listagem pra esse recurso |
 | Servidores, Cargos, Diárias | `/admin/rh/{servidores,cargos,diarias}` | `rh` | bespoke paginado (servidores/diárias) ou lista simples (cargos) |
-| Folha de Pagamento | `/admin/rh/folha` | `rh` | **sem `PUT`/`DELETE`** — lançamento é definitivo. **Pendente**: aba "Por mês" (`folha.service.ts` `listarPorMes`) ainda lê o `GET` como array puro — backend paginou esse endpoint (`GET .../folha/por-mes?mes=&ano=`) e isso vai quebrar a aba; não corrigido ainda, ver seção 4 |
+| Folha de Pagamento | `/admin/rh/folha` | `rh` | **sem `PUT`/`DELETE`** — lançamento é definitivo. Aba "Por mês" (`folha.service.ts` `listarPorMes`) já migrada pra `Page` (`GET .../folha/por-mes?mes=&ano=`, pede `size: 1000` e usa só `.content`, sem UI de paginação) |
 | Concursos | `/admin/rh/concursos` + `[id]` (anexos) | `padrao` (não `rh`!) | única exceção do grupo RH — segue a regra geral de MANAGER; bespoke paginado (admin + público), filtro via `GET .../filtro` (`numero`, `ano`, `descricao`, `dataAberturaInicial`, `dataAberturaFinal` — sem `status`); anexos por concurso continuam array simples (não paginado, é sub-listagem naturalmente pequena) |
 | Convênios | `/admin/convenios` | `obras-repasses` | multipart (`dto`+`pdf`); bespoke paginado, filtro via `GET .../filtro` (`numero`, `convenente`, `dataAssinaturaInicial`, `dataAssinaturaFinal`) — não confundir com o módulo público de Convênios (Transferências/Acordos), que é outro recurso e já estava correto |
 | Emendas Parlamentares | `/admin/emendas-parlamentares` | `obras-repasses` | JSON paginado, filtro por tipo OU ano (não combinável) |
@@ -251,6 +259,34 @@ devolve só "Secretaria de Educação"). Código revisado por leitura
 `secretariasService.listar`) sem nenhum bug encontrado. **Conclusão**: mais provável que o
 teste original tenha coincidido com os servidores caídos, não um bug de código — considerar
 resolvido a menos que o usuário confirme que ainda está quebrado num teste novo.
+
+## 2.3 Auditoria de filtro em todo o hub `/transparencia` (2026-07-24) — concluído
+
+Usuário pediu, além do item 1 da seção 2.2, filtro em **todos** os itens do hub
+`/transparencia` onde for possível — não só Gestão Fiscal. Fiz o levantamento completo
+(1 agente Explore cobrindo as ~50 combinações rota/aba alcançáveis a partir de
+`src/modules/transparencia/data/secoes.ts`) e cruzei os poucos casos sem filtro contra o
+backend real (`/v3/api-docs`). Resultado: quase tudo já estava filtrado (Licitações,
+Diárias, Servidores, Emendas, Obras, Concursos, Tabela de Valores, e todos os módulos de
+"documento genérico" — Convênios, Educação, Saúde, Recursos Humanos, Planejamento,
+Prestação de Contas, Legislação, Fiscal de Contrato, Renúncia Fiscal). As únicas lacunas
+reais:
+- **4 abas de Gestão Fiscal** (Execução Orçamentária, RGF, Empresas em Dívida Ativa,
+  Empresas Inidôneas/Suspensas) — backend tinha `/filtro` público pronto, só faltava a UI.
+  Implementado nesta rodada (ver item novo na seção 2, bespoke module list).
+- **`/contratos` e `/avisos`/`/noticias`** — sem suporte no backend, já cobertos pelo
+  pedido de backend da seção 2.2 (`prompt-backend-filtros-contratos-avisos.md`).
+- **`/cargos`** — `GET /recursos-humanos/cargos` não tem parâmetro nenhum, nem paginação
+  (lacuna nova, descoberta nesta auditoria) — adicionado como 3ª seção no mesmo arquivo de
+  pedido de backend.
+- **`/folha-pagamento`** — só filtra por `mes`/`ano` no backend, e a tela já expõe esse
+  seletor (não é `FiltroCard`, mas já usa a única dimensão de filtro disponível); não
+  virou pedido de backend por ser baixo valor (não bloqueia nada).
+- `/esic`, `/ouvidoria` são páginas de informação (objeto único), filtro não se aplica;
+  `/diarias-legislacao`, `/estrutura-organizacional`, `/organograma`, `/faq`, `/lgpd` são
+  estáticas, sem backend.
+
+Não fica pendência de "auditar o resto" pra próxima sessão — já foi feito.
 
 ## 3. Como decidir o padrão de um módulo novo
 

@@ -1,11 +1,24 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
+import { Page } from '@/modules/shared/types/Page'
 import {
   EmpresaDividaAtiva,
   EmpresaInidonea,
+  FiltroEmpresaDividaAtiva,
+  FiltroEmpresaInidonea,
+  FiltroRelatorioExecucaoOrcamentaria,
+  FiltroRelatorioGestaoFiscal,
   RelatorioExecucaoOrcamentaria,
   RelatorioGestaoFiscal
 } from '../types'
+
+function paginar<T>(dados: T[], page = 0, size = 10): Page<T> {
+  const totalElements = dados.length
+  const totalPages = Math.max(1, Math.ceil(totalElements / size))
+  const content = dados.slice(page * size, page * size + size)
+
+  return { content, totalElements, totalPages, number: page, size }
+}
 
 function gerarEmpresasDividaAtiva(): EmpresaDividaAtiva[] {
   faker.seed(501)
@@ -92,20 +105,53 @@ function gerarRelatoriosGestaoFiscal(): RelatorioGestaoFiscal[] {
   return registros.reverse()
 }
 
+type ListarParams<F> = F & { page?: number; size?: number; sort?: string }
+
 export const gestaoFiscalMock = {
-  async listarEmpresasDividaAtiva(): Promise<EmpresaDividaAtiva[]> {
-    return gerarEmpresasDividaAtiva()
+  async listarEmpresasDividaAtiva(params: ListarParams<FiltroEmpresaDividaAtiva>): Promise<Page<EmpresaDividaAtiva>> {
+    const { page, size, nome, razaoSocial, cnpj, dataInicial, dataFinal } = params
+
+    let dados = gerarEmpresasDividaAtiva()
+    if (nome) dados = dados.filter(e => e.nome.toLowerCase().includes(nome.toLowerCase()))
+    if (razaoSocial) dados = dados.filter(e => e.razaoSocial.toLowerCase().includes(razaoSocial.toLowerCase()))
+    if (cnpj) dados = dados.filter(e => e.cnpj.includes(cnpj))
+    if (dataInicial) dados = dados.filter(e => e.data >= dataInicial)
+    if (dataFinal) dados = dados.filter(e => e.data <= dataFinal)
+
+    return paginar(dados, page, size)
   },
 
-  async listarEmpresasInidoneas(): Promise<EmpresaInidonea[]> {
-    return gerarEmpresasInidoneas()
+  async listarEmpresasInidoneas(params: ListarParams<FiltroEmpresaInidonea>): Promise<Page<EmpresaInidonea>> {
+    const { page, size, empresa, cnpj, status, dataInicial, dataFinal } = params
+
+    let dados = gerarEmpresasInidoneas()
+    if (empresa) dados = dados.filter(e => e.empresa.toLowerCase().includes(empresa.toLowerCase()))
+    if (cnpj) dados = dados.filter(e => e.cnpj.includes(cnpj))
+    if (status) dados = dados.filter(e => e.status.toLowerCase().includes(status.toLowerCase()))
+    if (dataInicial) dados = dados.filter(e => e.data >= dataInicial)
+    if (dataFinal) dados = dados.filter(e => e.data <= dataFinal)
+
+    return paginar(dados, page, size)
   },
 
-  async listarRelatoriosExecucaoOrcamentaria(): Promise<RelatorioExecucaoOrcamentaria[]> {
-    return gerarRelatoriosExecucaoOrcamentaria()
+  async listarRelatoriosExecucaoOrcamentaria(params: ListarParams<FiltroRelatorioExecucaoOrcamentaria>): Promise<Page<RelatorioExecucaoOrcamentaria>> {
+    const { page, size, ano, bimestre, descricao } = params
+
+    let dados = gerarRelatoriosExecucaoOrcamentaria()
+    if (ano) dados = dados.filter(r => r.ano === ano)
+    if (bimestre) dados = dados.filter(r => r.bimestre === bimestre)
+    if (descricao) dados = dados.filter(r => r.descricao.toLowerCase().includes(descricao.toLowerCase()))
+
+    return paginar(dados, page, size)
   },
 
-  async listarRelatoriosGestaoFiscal(): Promise<RelatorioGestaoFiscal[]> {
-    return gerarRelatoriosGestaoFiscal()
+  async listarRelatoriosGestaoFiscal(params: ListarParams<FiltroRelatorioGestaoFiscal>): Promise<Page<RelatorioGestaoFiscal>> {
+    const { page, size, ano, periodo } = params
+
+    let dados = gerarRelatoriosGestaoFiscal()
+    if (ano) dados = dados.filter(r => r.ano === ano)
+    if (periodo) dados = dados.filter(r => r.periodo.toLowerCase().includes(periodo.toLowerCase()))
+
+    return paginar(dados, page, size)
   }
 }

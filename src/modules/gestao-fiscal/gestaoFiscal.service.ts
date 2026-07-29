@@ -4,44 +4,48 @@ import { gestaoFiscalMock } from './mocks/gestaoFiscal.mock'
 import {
   EmpresaDividaAtiva,
   EmpresaInidonea,
+  FiltroEmpresaDividaAtiva,
+  FiltroEmpresaInidonea,
+  FiltroRelatorioExecucaoOrcamentaria,
+  FiltroRelatorioGestaoFiscal,
   RelatorioExecucaoOrcamentaria,
   RelatorioGestaoFiscal
 } from './types'
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
-// Os 4 GETs abaixo agora são paginados no backend, mas nenhuma dessas telas públicas tem
-// UI de paginação (nem tinha antes) — pedimos uma página grande e devolvemos .content.
+type ListarParams<F> = F & { page?: number; size?: number; sort?: string }
+
 export const gestaoFiscalService = {
-  listarEmpresasDividaAtiva(): Promise<EmpresaDividaAtiva[]> {
-    if (USE_MOCK) return gestaoFiscalMock.listarEmpresasDividaAtiva()
+  listarEmpresasDividaAtiva(params: ListarParams<FiltroEmpresaDividaAtiva>): Promise<Page<EmpresaDividaAtiva>> {
+    if (USE_MOCK) return gestaoFiscalMock.listarEmpresasDividaAtiva(params)
 
     return api
-      .get<Page<EmpresaDividaAtiva>>('/gestao-fiscal/empresas-divida-ativa', { params: { size: 500 } })
-      .then(r => r.data.content)
+      .get<Page<EmpresaDividaAtiva>>('/gestao-fiscal/empresas-divida-ativa/filtro', { params })
+      .then(r => r.data)
   },
 
-  listarEmpresasInidoneas(): Promise<EmpresaInidonea[]> {
-    if (USE_MOCK) return gestaoFiscalMock.listarEmpresasInidoneas()
+  listarEmpresasInidoneas(params: ListarParams<FiltroEmpresaInidonea>): Promise<Page<EmpresaInidonea>> {
+    if (USE_MOCK) return gestaoFiscalMock.listarEmpresasInidoneas(params)
 
     return api
-      .get<Page<EmpresaInidonea>>('/gestao-fiscal/empresas-inidoneas', { params: { size: 500 } })
-      .then(r => r.data.content)
+      .get<Page<EmpresaInidonea>>('/gestao-fiscal/empresas-inidoneas/filtro', { params })
+      .then(r => r.data)
   },
 
-  listarRelatoriosExecucaoOrcamentaria(): Promise<RelatorioExecucaoOrcamentaria[]> {
-    if (USE_MOCK) return gestaoFiscalMock.listarRelatoriosExecucaoOrcamentaria()
+  listarRelatoriosExecucaoOrcamentaria(params: ListarParams<FiltroRelatorioExecucaoOrcamentaria>): Promise<Page<RelatorioExecucaoOrcamentaria>> {
+    if (USE_MOCK) return gestaoFiscalMock.listarRelatoriosExecucaoOrcamentaria(params)
 
     return api
-      .get<Page<RelatorioExecucaoOrcamentaria>>('/gestao-fiscal/relatorio-execucao-orcamentaria', { params: { size: 500 } })
-      .then(r => r.data.content)
+      .get<Page<RelatorioExecucaoOrcamentaria>>('/gestao-fiscal/relatorio-execucao-orcamentaria/filtro', { params })
+      .then(r => r.data)
   },
 
-  listarRelatoriosGestaoFiscal(): Promise<RelatorioGestaoFiscal[]> {
-    if (USE_MOCK) return gestaoFiscalMock.listarRelatoriosGestaoFiscal()
+  listarRelatoriosGestaoFiscal(params: ListarParams<FiltroRelatorioGestaoFiscal>): Promise<Page<RelatorioGestaoFiscal>> {
+    if (USE_MOCK) return gestaoFiscalMock.listarRelatoriosGestaoFiscal(params)
 
     return api
-      .get<Page<RelatorioGestaoFiscal>>('/gestao-fiscal/relatorios', { params: { size: 500 } })
-      .then(r => r.data.content)
+      .get<Page<RelatorioGestaoFiscal>>('/gestao-fiscal/relatorios/filtro', { params })
+      .then(r => r.data)
   }
 }
