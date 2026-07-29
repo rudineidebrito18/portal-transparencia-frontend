@@ -4,12 +4,15 @@ import AsyncList from '@/components/ui/AsyncList'
 import Pagination from '@/components/ui/Pagination'
 import { useConcursos } from '../hooks/useConcursos'
 import ConcursoCard from './ConcursoCard'
+import ConcursoFiltro from './ConcursoFiltro'
 
 export default function ConcursosListView() {
-  const { data, loading, erro, pagina, totalPaginas, setPagina } = useConcursos()
+  const { data, loading, erro, pagina, totalPaginas, setPagina, filtros, setFiltros } = useConcursos()
 
   return (
     <div>
+      <ConcursoFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
+
       <AsyncList
         data={data}
         loading={loading}

@@ -35,6 +35,9 @@ Módulos com padrão bespoke (fogem do CRUD genérico, vale saber antes de mexer
 - `/obras` — bespoke paginado (`usePageableResource`), filtro real via `GET /obras/filtro`
   (`numero`, `status`, `tipo`, `unidadeId`, `fornecedorId`, `paralisada`); aba "Paralisadas"
   virou filtro de verdade, não mais client-side.
+- `/concursos` — bespoke paginado (`usePageableResource`), filtro real via `GET
+  /concursos/filtro` (`numero`, `ano`, `descricao`, `dataAberturaInicial`,
+  `dataAberturaFinal`), `ConcursoFiltro.tsx` no padrão `FiltroCard`.
 - `/licitacoes`, `/contratos`, `/servidores` — detalhe em Server Component (`[id]/page.tsx`
   async, `notFound()` + `not-found.tsx`), não hook client-side.
 - `/secretarias` + `/secretarias/[id]` — lista client-side com busca/filtro de vigência via
@@ -213,45 +216,41 @@ lado admin (mesmo hook, mesmo padrão de service) sempre que existia um equivale
 
 Nenhuma pendência conhecida ficou aberta desta rodada.
 
-## 2.2 Pendências para a próxima sessão (2026-07-23, fim de dia)
+## 2.2 Filtros públicos + bug de Secretarias (2026-07-24) — concluído/atualizado
 
-Depois da rodada de paginação, a sessão seguiu pro redesign do módulo público de
-Secretarias (lista + detalhe em abas, foto otimizada com `next/image`, dropdown do header
-com secretarias reais, padronização do filtro/busca em `FiltroCard.tsx` — todos os commits
-do dia estão no `git log`). Ficou combinado continuar amanhã com:
+Continuação do dia seguinte à rodada de paginação + redesign de Secretarias. Duas
+pendências deixadas em aberto no fim daquela sessão, ambas fechadas nesta:
 
-**1. Adicionar filtro/busca nas telas públicas que hoje não têm nenhum** (`/contratos`,
-`/obras`, `/concursos`, `/avisos`, `/noticias`) — confirmado durante o levantamento desta
-sessão que nenhuma delas tem `*Filtro.tsx` hoje (Obras só tem as abas "Todas"/"Paralisadas";
-os outros quatro não têm filtro nem abas, só lista + paginação). Usar o padrão que acabou de
-virar convenção: componente `*Filtro.tsx` próprio (`valoresIniciais`/`onFiltrar`) envolto em
-`<FiltroCard subtituloPadrao="..." filtrosAtivosCount={N}>` (`src/components/ui/FiltroCard.tsx`)
-— ver qualquer um dos 8 já migrados (`EmendaParlamentarFiltro.tsx` é o exemplo mais simples,
-2 campos) como referência de estrutura. Precisa primeiro confirmar quais parâmetros de
-filtro cada endpoint já aceita (`curl .../v3/api-docs`) antes de desenhar os campos — Obras
-e Contratos já usam endpoints que aceitam filtro (`obraService`/`contratoService` no
-`src/modules/admin/*` já paginam e filtram do lado admin; conferir se o service **público**
-de cada um já expõe os mesmos parâmetros ou se só o admin foi migrado, mesmo tipo de gap que
-apareceu com Secretarias — ver item 2 abaixo).
+**1. Filtro/busca nas telas públicas que não tinham nenhum** (`/contratos`, `/obras`,
+`/concursos`, `/avisos`, `/noticias`) — levantamento (2 agentes em paralelo, backend real
+via `/v3/api-docs` + leitura de controller) mostrou que só Obras e Concursos já tinham
+suporte a filtro no backend; Contratos e Avisos/Notícias não têm parâmetro de filtro
+nenhum além de paginação (e `ativo`, no caso de Avisos/Notícias).
+- **Obras e Concursos**: implementados de verdade — `ObraFiltro.tsx` (Número, Status, Tipo,
+  Unidade, Fornecedor, "Só paralisadas", substituindo as abas antigas) e
+  `ConcursoFiltro.tsx` (Número, Ano, Descrição, Abertura início/fim), ambos no padrão
+  `FiltroCard`. Precisou criar `src/modules/fornecedores/` (novo módulo público mínimo,
+  `fornecedor.service.ts`) porque só existia o service admin de Fornecedor — o GET já é
+  `permitAll()` no backend (`SecurityConfiguration.java`), confirmado via `curl` sem token.
+- **Contratos e Avisos/Notícias**: sem suporte no backend — não construí UI de filtro que
+  finge funcionar. Pedido de backend documentado em
+  `prompt-backend-filtros-contratos-avisos.md` (scratchpad da sessão, pra relay ao time de
+  backend): generalizar o filtro de Contrato (hoje só escopado por `licitacaoId`) pra
+  listagem global + trocar datas `equals` por intervalo; adicionar `titulo`+intervalo de
+  data em Avisos/Notícias (controllers idênticos, um DTO serve os dois). Nota à parte
+  incluída no pedido: `StatusLicitacao` real do backend tem mais valores do que o mapa de
+  exibição hardcoded do frontend (`src/modules/contratos/status.ts`) — rótulo errado pra
+  parte dos contratos, não bloqueante.
 
-**2. Bug relatado: filtro de `/secretarias` "não está funcionando"** — usuário reportou no
-fim do dia, sem detalhar o sintoma exato ainda. Diagnóstico feito até aqui, sem conseguir
-reproduzir/confirmar a causa:
-- Backend confirmado filtrando certo via `curl` direto (`GET /api/geral/unidades?nome=Educa`
-  devolve só "Secretaria de Educação"; `?vigencia=2026-07-23` devolve as 3, todas vigentes
-  nessa data) — a lacuna não é no contrato do backend.
-- Código do frontend revisado por leitura (`SecretariaFiltro.tsx`, `SecretariasListView.tsx`,
-  `useSecretarias.ts`, `secretariasService.listar`) sem nenhum bug óbvio identificado — o
-  fluxo `onFiltrar` → `useUrlState` → `useSecretarias(nome, vigencia)` → `secretariasService.listar`
-  parece correto na leitura estática.
-- **Não deu pra testar ao vivo**: `/secretarias` trava no fallback do `<Suspense>` na
-  ferramenta de preview (pegadinha de sandbox já documentada, seção 4) — só o usuário
-  testou num navegador de verdade até agora.
-- **Próximo passo**: pedir pro usuário descrever o sintoma exato (o campo não filtra nada?
-  o botão "Aplicar" não responde? aparece erro no console do navegador? o filtro abre mas os
-  cards não mudam?) antes de tentar consertar às cegas — ou testar direto num navegador real
-  (Claude in Chrome, se disponível) já que a ferramenta de preview não consegue passar dessa
-  tela.
+**2. Bug relatado: filtro de `/secretarias` "não está funcionando"** — investigado com os
+dois servidores no ar (estavam ambos fora do ar no início desta sessão, sintoma de
+"nada funciona" bate com isso). Backend confirmado filtrando certo via `curl` direto e via
+`fetch()` no console do navegador pelo mesmo proxy `/api/*` que o app usa (`nome=Educa`
+devolve só "Secretaria de Educação"). Código revisado por leitura
+(`SecretariaFiltro.tsx`/`SecretariasListView.tsx`/`useSecretarias.ts`/
+`secretariasService.listar`) sem nenhum bug encontrado. **Conclusão**: mais provável que o
+teste original tenha coincidido com os servidores caídos, não um bug de código — considerar
+resolvido a menos que o usuário confirme que ainda está quebrado num teste novo.
 
 ## 3. Como decidir o padrão de um módulo novo
 
