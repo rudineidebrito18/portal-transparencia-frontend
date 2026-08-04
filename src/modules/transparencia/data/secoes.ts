@@ -197,13 +197,13 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdRecordVoiceOver,
     itens: [
       { label: 'E-SIC', icon: MdMailOutline, href: '/esic' },
-      { label: 'Regulamentação da LAI', icon: MdPolicy },
+      { label: 'Regulamentação da LAI', icon: MdPolicy, href: '/regulamentacao-lai' },
       { label: 'Prazos de resposta — SIC', icon: MdAccessTime },
       { label: 'Relatório anual estatístico', icon: MdShowChart },
       { label: 'Documentos classificados', icon: MdLock },
       { label: 'Documentos desclassificados', icon: MdLockOpen },
       { label: 'Ouvidoria municipal', icon: MdSupportAgent, href: '/ouvidoria' },
-      { label: 'Carta de serviços', icon: MdContactMail },
+      { label: 'Carta de serviços', icon: MdContactMail, href: '/carta-de-servicos' },
     ],
   },
   {

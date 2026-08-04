@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import Breadcrumbs from '@/components/Breadcrumbs'
+import PageHeader from '@/components/PageHeader'
 import Card from '@/components/ui/Card'
 
 // Conteúdo estático — cobre os 5 itens da seção "LGPD e Governo Digital" do hub
@@ -8,18 +8,10 @@ import Card from '@/components/ui/Card'
 export default function Lgpd() {
   return (
     <div className="max-w-4xl mx-auto p-2">
-      <Breadcrumbs
-        items={[
+      <PageHeader title="LGPD e Governo Digital" breadcrumbItems={[
           { label: 'Transparência', href: '/transparencia' },
           { label: 'LGPD e Governo Digital' }
-        ]}
-      />
-
-      <h1 className="text-3xl font-bold mb-4 text-primary uppercase">
-        LGPD e Governo Digital
-      </h1>
-
-      <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
+        ]} />
 
       <div className="space-y-6">
 

@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 
-import Breadcrumbs from '@/components/Breadcrumbs'
+import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 import FormularioEsicForm from '@/modules/esic/components/FormularioEsicForm'
 import InformacoesEsicView from '@/modules/esic/components/InformacoesEsicView'
@@ -8,16 +8,10 @@ import InformacoesEsicView from '@/modules/esic/components/InformacoesEsicView'
 export default function Esic() {
   return (
     <div className="max-w-4xl mx-auto p-2">
-      <Breadcrumbs
-        items={[
+      <PageHeader title="E-SIC" breadcrumbItems={[
           { label: 'Transparência', href: '/transparencia' },
           { label: 'E-SIC' }
-        ]}
-      />
-
-      <h1 className="text-3xl font-bold mb-4 text-primary uppercase">E-SIC</h1>
-
-      <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
+        ]} />
 
       <div className="space-y-6">
         <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20" />)}</div>}>

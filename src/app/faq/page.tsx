@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { MdExpandMore } from 'react-icons/md'
 
-import Breadcrumbs from '@/components/Breadcrumbs'
+import PageHeader from '@/components/PageHeader'
 import Card from '@/components/ui/Card'
 
 // Conteúdo estático — sem endpoint de backend pra FAQ. Perguntas genéricas sobre
@@ -70,16 +70,10 @@ const PERGUNTAS: { pergunta: string; resposta: React.ReactNode }[] = [
 export default function Faq() {
   return (
     <div className="max-w-4xl mx-auto p-2">
-      <Breadcrumbs
-        items={[
+      <PageHeader title="Perguntas Frequentes" breadcrumbItems={[
           { label: 'Transparência', href: '/transparencia' },
           { label: 'Perguntas frequentes' }
-        ]}
-      />
-
-      <h1 className="text-3xl font-bold mb-4 text-primary uppercase">Perguntas Frequentes</h1>
-
-      <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
+        ]} />
 
       <div className="space-y-3">
         {PERGUNTAS.map(({ pergunta, resposta }) => (

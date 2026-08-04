@@ -24,9 +24,12 @@ html, body {
   --color-neutral-light: #f9fafb;     /* Fundo quase branco */
   --color-neutral-dark: #cbd5e1;      /* Cinza médio */
 
-  /* Texto */
-  --color-text-primary: #ffffff;      /* Preto azulado para texto principal */
-  --color-text-secondary: #000000;    /* Cinza para texto secundário */
+  /* Texto — nomes contraintuitivos de propósito: "primary" é o texto usado sobre fundo
+     escuro (header, footer, botões primary), "secondary" é o texto padrão do corpo da
+     página (sobre fundo claro). Não é uma escala de ênfase, é uma escala de contexto de
+     fundo. Os comentários antigos aqui descreviam o oposto do valor real — corrigido. */
+  --color-text-primary: #ffffff;      /* Branco — texto sobre fundo escuro */
+  --color-text-secondary: #000000;    /* Preto — texto padrão sobre fundo claro */
 
   /* Bordas */
   --color-border: #242424;            /* Cinza claro para bordas */
