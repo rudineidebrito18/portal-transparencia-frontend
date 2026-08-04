@@ -6,6 +6,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
+import { formatarDataHora } from '@/utils/date'
 import { useContratos } from '../hooks/useContratos'
 import ContratoCard from './ContratoCard'
 
@@ -17,6 +18,7 @@ export default function ContratoListView() {
     pagina,
     totalPaginas,
     totalElements,
+    atualizadoEm,
     setPagina,
     setOrdenacao,
     ordenacao
@@ -30,6 +32,9 @@ export default function ContratoListView() {
 
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> resultados encontrados
+          {atualizadoEm && (
+            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
         </span>
 
         <div className="flex items-center gap-2">

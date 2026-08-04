@@ -5,6 +5,7 @@ import { ComponentType } from 'react'
 import { useUrlState } from '@/hooks/useUrlState'
 import EmpresasDividaAtivaListView from './EmpresasDividaAtivaListView'
 import EmpresasInidoneasListView from './EmpresasInidoneasListView'
+import GestaoFiscalGlossario from './GestaoFiscalGlossario'
 import RelatoriosExecucaoOrcamentariaListView from './RelatoriosExecucaoOrcamentariaListView'
 import RelatoriosGestaoFiscalListView from './RelatoriosGestaoFiscalListView'
 import RenunciaFiscalListView from './RenunciaFiscalListView'
@@ -15,13 +16,15 @@ type Aba =
   | 'rgf'
   | 'divida-ativa'
   | 'inidoneas'
+  | 'glossario'
 
 const CATEGORIAS: { aba: Aba; label: string }[] = [
   { aba: 'renuncia-fiscal', label: 'Renúncia Fiscal' },
   { aba: 'execucao-orcamentaria', label: 'Execução Orçamentária' },
   { aba: 'rgf', label: 'Relatório de Gestão Fiscal' },
   { aba: 'divida-ativa', label: 'Empresas em Dívida Ativa' },
-  { aba: 'inidoneas', label: 'Empresas Inidôneas/Suspensas' }
+  { aba: 'inidoneas', label: 'Empresas Inidôneas/Suspensas' },
+  { aba: 'glossario', label: 'O que é isso?' }
 ]
 
 const CONTEUDO: Record<Aba, ComponentType> = {
@@ -29,7 +32,8 @@ const CONTEUDO: Record<Aba, ComponentType> = {
   'execucao-orcamentaria': RelatoriosExecucaoOrcamentariaListView,
   rgf: RelatoriosGestaoFiscalListView,
   'divida-ativa': EmpresasDividaAtivaListView,
-  inidoneas: EmpresasInidoneasListView
+  inidoneas: EmpresasInidoneasListView,
+  glossario: GestaoFiscalGlossario
 }
 
 export default function GestaoFiscalView() {

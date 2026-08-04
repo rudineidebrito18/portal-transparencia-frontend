@@ -6,6 +6,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
+import { formatarDataHora } from '@/utils/date'
 import { ConteudoInstitucional } from '../types'
 import ConteudoInstitucionalCard from './ConteudoInstitucionalCard'
 
@@ -16,6 +17,7 @@ interface Props {
   pagina: number
   totalPaginas: number
   totalElements: number
+  atualizadoEm: Date | null
   setPagina: (pagina: number) => void
   ordenacao: string
   setOrdenacao: (ordenacao: string) => void
@@ -30,6 +32,7 @@ export default function ConteudoInstitucionalListView({
   pagina,
   totalPaginas,
   totalElements,
+  atualizadoEm,
   setPagina,
   ordenacao,
   setOrdenacao,
@@ -59,6 +62,9 @@ export default function ConteudoInstitucionalListView({
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong>{' '}
           {variant === 'aviso' ? 'avisos encontrados' : 'notícias encontradas'}
+          {atualizadoEm && (
+            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
         </span>
 
         <div className="flex items-center gap-2">

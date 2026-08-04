@@ -4,7 +4,7 @@ import { useAvisos } from '../hooks/useAvisos'
 import ConteudoInstitucionalListView from './ConteudoInstitucionalListView'
 
 export default function AvisosListView() {
-  const { data, loading, erro, pagina, totalPaginas, totalElements, setPagina, ordenacao, setOrdenacao } = useAvisos()
+  const { data, loading, erro, pagina, totalPaginas, totalElements, atualizadoEm, setPagina, ordenacao, setOrdenacao } = useAvisos()
 
   return (
     <ConteudoInstitucionalListView
@@ -14,6 +14,7 @@ export default function AvisosListView() {
       pagina={pagina}
       totalPaginas={totalPaginas}
       totalElements={totalElements}
+      atualizadoEm={atualizadoEm}
       setPagina={setPagina}
       ordenacao={ordenacao}
       setOrdenacao={setOrdenacao}

@@ -38,6 +38,7 @@ export function usePageableResource<
   const [erro, setErro] = useState<string | null>(null)
   const [totalPaginas, setTotalPaginas] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
+  const [atualizadoEm, setAtualizadoEm] = useState<Date | null>(null)
 
   const pagina = Number(searchParams.get('page') ?? 0)
   const ordenacao = searchParams.get('sort') ?? initialSort
@@ -108,6 +109,7 @@ export function usePageableResource<
           setData(response.content)
           setTotalPaginas(response.totalPages)
           setTotalElements(response.totalElements)
+          setAtualizadoEm(new Date())
         }
       } catch (e: unknown) {
         const message =
@@ -135,6 +137,7 @@ export function usePageableResource<
     pagina,
     totalPaginas,
     totalElements,
+    atualizadoEm,
     setPagina,
     setFiltros,
     setOrdenacao,

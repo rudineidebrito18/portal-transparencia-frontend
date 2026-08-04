@@ -6,6 +6,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
+import { formatarDataHora } from '@/utils/date'
 import { useLicitacoes } from '../hooks/useLicitacoes'
 import LicitacaoCard from './LicitacaoCard'
 import LicitacaoFiltro from './LicitacaoFiltro'
@@ -18,6 +19,7 @@ export default function LicitacaoListView() {
     pagina,
     totalPaginas,
     totalElements,
+    atualizadoEm,
     setPagina,
     filtros,
     setFiltros,
@@ -36,6 +38,9 @@ export default function LicitacaoListView() {
 
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> resultados encontrados
+          {atualizadoEm && (
+            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
         </span>
 
         <div className="flex items-center gap-2">

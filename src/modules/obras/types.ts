@@ -1,3 +1,5 @@
+import { STATUS_BADGE_STYLE } from '@/modules/shared/statusBadgeStyle'
+
 export enum TipoObra {
   CONSTRUCAO = 'CONSTRUCAO',
   IMPLANTACAO = 'IMPLANTACAO',
@@ -31,9 +33,9 @@ export const StatusObraDescricao: Record<StatusObra, string> = {
 }
 
 export const StatusObraStyle: Record<StatusObra, string> = {
-  [StatusObra.CANCELADA]: 'bg-red-100 text-red-700',
-  [StatusObra.CONCLUIDA]: 'bg-green-100 text-green-700',
-  [StatusObra.EM_ANDAMENTO]: 'bg-yellow-100 text-yellow-700'
+  [StatusObra.CANCELADA]: STATUS_BADGE_STYLE.cancelado,
+  [StatusObra.CONCLUIDA]: STATUS_BADGE_STYLE.concluido,
+  [StatusObra.EM_ANDAMENTO]: STATUS_BADGE_STYLE.emAndamento
 }
 
 export interface ObraPublica {

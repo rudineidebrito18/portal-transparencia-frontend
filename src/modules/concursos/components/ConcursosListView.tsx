@@ -4,13 +4,14 @@ import { MdSwapVert } from 'react-icons/md'
 
 import AsyncList from '@/components/ui/AsyncList'
 import Pagination from '@/components/ui/Pagination'
+import { formatarDataHora } from '@/utils/date'
 import { useConcursos } from '../hooks/useConcursos'
 import ConcursoCard from './ConcursoCard'
 import ConcursoFiltro from './ConcursoFiltro'
 
 export default function ConcursosListView() {
   const {
-    data, loading, erro, pagina, totalPaginas, totalElements, setPagina, filtros, setFiltros, ordenacao, setOrdenacao
+    data, loading, erro, pagina, totalPaginas, totalElements, atualizadoEm, setPagina, filtros, setFiltros, ordenacao, setOrdenacao
   } = useConcursos()
 
   return (
@@ -21,6 +22,9 @@ export default function ConcursosListView() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm mb-6">
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> concursos encontrados
+          {atualizadoEm && (
+            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
         </span>
 
         <div className="flex items-center gap-2">

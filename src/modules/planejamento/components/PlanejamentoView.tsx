@@ -3,17 +3,21 @@
 import { useUrlState } from '@/hooks/useUrlState'
 import { RecursoPlanejamento } from '../types'
 import DocumentoListView from './DocumentoListView'
+import PlanejamentoGlossario from './PlanejamentoGlossario'
 
-const CATEGORIAS: { recurso: RecursoPlanejamento; label: string }[] = [
+type AbaPlanejamento = RecursoPlanejamento | 'glossario'
+
+const CATEGORIAS: { recurso: AbaPlanejamento; label: string }[] = [
   { recurso: 'ldo', label: 'LDO' },
   { recurso: 'loa', label: 'LOA' },
   { recurso: 'ppa', label: 'PPA' },
   { recurso: 'plano-estrategico', label: 'Plano Estratégico' },
-  { recurso: 'rga', label: 'Relatórios de Gestão e Atividades' }
+  { recurso: 'rga', label: 'Relatórios de Gestão e Atividades' },
+  { recurso: 'glossario', label: 'O que é isso?' }
 ]
 
 export default function PlanejamentoView() {
-  const [aba, setAba] = useUrlState<RecursoPlanejamento>('categoria', CATEGORIAS[0].recurso)
+  const [aba, setAba] = useUrlState<AbaPlanejamento>('categoria', CATEGORIAS[0].recurso)
 
   return (
     <div>
@@ -35,7 +39,11 @@ export default function PlanejamentoView() {
       </div>
 
       {/* CONTEÚDO */}
-      <DocumentoListView key={aba} recurso={aba} />
+      {aba === 'glossario' ? (
+        <PlanejamentoGlossario />
+      ) : (
+        <DocumentoListView key={aba} recurso={aba} />
+      )}
     </div>
   )
 }

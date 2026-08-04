@@ -7,6 +7,7 @@ import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { usePageableResource } from '@/hooks/usePageableResource'
+import { formatarDataHora } from '@/utils/date'
 import { DocumentoGenerico, FiltroDocumentoGenerico } from '../../types/DocumentoGenerico'
 import DocumentoGenericoCard from './DocumentoGenericoCard'
 import DocumentoGenericoFiltro from './DocumentoGenericoFiltro'
@@ -20,6 +21,7 @@ export default function DocumentoGenericoListPanel({
   pagina,
   totalPaginas,
   totalElements,
+  atualizadoEm,
   setPagina,
   filtros,
   setFiltros,
@@ -37,6 +39,9 @@ export default function DocumentoGenericoListPanel({
 
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> documentos encontrados
+          {atualizadoEm && (
+            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
         </span>
 
         <div className="flex items-center gap-2">

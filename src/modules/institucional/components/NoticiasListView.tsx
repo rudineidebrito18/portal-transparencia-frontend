@@ -4,7 +4,7 @@ import { useNoticias } from '../hooks/useNoticias'
 import ConteudoInstitucionalListView from './ConteudoInstitucionalListView'
 
 export default function NoticiasListView() {
-  const { data, loading, erro, pagina, totalPaginas, totalElements, setPagina, ordenacao, setOrdenacao } = useNoticias()
+  const { data, loading, erro, pagina, totalPaginas, totalElements, atualizadoEm, setPagina, ordenacao, setOrdenacao } = useNoticias()
 
   return (
     <ConteudoInstitucionalListView
@@ -14,6 +14,7 @@ export default function NoticiasListView() {
       pagina={pagina}
       totalPaginas={totalPaginas}
       totalElements={totalElements}
+      atualizadoEm={atualizadoEm}
       setPagina={setPagina}
       ordenacao={ordenacao}
       setOrdenacao={setOrdenacao}

@@ -19,20 +19,22 @@ import { Documento } from '@/modules/shared/types/Documento'
 import { useUrlState } from '@/hooks/useUrlState'
 import { formatarData } from '@/utils/date'
 import { SecretariaDetalhe as SecretariaDetalheType, TipoDocumentoUnidade, TipoDocumentoUnidadeDescricao } from '../types'
+import SecretariaObras from './SecretariaObras'
 import SelinhoVerificado from './SelinhoVerificado'
 
 interface Props {
   detalhe: SecretariaDetalheType
 }
 
-type Aba = 'info' | 'ex-gestores' | 'ordenadores' | 'setores' | 'decretos'
+type Aba = 'info' | 'ex-gestores' | 'ordenadores' | 'setores' | 'decretos' | 'obras'
 
 const ABAS: { aba: Aba; label: string }[] = [
   { aba: 'info', label: 'Informações do Órgão' },
   { aba: 'ex-gestores', label: 'Ex-Gestores' },
   { aba: 'ordenadores', label: 'Ordenadores' },
   { aba: 'setores', label: 'Setores' },
-  { aba: 'decretos', label: 'Decretos' }
+  { aba: 'decretos', label: 'Decretos' },
+  { aba: 'obras', label: 'Obras' }
 ]
 
 const TIPOS_DOCUMENTO: TipoDocumentoUnidade[] = [
@@ -189,6 +191,10 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
 
         {aba === 'decretos' && (
           <DocumentList documentos={decretosComoDocumento} emptyMessage="Nenhum decreto cadastrado." />
+        )}
+
+        {aba === 'obras' && (
+          <SecretariaObras unidadeId={unidade.id} />
         )}
       </div>
     </div>

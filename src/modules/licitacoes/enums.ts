@@ -24,17 +24,21 @@ export const StatusLicitacaoDescricao: Record<StatusLicitacao, string> = {
   [StatusLicitacao.ANULADA]: "Anulada"
 }
 
+import { STATUS_BADGE_STYLE } from "@/modules/shared/statusBadgeStyle"
+
+// SUSPENSO usava vermelho aqui e cinza em Contratos pro mesmo conceito — unificado via
+// STATUS_BADGE_STYLE (mesma paleta semântica compartilhada entre Contratos/Licitações/Obras).
 export const StatusLicitacaoStyle: Record<StatusLicitacao, string> = {
-  [StatusLicitacao.EM_ABERTO]: "bg-blue-100 text-blue-700",
-  [StatusLicitacao.EM_ANDAMENTO]: "bg-yellow-100 text-yellow-700",
-  [StatusLicitacao.FINALIZADO]: "bg-green-100 text-green-700",
-  [StatusLicitacao.SUSPENSO]: "bg-red-100 text-red-700",
-  [StatusLicitacao.DESERTA]: "bg-gray-100 text-gray-600",
-  [StatusLicitacao.FRACASSADA]: "bg-gray-100 text-gray-600",
-  [StatusLicitacao.ANULADA]: "bg-red-100 text-red-700",
-  [StatusLicitacao.SINC_ABERTO]: "bg-blue-100 text-blue-700",
-  [StatusLicitacao.SINC_ANDAMENTO]: "bg-yellow-100 text-yellow-700",
-  [StatusLicitacao.INCLUIDO_SISTEMA]: "bg-gray-100 text-gray-600"
+  [StatusLicitacao.EM_ABERTO]: STATUS_BADGE_STYLE.info,
+  [StatusLicitacao.EM_ANDAMENTO]: STATUS_BADGE_STYLE.emAndamento,
+  [StatusLicitacao.FINALIZADO]: STATUS_BADGE_STYLE.concluido,
+  [StatusLicitacao.SUSPENSO]: STATUS_BADGE_STYLE.suspenso,
+  [StatusLicitacao.DESERTA]: STATUS_BADGE_STYLE.neutro,
+  [StatusLicitacao.FRACASSADA]: STATUS_BADGE_STYLE.neutro,
+  [StatusLicitacao.ANULADA]: STATUS_BADGE_STYLE.cancelado,
+  [StatusLicitacao.SINC_ABERTO]: STATUS_BADGE_STYLE.info,
+  [StatusLicitacao.SINC_ANDAMENTO]: STATUS_BADGE_STYLE.emAndamento,
+  [StatusLicitacao.INCLUIDO_SISTEMA]: STATUS_BADGE_STYLE.neutro
 }
 
 export enum TipoProcedimentoLicitacao {

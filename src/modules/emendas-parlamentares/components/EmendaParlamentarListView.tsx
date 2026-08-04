@@ -6,6 +6,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
+import { formatarDataHora } from '@/utils/date'
 import { useEmendasParlamentares } from '../hooks/useEmendasParlamentares'
 import EmendaParlamentarCard from './EmendaParlamentarCard'
 import EmendaParlamentarFiltro from './EmendaParlamentarFiltro'
@@ -18,6 +19,7 @@ export default function EmendaParlamentarListView() {
     pagina,
     totalPaginas,
     totalElements,
+    atualizadoEm,
     setPagina,
     filtros,
     setFiltros,
@@ -35,6 +37,9 @@ export default function EmendaParlamentarListView() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> resultados encontrados
+          {atualizadoEm && (
+            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
         </span>
 
         <div className="flex items-center gap-2">

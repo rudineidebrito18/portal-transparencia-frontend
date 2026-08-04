@@ -6,6 +6,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
+import { formatarDataHora } from '@/utils/date'
 import { useDiarias } from '../hooks/useDiarias'
 import DiariaCard from './DiariaCard'
 import DiariaFiltro from './DiariaFiltro'
@@ -18,6 +19,7 @@ export default function DiariaListView() {
     pagina,
     totalPaginas,
     totalElements,
+    atualizadoEm,
     setPagina,
     filtros,
     setFiltros,
@@ -36,6 +38,9 @@ export default function DiariaListView() {
 
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> diárias encontradas
+          {atualizadoEm && (
+            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
         </span>
 
         <div className="flex items-center gap-2">

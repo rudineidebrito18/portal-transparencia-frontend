@@ -7,6 +7,7 @@ import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { usePageableResource } from '@/hooks/usePageableResource'
+import { formatarDataHora } from '@/utils/date'
 import DocumentoGenericoFiltro from '@/modules/shared/components/documento-generico/DocumentoGenericoFiltro'
 import { ConvenioDocumento, FiltroConvenio } from '../types'
 import ConvenioCard from './ConvenioCard'
@@ -22,6 +23,7 @@ export default function ConvenioListPanel({
   pagina,
   totalPaginas,
   totalElements,
+  atualizadoEm,
   setPagina,
   filtros,
   setFiltros,
@@ -40,6 +42,9 @@ export default function ConvenioListPanel({
 
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> documentos encontrados
+          {atualizadoEm && (
+            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
         </span>
 
         <div className="flex items-center gap-2">
