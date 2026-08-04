@@ -48,6 +48,7 @@ export default function GestaoFiscalView() {
           <button
             key={categoria.aba}
             onClick={() => setAba(categoria.aba)}
+            aria-current={aba === categoria.aba ? 'true' : undefined}
             className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
               ${aba === categoria.aba
                 ? 'bg-primary text-white shadow-md'

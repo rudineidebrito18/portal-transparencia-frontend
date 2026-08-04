@@ -17,7 +17,11 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
     <nav className="flex mb-4 overflow-x-auto no-scrollbar" aria-label="Breadcrumb">
       <ol className="flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
         <li className="inline-flex items-center">
-          <Link href="/" className="text-text-secondary/60 hover:text-primary transition-colors flex items-center gap-1 text-xs md:text-sm">
+          <Link
+            href="/"
+            aria-label="Início"
+            className="text-text-secondary/60 hover:text-primary transition-colors flex items-center gap-1 text-xs md:text-sm"
+          >
             <MdHome size={18} />
             <span className="hidden md:inline">Início</span>
           </Link>

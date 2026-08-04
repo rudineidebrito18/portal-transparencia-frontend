@@ -11,6 +11,7 @@ import {
   MdMenu,
   MdSettings
 } from 'react-icons/md';
+import AcessibilidadeMenu from './AcessibilidadeMenu';
 import DropdownMenuItem from './DropdownMenuItem';
 import SecretariasDropdownItems from './SecretariasDropdownItems';
 
@@ -92,6 +93,7 @@ export default function Header() {
               <Link href="/esic" className="hover:underline">SIC</Link>
             </div>
             <Link href="/transparencia" className="flex items-center gap-1 hover:underline"><MdInfo /> Transparência</Link>
+            <AcessibilidadeMenu />
             <Link href="/admin/login" className="flex items-center gap-1 hover:underline" title="Acesso administrativo"><MdSettings /></Link>
           </div>
         </div>
@@ -115,7 +117,7 @@ export default function Header() {
               backgroundImage: "url('/fundo_header.png')",
             }}
           >
-            <Link href="/" className="w-40 md:w-68 flex items-center ml-20 hover:opacity-90 transition-opacity">
+            <Link href="/" className="w-40 md:w-68 flex items-center ml-4 lg:ml-20 hover:opacity-90 transition-opacity">
               <Image
                 src="/logo_lago_r.png"
                 alt="Logo Lago dos Rodrigues"
@@ -128,7 +130,7 @@ export default function Header() {
 
           {/* Nav */}
           <nav ref={navRef} className="bg-primary text-light text-sm shadow">
-            <ul className={`flex flex-col lg:flex-row flex-wrap gap-2 md:gap-2 justify-center items-center ${menuOpen ? 'flex' : 'hidden lg:flex'}`}>
+            <ul className={`flex flex-col lg:flex-row flex-wrap gap-2 justify-center items-center ${menuOpen ? 'flex' : 'hidden lg:flex'}`}>
               <Link className="px-4 py-2 hover:bg-secondary" href="/" onClick={() => setMenuOpen(false)}><MdHome /></Link>
 
               <DropdownMenuItem label="A PREFEITURA">
@@ -167,6 +169,8 @@ export default function Header() {
       <div className="fixed top-2 right-3 lg:hidden z-[70]">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+          aria-expanded={menuOpen}
           className="text-primary text-3xl bg-light rounded-full p-2 shadow-lg"
         >
           {menuOpen ? <MdClose /> : <MdMenu />}

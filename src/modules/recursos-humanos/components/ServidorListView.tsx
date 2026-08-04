@@ -52,6 +52,7 @@ export default function ServidorListView() {
           <select
             value={ordenacao || 'name,asc'}
             onChange={(e) => setOrdenacao(e.target.value)}
+            aria-label="Ordenar por"
             className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none"
           >
             <option value="name,asc">Nome (A-Z)</option>

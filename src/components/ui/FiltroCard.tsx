@@ -19,8 +19,18 @@ export default function FiltroCard({ subtituloPadrao, filtrosAtivosCount, childr
   return (
     <div className="bg-white border border-border/30 rounded-2xl shadow-sm mb-8 overflow-hidden">
       <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={isExpanded}
+        aria-controls="filtro-card-conteudo"
         className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-neutral-light/40 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setIsExpanded(!isExpanded)
+          }
+        }}
       >
         <div className="flex items-center gap-3">
           <div className="bg-primary/10 p-2 rounded-lg text-primary">
@@ -47,7 +57,10 @@ export default function FiltroCard({ subtituloPadrao, filtrosAtivosCount, childr
       </div>
 
       {isExpanded && (
-        <div className="px-6 pb-6 pt-2 border-t border-border/20 animate-in fade-in zoom-in-95 duration-200">
+        <div
+          id="filtro-card-conteudo"
+          className="px-6 pb-6 pt-2 border-t border-border/20 animate-in fade-in zoom-in-95 duration-200"
+        >
           {children}
         </div>
       )}

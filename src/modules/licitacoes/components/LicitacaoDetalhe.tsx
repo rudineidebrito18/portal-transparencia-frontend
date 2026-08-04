@@ -83,6 +83,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
       <div className="flex gap-2 px-6 pt-4">
         <button
           onClick={() => setActiveTab('dados')}
+          aria-current={activeTab === 'dados' ? 'true' : undefined}
           className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
             ${activeTab === 'dados'
               ? 'bg-primary text-white shadow-md'
@@ -94,6 +95,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
 
         <button
           onClick={() => setActiveTab('contratos')}
+          aria-current={activeTab === 'contratos' ? 'true' : undefined}
           className={`px-5 py-2 text-sm font-semibold rounded-full transition-all flex items-center gap-2
             ${activeTab === 'contratos'
               ? 'bg-primary text-white shadow-md'

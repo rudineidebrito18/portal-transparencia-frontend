@@ -142,6 +142,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
             <button
               key={item.aba}
               onClick={() => setAba(item.aba)}
+              aria-current={aba === item.aba ? 'true' : undefined}
               className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
                 ${aba === item.aba
                   ? 'bg-primary text-white shadow-md'

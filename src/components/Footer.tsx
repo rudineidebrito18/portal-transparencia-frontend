@@ -27,11 +27,11 @@ const LINKS_SERVICOS = [
   { label: 'E-SIC', href: '/esic' }
 ]
 
-// Só entram aqui páginas que já existem — Mapa do Site e Política de Acessibilidade
-// ainda não têm rota própria (ver Bloco 4 do roadmap de v1.0).
 const LINKS_ACESSIBILIDADE = [
+  { label: 'Acessibilidade', href: '/acessibilidade' },
   { label: 'Perguntas Frequentes', href: '/faq' },
-  { label: 'LGPD e Governo Digital', href: '/lgpd' }
+  { label: 'LGPD e Governo Digital', href: '/lgpd' },
+  { label: 'Mapa do Site', href: '/mapa-do-site' }
 ]
 
 function ColunaLinks({ titulo, links }: { titulo: string; links: { label: string; href: string }[] }) {

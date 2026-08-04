@@ -22,6 +22,7 @@ export default function EducacaoView() {
           <button
             key={categoria.recurso}
             onClick={() => setAba(categoria.recurso)}
+            aria-current={aba === categoria.recurso ? 'true' : undefined}
             className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
               ${aba === categoria.recurso
                 ? 'bg-primary text-white shadow-md'

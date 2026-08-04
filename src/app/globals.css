@@ -43,3 +43,43 @@ html, body {
   --color-shadow-light: rgba(31, 62, 115, 0.1);
   --color-shadow-dark: rgba(31, 62, 115, 0.3);
 }
+
+/* Alto contraste (menu de acessibilidade, src/components/AcessibilidadeMenu.tsx) —
+   sobrescreve os tokens de cor no <html>; como todo componente já usa esses tokens via
+   Tailwind (bg-primary, text-secondary etc.), a troca cascateia pro site inteiro sem
+   precisar tocar em nenhum componente.
+   --color-neutral-dark FICA DE FORA de propósito: é usado como fundo de hover em vários
+   dropdowns (Header.tsx, SecretariasDropdownItems.tsx) que têm texto escuro fixo
+   (`text-black`) — escurecer esse token também deixava o hover preto-sobre-preto,
+   ilegível, exatamente nesses menus. */
+html.alto-contraste {
+  --color-primary: #000000;
+  --color-primary-light: #1a1a1a;
+  --color-primary-dark: #000000;
+  --color-secondary: #b30000;
+  --color-secondary-light: #ff0000;
+  --color-secondary-dark: #800000;
+  --color-accent: #00308f;
+  --color-text-secondary: #000000;
+  --color-border: #000000;
+  --color-neutral: #ffffff;
+  --color-neutral-light: #ffffff;
+}
+
+html.alto-contraste a {
+  text-decoration: underline;
+}
+
+/* O CSS que o próprio plugin do VLibras injeta em runtime não estava aplicando
+   `position: fixed` no botão flutuante (confirmado via getComputedStyle no navegador —
+   vinha "static", o botão ficava jogado no fluxo normal da página em vez de fixo no
+   canto). Forçamos aqui, direto no elemento que o próprio plugin já cria
+   (`[vw-access-button]`), sem depender do CSS externo dele. */
+[vw-access-button] {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 999 !important;
+}
