@@ -91,7 +91,7 @@ export default function AcessibilidadeMenu() {
 
       {aberto && (
         <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-border/10 overflow-hidden z-50">
-          <p className="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-text-secondary/50 bg-neutral-light">
+          <p className="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-text-secondary/60 bg-neutral-light">
             Acessibilidade
           </p>
 

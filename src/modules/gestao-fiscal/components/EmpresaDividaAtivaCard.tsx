@@ -30,17 +30,17 @@ export default function EmpresaDividaAtivaCard({ empresa }: Props) {
 
       <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">CNPJ</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">CNPJ</p>
           <p className="font-semibold text-text-secondary">{empresa.cnpj}</p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Data</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Data</p>
           <p className="font-semibold text-text-secondary">{formatarData(empresa.data)}</p>
         </div>
 
         <div className="col-span-2">
-          <p className="text-[11px] uppercase text-text-secondary/50">Valor Inscrito</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Valor Inscrito</p>
           <p className="font-bold text-accent">{formatarMoeda(empresa.valor)}</p>
         </div>
       </div>

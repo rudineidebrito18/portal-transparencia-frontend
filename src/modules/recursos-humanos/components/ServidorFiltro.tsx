@@ -72,7 +72,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* NOME */}
             <div className="md:col-span-2">
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                 Nome
               </label>
               <input
@@ -87,7 +87,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* CPF */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                 CPF
               </label>
               <input
@@ -102,7 +102,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* CARGO */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                 Cargo
               </label>
               <input
@@ -117,7 +117,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* CARGA HORÁRIA */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                 Carga Horária
               </label>
               <select
@@ -137,7 +137,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* DATAS DE ADMISSÃO */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Admissão (início)
                 </label>
                 <input
@@ -150,7 +150,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Admissão (fim)
                 </label>
                 <input

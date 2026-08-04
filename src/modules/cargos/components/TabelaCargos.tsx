@@ -39,7 +39,7 @@ export default function TabelaCargos() {
                 <MdGroups size={22} />
               </div>
               <div>
-                <p className="text-[11px] uppercase text-text-secondary/50">Total de Servidores</p>
+                <p className="text-[11px] uppercase text-text-secondary/60">Total de Servidores</p>
                 <p className="text-xl font-bold text-primary">{totalServidores}</p>
               </div>
             </Card>
@@ -49,7 +49,7 @@ export default function TabelaCargos() {
                 <MdPayments size={22} />
               </div>
               <div>
-                <p className="text-[11px] uppercase text-text-secondary/50">Total Líquido (todos os cargos)</p>
+                <p className="text-[11px] uppercase text-text-secondary/60">Total Líquido (todos os cargos)</p>
                 <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolhaLiquida)}</p>
               </div>
             </Card>

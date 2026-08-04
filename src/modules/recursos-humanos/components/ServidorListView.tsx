@@ -39,7 +39,7 @@ export default function ServidorListView() {
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> servidores encontrados
           {atualizadoEm && (
-            <span className="text-text-secondary/50"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+            <span className="text-text-secondary/60"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
           )}
         </span>
 

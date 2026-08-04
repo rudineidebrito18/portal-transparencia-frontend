@@ -32,7 +32,7 @@ export default function EmpresaInidoneaCard({ empresa }: Props) {
 
       <div className="flex items-center justify-between pt-3 border-t border-border/20">
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Data</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Data</p>
           <p className="text-sm font-semibold text-text-secondary">{formatarData(empresa.data)}</p>
         </div>
 

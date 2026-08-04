@@ -31,7 +31,7 @@ export default function NotFound() {
       </Link>
 
       <Card hoverable={false} className="p-6 text-left">
-        <h2 className="text-xs font-bold uppercase tracking-wide text-text-secondary/50 mb-3">
+        <h2 className="text-xs font-bold uppercase tracking-wide text-text-secondary/60 mb-3">
           Páginas úteis
         </h2>
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">

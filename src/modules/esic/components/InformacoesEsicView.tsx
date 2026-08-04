@@ -40,7 +40,7 @@ export default function InformacoesEsicView() {
             <MdLocationOn size={22} />
           </div>
           <div>
-            <p className="text-[11px] uppercase font-semibold text-text-secondary/50">Endereço de atendimento</p>
+            <p className="text-[11px] uppercase font-semibold text-text-secondary/60">Endereço de atendimento</p>
             <p className="text-sm font-semibold text-text-secondary mt-1">{info.enderecoAtendimento}</p>
             <p className="text-xs text-text-secondary/60 mt-2">Responsável: {info.nomeResponsavel}</p>
           </div>
@@ -51,7 +51,7 @@ export default function InformacoesEsicView() {
             <MdSchedule size={22} />
           </div>
           <div>
-            <p className="text-[11px] uppercase font-semibold text-text-secondary/50">Horário de atendimento</p>
+            <p className="text-[11px] uppercase font-semibold text-text-secondary/60">Horário de atendimento</p>
             <p className="text-sm font-semibold text-text-secondary mt-1">
               {info.horarioInicioManha} às {info.horarioFimManha} e {info.horarioInicioTarde} às {info.horarioFimTarde}
             </p>
@@ -63,7 +63,7 @@ export default function InformacoesEsicView() {
             <MdPhone size={22} />
           </div>
           <div>
-            <p className="text-[11px] uppercase font-semibold text-text-secondary/50">Telefone</p>
+            <p className="text-[11px] uppercase font-semibold text-text-secondary/60">Telefone</p>
             <p className="text-sm font-semibold text-text-secondary mt-1">{info.telefone}</p>
           </div>
         </Card>
@@ -73,14 +73,14 @@ export default function InformacoesEsicView() {
             <MdEmail size={22} />
           </div>
           <div>
-            <p className="text-[11px] uppercase font-semibold text-text-secondary/50">E-mail</p>
+            <p className="text-[11px] uppercase font-semibold text-text-secondary/60">E-mail</p>
             <p className="text-sm font-semibold text-text-secondary mt-1">{info.email}</p>
           </div>
         </Card>
       </div>
 
       <Card className="p-5">
-        <p className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-3">Prazos de resposta</p>
+        <p className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-3">Prazos de resposta</p>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-text-secondary/60">Resposta padrão</p>

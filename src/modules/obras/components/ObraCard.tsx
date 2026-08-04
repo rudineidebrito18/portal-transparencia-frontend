@@ -35,22 +35,22 @@ export default function ObraCard({ obra }: Props) {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3 text-sm">
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Tipo</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Tipo</p>
           <p className="font-semibold text-text-secondary">{TipoObraDescricao[obra.tipo]}</p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Fonte</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Fonte</p>
           <p className="font-semibold text-text-secondary">{obra.fonte}</p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Início</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Início</p>
           <p className="font-semibold text-text-secondary">{formatarData(obra.dataInicio)}</p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">
+          <p className="text-[11px] uppercase text-text-secondary/60">
             {obra.dataTermino ? 'Término' : 'Previsão de término'}
           </p>
           <p className="font-semibold text-text-secondary">
@@ -59,18 +59,18 @@ export default function ObraCard({ obra }: Props) {
         </div>
 
         <div className="col-span-2">
-          <p className="text-[11px] uppercase text-text-secondary/50">Fornecedor</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Fornecedor</p>
           <p className="font-semibold text-text-secondary">{obra.nomeFornecedor}</p>
         </div>
 
         <div className="col-span-2">
-          <p className="text-[11px] uppercase text-text-secondary/50">Valor Total</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Valor Total</p>
           <p className="font-bold text-accent">{formatarMoeda(obra.valorTotal)}</p>
         </div>
       </div>
 
       <div>
-        <div className="flex items-center justify-between text-[11px] uppercase text-text-secondary/50 mb-1">
+        <div className="flex items-center justify-between text-[11px] uppercase text-text-secondary/60 mb-1">
           <span>Execução física</span>
           <span>{obra.percentualObra.toFixed(1)}%</span>
         </div>

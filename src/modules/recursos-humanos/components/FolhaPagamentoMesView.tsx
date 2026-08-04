@@ -64,7 +64,7 @@ export default function FolhaPagamentoMesView() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
           <div>
-            <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+            <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
               Mês
             </label>
             <select
@@ -79,7 +79,7 @@ export default function FolhaPagamentoMesView() {
           </div>
 
           <div>
-            <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+            <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
               Ano
             </label>
             <select
@@ -130,7 +130,7 @@ export default function FolhaPagamentoMesView() {
                     <MdGroups size={22} />
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase text-text-secondary/50">Servidores na Folha</p>
+                    <p className="text-[11px] uppercase text-text-secondary/60">Servidores na Folha</p>
                     <p className="text-xl font-bold text-primary">{totalRegistros}</p>
                   </div>
                 </Card>
@@ -140,7 +140,7 @@ export default function FolhaPagamentoMesView() {
                     <MdPayments size={22} />
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase text-text-secondary/50">Total Líquido no Mês</p>
+                    <p className="text-[11px] uppercase text-text-secondary/60">Total Líquido no Mês</p>
                     <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolha)}</p>
                   </div>
                 </Card>

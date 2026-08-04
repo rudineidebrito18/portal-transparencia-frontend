@@ -11,7 +11,7 @@ export default function ItemAcessoCard({ label, href, icon: Icon }: ItemAcesso) 
         hoverable={false}
         className="p-4 flex items-center gap-3 opacity-60 cursor-not-allowed"
       >
-        <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-neutral text-text-secondary/50 shrink-0">
+        <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-neutral text-text-secondary/60 shrink-0">
           <Icon size={18} />
         </span>
         <span className="text-sm font-medium text-text-secondary flex-1">{label}</span>

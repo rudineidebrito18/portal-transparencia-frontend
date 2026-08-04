@@ -133,7 +133,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
             {/* UNIDADE / AUTORIDADE */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
               <div className="bg-white p-5 rounded-xl border border-border/30 shadow-sm">
-                <p className="text-xs uppercase text-text-secondary/50 mb-1 flex items-center gap-1">
+                <p className="text-xs uppercase text-text-secondary/60 mb-1 flex items-center gap-1">
                   <MdAccountBalance /> Unidade
                 </p>
                 <p className="font-bold text-primary uppercase">
@@ -142,7 +142,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
               </div>
 
               <div className="bg-white p-5 rounded-xl border border-border/30 shadow-sm">
-                <p className="text-xs uppercase text-text-secondary/50 mb-1">
+                <p className="text-xs uppercase text-text-secondary/60 mb-1">
                   Autoridade
                 </p>
                 <p className="font-bold text-text-secondary uppercase">

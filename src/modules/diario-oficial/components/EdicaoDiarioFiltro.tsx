@@ -54,7 +54,7 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Tipo
           </label>
           <select
@@ -70,7 +70,7 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Número da Edição
           </label>
           <input
@@ -84,7 +84,7 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Publicação (início)
           </label>
           <input
@@ -96,7 +96,7 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Publicação (fim)
           </label>
           <input

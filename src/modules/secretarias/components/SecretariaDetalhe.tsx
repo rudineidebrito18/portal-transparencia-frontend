@@ -80,7 +80,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
           </div>
 
           {(unidade.dataInicio || unidade.dataFim) && (
-            <p className="text-xs text-text-secondary/50 mt-2">
+            <p className="text-xs text-text-secondary/60 mt-2">
               Órgão vigente de {formatarData(unidade.dataInicio ?? undefined)} a {unidade.dataFim ? formatarData(unidade.dataFim) : 'o momento'}
             </p>
           )}
@@ -213,7 +213,7 @@ function PessoaCargoList({ lista, emptyMessage }: { lista: SecretariaDetalheType
             <p className="text-sm font-semibold text-text-secondary">{p.nome}</p>
             <p className="text-xs text-text-secondary/60">{p.cargo}</p>
           </div>
-          <p className="text-xs text-text-secondary/50 whitespace-nowrap">
+          <p className="text-xs text-text-secondary/60 whitespace-nowrap">
             {formatarData(p.dataInicio)} — {formatarData(p.dataFim)}
           </p>
         </Card>

@@ -82,7 +82,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* NÚMERO DO PROCESSO */}
             <div className="md:col-span-2">
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                 Número do Processo
               </label>
               <input
@@ -97,7 +97,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* MODALIDADE */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                 Modalidade
               </label>
               <select
@@ -117,7 +117,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* STATUS */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                 Status
               </label>
               <select
@@ -138,7 +138,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* NÚMERO + ANO */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Número
                 </label>
                 <input
@@ -152,7 +152,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Ano
                 </label>
                 <select
@@ -174,7 +174,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* DATAS DE ABERTURA */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Abertura (início)
                 </label>
                 <input
@@ -187,7 +187,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Abertura (fim)
                 </label>
                 <input
@@ -203,7 +203,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* DATAS DE PUBLICAÇÃO */}
             <div className="lg:col-span-2 grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Publicação (início)
                 </label>
                 <input
@@ -216,7 +216,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Publicação (fim)
                 </label>
                 <input
@@ -231,7 +231,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* COVID */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 flex items-center gap-1">
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 flex items-center gap-1">
                 <MdCoronavirus size={14} /> COVID-19
               </label>
               <select

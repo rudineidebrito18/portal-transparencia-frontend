@@ -28,10 +28,22 @@ export default function DropdownMenuItem({ label, children }: DropdownMenuItemPr
       ref={ref}
       className="relative group h-full"
     >
-      {/* Botão do menu */}
+      {/* Botão do menu — no desktop o submenu também abre com :focus-within (não só
+          :hover), senão quem navega por teclado cai em links do submenu sem eles
+          estarem visíveis na tela. */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
         className="flex items-center gap-1 cursor-pointer hover:bg-secondary px-2 py-2"
         onClick={() => setIsOpen((prev) => !prev)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen((prev) => !prev);
+          }
+        }}
       >
         {label}
         <MdExpandMore />
@@ -42,8 +54,8 @@ export default function DropdownMenuItem({ label, children }: DropdownMenuItemPr
         className={`
           absolute left-0 top-full w-48 rounded bg-white text-black shadow-md z-50
           max-h-96 overflow-y-auto
-          md:invisible md:group-hover:visible
-          ${isOpen ? 'block md:hidden' : 'hidden md:group-hover:block'}
+          md:invisible md:group-hover:visible md:group-focus-within:visible
+          ${isOpen ? 'block md:hidden' : 'hidden md:group-hover:block md:group-focus-within:block'}
         `}
       >
         {children}

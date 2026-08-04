@@ -35,28 +35,28 @@ export default function ContratoCard({ contrato }: Props) {
       {/* GRID INFO */}
       <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Fornecedor</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Fornecedor</p>
           <p className="font-semibold text-text-secondary truncate">
             {contrato.fornecedor}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Valor</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Valor</p>
           <p className="font-semibold text-accent">
             {formatarMoeda(contrato.valorContrato)}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Vigência</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Vigência</p>
           <p className="font-semibold text-text-secondary">
             {formatarData(contrato.dataInicio)} — {formatarData(contrato.dataTermino)}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/50">Unidade</p>
+          <p className="text-[11px] uppercase text-text-secondary/60">Unidade</p>
           <p className="font-semibold text-text-secondary truncate">
             {contrato.unidade || 'Não informada'}
           </p>

@@ -70,7 +70,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
         <div className="md:col-span-2">
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Descrição
           </label>
           <input
@@ -84,7 +84,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Número
           </label>
           <input
@@ -98,7 +98,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Ano
           </label>
           <input
@@ -112,7 +112,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Abertura (início)
           </label>
           <input
@@ -125,7 +125,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/50 mb-1 block">
+          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
             Abertura (fim)
           </label>
           <input
