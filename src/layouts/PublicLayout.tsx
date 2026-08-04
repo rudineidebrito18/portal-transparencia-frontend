@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import VLibrasReinit from "@/components/VLibrasReinit";
 import VLibrasWidget from "@/components/VLibrasWidget";
 
 type Props = {
@@ -28,7 +27,6 @@ export default function PublicLayout({ children }: Props) {
       <Footer />
 
       <VLibrasWidget />
-      <VLibrasReinit />
     </div>
   );
 }

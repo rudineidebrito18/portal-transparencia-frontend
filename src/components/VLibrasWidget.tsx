@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 // Replica ao pé da letra o snippet oficial do VLibras (o mesmo usado em gov.br) — div +
 // os dois scripts como markup ESTÁTICO renderizado no HTML retornado pelo servidor, e
 // não injetado via useEffect. Investigação anterior confirmou por que isso importa:
@@ -17,7 +19,15 @@
 // subárvore (log capturado com Playwright). dangerouslySetInnerHTML + suppressHydrationWarning
 // faz o React tratar o conteúdo dessa div como opaco (não compara filhos), eliminando o
 // mismatch sem voltar a depender de useEffect.
-export default function VLibrasWidget() {
+// Tentei consertar o desaparecimento na navegação client-side chamando new Widget() de
+// novo depois de cada troca de rota (ver histórico), mas isso quebra quando o avatar 3D
+// (engine Unity WebGL) já está carregando/aberto — o carregamento é assíncrono e continua
+// rodando em segundo plano depois que o DOM já foi resetado, e criar uma SEGUNDA instância
+// do Widget nesse meio-tempo corrompe o estado (confirmado com Playwright: o botão fica
+// preso, nem reabre no clique). Memo é mais correto: em vez de consertar o reset depois,
+// impede o React de re-renderizar esse componente quando o layout pai (RootLayoutSwitch,
+// que usa usePathname()) renderizar de novo — o DOM que o plugin construiu nunca é tocado.
+export default memo(function VLibrasWidget() {
   return (
     <>
       <div
@@ -58,4 +68,4 @@ export default function VLibrasWidget() {
       />
     </>
   )
-}
+})
