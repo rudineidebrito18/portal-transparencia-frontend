@@ -4,15 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import {
-  MdAccessibility,
   MdClose,
-  MdEmail,
-  MdFacebook,
   MdHeadsetMic,
   MdHome,
   MdInfo,
   MdMenu,
-  MdSearch,
   MdSettings
 } from 'react-icons/md';
 import DropdownMenuItem from './DropdownMenuItem';
@@ -89,13 +85,14 @@ export default function Header() {
         >
           <div className="text-xs">Prefeitura Municipal de Lago dos Rodrigues</div>
           <div className="hidden lg:flex items-center gap-3 text-xs">
-            <div className="flex items-center gap-1 cursor-pointer"><MdHeadsetMic /> Ouvidoria/SIC</div>
-            <div className="flex items-center gap-1 cursor-pointer"><MdInfo /> Transparência</div>
-            <div className="flex items-center gap-1 cursor-pointer"><MdAccessibility /> Acessibilidade</div>
-            <div className="flex items-center gap-1 cursor-pointer"><MdSearch /> Pesquisar</div>
-            <a href="#"><MdFacebook /></a>
-            <a href="#"><MdEmail /></a>
-            <a href="#"><MdSettings /></a>
+            <div className="flex items-center gap-1">
+              <MdHeadsetMic />
+              <Link href="/ouvidoria" className="hover:underline">Ouvidoria</Link>
+              /
+              <Link href="/esic" className="hover:underline">SIC</Link>
+            </div>
+            <Link href="/transparencia" className="flex items-center gap-1 hover:underline"><MdInfo /> Transparência</Link>
+            <Link href="/admin/login" className="flex items-center gap-1 hover:underline" title="Acesso administrativo"><MdSettings /></Link>
           </div>
         </div>
 
@@ -135,14 +132,8 @@ export default function Header() {
               <Link className="px-4 py-2 hover:bg-secondary" href="/" onClick={() => setMenuOpen(false)}><MdHome /></Link>
 
               <DropdownMenuItem label="A PREFEITURA">
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Gabinete do Prefeito</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Controladoria</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Procuradoria</Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem label="O MUNICÍPIO">
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>História</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Símbolos</Link>
+                <Link href="/estrutura-organizacional" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Estrutura Organizacional</Link>
+                <Link href="/organograma" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Organograma</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="SECRETARIAS">
@@ -150,7 +141,6 @@ export default function Header() {
               </DropdownMenuItem>
 
               <Link href="/diario-oficial" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>DIÁRIO OFICIAL</Link>
-              <Link href="#" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>SERVIÇOS</Link>
               <Link href="/transparencia" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>TRANSPARÊNCIA</Link>
 
               <DropdownMenuItem label="RECURSOS HUMANOS">
@@ -167,7 +157,6 @@ export default function Header() {
               <DropdownMenuItem label="PUBLICAÇÕES">
                 <Link href="/noticias" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Notícias</Link>
                 <Link href="/avisos" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Avisos</Link>
-                <Link href="#" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Editais</Link>
               </DropdownMenuItem>
             </ul>
           </nav>
