@@ -78,6 +78,9 @@ import {
   MdChildCare,
   MdSavings,
   MdVolunteerActivism,
+  MdPeopleAlt,
+  MdAssignment,
+  MdArchive,
 } from 'react-icons/md'
 import { IconType } from 'react-icons'
 
@@ -178,6 +181,8 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
       { label: 'Relatórios de gestão e atividades', icon: MdInsertChart, href: '/planejamento?categoria=rga' },
       { label: 'Julgamento das contas pelo tribunal de contas', icon: MdBalance, href: '/prestacao-contas?categoria=julgamento-contas-tce' },
       { label: 'Julgamento das contas do executivo pelo legislativo', icon: MdHowToVote, href: '/prestacao-contas?categoria=julgamento-contas-legislativo' },
+      { label: 'Parecer prévio do tribunal de contas', icon: MdGavel, href: '/prestacao-contas?categoria=parecer-previo' },
+      { label: 'Prestação de contas — anos anteriores', icon: MdArchive, href: '/prestacao-contas?categoria=prestacao-contas-anos-anteriores' },
       { label: 'RGF — Relatório de gestão fiscal', icon: MdBarChart, href: '/gestao-fiscal?categoria=rgf' },
       { label: 'RREO — Relatório resumido da execução orçamentária', icon: MdPieChart, href: '/gestao-fiscal?categoria=execucao-orcamentaria' },
       { label: 'PPA — Plano plurianual', icon: MdDateRange, href: '/planejamento?categoria=ppa' },
@@ -218,7 +223,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     itens: [
       { label: 'Renúncias fiscais', icon: MdPercent, href: '/gestao-fiscal?categoria=renuncia-fiscal' },
       { label: 'Emendas parlamentares', icon: MdEditNote, href: '/emendas-parlamentares' },
-      { label: 'Transferências disciplinadas pela EC nº 105', icon: MdCompareArrows },
+      { label: 'Transferências disciplinadas pela EC nº 105', icon: MdCompareArrows, href: '/transferencia-voluntaria' },
     ],
   },
   {
@@ -240,6 +245,8 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     itens: [
       { label: 'Planos e relatórios de educação', icon: MdMenuBook, href: '/educacao?categoria=planos' },
       { label: 'Lista de espera de creche', icon: MdChildCare, href: '/educacao?categoria=lista-espera-creche' },
+      { label: 'Lista de alunos', icon: MdPeopleAlt, href: '/educacao?categoria=lista-alunos' },
+      { label: 'Solicitações de matrícula', icon: MdAssignment, href: '/educacao?categoria=lista-solicitacao-matricula' },
       { label: 'Conselho do FUNDEB', icon: MdSavings },
       { label: 'Conselho de assistência social', icon: MdVolunteerActivism },
     ],

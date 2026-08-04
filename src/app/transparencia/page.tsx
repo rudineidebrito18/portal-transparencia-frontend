@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
+import { Suspense } from 'react'
 
 import Breadcrumbs from '@/components/Breadcrumbs'
-import SecaoAcesso from '@/modules/transparencia/components/SecaoAcesso'
-import { secoesAcessoInformacao } from '@/modules/transparencia/data/secoes'
+import Skeleton from '@/components/ui/Skeleton'
+import TransparenciaHub from '@/modules/transparencia/components/TransparenciaHub'
 
 export const metadata: Metadata = {
   title: 'Transparência — Acesso à Informação',
@@ -24,11 +25,9 @@ export default function TransparenciaPage() {
         ainda não possuem página própria e serão disponibilizados progressivamente.
       </p>
 
-      <div className="flex flex-col gap-10 pb-16">
-        {secoesAcessoInformacao.map((secao) => (
-          <SecaoAcesso key={secao.titulo} {...secao} />
-        ))}
-      </div>
+      <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
+        <TransparenciaHub />
+      </Suspense>
     </div>
   )
 }

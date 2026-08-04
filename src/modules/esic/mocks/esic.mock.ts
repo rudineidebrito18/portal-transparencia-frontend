@@ -1,4 +1,4 @@
-import { InformacoesEsic } from '../types'
+import { FormularioEsicRequest, InformacoesEsic } from '../types'
 
 const INFORMACOES: InformacoesEsic = {
   id: 1,
@@ -17,5 +17,9 @@ const INFORMACOES: InformacoesEsic = {
 export const esicMock = {
   async buscarInformacoes(): Promise<InformacoesEsic> {
     return INFORMACOES
+  },
+
+  async enviarFormulario(dados: FormularioEsicRequest): Promise<void> {
+    console.log('[mock] formulário e-SIC enviado:', dados)
   }
 }

@@ -1,4 +1,4 @@
-import { InformacoesOuvidoria } from '../types'
+import { FormularioOuvidoriaRequest, InformacoesOuvidoria } from '../types'
 
 const INFORMACOES: InformacoesOuvidoria = {
   id: 1,
@@ -14,5 +14,9 @@ const INFORMACOES: InformacoesOuvidoria = {
 export const ouvidoriaMock = {
   async buscarInformacoes(): Promise<InformacoesOuvidoria> {
     return INFORMACOES
+  },
+
+  async enviarFormulario(dados: FormularioOuvidoriaRequest, arquivo?: File | null): Promise<void> {
+    console.log('[mock] formulário Ouvidoria enviado:', dados, arquivo?.name)
   }
 }

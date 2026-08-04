@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Skeleton from '@/components/ui/Skeleton'
+import FormularioEsicForm from '@/modules/esic/components/FormularioEsicForm'
 import InformacoesEsicView from '@/modules/esic/components/InformacoesEsicView'
 
 export default function Esic() {
@@ -18,9 +19,13 @@ export default function Esic() {
 
       <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
 
-      <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20" />)}</div>}>
-        <InformacoesEsicView />
-      </Suspense>
+      <div className="space-y-6">
+        <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20" />)}</div>}>
+          <InformacoesEsicView />
+        </Suspense>
+
+        <FormularioEsicForm />
+      </div>
     </div>
   )
 }
