@@ -11,6 +11,7 @@ import {
   MdSchedule
 } from 'react-icons/md'
 
+import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import DocumentList from '@/components/ui/DocumentList'
 import EmptyState from '@/components/ui/EmptyState'
@@ -26,11 +27,11 @@ interface Props {
   detalhe: SecretariaDetalheType
 }
 
-type Aba = 'info' | 'ex-gestores' | 'ordenadores' | 'setores' | 'decretos' | 'obras'
+type Aba = 'info' | 'gestores' | 'ordenadores' | 'setores' | 'decretos' | 'obras'
 
 const ABAS: { aba: Aba; label: string }[] = [
   { aba: 'info', label: 'Informações do Órgão' },
-  { aba: 'ex-gestores', label: 'Ex-Gestores' },
+  { aba: 'gestores', label: 'Gestores' },
   { aba: 'ordenadores', label: 'Ordenadores' },
   { aba: 'setores', label: 'Setores' },
   { aba: 'decretos', label: 'Decretos' },
@@ -44,8 +45,9 @@ const TIPOS_DOCUMENTO: TipoDocumentoUnidade[] = [
 ]
 
 export default function SecretariaDetalhe({ detalhe }: Props) {
-  const { unidade, decretos, documentos, exGestores, ordenadores, setores } = detalhe
+  const { unidade, decretos, documentos, gestores, ordenadores, setores } = detalhe
   const [aba, setAba] = useUrlState<Aba>('secao', 'info')
+  const gestor = unidade.gestorAtual
 
   const decretosComoDocumento: Documento[] = decretos.map(d => ({
     id: d.id,
@@ -58,10 +60,10 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
   return (
     <div className="space-y-6">
       <Card className="p-6 flex flex-col md:flex-row gap-6" hoverable={false}>
-        {unidade.gestorFotoUrl ? (
+        {gestor?.fotoUrl ? (
           <Image
-            src={unidade.gestorFotoUrl}
-            alt={unidade.gestorNome}
+            src={gestor.fotoUrl}
+            alt={gestor.nome}
             width={96}
             height={96}
             className="w-24 h-24 rounded-xl object-cover shrink-0"
@@ -73,10 +75,10 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
         )}
 
         <div className="flex-1">
-          <h2 className="text-lg font-bold text-primary">{unidade.gestorNome || 'Gestor não informado'}</h2>
+          <h2 className="text-lg font-bold text-primary">{gestor?.nome || 'Gestor não informado'}</h2>
           <div className="flex flex-wrap items-center gap-2 text-sm text-text-secondary/70">
-            <span>{unidade.gestorCargo}</span>
-            {unidade.gestorVerificado && <SelinhoVerificado />}
+            <span>{gestor?.cargo}</span>
+            {gestor?.verificado && <SelinhoVerificado />}
           </div>
 
           {(unidade.dataInicio || unidade.dataFim) && (
@@ -167,8 +169,8 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
           )
         )}
 
-        {aba === 'ex-gestores' && (
-          <PessoaCargoList lista={exGestores} emptyMessage="Nenhum ex-gestor cadastrado." />
+        {aba === 'gestores' && (
+          <GestorList lista={gestores} />
         )}
 
         {aba === 'ordenadores' && (
@@ -202,7 +204,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
   )
 }
 
-function PessoaCargoList({ lista, emptyMessage }: { lista: SecretariaDetalheType['exGestores']; emptyMessage: string }) {
+function PessoaCargoList({ lista, emptyMessage }: { lista: SecretariaDetalheType['ordenadores']; emptyMessage: string }) {
   if (lista.length === 0) return <EmptyState message={emptyMessage} />
 
   return (
@@ -215,6 +217,47 @@ function PessoaCargoList({ lista, emptyMessage }: { lista: SecretariaDetalheType
           </div>
           <p className="text-xs text-text-secondary/60 whitespace-nowrap">
             {formatarData(p.dataInicio)} — {formatarData(p.dataFim)}
+          </p>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
+// Histórico completo (inclui o gestor vigente, não só os anteriores) — diferente de
+// PessoaCargoList porque GestorUnidade tem foto/verificado/ativo além de nome/cargo/período.
+function GestorList({ lista }: { lista: SecretariaDetalheType['gestores'] }) {
+  if (lista.length === 0) return <EmptyState message="Nenhum gestor cadastrado." />
+
+  return (
+    <div className="space-y-3">
+      {lista.map(g => (
+        <Card key={g.id} className="p-4 flex items-center gap-4">
+          {g.fotoUrl ? (
+            <Image
+              src={g.fotoUrl}
+              alt={g.nome}
+              width={48}
+              height={48}
+              className="w-12 h-12 rounded-lg object-cover shrink-0"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <MdApartment size={22} />
+            </div>
+          )}
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-sm font-semibold text-text-secondary">{g.nome}</p>
+              {g.verificado && <SelinhoVerificado />}
+              {g.ativo && <Badge className="bg-primary/10 text-primary">Vigente</Badge>}
+            </div>
+            <p className="text-xs text-text-secondary/60">{g.cargo}</p>
+          </div>
+
+          <p className="text-xs text-text-secondary/60 whitespace-nowrap">
+            {formatarData(g.dataInicio ?? undefined)} — {g.dataFim ? formatarData(g.dataFim) : 'o momento'}
           </p>
         </Card>
       ))}

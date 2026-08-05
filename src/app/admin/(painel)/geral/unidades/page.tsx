@@ -24,9 +24,6 @@ interface FormState {
   horarioAtendimento: string
   endereco: string
   atribuicoes: string
-  gestorNome: string
-  gestorCargo: string
-  gestorVerificado: boolean
   dataInicio: string
   dataFim: string
 }
@@ -40,9 +37,6 @@ const FORM_VAZIO: FormState = {
   horarioAtendimento: '',
   endereco: '',
   atribuicoes: '',
-  gestorNome: '',
-  gestorCargo: '',
-  gestorVerificado: false,
   dataInicio: '',
   dataFim: ''
 }
@@ -64,19 +58,16 @@ export default function UnidadesAdminPage() {
   >({ fetchFunction, initialSort: 'nome,asc' })
 
   const [form, setForm] = useState<FormState | null>(null)
-  const [foto, setFoto] = useState<File | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
 
   function abrirCriacao() {
     setErroForm(null)
-    setFoto(null)
     setForm(FORM_VAZIO)
   }
 
   function abrirEdicao(u: Unidade) {
     setErroForm(null)
-    setFoto(null)
     setForm({
       id: u.id,
       nome: u.nome,
@@ -86,9 +77,6 @@ export default function UnidadesAdminPage() {
       horarioAtendimento: u.horarioAtendimento ?? '',
       endereco: u.endereco ?? '',
       atribuicoes: u.atribuicoes ?? '',
-      gestorNome: u.gestorNome ?? '',
-      gestorCargo: u.gestorCargo ?? '',
-      gestorVerificado: u.gestorVerificado ?? false,
       dataInicio: u.dataInicio ?? '',
       dataFim: u.dataFim ?? ''
     })
@@ -126,13 +114,12 @@ export default function UnidadesAdminPage() {
 
     try {
       if (id) {
-        await unidadesService.atualizar(id, request, foto)
+        await unidadesService.atualizar(id, request)
       } else {
-        await unidadesService.criar(request, foto)
+        await unidadesService.criar(request)
       }
 
       setForm(null)
-      setFoto(null)
       recarregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
@@ -260,34 +247,6 @@ export default function UnidadesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Gestor atual</label>
-                <input
-                  value={form.gestorNome}
-                  onChange={e => setForm({ ...form, gestorNome: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Cargo do gestor</label>
-                <input
-                  value={form.gestorCargo}
-                  onChange={e => setForm({ ...form, gestorCargo: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-            </div>
-
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={form.gestorVerificado}
-                onChange={e => setForm({ ...form, gestorVerificado: e.target.checked })}
-              />
-              Cadastro do gestor verificado
-            </label>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
                 <label className="block text-sm font-medium mb-1">
                   Data de criação do órgão (opcional)
                 </label>
@@ -312,21 +271,15 @@ export default function UnidadesAdminPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Foto do gestor {form.id && '(opcional — mantém a atual se vazio)'}
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={e => setFoto(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-text-secondary/70
-                  file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0
-                  file:text-sm file:font-semibold file:bg-primary file:text-white
-                  hover:file:bg-primary-dark file:cursor-pointer file:transition-all"
-              />
-              {foto && <p className="text-xs text-text-secondary/70 mt-1">Selecionada: {foto.name}</p>}
-            </div>
+            {form.id && (
+              <p className="text-xs text-text-secondary/60">
+                Gestor da unidade se gerencia na tela de detalhe (
+                <Link href={`/admin/geral/unidades/${form.id}`} className="text-primary hover:underline">
+                  ver detalhes
+                </Link>
+                , aba Gestores) — não faz mais parte deste formulário.
+              </p>
+            )}
 
             {erroForm && <ErrorState message={erroForm} />}
 
@@ -370,10 +323,10 @@ export default function UnidadesAdminPage() {
                 <tr key={u.id} className="border-t border-border/20">
                   <td className="p-3 font-semibold">{u.nome}</td>
                   <td className="p-3">
-                    {u.gestorNome ? (
+                    {u.gestorAtual ? (
                       <>
-                        {u.gestorNome} {u.gestorCargo && `— ${u.gestorCargo}`}
-                        {u.gestorVerificado && <Badge className="bg-success/10 text-success ml-2">Verificado</Badge>}
+                        {u.gestorAtual.nome} {u.gestorAtual.cargo && `— ${u.gestorAtual.cargo}`}
+                        {u.gestorAtual.verificado && <Badge className="bg-success/10 text-success ml-2">Verificado</Badge>}
                       </>
                     ) : (
                       <span className="text-text-secondary/50">-</span>

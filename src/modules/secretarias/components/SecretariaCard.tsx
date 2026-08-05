@@ -22,13 +22,15 @@ function LinhaContato({ icon: Icon, valor }: { icon: typeof MdEmail; valor?: str
 }
 
 export default function SecretariaCard({ unidade }: Props) {
+  const gestor = unidade.gestorAtual
+
   return (
     <Card className="p-5 flex flex-col gap-3 h-full">
       <div className="flex items-start gap-3">
-        {unidade.gestorFotoUrl ? (
+        {gestor?.fotoUrl ? (
           <Image
-            src={unidade.gestorFotoUrl}
-            alt={unidade.gestorNome}
+            src={gestor.fotoUrl}
+            alt={gestor.nome}
             width={40}
             height={40}
             className="w-10 h-10 rounded-lg object-cover shrink-0"
@@ -41,13 +43,13 @@ export default function SecretariaCard({ unidade }: Props) {
 
         <div className="min-w-0">
           <h2 className="text-base font-bold text-primary leading-tight">{unidade.nome}</h2>
-          {unidade.gestorNome && (
+          {gestor?.nome && (
             <p className="text-xs text-text-secondary/60 mt-1 flex items-center gap-1">
               <MdBadge size={14} />
-              {unidade.gestorNome}{unidade.gestorCargo && ` — ${unidade.gestorCargo}`}
+              {gestor.nome}{gestor.cargo && ` — ${gestor.cargo}`}
             </p>
           )}
-          {unidade.gestorVerificado && <SelinhoVerificado className="mt-1" />}
+          {gestor?.verificado && <SelinhoVerificado className="mt-1" />}
         </div>
       </div>
 

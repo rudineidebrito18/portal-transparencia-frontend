@@ -1,6 +1,6 @@
 import { api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
-import { Decreto, DocumentoUnidade, FiltroSecretaria, PessoaCargoUnidade, SetorUnidade, Unidade } from './types'
+import { Decreto, DocumentoUnidade, FiltroSecretaria, GestorUnidade, PessoaCargoUnidade, SetorUnidade, Unidade } from './types'
 
 const BASE = '/geral/unidades'
 
@@ -26,8 +26,10 @@ export const secretariasService = {
     return api.get<DocumentoUnidade[]>(`${BASE}/${unidadeId}/documentos`).then(r => r.data)
   },
 
-  listarExGestores(unidadeId: number): Promise<PessoaCargoUnidade[]> {
-    return api.get<PessoaCargoUnidade[]>(`${BASE}/${unidadeId}/ex-gestores`).then(r => r.data)
+  // /ex-gestores foi renomeado pra /gestores em 2026-08-05 — agora é histórico
+  // completo (inclui o vigente, não só os anteriores).
+  listarGestores(unidadeId: number): Promise<GestorUnidade[]> {
+    return api.get<GestorUnidade[]>(`${BASE}/${unidadeId}/gestores`).then(r => r.data)
   },
 
   listarOrdenadores(unidadeId: number): Promise<PessoaCargoUnidade[]> {

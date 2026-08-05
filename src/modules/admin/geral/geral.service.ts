@@ -27,20 +27,11 @@ export const fornecedoresService = {
 
 const UNIDADES_BASE = '/geral/unidades'
 
-// Unidades saiu da fábrica JSON genérica em 2026-07-16: o backend passou a
-// exigir multipart/form-data (parte "dados" + "foto" opcional) pra virar a
-// base do futuro módulo público "Secretarias" — mesmo padrão de
-// tabela-valores.service.ts. Não reaproveitar criarServicoAdminSimples aqui:
-// ela ainda serve Fornecedores, que continua JSON puro.
-function montarFormData(dados: UnidadeRequest, foto?: File | null): FormData {
-  const formData = new FormData()
-  formData.append('dados', new Blob([JSON.stringify(dados)], { type: 'application/json' }))
-  if (foto) formData.append('foto', foto)
-  return formData
-}
-
 type ListarUnidadesParams = FiltroUnidade & { page?: number; size?: number; sort?: string }
 
+// Unidade voltou a ser JSON puro em 2026-08-05 — o gestor (antes multipart com foto
+// embutida no PUT/POST da unidade) virou recurso próprio (GestorUnidade, ver
+// unidadeSubrecursos.service.ts), sem vínculo/request aqui.
 export const unidadesService = {
   listar(params: ListarUnidadesParams): Promise<Page<Unidade>> {
     return api.get<Page<Unidade>>(UNIDADES_BASE, { params }).then(r => r.data)
@@ -50,16 +41,12 @@ export const unidadesService = {
     return api.get<Unidade>(`${UNIDADES_BASE}/${id}`).then(r => r.data)
   },
 
-  criar(dados: UnidadeRequest, foto?: File | null): Promise<Unidade> {
-    return api
-      .post<Unidade>(UNIDADES_BASE, montarFormData(dados, foto), { headers: { 'Content-Type': 'multipart/form-data' } })
-      .then(r => r.data)
+  criar(dados: UnidadeRequest): Promise<Unidade> {
+    return api.post<Unidade>(UNIDADES_BASE, dados).then(r => r.data)
   },
 
-  atualizar(id: number, dados: UnidadeRequest, foto?: File | null): Promise<Unidade> {
-    return api
-      .put<Unidade>(`${UNIDADES_BASE}/${id}`, montarFormData(dados, foto), { headers: { 'Content-Type': 'multipart/form-data' } })
-      .then(r => r.data)
+  atualizar(id: number, dados: UnidadeRequest): Promise<Unidade> {
+    return api.put<Unidade>(`${UNIDADES_BASE}/${id}`, dados).then(r => r.data)
   },
 
   excluir(id: number): Promise<void> {

@@ -1,8 +1,10 @@
 'use client'
 
+import Image from 'next/image'
 import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { MdApartment } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
@@ -10,18 +12,20 @@ import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
-import { podeCriar, podeExcluir } from '@/modules/auth/permissoes'
+import { isAdministrador, podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { unidadesService } from '@/modules/admin/geral/geral.service'
 import {
   decretoUnidadeService,
   documentoUnidadeService,
-  exGestorUnidadeService,
+  gestorUnidadeService,
   ordenadorUnidadeService,
   setorUnidadeService
 } from '@/modules/admin/geral/unidadeSubrecursos.service'
 import {
   Decreto,
   DocumentoUnidade,
+  GestorUnidade,
+  GestorUnidadeRequest,
   PessoaCargoUnidade,
   SetorUnidade,
   TipoDocumentoUnidade,
@@ -34,7 +38,7 @@ function formatarData(data?: string | null) {
   return new Date(`${data}T00:00:00`).toLocaleDateString('pt-BR')
 }
 
-type Aba = 'decretos' | 'documentos' | 'exGestores' | 'ordenadores' | 'setores'
+type Aba = 'decretos' | 'documentos' | 'gestores' | 'ordenadores' | 'setores'
 
 export default function UnidadeDetalheAdminPage() {
   const params = useParams<{ id: string }>()
@@ -70,13 +74,18 @@ export default function UnidadeDetalheAdminPage() {
       </div>
 
       <Card className="p-4 flex flex-col md:flex-row gap-4" hoverable={false}>
-        {unidade.gestorFotoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={unidade.gestorFotoUrl}
-            alt={unidade.gestorNome}
+        {unidade.gestorAtual?.fotoUrl ? (
+          <Image
+            src={unidade.gestorAtual.fotoUrl}
+            alt={unidade.gestorAtual.nome}
+            width={96}
+            height={96}
             className="w-24 h-24 rounded-lg object-cover shrink-0"
           />
+        ) : (
+          <div className="w-24 h-24 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <MdApartment size={36} />
+          </div>
         )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm flex-1">
@@ -107,8 +116,8 @@ export default function UnidadeDetalheAdminPage() {
           <div>
             <p className="text-text-secondary/60 text-xs">Gestor atual</p>
             <p className="font-semibold">
-              {unidade.gestorNome || '—'} {unidade.gestorCargo && `— ${unidade.gestorCargo}`}
-              {unidade.gestorVerificado && <Badge className="bg-success/10 text-success ml-2">Verificado</Badge>}
+              {unidade.gestorAtual?.nome || '—'} {unidade.gestorAtual?.cargo && `— ${unidade.gestorAtual.cargo}`}
+              {unidade.gestorAtual?.verificado && <Badge className="bg-success/10 text-success ml-2">Verificado</Badge>}
             </p>
           </div>
           <div>
@@ -122,7 +131,7 @@ export default function UnidadeDetalheAdminPage() {
         {([
           ['decretos', 'Decretos'],
           ['documentos', 'Documentos'],
-          ['exGestores', 'Ex-gestores'],
+          ['gestores', 'Gestores'],
           ['ordenadores', 'Ordenadores'],
           ['setores', 'Setores']
         ] as [Aba, string][]).map(([valor, label]) => (
@@ -140,8 +149,8 @@ export default function UnidadeDetalheAdminPage() {
 
       {aba === 'decretos' && <AbaDecretos unidadeId={unidadeId} />}
       {aba === 'documentos' && <AbaDocumentos unidadeId={unidadeId} />}
-      {aba === 'exGestores' && <AbaPessoaCargo unidadeId={unidadeId} tipo="exGestores" />}
-      {aba === 'ordenadores' && <AbaPessoaCargo unidadeId={unidadeId} tipo="ordenadores" />}
+      {aba === 'gestores' && <AbaGestores unidadeId={unidadeId} />}
+      {aba === 'ordenadores' && <AbaPessoaCargo unidadeId={unidadeId} />}
       {aba === 'setores' && <AbaSetores unidadeId={unidadeId} />}
     </div>
   )
@@ -429,10 +438,9 @@ function SlotDocumento({
   )
 }
 
-function AbaPessoaCargo({ unidadeId, tipo }: { unidadeId: number; tipo: 'exGestores' | 'ordenadores' }) {
+function AbaPessoaCargo({ unidadeId }: { unidadeId: number }) {
   const { usuario } = useAuth()
-  const servico = tipo === 'exGestores' ? exGestorUnidadeService : ordenadorUnidadeService
-  const titulo = tipo === 'exGestores' ? 'ex-gestor' : 'ordenador de despesa'
+  const titulo = 'ordenador de despesa'
 
   const [lista, setLista] = useState<PessoaCargoUnidade[]>([])
   const [loading, setLoading] = useState(true)
@@ -441,15 +449,14 @@ function AbaPessoaCargo({ unidadeId, tipo }: { unidadeId: number; tipo: 'exGesto
   function carregar() {
     setLoading(true)
     setErro(null)
-    servico
+    ordenadorUnidadeService
       .listarPorUnidade(unidadeId)
       .then(setLista)
       .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
       .finally(() => setLoading(false))
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(carregar, [unidadeId, tipo])
+  useEffect(carregar, [unidadeId])
 
   const [nome, setNome] = useState('')
   const [cargo, setCargo] = useState('')
@@ -461,7 +468,7 @@ function AbaPessoaCargo({ unidadeId, tipo }: { unidadeId: number; tipo: 'exGesto
   async function excluir(id: number) {
     if (!confirm(`Excluir este ${titulo}? Essa ação não pode ser desfeita.`)) return
     try {
-      await servico.excluir(id)
+      await ordenadorUnidadeService.excluir(id)
       carregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
@@ -480,7 +487,7 @@ function AbaPessoaCargo({ unidadeId, tipo }: { unidadeId: number; tipo: 'exGesto
     setErroForm(null)
 
     try {
-      await servico.criar(unidadeId, { nome, cargo, dataInicio, dataFim })
+      await ordenadorUnidadeService.criar(unidadeId, { nome, cargo, dataInicio, dataFim })
       setNome('')
       setCargo('')
       setDataInicio('')
@@ -581,6 +588,300 @@ function AbaPessoaCargo({ unidadeId, tipo }: { unidadeId: number; tipo: 'exGesto
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'geral') && (
                       <button onClick={() => excluir(p.id)} className="text-error hover:underline">
+                        Excluir
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+interface GestorFormState {
+  id: number | null
+  nome: string
+  cargo: string
+  dataInicio: string
+  dataFim: string
+  verificado: boolean
+}
+
+const GESTOR_VAZIO: GestorFormState = { id: null, nome: '', cargo: '', dataInicio: '', dataFim: '', verificado: false }
+
+// Gestor divergiu de ex-gestores/ordenadores em 2026-08-05: virou histórico com 1
+// vigente (POST cria e já ativa, desativando o anterior), PUT só corrige dados sem
+// mexer em quem tá ativo, PATCH .../ativar reativa um antigo, e DELETE é admin-only
+// no backend (checagem direta com isAdministrador, não via podeExcluir(usuario,
+// 'geral') — esse grupo resolve MANAGER, certo pros outros sub-recursos, errado aqui).
+function AbaGestores({ unidadeId }: { unidadeId: number }) {
+  const { usuario } = useAuth()
+
+  const [lista, setLista] = useState<GestorUnidade[]>([])
+  const [loading, setLoading] = useState(true)
+  const [erro, setErro] = useState<string | null>(null)
+
+  function carregar() {
+    setLoading(true)
+    setErro(null)
+    gestorUnidadeService
+      .listarPorUnidade(unidadeId)
+      .then(setLista)
+      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(carregar, [unidadeId])
+
+  const [form, setForm] = useState<GestorFormState | null>(null)
+  const [foto, setFoto] = useState<File | null>(null)
+  const [salvando, setSalvando] = useState(false)
+  const [erroForm, setErroForm] = useState<string | null>(null)
+  const [processando, setProcessando] = useState<number | null>(null)
+
+  function abrirCriacao() {
+    setErroForm(null)
+    setFoto(null)
+    setForm(GESTOR_VAZIO)
+  }
+
+  function abrirEdicao(g: GestorUnidade) {
+    setErroForm(null)
+    setFoto(null)
+    setForm({
+      id: g.id,
+      nome: g.nome,
+      cargo: g.cargo,
+      dataInicio: g.dataInicio ?? '',
+      dataFim: g.dataFim ?? '',
+      verificado: g.verificado
+    })
+  }
+
+  async function ativar(gestorId: number) {
+    setProcessando(gestorId)
+    try {
+      await gestorUnidadeService.ativar(unidadeId, gestorId)
+      carregar()
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erro ao reativar')
+    } finally {
+      setProcessando(null)
+    }
+  }
+
+  async function excluir(gestorId: number) {
+    if (!confirm('Excluir este registro do histórico? Essa ação não pode ser desfeita.')) return
+    try {
+      await gestorUnidadeService.excluir(unidadeId, gestorId)
+      carregar()
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    }
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!form) return
+
+    if (form.dataInicio && form.dataFim && form.dataInicio > form.dataFim) {
+      setErroForm('A data de início não pode ser depois da data de término.')
+      return
+    }
+
+    setSalvando(true)
+    setErroForm(null)
+
+    const dados: GestorUnidadeRequest = {
+      nome: form.nome,
+      cargo: form.cargo,
+      dataInicio: form.dataInicio || undefined,
+      dataFim: form.dataFim || undefined,
+      verificado: form.verificado
+    }
+
+    try {
+      if (form.id) {
+        await gestorUnidadeService.atualizar(unidadeId, form.id, dados, foto)
+      } else {
+        await gestorUnidadeService.criar(unidadeId, dados, foto)
+      }
+      setForm(null)
+      setFoto(null)
+      carregar()
+    } catch (e: unknown) {
+      setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
+    } finally {
+      setSalvando(false)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-text-secondary/60">
+        Cadastrar um novo gestor aqui o torna automaticamente o vigente (desativa o
+        anterior, sem apagar do histórico). Pra corrigir dados de um registro existente
+        sem trocar quem está ativo, use &quot;Editar&quot;; pra voltar um gestor antigo a
+        ser o vigente, use &quot;Reativar&quot;.
+      </p>
+
+      {podeCriar(usuario, 'geral') && !form && (
+        <button
+          onClick={abrirCriacao}
+          className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+        >
+          + Novo gestor
+        </button>
+      )}
+
+      {form && (
+        <Card className="p-4" hoverable={false}>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <h2 className="font-semibold text-sm">
+              {form.id ? 'Editar registro' : 'Novo gestor (torna-se o vigente)'}
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Nome</label>
+                <input
+                  required
+                  value={form.nome}
+                  onChange={e => setForm({ ...form, nome: e.target.value })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Cargo</label>
+                <input
+                  required
+                  value={form.cargo}
+                  onChange={e => setForm({ ...form, cargo: e.target.value })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Data de início (opcional)</label>
+                <input
+                  type="date"
+                  value={form.dataInicio}
+                  onChange={e => setForm({ ...form, dataInicio: e.target.value })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Data de término (opcional)</label>
+                <input
+                  type="date"
+                  min={form.dataInicio || undefined}
+                  value={form.dataFim}
+                  onChange={e => setForm({ ...form, dataFim: e.target.value })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.verificado}
+                onChange={e => setForm({ ...form, verificado: e.target.checked })}
+              />
+              Cadastro verificado
+            </label>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Foto {form.id && '(opcional — mantém a atual se vazio)'}
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => setFoto(e.target.files?.[0] ?? null)}
+                className="block w-full text-sm text-text-secondary/70
+                  file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0
+                  file:text-sm file:font-semibold file:bg-primary file:text-white
+                  hover:file:bg-primary-dark file:cursor-pointer file:transition-all"
+              />
+              {foto && <p className="text-xs text-text-secondary/70 mt-1">Selecionada: {foto.name}</p>}
+            </div>
+
+            {erroForm && <ErrorState message={erroForm} />}
+
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={salvando}
+                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+              >
+                {salvando ? 'Salvando...' : 'Salvar'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm(null)}
+                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      {loading && <Skeleton className="h-40" />}
+      {erro && <ErrorState message={erro} />}
+      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum gestor cadastrado." />}
+
+      {!loading && !erro && lista.length > 0 && (
+        <Card className="overflow-x-auto" hoverable={false}>
+          <table className="w-full text-sm">
+            <thead className="bg-neutral-light text-left">
+              <tr>
+                <th className="p-3">Nome</th>
+                <th className="p-3">Cargo</th>
+                <th className="p-3">Período</th>
+                <th className="p-3">Status</th>
+                <th className="p-3 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lista.map(g => (
+                <tr key={g.id} className="border-t border-border/20">
+                  <td className="p-3 font-semibold">{g.nome}</td>
+                  <td className="p-3">{g.cargo}</td>
+                  <td className="p-3">
+                    {formatarData(g.dataInicio)} — {g.dataFim ? formatarData(g.dataFim) : 'o momento'}
+                  </td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-1.5">
+                      {g.ativo && <Badge className="bg-primary/10 text-primary">Vigente</Badge>}
+                      {g.verificado && <Badge className="bg-success/10 text-success">Verificado</Badge>}
+                    </div>
+                  </td>
+                  <td className="p-3 text-right space-x-2">
+                    {podeEditar(usuario, 'geral') && (
+                      <button onClick={() => abrirEdicao(g)} className="text-primary hover:underline">
+                        Editar
+                      </button>
+                    )}
+                    {!g.ativo && podeEditar(usuario, 'geral') && (
+                      <button
+                        onClick={() => ativar(g.id)}
+                        disabled={processando === g.id}
+                        className="text-primary hover:underline disabled:opacity-60"
+                      >
+                        {processando === g.id ? 'Aguarde...' : 'Reativar'}
+                      </button>
+                    )}
+                    {isAdministrador(usuario) && (
+                      <button onClick={() => excluir(g.id)} className="text-error hover:underline">
                         Excluir
                       </button>
                     )}

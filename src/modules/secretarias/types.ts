@@ -1,3 +1,20 @@
+// Gestor agora é histórico (N registros por unidade, só 1 ativo por vez) — Unidade só
+// referencia o vigente. gestorAtual vem null se a unidade ainda não tem nenhum gestor.
+export interface GestorUnidade {
+  id: number
+  nome: string
+  cargo: string
+  dataInicio: string | null
+  dataFim: string | null
+  fotoUrl: string | null
+  verificado: boolean
+  ativo: boolean
+  // null nos registros migrados da era pré-histórico (2026-08-05) que não tinham
+  // esse campo — confirmado em runtime (GET .../gestores devolveu criadoEm: null
+  // pro gestor que já existia antes da migration).
+  criadoEm: string | null
+}
+
 export interface Unidade {
   id: number
   nome: string
@@ -7,10 +24,7 @@ export interface Unidade {
   horarioAtendimento: string
   endereco: string
   atribuicoes: string
-  gestorNome: string
-  gestorCargo: string
-  gestorFotoUrl: string | null
-  gestorVerificado: boolean
+  gestorAtual: GestorUnidade | null
   dataInicio: string | null
   dataFim: string | null
 }
@@ -46,7 +60,8 @@ export interface DocumentoUnidade {
   dataEnvio: string
 }
 
-// Ex-gestores e ordenadores de despesa têm exatamente a mesma forma no backend.
+// Só Ordenador de despesa usa esse formato agora — Gestor (GestorUnidade acima) divergiu
+// em 2026-08-05 (virou histórico com foto/verificado/ativo).
 export interface PessoaCargoUnidade {
   id: number
   nome: string
@@ -67,7 +82,7 @@ export interface SecretariaDetalhe {
   unidade: Unidade
   decretos: Decreto[]
   documentos: DocumentoUnidade[]
-  exGestores: PessoaCargoUnidade[]
+  gestores: GestorUnidade[]
   ordenadores: PessoaCargoUnidade[]
   setores: SetorUnidade[]
 }

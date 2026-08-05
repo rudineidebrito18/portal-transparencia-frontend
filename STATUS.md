@@ -115,7 +115,7 @@ sidebar junto no scroll.
 | Avisos | `/admin/institucional/avisos` | `institucional` | JSON puro, `InstitucionalCrudPage` genérico |
 | Notícias | `/admin/institucional/noticias` | `institucional` | multipart (`dados`+`imagem` opcional), form próprio (não usa o genérico) |
 | Fornecedores | `/admin/geral/fornecedores` | `geral` | bespoke paginado (`usePageableResource`), filtro via `GET .../filtro` (`nome`, `cnpj`); `GeralSimplesCrudPage.tsx` genérico foi removido (só Fornecedores usava, virou página própria) |
-| Secretarias (Unidade + 5 sub-recursos) | `/admin/geral/unidades` + `/admin/geral/unidades/[id]` | `geral` | multipart na unidade; agora bespoke paginado (`GET` base já aceita `nome`/`vigencia` como query params direto, sem `/filtro` separado); detalhe com abas pros 5 sub-recursos; Documentos tipados são 3 slots fixos (Termo/EDTC/Declaração E-SIC), reenviar substitui; excluir a unidade dá `409` se tiver sub-recurso vinculado (sem cascade) — excluir os 5 primeiro |
+| Secretarias (Unidade + 5 sub-recursos) | `/admin/geral/unidades` + `/admin/geral/unidades/[id]` | `geral` | **Unidade voltou a ser JSON puro em 2026-08-05** (era multipart até então) — bespoke paginado (`GET` base já aceita `nome`/`vigencia` como query params direto, sem `/filtro` separado); detalhe com abas pros 5 sub-recursos; Documentos tipados são 3 slots fixos (Termo/EDTC/Declaração E-SIC), reenviar substitui; excluir a unidade dá `409` se tiver sub-recurso vinculado (sem cascade) — excluir os 5 primeiro. **Gestor virou recurso próprio** (`gestorAtual` na Unidade, aba "Gestores" no detalhe) — ver seção 2.6 |
 | Perfil do Prefeito / Vice-Prefeito | `/admin/geral/prefeito` + `/admin/geral/vice-prefeito` | `geral` | singleton (upsert, 404 antes de configurado), multipart com foto opcional (mantém a atual se omitida); dois recursos independentes, sem vínculo com `Unidade`; formulário compartilhado (`AutoridadeConfigPage.tsx`), só título/service mudam. Ver seção 2.5 |
 | Tabela de Valores de Diária | `/admin/geral/tabela-valores` | `geral` | multipart; **o OpenAPI documenta esse endpoint como JSON por engano, é multipart de verdade** |
 | E-SIC — Configuração | `/admin/esic/config` | `esic-ouvidoria` | singleton (upsert, 404 antes de configurado) |
@@ -417,6 +417,44 @@ foto preservando a atual):
 - Links adicionados: dropdown "A PREFEITURA" do `Header.tsx`, coluna Institucional do
   `Footer.tsx`, `mapa-do-site/page.tsx`, e seção "Informações Institucionais" do hub
   `/transparencia` (`secoes.ts`).
+
+## 2.6 Gestor de Unidade virou recurso próprio com histórico (2026-08-05) — breaking, concluído
+
+Backend aplicou o mesmo modelo do Prefeito/Vice-Prefeito (seção 2.5) ao gestor de cada
+secretaria — mudança bem maior porque mexe direto em `Unidade`, que já era consumida em
+vários lugares. Contrato antigo (`gestorNome`/`gestorCargo`/`gestorFotoUrl`/`gestorVerificado`
+soltos na Unidade, editáveis só pelo `PUT` multipart da própria Unidade) não existe mais.
+
+- **`POST`/`PUT /api/geral/unidades` voltaram a ser JSON puro** (eram multipart desde
+  2026-07-16) — `unidadesService.criar`/`atualizar` perderam o parâmetro `foto`.
+  `UnidadeRequest` perdeu os 3 campos de gestor.
+- **`UnidadeResponseDto.gestorNome/gestorCargo/gestorFotoUrl/gestorVerificado` viraram 1
+  campo aninhado**: `gestorAtual: GestorUnidade | null` (`id, nome, cargo, dataInicio,
+  dataFim, fotoUrl, verificado, ativo, criadoEm` — `criadoEm` pode vir `null` nos
+  registros migrados da era pré-histórico, confirmado em runtime). Todo lugar que lia os
+  4 campos soltos (`SecretariaCard.tsx`, `SecretariaDetalhe.tsx`, admin
+  `unidades/page.tsx` e `unidades/[id]/page.tsx`) passou a ler `unidade.gestorAtual?.*`.
+- **`/geral/unidades/{id}/ex-gestores` → `/geral/unidades/{id}/gestores`**, e não é só
+  troca de nome — o recurso virou histórico completo (inclui o vigente, não só os
+  anteriores) com CRUD de verdade: `POST` cria e já ativa (desativa o anterior — não dá
+  pra ter 2 ativos), `PUT` só corrige dados de um registro sem mexer em quem tá ativo,
+  `PATCH .../ativar` reativa um antigo do histórico, `DELETE` é **admin-only** (MANAGER
+  toma 403 — única exceção dentro do grupo `geral`, que pro resto dos sub-recursos de
+  Unidade resolve MANAGER; a tela checa `isAdministrador(usuario)` direto em vez de
+  `podeExcluir(usuario, 'geral')` só pro botão Excluir de gestor). `POST`/`PUT` são
+  multipart (`dados` + `foto` opcional, mantém a atual se omitida).
+- **`OrdenadorUnidade` não mudou** — `PessoaCargoUnidade`/`criarServicoPessoaCargo` (antes
+  compartilhados entre `ex-gestores` e `ordenadores`) agora servem só Ordenador; Gestor
+  ganhou tipo (`GestorUnidade`) e service (`gestorUnidadeService`) próprios em
+  `unidadeSubrecursos.service.ts`.
+- Aba do detalhe admin renomeada "Ex-gestores" → "Gestores", com formulário de
+  criar/editar (nome, cargo, período, verificado, foto) + botão "Reativar" por registro
+  inativo do histórico. Aba pública equivalente em `SecretariaDetalhe.tsx` também
+  renomeada, mostrando o histórico completo com badge "Vigente"/selo de verificado.
+- Testado direto contra o backend real (`curl` com token): `PUT` de Unidade JSON puro,
+  `POST` de gestor (cria e ativa, confirmado que desativa o anterior), `PATCH ativar`
+  trazendo o gestor original de volta, `DELETE` admin-only (`204`). Estado de dev
+  restaurado ao original depois do teste.
 
 ## 3. Como decidir o padrão de um módulo novo
 

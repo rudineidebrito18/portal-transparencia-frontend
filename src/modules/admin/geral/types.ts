@@ -22,6 +22,7 @@ export type {
   Unidade,
   Decreto,
   DocumentoUnidade,
+  GestorUnidade,
   PessoaCargoUnidade,
   SetorUnidade
 } from '@/modules/secretarias/types'
@@ -34,6 +35,8 @@ export interface FiltroUnidade {
   vigencia?: string
 }
 
+// Gestor saiu do PUT/POST de Unidade em 2026-08-05 — vira multipart JSON puro, sem
+// parte "foto" (a foto agora pertence ao registro de GestorUnidade, não à Unidade).
 export interface UnidadeRequest {
   nome: string
   cnpj: string
@@ -42,11 +45,16 @@ export interface UnidadeRequest {
   horarioAtendimento: string
   endereco: string
   atribuicoes: string
-  gestorNome: string
-  gestorCargo: string
-  gestorVerificado: boolean
   dataInicio?: string
   dataFim?: string
+}
+
+export interface GestorUnidadeRequest {
+  nome: string
+  cargo: string
+  dataInicio?: string
+  dataFim?: string
+  verificado?: boolean
 }
 
 export interface DecretoRequest {

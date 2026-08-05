@@ -4,6 +4,8 @@ import {
   DecretoRequest,
   DocumentoUnidade,
   DocumentoUnidadeRequest,
+  GestorUnidade,
+  GestorUnidadeRequest,
   PessoaCargoUnidade,
   PessoaCargoUnidadeRequest,
   SetorUnidade,
@@ -58,9 +60,10 @@ export const documentoUnidadeService = {
   }
 }
 
-// Ex-gestores e ordenadores de despesa: mesma forma exata (nome, cargo, dataInicio,
-// dataFim), JSON puro — só o nome do sub-recurso na URL muda.
-function criarServicoPessoaCargo(recurso: 'ex-gestores' | 'ordenadores') {
+// Ordenador de despesa: JSON puro, só criar + listar + excluir (sem edição —
+// excluir e recriar faz as vezes). Gestor divergiu desse formato em 2026-08-05
+// (ver gestorUnidadeService abaixo) — não compartilha mais fábrica com Ordenador.
+function criarServicoPessoaCargo(recurso: 'ordenadores') {
   return {
     listarPorUnidade(unidadeId: number): Promise<PessoaCargoUnidade[]> {
       return api.get<PessoaCargoUnidade[]>(`${BASE}/${unidadeId}/${recurso}`).then(r => r.data)
@@ -76,8 +79,47 @@ function criarServicoPessoaCargo(recurso: 'ex-gestores' | 'ordenadores') {
   }
 }
 
-export const exGestorUnidadeService = criarServicoPessoaCargo('ex-gestores')
 export const ordenadorUnidadeService = criarServicoPessoaCargo('ordenadores')
+
+function montarFormDataGestor(dados: GestorUnidadeRequest, foto?: File | null): FormData {
+  const formData = new FormData()
+  formData.append('dados', new Blob([JSON.stringify(dados)], { type: 'application/json' }))
+  if (foto) formData.append('foto', foto)
+  return formData
+}
+
+// Gestor agora é histórico com um vigente por unidade (renomeado de /ex-gestores em
+// 2026-08-05). criar() sempre cria um novo registro E o torna vigente (desativa o
+// anterior) — não existe mais "editar o gestor atual" direto, só corrigir um registro
+// existente (atualizar, sem mexer em quem está ativo) ou reativar um antigo do
+// histórico (ativar). excluir é admin-only no backend (MANAGER toma 403) — a tela
+// verifica isAdministrador direto em vez de usar podeExcluir(usuario, 'geral')
+// (que resolveria MANAGER, certo pros outros sub-recursos de Unidade, errado aqui).
+export const gestorUnidadeService = {
+  listarPorUnidade(unidadeId: number): Promise<GestorUnidade[]> {
+    return api.get<GestorUnidade[]>(`${BASE}/${unidadeId}/gestores`).then(r => r.data)
+  },
+
+  criar(unidadeId: number, dados: GestorUnidadeRequest, foto?: File | null): Promise<GestorUnidade> {
+    return api
+      .post<GestorUnidade>(`${BASE}/${unidadeId}/gestores`, montarFormDataGestor(dados, foto), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then(r => r.data)
+  },
+
+  atualizar(unidadeId: number, gestorId: number, dados: GestorUnidadeRequest, foto?: File | null): Promise<GestorUnidade> {
+    return api
+      .put<GestorUnidade>(`${BASE}/${unidadeId}/gestores/${gestorId}`, montarFormDataGestor(dados, foto), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then(r => r.data)
+  },
+
+  ativar(unidadeId: number, gestorId: number): Promise<GestorUnidade> {
+    return api.patch<GestorUnidade>(`${BASE}/${unidadeId}/gestores/${gestorId}/ativar`).then(r => r.data)
+  },
+
+  excluir(unidadeId: number, gestorId: number): Promise<void> {
+    return api.delete(`${BASE}/${unidadeId}/gestores/${gestorId}`).then(() => undefined)
+  }
+}
 
 export const setorUnidadeService = {
   listarPorUnidade(unidadeId: number): Promise<SetorUnidade[]> {

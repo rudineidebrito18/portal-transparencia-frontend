@@ -17,15 +17,15 @@ export default async function SecretariaPage({
 
   let detalhe: SecretariaDetalheType
   try {
-    const [unidade, decretos, documentos, exGestores, ordenadores, setores] = await Promise.all([
+    const [unidade, decretos, documentos, gestores, ordenadores, setores] = await Promise.all([
       secretariasService.buscarPorId(numericId),
       secretariasService.listarDecretos(numericId),
       secretariasService.listarDocumentos(numericId),
-      secretariasService.listarExGestores(numericId),
+      secretariasService.listarGestores(numericId),
       secretariasService.listarOrdenadores(numericId),
       secretariasService.listarSetores(numericId)
     ])
-    detalhe = { unidade, decretos, documentos, exGestores, ordenadores, setores }
+    detalhe = { unidade, decretos, documentos, gestores, ordenadores, setores }
   } catch (error) {
     if ((error as { status?: number }).status === 404) notFound()
     throw error
