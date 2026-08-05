@@ -2,7 +2,7 @@ import { Page } from '@/modules/shared/types/Page'
 import { Documento } from '@/modules/shared/types/Documento'
 import { api } from '@/services/api'
 import { contratoMock } from './mocks/contrato.mock'
-import { Aditivo, ContratoLicitacao } from './types'
+import { Aditivo, ContratoLicitacao, FiltroContrato } from './types'
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
@@ -11,6 +11,8 @@ type ListarParams = {
   size?: number
   sort?: string
 }
+
+type ListarTodosParams = FiltroContrato & ListarParams
 
 export const contratoService = {
   buscarPorId(id: number): Promise<ContratoLicitacao> {
@@ -29,11 +31,11 @@ export const contratoService = {
       .then(response => response.data)
   },
 
-  listarTodos(params: ListarParams): Promise<Page<ContratoLicitacao>> {
+  listarTodos(params: ListarTodosParams): Promise<Page<ContratoLicitacao>> {
     if (USE_MOCK) return contratoMock.listarTodos(params)
 
     return api
-      .get<Page<ContratoLicitacao>>('/licitacoes/contratos', { params })
+      .get<Page<ContratoLicitacao>>('/licitacoes/contratos/filtro', { params })
       .then(response => response.data)
   },
 

@@ -70,3 +70,27 @@ export interface AditivoRequest {
   fornecedorId: number
   contratoLicitacaoId: number
 }
+
+export enum TipoOrgao {
+  GERENCIADOR = 'GERENCIADOR',
+  PARTICIPANTE = 'PARTICIPANTE'
+}
+
+export const TipoOrgaoDescricao: Record<TipoOrgao, string> = {
+  [TipoOrgao.GERENCIADOR]: 'Gerenciador',
+  [TipoOrgao.PARTICIPANTE]: 'Participante'
+}
+
+export interface LicitacaoOrgao {
+  id: number
+  unidadeId: number
+  unidadeNome: string
+  ordenador: string
+  tipo: TipoOrgao
+}
+
+export interface LicitacaoOrgaoRequest {
+  unidadeId: number
+  ordenador: string
+  tipo: TipoOrgao
+}

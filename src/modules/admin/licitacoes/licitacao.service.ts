@@ -1,7 +1,7 @@
 import { api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
 import { LicitacaoDetalhe, LicitacaoResumo } from '@/modules/licitacoes/types'
-import { DocumentoUploadRequest, Documento, FiltroLicitacaoAdmin, LicitacaoRequest } from './types'
+import { DocumentoUploadRequest, Documento, FiltroLicitacaoAdmin, LicitacaoOrgao, LicitacaoOrgaoRequest, LicitacaoRequest } from './types'
 
 const BASE = '/licitacoes'
 
@@ -55,5 +55,24 @@ export const licitacaoService = {
 
   excluirDocumento(licitacaoId: number, documentoId: number): Promise<void> {
     return api.delete(`${BASE}/${licitacaoId}/documento/${documentoId}`).then(() => undefined)
+  },
+
+  // Sem paginação (volume baixo por licitação) — padrão PNCP de gerenciador + participantes
+  // de uma compra compartilhada/SRP. Regras de negócio (409 se violadas): só um GERENCIADOR
+  // por licitação, mesma unidade não pode ser vinculada duas vezes.
+  listarOrgaos(licitacaoId: number): Promise<LicitacaoOrgao[]> {
+    return api.get<LicitacaoOrgao[]>(`${BASE}/${licitacaoId}/orgaos`).then(r => r.data)
+  },
+
+  criarOrgao(licitacaoId: number, dados: LicitacaoOrgaoRequest): Promise<LicitacaoOrgao> {
+    return api.post<LicitacaoOrgao>(`${BASE}/${licitacaoId}/orgaos`, dados).then(r => r.data)
+  },
+
+  atualizarOrgao(licitacaoId: number, id: number, dados: LicitacaoOrgaoRequest): Promise<LicitacaoOrgao> {
+    return api.put<LicitacaoOrgao>(`${BASE}/${licitacaoId}/orgaos/${id}`, dados).then(r => r.data)
+  },
+
+  excluirOrgao(licitacaoId: number, id: number): Promise<void> {
+    return api.delete(`${BASE}/${licitacaoId}/orgaos/${id}`).then(() => undefined)
   }
 }

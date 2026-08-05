@@ -1,11 +1,11 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
 import { institucionalMock } from './mocks/institucional.mock'
-import { ConteudoInstitucional, RecursoInstitucional } from './types'
+import { ConteudoInstitucional, FiltroConteudoInstitucional, RecursoInstitucional } from './types'
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
-type ListarParams = {
+type ListarParams = FiltroConteudoInstitucional & {
   ativo?: boolean
   page?: number
   size?: number
@@ -18,7 +18,7 @@ function criarServicoInstitucional(recurso: RecursoInstitucional) {
       if (USE_MOCK) return institucionalMock.listar(recurso, params)
 
       return api
-        .get<Page<ConteudoInstitucional>>(`/institucional/${recurso}`, { params })
+        .get<Page<ConteudoInstitucional>>(`/institucional/${recurso}/filtro`, { params })
         .then(response => response.data)
     }
   }

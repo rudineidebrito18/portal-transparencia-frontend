@@ -4,9 +4,13 @@ import { buscarLicitacaoMockPorId, listarTodasLicitacoesMock, LicitacaoCompleta 
 import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Documento } from '@/modules/shared/types/Documento'
 import { Page } from '@/modules/shared/types/Page'
-import { Aditivo, ContratoLicitacao } from '../types'
+import { Aditivo, ContratoLicitacao, FiltroContrato } from '../types'
 
-function gerarContratosDaLicitacao(licitacao: LicitacaoCompleta): ContratoLicitacao[] {
+interface ContratoMockGerado extends ContratoLicitacao {
+  unidadeId?: number
+}
+
+function gerarContratosDaLicitacao(licitacao: LicitacaoCompleta): ContratoMockGerado[] {
   faker.seed(licitacao.id + 10_000)
 
   const quantidade = faker.number.int({ min: 0, max: 3 })
@@ -33,7 +37,8 @@ function gerarContratosDaLicitacao(licitacao: LicitacaoCompleta): ContratoLicita
       valorContrato: Number(faker.commerce.price({ min: 10000, max: 1000000 })),
       status: faker.helpers.arrayElement(['EM_ANDAMENTO', 'CONCLUIDO', 'RESCINDIDO', 'SUSPENSO']),
       objeto: licitacao.objeto,
-      numeroLicitacao: `${licitacao.numeroInstrumento}/${licitacao.ano}`
+      numeroLicitacao: `${licitacao.numeroInstrumento}/${licitacao.ano}`,
+      unidadeId: licitacao.unidadeId
     }
   })
 }
@@ -98,13 +103,44 @@ export const contratoMock = {
   },
 
   async listarTodos(
-    params: { page?: number; size?: number; sort?: string }
+    params: FiltroContrato & { page?: number; size?: number; sort?: string }
   ): Promise<Page<ContratoLicitacao>> {
-    const { page = 0, size = 10, sort } = params
+    const { page = 0, size = 10, sort, ...filtros } = params
 
-    const todosContratos = listarTodasLicitacoesMock().flatMap(gerarContratosDaLicitacao)
+    let dados = listarTodasLicitacoesMock().flatMap(gerarContratosDaLicitacao)
+
+    if (filtros.numeroContrato !== undefined) {
+      dados = dados.filter(c => c.numeroContrato === Number(filtros.numeroContrato))
+    }
+    if (filtros.exercicio !== undefined) {
+      dados = dados.filter(c => c.exercicio === Number(filtros.exercicio))
+    }
+    if (filtros.fornecedor) {
+      dados = dados.filter(c => c.fornecedor.toLowerCase().includes(String(filtros.fornecedor).toLowerCase()))
+    }
+    if (filtros.objeto) {
+      dados = dados.filter(c => c.objeto.toLowerCase().includes(String(filtros.objeto).toLowerCase()))
+    }
+    if (filtros.status) {
+      dados = dados.filter(c => c.status === filtros.status)
+    }
+    if (filtros.gestorContrato) {
+      dados = dados.filter(c => c.gestorContrato.toLowerCase().includes(String(filtros.gestorContrato).toLowerCase()))
+    }
+    if (filtros.unidadeId !== undefined) {
+      dados = dados.filter(c => c.unidadeId === Number(filtros.unidadeId))
+    }
+    if (filtros.dataInicial) {
+      const inicio = new Date(String(filtros.dataInicial)).getTime()
+      dados = dados.filter(c => new Date(c.dataAssinatura).getTime() >= inicio)
+    }
+    if (filtros.dataFinal) {
+      const fim = new Date(String(filtros.dataFinal)).getTime()
+      dados = dados.filter(c => new Date(c.dataAssinatura).getTime() <= fim)
+    }
+
     const ordenados = ordenar(
-      todosContratos as unknown as Record<string, unknown>[],
+      dados as unknown as Record<string, unknown>[],
       sort ?? 'dataPublicacao,desc'
     ) as unknown as ContratoLicitacao[]
 

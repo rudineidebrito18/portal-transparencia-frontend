@@ -9,6 +9,7 @@ import Skeleton from '@/components/ui/Skeleton'
 import { formatarDataHora } from '@/utils/date'
 import { useContratos } from '../hooks/useContratos'
 import ContratoCard from './ContratoCard'
+import ContratoFiltro from './ContratoFiltro'
 
 export default function ContratoListView() {
   const {
@@ -21,11 +22,16 @@ export default function ContratoListView() {
     atualizadoEm,
     setPagina,
     setOrdenacao,
-    ordenacao
+    ordenacao,
+    filtros,
+    setFiltros
   } = useContratos()
 
   return (
     <div className="space-y-6">
+
+      {/* FILTRO */}
+      <ContratoFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
@@ -75,7 +81,7 @@ export default function ContratoListView() {
                 <ContratoCard key={item.id} contrato={item} />
               ))
             ) : (
-              <EmptyState message="Nenhum contrato encontrado." />
+              <EmptyState message="Nenhum contrato encontrado com os filtros aplicados." />
             )}
           </div>
 

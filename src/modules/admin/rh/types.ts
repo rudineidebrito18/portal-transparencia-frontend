@@ -51,6 +51,12 @@ export interface CargoRequest {
   valorDesconto: number
 }
 
+export interface FiltroCargo {
+  cargo?: string
+  valorBrutoMin?: number
+  valorBrutoMax?: number
+}
+
 export interface Diaria {
   id: number
   dataInicio: string
@@ -61,9 +67,21 @@ export interface Diaria {
   motivo: string
   quantDiarias: number
   valorConcedido: number
+  unidadeId?: number
+  unidadeNome?: string
 }
 
-export type DiariaRequest = Omit<Diaria, 'id'>
+export interface DiariaRequest {
+  dataInicio: string
+  dataTermino: string
+  beneficiario: string
+  cargo: string
+  destino: string
+  motivo: string
+  quantDiarias: number
+  valorConcedido: number
+  unidadeId?: number
+}
 
 export interface FiltroDiaria {
   dataInicio?: string
@@ -72,6 +90,7 @@ export interface FiltroDiaria {
   cargo?: string
   destino?: string
   motivo?: string
+  unidadeId?: number
 }
 
 export interface FolhaPagamento {

@@ -51,7 +51,7 @@ export interface FiltroLicitacao {
   tipoProcedimentoLicitacao?: string
   nomeAutoridade?: string
   status?: string
-  unidade?: string
+  unidadeId?: number
   covid?: boolean
   dataAberturaInicio?: string
   dataAberturaFim?: string

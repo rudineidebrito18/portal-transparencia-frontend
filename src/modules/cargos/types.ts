@@ -7,3 +7,9 @@ export interface Cargo {
   valorLiquido: number
   media: number
 }
+
+export interface FiltroCargo {
+  cargo?: string
+  valorBrutoMin?: number
+  valorBrutoMax?: number
+}

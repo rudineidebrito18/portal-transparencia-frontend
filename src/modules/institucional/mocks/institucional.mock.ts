@@ -2,9 +2,9 @@ import { fakerPT_BR as faker } from '@faker-js/faker'
 
 import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Page } from '@/modules/shared/types/Page'
-import { ConteudoInstitucional, RecursoInstitucional } from '../types'
+import { ConteudoInstitucional, FiltroConteudoInstitucional, RecursoInstitucional } from '../types'
 
-type ListParams = {
+type ListParams = FiltroConteudoInstitucional & {
   ativo?: boolean
   page?: number
   size?: number
@@ -49,12 +49,23 @@ const dados: Record<RecursoInstitucional, ConteudoInstitucional[]> = {
 
 export const institucionalMock = {
   async listar(recurso: RecursoInstitucional, params: ListParams): Promise<Page<ConteudoInstitucional>> {
-    const { page = 0, size = 10, sort, ativo } = params
+    const { page = 0, size = 10, sort, ativo, titulo, dataInicial, dataFinal } = params
 
     let itens = dados[recurso]
 
     if (ativo !== undefined) {
       itens = itens.filter(item => item.ativo === ativo)
+    }
+    if (titulo) {
+      itens = itens.filter(item => item.titulo.toLowerCase().includes(String(titulo).toLowerCase()))
+    }
+    if (dataInicial) {
+      const inicio = new Date(String(dataInicial)).getTime()
+      itens = itens.filter(item => new Date(item.data).getTime() >= inicio)
+    }
+    if (dataFinal) {
+      const fim = new Date(String(dataFinal)).getTime()
+      itens = itens.filter(item => new Date(item.data).getTime() <= fim)
     }
 
     const ordenados = ordenar(itens as unknown as Record<string, unknown>[], sort) as unknown as ConteudoInstitucional[]

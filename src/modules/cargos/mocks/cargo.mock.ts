@@ -1,6 +1,14 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
-import { Cargo } from '../types'
+import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
+import { Page } from '@/modules/shared/types/Page'
+import { Cargo, FiltroCargo } from '../types'
+
+type ListarParams = FiltroCargo & {
+  page?: number
+  size?: number
+  sort?: string
+}
 
 const NOMES_CARGO = [
   'Professor',
@@ -44,7 +52,23 @@ function gerarCargo(id: number, nomeCargo: string): Cargo {
 const CARGOS = NOMES_CARGO.map((nome, i) => gerarCargo(i + 1, nome))
 
 export const cargoMock = {
-  async listar(): Promise<Cargo[]> {
-    return CARGOS
+  async listar(params: ListarParams): Promise<Page<Cargo>> {
+    const { page = 0, size = 10, sort, ...filtros } = params
+
+    let dados = CARGOS
+
+    if (filtros.cargo) {
+      dados = dados.filter(c => c.cargo.toLowerCase().includes(String(filtros.cargo).toLowerCase()))
+    }
+    if (filtros.valorBrutoMin !== undefined) {
+      dados = dados.filter(c => c.valorBruto >= Number(filtros.valorBrutoMin))
+    }
+    if (filtros.valorBrutoMax !== undefined) {
+      dados = dados.filter(c => c.valorBruto <= Number(filtros.valorBrutoMax))
+    }
+
+    const ordenados = ordenar(dados as unknown as Record<string, unknown>[], sort) as unknown as Cargo[]
+
+    return paginar(ordenados, page, size)
   }
 }

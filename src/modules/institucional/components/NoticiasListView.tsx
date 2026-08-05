@@ -4,7 +4,10 @@ import { useNoticias } from '../hooks/useNoticias'
 import ConteudoInstitucionalListView from './ConteudoInstitucionalListView'
 
 export default function NoticiasListView() {
-  const { data, loading, erro, pagina, totalPaginas, totalElements, atualizadoEm, setPagina, ordenacao, setOrdenacao } = useNoticias()
+  const {
+    data, loading, erro, pagina, totalPaginas, totalElements, atualizadoEm,
+    setPagina, ordenacao, setOrdenacao, filtros, setFiltros
+  } = useNoticias()
 
   return (
     <ConteudoInstitucionalListView
@@ -18,6 +21,8 @@ export default function NoticiasListView() {
       setPagina={setPagina}
       ordenacao={ordenacao}
       setOrdenacao={setOrdenacao}
+      filtros={filtros}
+      setFiltros={setFiltros}
       variant="noticia"
       emptyMessage="Nenhuma notícia publicada no momento."
     />

@@ -1,11 +1,18 @@
 import { api } from '@/services/api'
-import { Cargo, CargoRequest } from './types'
+import { Page } from '@/modules/shared/types/Page'
+import { Cargo, CargoRequest, FiltroCargo } from './types'
 
 const BASE = '/recursos-humanos/cargos'
 
+type ListarParams = FiltroCargo & {
+  page?: number
+  size?: number
+  sort?: string
+}
+
 export const cargoService = {
-  listar(): Promise<Cargo[]> {
-    return api.get<Cargo[]>(BASE).then(r => r.data)
+  listar(params: ListarParams): Promise<Page<Cargo>> {
+    return api.get<Page<Cargo>>(`${BASE}/filtro`, { params }).then(r => r.data)
   },
 
   criar(dados: CargoRequest): Promise<Cargo> {

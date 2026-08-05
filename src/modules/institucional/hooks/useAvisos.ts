@@ -3,16 +3,16 @@
 import { useCallback } from 'react'
 import { usePageableResource } from '@/hooks/usePageableResource'
 import { avisoService } from '../institucional.service'
-import { ConteudoInstitucional } from '../types'
+import { ConteudoInstitucional, FiltroConteudoInstitucional } from '../types'
 
 export function useAvisos() {
   const fetchFunction = useCallback(
-    (params: { page?: number; size?: number; sort?: string }) =>
+    (params: FiltroConteudoInstitucional & { page?: number; size?: number; sort?: string }) =>
       avisoService.listar({ ...params, ativo: true }),
     []
   )
 
-  return usePageableResource<ConteudoInstitucional, Record<string, never>>({
+  return usePageableResource<ConteudoInstitucional, FiltroConteudoInstitucional>({
     fetchFunction,
     initialSort: 'data,desc',
     size: 10

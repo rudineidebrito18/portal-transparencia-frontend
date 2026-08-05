@@ -26,3 +26,18 @@ export interface ContratoLicitacao {
   objeto: string
   numeroLicitacao: string
 }
+
+// GET /licitacoes/contratos/filtro (global, sem exigir licitacaoId) — Contrato.unidade é
+// String livre sem FK, mas o backend agora resolve unidadeId via os Órgãos da licitação
+// de origem do contrato.
+export interface FiltroContrato {
+  numeroContrato?: number
+  exercicio?: number
+  fornecedor?: string
+  objeto?: string
+  status?: string
+  unidadeId?: number
+  gestorContrato?: string
+  dataInicial?: string
+  dataFinal?: string
+}

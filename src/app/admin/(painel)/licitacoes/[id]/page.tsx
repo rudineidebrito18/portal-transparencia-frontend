@@ -15,15 +15,21 @@ import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { LicitacaoDetalhe } from '@/modules/licitacoes/types'
 import { ContratoLicitacao } from '@/modules/contratos/types'
+import { unidadesService } from '@/modules/admin/geral/geral.service'
+import { Unidade } from '@/modules/admin/geral/types'
 import { licitacaoService } from '@/modules/admin/licitacoes/licitacao.service'
 import { contratoService } from '@/modules/admin/licitacoes/contrato.service'
 import {
   ContratoLicitacaoRequest,
   Documento,
   DocumentoUploadRequest,
+  LicitacaoOrgao,
+  LicitacaoOrgaoRequest,
   StatusLicitacao,
   StatusLicitacaoDescricao,
   StatusLicitacaoStyle,
+  TipoOrgao,
+  TipoOrgaoDescricao,
   TipoProcedimentoDescricao,
   TipoProcedimentoLicitacao,
   normalizarStatus
@@ -39,7 +45,7 @@ function formatarMoeda(valor?: number) {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-type Aba = 'documentos' | 'contratos'
+type Aba = 'documentos' | 'contratos' | 'orgaos'
 type ContratoFormState = { id: number | null } & ContratoLicitacaoRequest
 
 const CONTRATO_VAZIO: ContratoLicitacaoRequest = {
@@ -196,7 +202,8 @@ export default function LicitacaoDetalheAdminPage() {
       <div className="flex gap-1 border-b border-border/30">
         {([
           ['documentos', 'Documentos'],
-          ['contratos', 'Contratos']
+          ['contratos', 'Contratos'],
+          ['orgaos', 'Órgãos']
         ] as [Aba, string][]).map(([valor, label]) => (
           <button
             key={valor}
@@ -212,6 +219,7 @@ export default function LicitacaoDetalheAdminPage() {
 
       {aba === 'documentos' && <AbaDocumentos licitacaoId={licitacaoId} />}
       {aba === 'contratos' && <AbaContratos licitacaoId={licitacaoId} />}
+      {aba === 'orgaos' && <AbaOrgaos licitacaoId={licitacaoId} />}
     </div>
   )
 }
@@ -693,6 +701,211 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
       )}
 
       <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+    </div>
+  )
+}
+
+const ORGAO_VAZIO: LicitacaoOrgaoRequest = { unidadeId: 0, ordenador: '', tipo: TipoOrgao.PARTICIPANTE }
+type OrgaoFormState = { id: number | null } & LicitacaoOrgaoRequest
+
+function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
+  const { usuario } = useAuth()
+
+  const [lista, setLista] = useState<LicitacaoOrgao[]>([])
+  const [loading, setLoading] = useState(true)
+  const [erro, setErro] = useState<string | null>(null)
+
+  function carregar() {
+    setLoading(true)
+    setErro(null)
+    licitacaoService
+      .listarOrgaos(licitacaoId)
+      .then(setLista)
+      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(carregar, [licitacaoId])
+
+  const [unidades, setUnidades] = useState<Unidade[]>([])
+  useEffect(() => {
+    unidadesService.listar({ size: 200, sort: 'nome,asc' }).then(p => setUnidades(p.content)).catch(() => {})
+  }, [])
+
+  const [form, setForm] = useState<OrgaoFormState | null>(null)
+  const [salvando, setSalvando] = useState(false)
+  const [erroForm, setErroForm] = useState<string | null>(null)
+
+  function abrirCriacao() {
+    setErroForm(null)
+    setForm({ id: null, ...ORGAO_VAZIO })
+  }
+
+  function abrirEdicao(o: LicitacaoOrgao) {
+    setErroForm(null)
+    setForm({ id: o.id, unidadeId: o.unidadeId, ordenador: o.ordenador, tipo: o.tipo })
+  }
+
+  async function excluir(id: number) {
+    if (!confirm('Excluir este vínculo de órgão? Essa ação não pode ser desfeita.')) return
+    try {
+      await licitacaoService.excluirOrgao(licitacaoId, id)
+      carregar()
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    }
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!form) return
+
+    setSalvando(true)
+    setErroForm(null)
+
+    const { id, ...dados } = form
+
+    try {
+      if (id) {
+        await licitacaoService.atualizarOrgao(licitacaoId, id, dados)
+      } else {
+        await licitacaoService.criarOrgao(licitacaoId, dados)
+      }
+      setForm(null)
+      carregar()
+    } catch (e: unknown) {
+      setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
+    } finally {
+      setSalvando(false)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-text-secondary/70">
+        Órgãos vinculados a esta licitação (padrão PNCP de compra compartilhada) — só um pode
+        ser o gerenciador; os demais entram como participantes.
+      </p>
+
+      {podeCriar(usuario, 'licitacoes') && !form && (
+        <button
+          onClick={abrirCriacao}
+          className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+        >
+          + Vincular órgão
+        </button>
+      )}
+
+      {form && (
+        <Card className="p-4" hoverable={false}>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <h2 className="font-semibold text-sm">{form.id ? 'Editar vínculo' : 'Novo vínculo'}</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Unidade</label>
+                <select
+                  required
+                  value={form.unidadeId || ''}
+                  onChange={e => setForm({ ...form, unidadeId: Number(e.target.value) })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                >
+                  <option value="" disabled>Selecione...</option>
+                  {unidades.map(u => (
+                    <option key={u.id} value={u.id}>{u.nome}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Ordenador</label>
+                <input
+                  required
+                  value={form.ordenador}
+                  onChange={e => setForm({ ...form, ordenador: e.target.value })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  placeholder="Nome de quem ordenava a despesa nesse órgão"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <select
+                  required
+                  value={form.tipo}
+                  onChange={e => setForm({ ...form, tipo: e.target.value as TipoOrgao })}
+                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                >
+                  {Object.values(TipoOrgao).map(t => (
+                    <option key={t} value={t}>{TipoOrgaoDescricao[t]}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {erroForm && <ErrorState message={erroForm} />}
+
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={salvando}
+                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+              >
+                {salvando ? 'Salvando...' : 'Salvar'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm(null)}
+                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      {loading && <Skeleton className="h-40" />}
+      {erro && <ErrorState message={erro} />}
+      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum órgão vinculado a esta licitação." />}
+
+      {!loading && !erro && lista.length > 0 && (
+        <Card className="overflow-x-auto" hoverable={false}>
+          <table className="w-full text-sm">
+            <thead className="bg-neutral-light text-left">
+              <tr>
+                <th className="p-3">Unidade</th>
+                <th className="p-3">Ordenador</th>
+                <th className="p-3">Tipo</th>
+                <th className="p-3 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lista.map(o => (
+                <tr key={o.id} className="border-t border-border/20">
+                  <td className="p-3 font-semibold">{o.unidadeNome}</td>
+                  <td className="p-3">{o.ordenador}</td>
+                  <td className="p-3">
+                    <Badge className={o.tipo === TipoOrgao.GERENCIADOR ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-600'}>
+                      {TipoOrgaoDescricao[o.tipo]}
+                    </Badge>
+                  </td>
+                  <td className="p-3 text-right space-x-2">
+                    {podeEditar(usuario, 'licitacoes') && (
+                      <button onClick={() => abrirEdicao(o)} className="text-primary hover:underline">
+                        Editar
+                      </button>
+                    )}
+                    {podeExcluir(usuario, 'licitacoes') && (
+                      <button onClick={() => excluir(o.id)} className="text-error hover:underline">
+                        Excluir
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
     </div>
   )
 }

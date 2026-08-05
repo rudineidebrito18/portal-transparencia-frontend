@@ -1,15 +1,17 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useState } from 'react'
 
+import { usePageableResource } from '@/hooks/usePageableResource'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { cargoService } from '@/modules/admin/rh/cargo.service'
-import { Cargo, CargoRequest } from '@/modules/admin/rh/types'
+import { Cargo, CargoRequest, FiltroCargo } from '@/modules/admin/rh/types'
 
 interface FormState {
   id: number | null
@@ -28,21 +30,18 @@ function formatarMoeda(valor: number) {
 export default function CargosAdminPage() {
   const { usuario } = useAuth()
 
-  const [lista, setLista] = useState<Cargo[]>([])
-  const [loading, setLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
+  const [versao, setVersao] = useState(0)
+  const recarregar = () => setVersao(v => v + 1)
+  const fetchFunction = useCallback(
+    (params: FiltroCargo & { page?: number; size?: number; sort?: string }) => cargoService.listar(params),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [versao]
+  )
 
-  function carregar() {
-    setLoading(true)
-    setErro(null)
-    cargoService
-      .listar()
-      .then(setLista)
-      .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(carregar, [])
+  const { data: lista, loading, erro, pagina, totalPaginas, setPagina, filtros, setFiltros } = usePageableResource<
+    Cargo,
+    FiltroCargo
+  >({ fetchFunction, initialSort: 'cargo,asc' })
 
   const [form, setForm] = useState<FormState | null>(null)
   const [salvando, setSalvando] = useState(false)
@@ -63,7 +62,7 @@ export default function CargosAdminPage() {
 
     try {
       await cargoService.excluir(id)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
     }
@@ -91,7 +90,7 @@ export default function CargosAdminPage() {
       }
 
       setForm(null)
-      carregar()
+      recarregar()
     } catch (e: unknown) {
       setErroForm(e instanceof Error ? e.message : 'Erro ao salvar')
     } finally {
@@ -113,6 +112,33 @@ export default function CargosAdminPage() {
           </button>
         )}
       </div>
+
+      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+        <input
+          placeholder="Cargo..."
+          defaultValue={filtros.cargo ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, cargo: (e.target as HTMLInputElement).value || undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        />
+        <input
+          type="number"
+          step="0.01"
+          min={0}
+          placeholder="Valor bruto mínimo"
+          defaultValue={filtros.valorBrutoMin ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, valorBrutoMin: (e.target as HTMLInputElement).value ? Number((e.target as HTMLInputElement).value) : undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        />
+        <input
+          type="number"
+          step="0.01"
+          min={0}
+          placeholder="Valor bruto máximo"
+          defaultValue={filtros.valorBrutoMax ?? ''}
+          onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, valorBrutoMax: (e.target as HTMLInputElement).value ? Number((e.target as HTMLInputElement).value) : undefined }) }}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        />
+      </Card>
 
       {form && (
         <Card className="p-4" hoverable={false}>
@@ -234,6 +260,8 @@ export default function CargosAdminPage() {
           </table>
         </Card>
       )}
+
+      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

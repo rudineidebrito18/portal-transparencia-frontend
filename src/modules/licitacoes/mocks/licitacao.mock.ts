@@ -8,7 +8,16 @@ import { FiltroLicitacao, LicitacaoDetalhe, LicitacaoResumo } from '../types'
 
 export interface LicitacaoCompleta extends LicitacaoDetalhe {
   id: number
+  unidadeId?: number
 }
+
+const UNIDADES_MOCK = [
+  { id: 1, nome: 'Secretaria de Administração' },
+  { id: 2, nome: 'Secretaria de Saúde' },
+  { id: 3, nome: 'Secretaria de Educação' },
+  { id: 4, nome: 'Secretaria de Obras' },
+  { id: 5, nome: 'Gabinete do Prefeito' }
+]
 
 type ListParams = FiltroLicitacao & {
   page?: number
@@ -62,6 +71,7 @@ function gerarLicitacao(id: number): LicitacaoCompleta {
     naturezaDespesa: 'Material Permanente',
     origemRecurso: faker.helpers.arrayElement(['Recursos Próprios', 'FUNDEB', 'Federal']),
     unidade: faker.company.name(),
+    unidadeId: faker.helpers.arrayElement(UNIDADES_MOCK).id,
     nomeAutoridade: faker.person.fullName(),
     sistemaEletronico: faker.helpers.arrayElement(['SICAF', 'COMPRASNET', 'BLL Compras']),
     lei: 'Lei 14.133/2021',
@@ -123,8 +133,8 @@ export const licitacaoMock = {
     if (filtros.nomeAutoridade) {
       dados = dados.filter(l => l.nomeAutoridade?.toLowerCase().includes(String(filtros.nomeAutoridade).toLowerCase()))
     }
-    if (filtros.unidade) {
-      dados = dados.filter(l => l.unidade?.toLowerCase().includes(String(filtros.unidade).toLowerCase()))
+    if (filtros.unidadeId !== undefined) {
+      dados = dados.filter(l => l.unidadeId === Number(filtros.unidadeId))
     }
     if (filtros.ano !== undefined) {
       dados = dados.filter(l => l.ano === Number(filtros.ano))

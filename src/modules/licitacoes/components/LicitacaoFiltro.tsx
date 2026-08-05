@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MdCoronavirus, MdRestartAlt, MdSearch } from 'react-icons/md'
 
 import FiltroCard from '@/components/ui/FiltroCard'
+import { secretariasService } from '@/modules/secretarias/secretarias.service'
+import { Unidade } from '@/modules/secretarias/types'
 import { StatusLicitacao, StatusLicitacaoDescricao, TipoProcedimentoDescricao, TipoProcedimentoLicitacao } from '../enums'
 import { FiltroLicitacao } from '../types'
 
@@ -18,6 +20,7 @@ const initialState: FiltroLicitacao = {
   tipoProcedimentoLicitacao: '',
   status: '',
   ano: undefined,
+  unidadeId: undefined,
   covid: undefined,
   dataAberturaInicio: '',
   dataAberturaFim: '',
@@ -31,6 +34,11 @@ const anos = Array.from({ length: 21 }, (_, i) => anoAtual - i)
 export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
   const [filtros, setFiltros] = useState<FiltroLicitacao>({ ...initialState, ...valoresIniciais })
 
+  const [unidades, setUnidades] = useState<Unidade[]>([])
+  useEffect(() => {
+    secretariasService.listar({ sort: 'nome,asc' }).then(setUnidades).catch(() => {})
+  }, [])
+
   const filtrosAtivosCount = Object.entries(filtros).filter(
     ([, v]) => v !== undefined && v !== ''
   ).length
@@ -41,7 +49,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
     setFiltros(prev => {
       let novoValor: string | number | boolean | undefined = value
 
-      if (name === 'ano') {
+      if (name === 'ano' || name === 'unidadeId') {
         novoValor = value ? parseInt(value, 10) : undefined
       } else if (name === 'covid') {
         novoValor = value === '' ? undefined : value === 'true'
@@ -169,6 +177,24 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* UNIDADE */}
+            <div>
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                Unidade
+              </label>
+              <select
+                name="unidadeId"
+                value={filtros.unidadeId ?? ''}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">Todas</option>
+                {unidades.map(u => (
+                  <option key={u.id} value={u.id}>{u.nome}</option>
+                ))}
+              </select>
             </div>
 
             {/* DATAS DE ABERTURA */}

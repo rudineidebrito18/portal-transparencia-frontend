@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useCallback, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
 
@@ -13,6 +13,8 @@ import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { isAdministrador, podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
+import { unidadesService } from '@/modules/admin/geral/geral.service'
+import { Unidade } from '@/modules/admin/geral/types'
 import { licitacaoService } from '@/modules/admin/licitacoes/licitacao.service'
 import {
   FiltroLicitacaoAdmin,
@@ -69,6 +71,11 @@ export default function LicitacoesAdminPage() {
     LicitacaoResumo,
     FiltroLicitacaoAdmin
   >({ fetchFunction, initialSort: 'dataAbertura,desc' })
+
+  const [unidades, setUnidades] = useState<Unidade[]>([])
+  useEffect(() => {
+    unidadesService.listar({ size: 200, sort: 'nome,asc' }).then(p => setUnidades(p.content)).catch(() => {})
+  }, [])
 
   const [form, setForm] = useState<LicitacaoFormState | null>(null)
   const [salvando, setSalvando] = useState(false)
@@ -216,6 +223,16 @@ export default function LicitacoesAdminPage() {
           <option value="">Todos os procedimentos</option>
           {Object.values(TipoProcedimentoLicitacao).map(t => (
             <option key={t} value={t}>{TipoProcedimentoDescricao[t]}</option>
+          ))}
+        </select>
+        <select
+          value={filtros.unidadeId ?? ''}
+          onChange={e => setFiltros({ ...filtros, unidadeId: e.target.value ? Number(e.target.value) : undefined })}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">Todas as unidades (Órgãos)</option>
+          {unidades.map(u => (
+            <option key={u.id} value={u.id}>{u.nome}</option>
           ))}
         </select>
         {isAdministrador(usuario) && (

@@ -1,6 +1,6 @@
 import { ApiError, api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
-import { EsicInfo, EsicInfoRequest, FiltroFormularioEsic, FormularioEsic, OuvidoriaInfo, OuvidoriaInfoRequest } from './types'
+import { EsicInfo, EsicInfoRequest, FiltroFormularioEsic, FiltroFormularioOuvidoria, FormularioEsic, FormularioOuvidoria, OuvidoriaInfo, OuvidoriaInfoRequest } from './types'
 
 export const esicInfoService = {
   // GET devolve 404 antes da primeira configuração (PUT faz upsert), igual ouvidoria.
@@ -42,5 +42,16 @@ export const ouvidoriaInfoService = {
 
   atualizar(dados: OuvidoriaInfoRequest): Promise<OuvidoriaInfo> {
     return api.put<OuvidoriaInfo>('/ouvidoria/info', dados).then(r => r.data)
+  }
+}
+
+type ListarFormularioOuvidoriaParams = FiltroFormularioOuvidoria & { page?: number; size?: number; sort?: string }
+
+// GET /api/ouvidoria/formulario[/filtro] agora exige login (ROLE_MANAGER+) — antes era
+// público, dado pessoal do cidadão ficava exposto sem autenticação (bug de privacidade
+// corrigido pelo backend). Espelha exatamente o padrão de esicFormularioService.
+export const ouvidoriaFormularioService = {
+  listar(params: ListarFormularioOuvidoriaParams): Promise<Page<FormularioOuvidoria>> {
+    return api.get<Page<FormularioOuvidoria>>('/ouvidoria/formulario/filtro', { params }).then(r => r.data)
   }
 }

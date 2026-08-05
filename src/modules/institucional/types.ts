@@ -9,3 +9,9 @@ export interface ConteudoInstitucional {
 }
 
 export type RecursoInstitucional = 'noticias' | 'avisos'
+
+export interface FiltroConteudoInstitucional {
+  titulo?: string
+  dataInicial?: string
+  dataFinal?: string
+}

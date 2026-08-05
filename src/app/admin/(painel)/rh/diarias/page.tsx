@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useCallback, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useState } from 'react'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
 import Card from '@/components/ui/Card'
@@ -10,6 +10,8 @@ import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
+import { unidadesService } from '@/modules/admin/geral/geral.service'
+import { Unidade } from '@/modules/admin/geral/types'
 import { diariaService } from '@/modules/admin/rh/diaria.service'
 import { Diaria, DiariaRequest, FiltroDiaria } from '@/modules/admin/rh/types'
 
@@ -23,6 +25,7 @@ interface FormState {
   motivo: string
   quantDiarias: number
   valorConcedido: number
+  unidadeId?: number
 }
 
 const FORM_VAZIO: FormState = {
@@ -34,7 +37,8 @@ const FORM_VAZIO: FormState = {
   destino: '',
   motivo: '',
   quantDiarias: 1,
-  valorConcedido: 0
+  valorConcedido: 0,
+  unidadeId: undefined
 }
 
 export default function DiariasAdminPage() {
@@ -52,6 +56,11 @@ export default function DiariasAdminPage() {
     Diaria,
     FiltroDiaria
   >({ fetchFunction, initialSort: 'dataInicio,desc' })
+
+  const [unidades, setUnidades] = useState<Unidade[]>([])
+  useEffect(() => {
+    unidadesService.listar({ size: 200, sort: 'nome,asc' }).then(p => setUnidades(p.content)).catch(() => {})
+  }, [])
 
   const [form, setForm] = useState<FormState | null>(null)
   const [salvando, setSalvando] = useState(false)
@@ -156,6 +165,16 @@ export default function DiariasAdminPage() {
             className="border border-border/30 rounded-lg px-3 py-2 text-sm"
           />
         </div>
+        <select
+          value={filtros.unidadeId ?? ''}
+          onChange={e => setFiltros({ ...filtros, unidadeId: e.target.value ? Number(e.target.value) : undefined })}
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">Todas as unidades</option>
+          {unidades.map(u => (
+            <option key={u.id} value={u.id}>{u.nome}</option>
+          ))}
+        </select>
       </Card>
 
       {form && (
@@ -215,6 +234,20 @@ export default function DiariasAdminPage() {
                 onChange={e => setForm({ ...form, destino: e.target.value })}
                 className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Unidade</label>
+              <select
+                value={form.unidadeId ?? ''}
+                onChange={e => setForm({ ...form, unidadeId: e.target.value ? Number(e.target.value) : undefined })}
+                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+              >
+                <option value="">Não vinculada</option>
+                {unidades.map(u => (
+                  <option key={u.id} value={u.id}>{u.nome}</option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -288,6 +321,7 @@ export default function DiariasAdminPage() {
                 <th className="p-3">Beneficiário</th>
                 <th className="p-3">Cargo</th>
                 <th className="p-3">Destino</th>
+                <th className="p-3">Unidade</th>
                 <th className="p-3">Período</th>
                 <th className="p-3">Qtd.</th>
                 <th className="p-3">Valor</th>
@@ -300,6 +334,7 @@ export default function DiariasAdminPage() {
                   <td className="p-3 font-semibold">{d.beneficiario}</td>
                   <td className="p-3">{d.cargo}</td>
                   <td className="p-3">{d.destino}</td>
+                  <td className="p-3 text-text-secondary/70">{d.unidadeNome ?? '—'}</td>
                   <td className="p-3">{d.dataInicio} a {d.dataTermino}</td>
                   <td className="p-3">{d.quantDiarias}</td>
                   <td className="p-3">{d.valorConcedido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>

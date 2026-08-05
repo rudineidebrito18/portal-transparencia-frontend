@@ -12,6 +12,13 @@ type ListParams = FiltroDiaria & {
 
 const CARGOS = ['Prefeito', 'Secretário Municipal', 'Assessor', 'Motorista', 'Fiscal de Obras']
 const DESTINOS = ['São Luís - MA', 'Brasília - DF', 'Imperatriz - MA', 'Teresina - PI', 'Fortaleza - CE']
+const UNIDADES = [
+  { id: 1, nome: 'Secretaria de Administração' },
+  { id: 2, nome: 'Secretaria de Saúde' },
+  { id: 3, nome: 'Secretaria de Educação' },
+  { id: 4, nome: 'Secretaria de Obras' },
+  { id: 5, nome: 'Gabinete do Prefeito' }
+]
 const MOTIVOS = [
   'Participação em reunião com órgão estadual',
   'Capacitação técnica',
@@ -27,6 +34,7 @@ function gerarDiaria(id: number): Diaria {
   const quantDiarias = faker.number.int({ min: 1, max: 5 })
   const dataTermino = new Date(dataInicio)
   dataTermino.setDate(dataTermino.getDate() + quantDiarias)
+  const unidade = faker.helpers.arrayElement(UNIDADES)
 
   return {
     id,
@@ -37,7 +45,9 @@ function gerarDiaria(id: number): Diaria {
     destino: faker.helpers.arrayElement(DESTINOS),
     motivo: faker.helpers.arrayElement(MOTIVOS),
     quantDiarias,
-    valorConcedido: faker.number.float({ min: 200, max: 3500, multipleOf: 0.01 })
+    valorConcedido: faker.number.float({ min: 200, max: 3500, multipleOf: 0.01 }),
+    unidadeId: unidade.id,
+    unidadeNome: unidade.nome
   }
 }
 
@@ -64,6 +74,9 @@ export const diariaMock = {
     }
     if (filtros.quantDiarias !== undefined) {
       dados = dados.filter(d => d.quantDiarias === Number(filtros.quantDiarias))
+    }
+    if (filtros.unidadeId !== undefined) {
+      dados = dados.filter(d => d.unidadeId === Number(filtros.unidadeId))
     }
     if (filtros.dataInicio) {
       const inicio = new Date(String(filtros.dataInicio)).getTime()

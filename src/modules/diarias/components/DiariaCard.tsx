@@ -21,7 +21,10 @@ export default function DiariaCard({ diaria }: Props) {
 
           <div>
             <h2 className="text-base font-bold text-primary leading-tight">{diaria.beneficiario}</h2>
-            <p className="text-xs text-text-secondary/60 mt-0.5">{diaria.cargo}</p>
+            <p className="text-xs text-text-secondary/60 mt-0.5">
+              {diaria.cargo}
+              {diaria.unidadeNome && ` · ${diaria.unidadeNome}`}
+            </p>
           </div>
         </div>
       </div>

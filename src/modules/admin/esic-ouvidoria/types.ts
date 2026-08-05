@@ -76,3 +76,34 @@ export interface OuvidoriaInfoRequest {
   prazos: string
   unidadeId: number
 }
+
+export type FinalidadeOuvidoria = 'DENUNCIA' | 'ELOGIO' | 'RECLAMACAO' | 'SOLICITACAO' | 'SUGESTAO'
+
+export const LABELS_FINALIDADE_OUVIDORIA: Record<FinalidadeOuvidoria, string> = {
+  DENUNCIA: 'Denúncia',
+  ELOGIO: 'Elogio',
+  RECLAMACAO: 'Reclamação',
+  SOLICITACAO: 'Solicitação',
+  SUGESTAO: 'Sugestão'
+}
+
+export interface FormularioOuvidoria {
+  id: number
+  unidadeNome: string
+  finalidade: FinalidadeOuvidoria
+  anonima: boolean
+  // Vêm null quando anonima=true.
+  nome: string | null
+  email: string | null
+  comentario: string
+  caminhoArquivo: string | null
+  criadoEm: string
+}
+
+export interface FiltroFormularioOuvidoria {
+  finalidade?: FinalidadeOuvidoria
+  nome?: string
+  email?: string
+  dataInicial?: string
+  dataFinal?: string
+}

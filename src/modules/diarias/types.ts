@@ -8,6 +8,8 @@ export interface Diaria {
   motivo: string
   quantDiarias: number
   valorConcedido: number
+  unidadeId?: number
+  unidadeNome?: string
 }
 
 export interface FiltroDiaria {
@@ -19,4 +21,5 @@ export interface FiltroDiaria {
   motivo?: string
   quantDiarias?: number
   valorConcedido?: number
+  unidadeId?: number
 }

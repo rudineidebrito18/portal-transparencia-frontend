@@ -1,13 +1,20 @@
+import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
 import { cargoMock } from './mocks/cargo.mock'
-import { Cargo } from './types'
+import { Cargo, FiltroCargo } from './types'
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
-export const cargoService = {
-  listar(): Promise<Cargo[]> {
-    if (USE_MOCK) return cargoMock.listar()
+type ListarParams = FiltroCargo & {
+  page?: number
+  size?: number
+  sort?: string
+}
 
-    return api.get<Cargo[]>('/recursos-humanos/cargos').then(r => r.data)
+export const cargoService = {
+  listar(params: ListarParams): Promise<Page<Cargo>> {
+    if (USE_MOCK) return cargoMock.listar(params)
+
+    return api.get<Page<Cargo>>('/recursos-humanos/cargos/filtro', { params }).then(r => r.data)
   }
 }

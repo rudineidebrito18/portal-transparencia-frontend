@@ -119,14 +119,15 @@ sidebar junto no scroll.
 | Tabela de Valores de Diária | `/admin/geral/tabela-valores` | `geral` | multipart; **o OpenAPI documenta esse endpoint como JSON por engano, é multipart de verdade** |
 | E-SIC — Configuração | `/admin/esic/config` | `esic-ouvidoria` | singleton (upsert, 404 antes de configurado) |
 | E-SIC — Formulários recebidos | `/admin/esic/formularios` | `esic-ouvidoria` | somente leitura; bespoke paginado, filtro via `GET .../filtro` (`tipoSolicitacao`, `nome`, `email`, `dataInicial`, `dataFinal`) — `GET .../tipo` foi removido pelo backend, não usar mais |
-| Ouvidoria — Configuração | `/admin/ouvidoria/config` | `esic-ouvidoria` | singleton; **sem tela de formulários recebidos** — backend não expõe listagem pra esse recurso |
-| Servidores, Cargos, Diárias | `/admin/rh/{servidores,cargos,diarias}` | `rh` | bespoke paginado (servidores/diárias) ou lista simples (cargos) |
+| Ouvidoria — Configuração | `/admin/ouvidoria/config` | `esic-ouvidoria` | singleton (upsert, 404 antes de configurado) |
+| Ouvidoria — Formulários recebidos | `/admin/ouvidoria/formularios` | `esic-ouvidoria` | somente leitura; bespoke paginado, filtro via `GET .../filtro` (`finalidade`, `nome`, `email`, `dataInicial`, `dataFinal`) — espelha E-SIC Formulários; **GET agora exige login MANAGER+** (antes era público, bug de privacidade corrigido pelo backend em 2026-08-04, ver seção 2.4) |
+| Servidores, Cargos, Diárias | `/admin/rh/{servidores,cargos,diarias}` | `rh` | bespoke paginado nos 3 (Cargos migrou de lista simples pra bespoke paginado em 2026-08-04, filtro via `GET /recursos-humanos/cargos/filtro` — `cargo`, `valorBrutoMin`, `valorBrutoMax`; ver seção 2.4) |
 | Folha de Pagamento | `/admin/rh/folha` | `rh` | **sem `PUT`/`DELETE`** — lançamento é definitivo. Aba "Por mês" (`folha.service.ts` `listarPorMes`) já migrada pra `Page` (`GET .../folha/por-mes?mes=&ano=`, pede `size: 1000` e usa só `.content`, sem UI de paginação) |
 | Concursos | `/admin/rh/concursos` + `[id]` (anexos) | `padrao` (não `rh`!) | única exceção do grupo RH — segue a regra geral de MANAGER; bespoke paginado (admin + público), filtro via `GET .../filtro` (`numero`, `ano`, `descricao`, `dataAberturaInicial`, `dataAberturaFinal` — sem `status`); anexos por concurso continuam array simples (não paginado, é sub-listagem naturalmente pequena) |
 | Convênios | `/admin/convenios` | `obras-repasses` | multipart (`dto`+`pdf`); bespoke paginado, filtro via `GET .../filtro` (`numero`, `convenente`, `dataAssinaturaInicial`, `dataAssinaturaFinal`) — não confundir com o módulo público de Convênios (Transferências/Acordos), que é outro recurso e já estava correto |
 | Emendas Parlamentares | `/admin/emendas-parlamentares` | `obras-repasses` | JSON paginado, filtro por tipo OU ano (não combinável) |
 | Obras Públicas | `/admin/obras` + `/admin/obras/[id]` (Medições/Anexos/ART) | `obras-repasses`, **exceto ART = `padrao`** | campos calculados da obra (`totalMedicao`, `saldoObra` etc.) dependem do módulo Licitações (contratos), ainda não implementado — ficam em 0/negativo até lá, não é bug. Bespoke paginado (admin + público), filtro via `GET .../filtro` (`numero`, `status`, `tipo`, `unidadeId`, `fornecedorId`, `paralisada`) — público migrou de "sem paginação"/filtro em memória pra filtro real no backend; Medições/Anexos/ART continuam array simples (sub-recurso pequeno, sem paginação) |
-| Licitações (Licitação + Contratos + Aditivos) | `/admin/licitacoes` + `/admin/licitacoes/[id]` (Documentos/Contratos) + `/admin/licitacoes/contratos/[contratoId]` (Documento/Aditivos) | `licitacoes` | 3 níveis (licitação → contrato → aditivo/documento); editar/excluir Contrato na própria aba; Aditivo edita com reenvio opcional de PDF; RBAC combinada: editar é `MANAGER`, excluir é admin-only (`licitacoes` fora do `EDITAR_ADMIN_ONLY`, dentro do `EXCLUIR_ADMIN_ONLY` em `permissoes.ts`); status/tipo de procedimento vêm do backend como texto (não a chave do enum) — `enumMapping.ts` reverte pra popular `<select>` de edição e colorir o Badge. **Licitação não tem mais `DELETE`** (exigência do TCE, preserva sequência/histórico) — troca por `PATCH .../visibilidade` (ocultar/mostrar da consulta pública, admin-only, botão com ícone de olho); toda licitação tem `numeroSequencial` (nº oficial do TCE, mostrado em destaque na lista e no detalhe) e `visivel`; filtro `visivel` em `/buscar` é admin-only (403 pra MANAGER) — só aparece na UI pra quem é `ROLE_ADMINISTRATOR` (`FiltroLicitacaoAdmin`, separado do `FiltroLicitacao` público de propósito). `GET /licitacoes/contratos/aditivos` (listagem por contrato) também virou sempre paginado — como aditivos por contrato são poucos, o service só pede uma página grande (`size: 100`) e devolve `.content`, sem UI de paginação |
+| Licitações (Licitação + Contratos + Aditivos + Órgãos) | `/admin/licitacoes` + `/admin/licitacoes/[id]` (Documentos/Contratos/Órgãos) + `/admin/licitacoes/contratos/[contratoId]` (Documento/Aditivos) | `licitacoes` | 3 níveis (licitação → contrato → aditivo/documento); editar/excluir Contrato na própria aba; Aditivo edita com reenvio opcional de PDF; RBAC combinada: editar é `MANAGER`, excluir é admin-only (`licitacoes` fora do `EDITAR_ADMIN_ONLY`, dentro do `EXCLUIR_ADMIN_ONLY` em `permissoes.ts`); status/tipo de procedimento vêm do backend como texto (não a chave do enum) — `enumMapping.ts` reverte pra popular `<select>` de edição e colorir o Badge. **Licitação não tem mais `DELETE`** (exigência do TCE, preserva sequência/histórico) — troca por `PATCH .../visibilidade` (ocultar/mostrar da consulta pública, admin-only, botão com ícone de olho); toda licitação tem `numeroSequencial` (nº oficial do TCE, mostrado em destaque na lista e no detalhe) e `visivel`; filtro `visivel` em `/buscar` é admin-only (403 pra MANAGER) — só aparece na UI pra quem é `ROLE_ADMINISTRATOR` (`FiltroLicitacaoAdmin`, separado do `FiltroLicitacao` público de propósito). `GET /licitacoes/contratos/aditivos` (listagem por contrato) também virou sempre paginado — como aditivos por contrato são poucos, o service só pede uma página grande (`size: 100`) e devolve `.content`, sem UI de paginação. **Aba "Órgãos" nova (2026-08-04)**: `LicitacaoOrgao` (`GET`/`POST`/`PUT`/`DELETE /licitacoes/{id}/orgaos`), padrão PNCP de compra compartilhada — 1 `GERENCIADOR` + N `PARTICIPANTE`s, `unidadeId` + `ordenador` (texto livre, snapshot) + `tipo`; backend valida com `409` (só 1 gerenciador, unidade não duplicada) — mensagem do backend já sobe direto pro `erroForm` via `e.message`. Sem paginação (volume baixo por licitação). Ver seção 2.4 |
 | Diário Oficial — Configuração | `/admin/diario-oficial/config` | `diario-oficial` | singleton multipart; **brasão e logo são partes obrigatórias sempre** — não tem como editar só texto sem reenviar as duas imagens (backend, não é bug do front) |
 | Diário Oficial — Publicações | `/admin/diario-oficial/publicacoes` (fila paginada com filtro por status + criar) + `/admin/diario-oficial/publicacoes/[id]` (status + timeline de logs + aprovar/rejeitar/retomar/excluir) | `diario-oficial` | pipeline assíncrono real (validação → composição do documento oficial com cabeçalho/rodapé/QR code → aguarda aprovação humana → assinatura digital ICP-Brasil de verdade via DSS → publica → indexa no Meilisearch); página de detalhe faz polling a cada 3s enquanto o processamento automático está rodando; existe um job de reconciliação no backend que retoma sozinho solicitações travadas há +15min — já vimos ele falhar de verdade numa fixture por não conseguir alcançar o TSA externo (freetsa.org) a partir do ambiente local, não é bug do front. **Dois excluir admin-only na tela de detalhe** (só aparecem se status `FALHOU`/`PUBLICADO`): "Excluir da fila" (`DELETE .../publicacoes/{id}`, só tira da lista) e "Excluir edição publicada" (`DELETE /edicoes/{numero}`, só quando `PUBLICADO` — apaga PDF + índice no Meilisearch de verdade, redireciona pra lista depois); `diario-oficial` foi adicionado ao `EXCLUIR_ADMIN_ONLY` em `permissoes.ts` pra isso |
 | Anticorrupção (Empresas em Dívida Ativa + Empresas Inidôneas/Suspensas) | `/admin/anticorrupcao/empresas-divida-ativa` (CRUD completo) + `/admin/anticorrupcao/empresas-inidoneas` (CRUD completo) | `anticorrupcao` (admin-only edit/exclude) | bespoke paginado (`usePageableResource`, filtro via `GET .../filtro` com `nome`/`razaoSocial`/`cnpj` ou `empresa`/`cnpj`/`status` + `dataInicial`/`dataFinal`), multipart `dados`+`pdf` (pdf sempre opcional, nome da parte é `pdf`, não `arquivo`); aparece na sidebar mesclado na categoria "Fiscal e Orçamentário" (mesma UI da Renúncia Fiscal), mas o grupo de permissão é `anticorrupcao`, não `fiscal-orcamentario` — só a categoria visual é compartilhada |
@@ -311,6 +312,73 @@ compartilhado pra isso desde antes (`ordenar()`/`paginar()` em
 `emendaParlamentar.mock.ts`) — os 3 mocks quebrados foram migrados pra usá-lo. Vale
 conferir qualquer mock novo/futuro que pagine em memória usa esse helper em vez de
 reimplementar paginação na mão sem ordenar.
+
+## 2.4 Adaptação aos 5 itens de prioridade alta do backend (2026-08-04) — concluído
+
+Sessão em máquina nova (PC de casa, ver seção 4 sobre o ambiente) — backend implementou 5
+pedidos de prioridade alta (commit `d3b28d8` do repo backend) e o frontend adaptou todos no
+mesmo dia, testado direto contra o backend real (`curl` com token, não só leitura de código).
+Nenhuma mudança de arquitetura, só consumo das novas capacidades.
+
+1. **Cargos migrou de "lista simples" pra bespoke paginado** — `GET
+   /recursos-humanos/cargos` virou `Page<Cargo>` (breaking) e ganhou `GET .../filtro`
+   (`cargo`, `valorBrutoMin`, `valorBrutoMax`). Público (`/cargos`) e admin
+   (`/admin/rh/cargos`) migrados pro padrão `usePageableResource` + `FiltroCard`/filtro
+   inline, igual Fornecedores. Os 2 cards de resumo (`TabelaCargos.tsx`) recalculam a
+   partir de `cargos` (agora só a página atual, não mais a lista inteira) — renomeados pra
+   "nesta página" em vez de "total" pra não mentir sobre o escopo do número.
+2. **Diárias ganhou `unidadeId`** — filtro (`GET /diarias/buscar?unidadeId=`) e cadastro
+   (`POST`/`PUT` aceitam `unidadeId` opcional; resposta ganhou `unidadeNome`). `<select>`
+   de Unidade adicionado no `DiariaFiltro.tsx` (público) e no form admin
+   (`/admin/rh/diarias`), populado via `secretariasService`/`unidadesService` (mesmo
+   padrão de `ObraFiltro.tsx`). Diárias antigas ficam com `unidadeId: null` — tratado como
+   "Não vinculada" no `<select>` de edição e `—` na listagem.
+3. **Avisos/Notícias ganharam filtro** (`GET /institucional/{avisos,noticias}/filtro?titulo=&dataInicial=&dataFinal=`)
+   — fechava a lacuna que a seção 2.2 já tinha documentado como bloqueada por backend.
+   `useAvisos`/`useNoticias` trocaram `Record<string, never>` por um `FiltroConteudoInstitucional`
+   de verdade; `ativo: true` continua fixo no fetch (regra de negócio do site público, não
+   vira filtro exposto na UI). Componente novo `ConteudoInstitucionalFiltro.tsx`
+   compartilhado pelos dois (mesmo padrão dos outros `*Filtro.tsx`). Admin (`InstitucionalCrudPage`)
+   não mexido — o pedido original era só do lado público.
+4. **Licitações — `unidade` (string, nunca funcionou de verdade) virou `unidadeId`
+   (Long)** em `GET /licitacoes/buscar` — breaking change. `FiltroLicitacao.unidade` foi
+   removido do tipo (não existia UI pra ele mesmo, só o campo no tipo); `unidadeId` novo
+   com `<select>` real no `LicitacaoFiltro.tsx` (público) e na barra de filtro do
+   `/admin/licitacoes` (antes não tinha filtro de unidade nenhum ali). **Importante**: o
+   campo "Unidade responsável" (texto livre) que já existia no cadastro de Licitação/Contrato
+   continua exatamente igual — é uma entidade `String` solta na tabela, sem FK; o que mudou
+   foi só o parâmetro de *busca*, que agora resolve via o novo relacionamento de Órgãos
+   (item 5), não via esse texto livre.
+5. **Licitações — recurso novo `LicitacaoOrgao`** (aba "Órgãos" no detalhe admin, ver linha
+   da tabela de módulos acima) — modelo PNCP de compra compartilhada/SRP, foi além do
+   pedido original ("só" generalizar o filtro de Contrato) porque o backend percebeu que
+   `Licitacao.unidade`/`Contrato.unidade` sendo `String` livre sem FK inviabilizava filtro
+   de verdade por ID.
+6. **Contratos — filtro público novo, de vez** (`GET /licitacoes/contratos/filtro`, global,
+   sem exigir `licitacaoId`) — `/contratos` não tinha filtro nenhum antes (STATUS.md já
+   documentava isso como bloqueado por backend, seção 2.2). `ContratoFiltro.tsx` novo
+   (número, exercício, fornecedor, unidade via `<select>`, status, gestor, objeto,
+   intervalo de assinatura). `fornecedorId` do pedido original **não** veio — `Contrato.fornecedor`
+   continua `String` livre (sem FK), só dá pra buscar por texto; se filtro exato por
+   fornecedor virar necessidade real, é outra migration no backend.
+7. **e-SIC e Ouvidoria — `GET /{recurso}/formulario[/filtro][/{id}]` agora exigem login
+   `ROLE_MANAGER`+** (antes eram públicos — dado pessoal do cidadão que preencheu o
+   formulário ficava exposto sem autenticação, bug de privacidade corrigido pelo backend).
+   Confirmado que nenhum código público chamava esses GETs (só POST de envio, que continua
+   público — exigência da LAI); os únicos consumidores já são as telas admin autenticadas,
+   então não quebrou nada no frontend. **Ouvidoria ganhou tela admin nova**
+   (`/admin/ouvidoria/formularios`) — não existia (STATUS.md linha da tabela dizia
+   explicitamente "sem tela de formulários recebidos, backend não expõe listagem"), agora
+   espelha `/admin/esic/formularios` (`FinalidadeOuvidoria`: `DENUNCIA`/`ELOGIO`/`RECLAMACAO`/
+   `SOLICITACAO`/`SUGESTAO`, campos `nome`/`email` nulos quando `anonima: true`, `unidadeNome`
+   e `caminhoArquivo` novos na resposta).
+
+Resumo de breaking changes já corrigidos: `GET /licitacoes/buscar?unidade=` → `?unidadeId=`;
+`GET /esic/formulario*` e `GET /ouvidoria/formulario*` exigem token agora; `GET
+/recursos-humanos/cargos` virou `Page` em vez de array puro. Todos os mocks (`*.mock.ts`)
+correspondentes foram atualizados junto — Cargos, Diárias, Licitações e Contratos ganharam
+campos fake (`unidadeId` com um pool de 5 unidades fictícias) pra que o filtro por unidade
+também funcione em `NEXT_PUBLIC_USE_MOCK=true`, não só contra o backend real.
 
 ## 3. Como decidir o padrão de um módulo novo
 

@@ -53,7 +53,8 @@ const LINKS_INSTITUCIONAL_GERAL = [
 const LINKS_ESIC_OUVIDORIA = [
   { href: '/admin/esic/config', label: 'E-SIC — Configuração' },
   { href: '/admin/esic/formularios', label: 'E-SIC — Formulários Recebidos' },
-  { href: '/admin/ouvidoria/config', label: 'Ouvidoria — Configuração' }
+  { href: '/admin/ouvidoria/config', label: 'Ouvidoria — Configuração' },
+  { href: '/admin/ouvidoria/formularios', label: 'Ouvidoria — Formulários Recebidos' }
 ]
 
 const LINKS_DIARIO_OFICIAL = [

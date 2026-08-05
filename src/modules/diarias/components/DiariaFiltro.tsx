@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
 import FiltroCard from '@/components/ui/FiltroCard'
+import { secretariasService } from '@/modules/secretarias/secretarias.service'
+import { Unidade } from '@/modules/secretarias/types'
 import { FiltroDiaria } from '../types'
 
 interface Props {
@@ -17,18 +19,30 @@ const initialState: FiltroDiaria = {
   destino: '',
   motivo: '',
   dataInicio: '',
-  dataTermino: ''
+  dataTermino: '',
+  unidadeId: undefined
 }
 
 export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
   const [filtros, setFiltros] = useState<FiltroDiaria>({ ...initialState, ...valoresIniciais })
 
+  const [unidades, setUnidades] = useState<Unidade[]>([])
+  useEffect(() => {
+    secretariasService.listar({ sort: 'nome,asc' }).then(setUnidades).catch(() => {})
+  }, [])
+
   const filtrosAtivosCount = Object.entries(filtros).filter(
     ([, v]) => v !== undefined && v !== ''
   ).length
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target
+
+    if (name === 'unidadeId') {
+      setFiltros(prev => ({ ...prev, unidadeId: value ? Number(value) : undefined }))
+      return
+    }
+
     setFiltros(prev => ({ ...prev, [name]: value === '' ? undefined : value }))
   }
 
@@ -99,6 +113,23 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
                 className={inputClass}
                 placeholder="Ex: São Luís - MA"
               />
+            </div>
+
+            <div>
+              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                Unidade
+              </label>
+              <select
+                name="unidadeId"
+                value={filtros.unidadeId ?? ''}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">Todas</option>
+                {unidades.map(u => (
+                  <option key={u.id} value={u.id}>{u.nome}</option>
+                ))}
+              </select>
             </div>
 
             <div className="md:col-span-2">

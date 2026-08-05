@@ -1,22 +1,72 @@
 'use client'
 
-import { MdGroups, MdPayments } from 'react-icons/md'
+import { MdGroups, MdPayments, MdSwapVert } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
+import { formatarDataHora } from '@/utils/date'
 import { formatarMoeda } from '@/utils/currency'
 import { useCargos } from '../hooks/useCargos'
+import CargoFiltro from './CargoFiltro'
 
 export default function TabelaCargos() {
-  const { data: cargos, loading, erro } = useCargos()
+  const {
+    data: cargos,
+    loading,
+    erro,
+    pagina,
+    totalPaginas,
+    totalElements,
+    atualizadoEm,
+    setPagina,
+    filtros,
+    setFiltros,
+    setOrdenacao,
+    ordenacao
+  } = useCargos()
 
   const totalServidores = cargos.reduce((soma, c) => soma + c.quantidade, 0)
   const totalFolhaLiquida = cargos.reduce((soma, c) => soma + c.valorLiquido, 0)
 
   return (
     <div className="space-y-6">
+
+      {/* FILTRO */}
+      <CargoFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
+
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
+
+        <span className="text-sm text-text-secondary">
+          <strong className="text-primary">{totalElements}</strong> cargos encontrados
+          {atualizadoEm && (
+            <span className="text-text-secondary/60"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
+        </span>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-text-secondary text-sm">
+            <MdSwapVert />
+            Ordenar
+          </div>
+
+          <select
+            value={ordenacao || 'cargo,asc'}
+            onChange={(e) => setOrdenacao(e.target.value)}
+            aria-label="Ordenar por"
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none"
+          >
+            <option value="cargo,asc">Cargo (A-Z)</option>
+            <option value="cargo,desc">Cargo (Z-A)</option>
+            <option value="valorBruto,desc">Maior valor bruto</option>
+            <option value="valorBruto,asc">Menor valor bruto</option>
+          </select>
+        </div>
+
+      </div>
 
       {/* ERRO */}
       {erro && <ErrorState message={erro} />}
@@ -29,7 +79,7 @@ export default function TabelaCargos() {
           ))}
         </div>
       ) : cargos.length === 0 && !erro ? (
-        <EmptyState message="Nenhum cargo cadastrado." />
+        <EmptyState message="Nenhum cargo encontrado com os filtros aplicados." />
       ) : (
         <>
           {/* RESUMO */}
@@ -39,7 +89,7 @@ export default function TabelaCargos() {
                 <MdGroups size={22} />
               </div>
               <div>
-                <p className="text-[11px] uppercase text-text-secondary/60">Total de Servidores</p>
+                <p className="text-[11px] uppercase text-text-secondary/60">Servidores nesta página</p>
                 <p className="text-xl font-bold text-primary">{totalServidores}</p>
               </div>
             </Card>
@@ -49,7 +99,7 @@ export default function TabelaCargos() {
                 <MdPayments size={22} />
               </div>
               <div>
-                <p className="text-[11px] uppercase text-text-secondary/60">Total Líquido (todos os cargos)</p>
+                <p className="text-[11px] uppercase text-text-secondary/60">Total líquido nesta página</p>
                 <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolhaLiquida)}</p>
               </div>
             </Card>
@@ -90,6 +140,8 @@ export default function TabelaCargos() {
               </tbody>
             </table>
           </div>
+
+          <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
         </>
       )}
     </div>
