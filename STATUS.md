@@ -86,8 +86,35 @@ Módulos com padrão bespoke (fogem do CRUD genérico, vale saber antes de mexer
   `@next/next/no-img-element` aceito/ignorado nos outros lugares) — se o mesmo problema
   aparecer no card de outros módulos (Obras, Fornecedor etc.) ou na tela de detalhe do admin
   de Unidades, o mesmo padrão serve.
-- `/estrutura-organizacional`, `/organograma`, `/diarias-legislacao` — PDF estático via
-  `PdfViewer`, sem backend (`/test.pdf` placeholder).
+- `/estrutura-organizacional`, `/diarias-legislacao` — PDF estático via `PdfViewer`, sem
+  backend (`/test.pdf` placeholder).
+- `/organograma` (2026-08-05) — **não é mais PDF**, virou diagrama HTML/CSS
+  (`src/components/OrganogramaDiagrama.tsx`) com a estrutura real da Prefeitura de Lago
+  dos Rodrigues (Lei Municipal nº 88/2009, alterada pela Lei nº 164/2016) — este sistema
+  substitui o portal atual dessa prefeitura, então não é dado de exemplo de outro
+  município. Conteúdo veio de um print do organograma do site antigo (o PDF de origem é
+  gerado client-side via `jsPDF`+`dom-to-image` na aplicação deles, não dá pra baixar via
+  `curl`/fetch — sem headless browser neste ambiente pra reproduzir a exportação).
+  Hierarquia simplificada em relação à imagem original: lá, Assessorias e os 5 órgãos de
+  apoio (CPL, Pregoeiro, Tesouraria, Junta Militar, Setor de Identificação) apareciam em
+  duas fileiras separadas só por causa da largura da imagem; aqui viraram um grupo único
+  (mesmo nível hierárquico, todos vinculados ao Gabinete do Prefeito), com quebra de
+  linha responsiva via `flex-wrap` em vez de fileiras fixas. Assessorias/CPL/Pregoeiro/
+  etc. são texto fixo no componente (não têm cadastro de `Unidade` própria no backend,
+  organograma "dificilmente muda" nessa parte, decisão do usuário). **Gabinete do
+  Prefeito e Secretarias Municipais, ao contrário, são 100% dinâmicos**
+  (`secretariasService.listar()`, Server Component, `async function`): Gabinete ocupa
+  posição fixa/especial no diagrama (entre Vice-Prefeito e as assessorias), então é
+  achado por nome normalizado (sem acento, `includes()` nos dois sentidos — tolerante a
+  nome cadastrado diferente do exato "Gabinete do Prefeito"); Secretarias não tem lista
+  fixa nenhuma — é literalmente `unidades.filter(u => u.id !== gabinete?.id)`, então
+  cresce sozinha conforme o admin cadastra novas secretarias, sem precisar tocar no
+  componente de novo. Testado contra o backend real: as 4 unidades cadastradas em dev
+  (Gabinete do Prefeito, Saúde, Educação, e uma "Secretaria de Teste" que nem sabíamos
+  que existia no ambiente) apareceram automaticamente, cada uma linkada pra
+  `/secretarias/{id}`. Lista vazia (nenhuma secretaria cadastrada ainda) mostra uma
+  mensagem em vez de grupo vazio. `/estrutura-organizacional` continua com PDF
+  placeholder, não mexida nessa rodada.
 - `/diario-oficial` — fluxo de publicação mais simples (busca com filtros); o site público só
   lê `EdicaoDiario` já publicada. O fluxo de aprovação/assinatura em si é admin (seção seguinte).
 
