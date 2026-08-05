@@ -1,10 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { MdAccountCircle, MdEmail, MdLocationOn, MdPhone, MdSchedule } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
+import FotoAmpliavel from '@/components/ui/FotoAmpliavel'
 import InfoBlock from '@/components/ui/InfoBlock'
 import { secretariasService } from '@/modules/secretarias/secretarias.service'
 import { Unidade } from '@/modules/secretarias/types'
@@ -37,12 +37,12 @@ export default function AutoridadeView({ autoridade }: Props) {
     <div className="space-y-6">
       <Card className="p-6 flex flex-col md:flex-row gap-6" hoverable={false}>
         {autoridade.fotoUrl ? (
-          <Image
+          <FotoAmpliavel
             src={autoridade.fotoUrl}
             alt={autoridade.nome}
             width={128}
             height={128}
-            className="w-32 h-32 rounded-xl object-cover shrink-0"
+            className="w-32 h-32 rounded-xl"
           />
         ) : (
           <div className="w-32 h-32 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">

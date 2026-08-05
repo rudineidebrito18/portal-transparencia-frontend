@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import {
   MdApartment,
   MdBadge,
@@ -15,6 +14,7 @@ import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import DocumentList from '@/components/ui/DocumentList'
 import EmptyState from '@/components/ui/EmptyState'
+import FotoAmpliavel from '@/components/ui/FotoAmpliavel'
 import InfoBlock from '@/components/ui/InfoBlock'
 import { Documento } from '@/modules/shared/types/Documento'
 import { useUrlState } from '@/hooks/useUrlState'
@@ -61,12 +61,12 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
     <div className="space-y-6">
       <Card className="p-6 flex flex-col md:flex-row gap-6" hoverable={false}>
         {gestor?.fotoUrl ? (
-          <Image
+          <FotoAmpliavel
             src={gestor.fotoUrl}
             alt={gestor.nome}
             width={96}
             height={96}
-            className="w-24 h-24 rounded-xl object-cover shrink-0"
+            className="w-24 h-24 rounded-xl"
           />
         ) : (
           <div className="w-24 h-24 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -234,12 +234,12 @@ function GestorList({ lista }: { lista: SecretariaDetalheType['gestores'] }) {
       {lista.map(g => (
         <Card key={g.id} className="p-4 flex items-center gap-4">
           {g.fotoUrl ? (
-            <Image
+            <FotoAmpliavel
               src={g.fotoUrl}
               alt={g.nome}
               width={48}
               height={48}
-              className="w-12 h-12 rounded-lg object-cover shrink-0"
+              className="w-12 h-12 rounded-lg"
             />
           ) : (
             <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">

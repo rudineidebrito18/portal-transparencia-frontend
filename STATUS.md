@@ -503,6 +503,19 @@ soltos na Unidade, editáveis só pelo `PUT` multipart da própria Unidade) não
   trazendo o gestor original de volta, `DELETE` admin-only (`204`). Estado de dev
   restaurado ao original depois do teste.
 
+## 2.7 Lightbox de foto (2026-08-05)
+
+`src/components/ui/FotoAmpliavel.tsx` — componente novo, genérico: recebe os mesmos
+props de um `next/image` normal (`src`, `alt`, `width`, `height`, `className`) e já
+cuida de tudo (botão com hover mostrando ícone de lupa, overlay em tela cheia com
+`next/image fill` pro tamanho grande, fecha com Esc ou clique fora, `role="dialog"` +
+`aria-modal`). Sem lib nova — só `useState`/`useEffect`. Aplicado nas 3 fotos de
+pessoa que já existiam: `SecretariaCard.tsx` (miniatura do gestor na listagem),
+`SecretariaDetalhe.tsx` (foto grande do gestor vigente no hero + miniaturas do
+histórico na aba Gestores) e `AutoridadeView.tsx` (Prefeito/Vice-Prefeito). Não
+mexido em fotos de outros contextos (notícias, avisos etc.) — escopo foi só
+"fotos de pessoa" a pedido do usuário.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

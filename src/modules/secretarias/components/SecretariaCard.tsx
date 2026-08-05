@@ -1,8 +1,8 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { MdApartment, MdBadge, MdEmail, MdLocationOn, MdPhone, MdSchedule, MdVisibility } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
+import FotoAmpliavel from '@/components/ui/FotoAmpliavel'
 import { Unidade } from '../types'
 import SelinhoVerificado from './SelinhoVerificado'
 
@@ -28,12 +28,12 @@ export default function SecretariaCard({ unidade }: Props) {
     <Card className="p-5 flex flex-col gap-3 h-full">
       <div className="flex items-start gap-3">
         {gestor?.fotoUrl ? (
-          <Image
+          <FotoAmpliavel
             src={gestor.fotoUrl}
             alt={gestor.nome}
             width={40}
             height={40}
-            className="w-10 h-10 rounded-lg object-cover shrink-0"
+            className="w-10 h-10 rounded-lg"
           />
         ) : (
           <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
