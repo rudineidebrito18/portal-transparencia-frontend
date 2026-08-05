@@ -8,9 +8,10 @@ type ListarParams = FiltroAuditoria & {
   sort?: string
 }
 
-// Cobre só os módulos do padrão genérico (seção 6.7 do prompt do admin) +
-// gestão de usuários por enquanto — módulos bespoke (licitações, obras, RH
-// específico, diário oficial etc.) ainda não geram registro de auditoria.
+// Cobertura completa desde 2026-08-05 — módulos bespoke (licitações, obras, RH
+// específico, diário oficial etc.) agora geram registro igual aos módulos do
+// padrão genérico. Contrato de resposta/filtro não mudou nessa rodada, só a
+// cobertura no backend.
 export const auditoriaService = {
   listar(params: ListarParams): Promise<Page<AuditLog>> {
     return api.get<Page<AuditLog>>('/admin/auditoria', { params }).then(r => r.data)

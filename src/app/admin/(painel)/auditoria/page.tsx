@@ -41,9 +41,8 @@ export default function AuditoriaPage() {
       <div>
         <h1 className="text-lg font-bold text-primary">Auditoria</h1>
         <p className="text-sm text-text-secondary/70">
-          Registro de quem criou/editou/excluiu o quê. Cobre só os módulos do padrão genérico
-          (Renúncia Fiscal, PPA, Lei etc.) e a gestão de usuários por enquanto — módulos
-          próprios (licitações, obras, RH específico, diário oficial) ainda não geram registro.
+          Registro de quem criou/editou/excluiu o quê — cobre todos os módulos do sistema,
+          incluindo licitações, obras, RH específico e diário oficial.
         </p>
       </div>
 
@@ -61,7 +60,7 @@ export default function AuditoriaPage() {
           className="border border-border/30 rounded-lg px-3 py-2 text-sm w-36"
         />
         <input
-          placeholder="Módulo (ex: recursos-humanos/estagiarios)"
+          placeholder="Módulo (ex: Fornecedor, Cargo, Notícia)"
           defaultValue={filtros.modulo ?? ''}
           onKeyDown={e => {
             if (e.key === 'Enter') setFiltros({ ...filtros, modulo: (e.target as HTMLInputElement).value })
