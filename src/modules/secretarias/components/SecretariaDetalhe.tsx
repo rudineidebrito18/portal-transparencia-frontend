@@ -3,9 +3,10 @@
 import {
   MdApartment,
   MdBadge,
+  MdDescription,
   MdEmail,
-  MdFileDownload,
   MdLocationOn,
+  MdOpenInNew,
   MdPhone,
   MdSchedule
 } from 'react-icons/md'
@@ -116,7 +117,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
                   key={tipo}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-light text-text-secondary/40 text-sm font-semibold whitespace-nowrap cursor-not-allowed"
                 >
-                  <MdFileDownload size={16} />
+                  <MdDescription size={16} />
                   {label} — não disponível
                 </span>
               )
@@ -130,7 +131,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
               >
-                <MdFileDownload size={16} />
+                <MdOpenInNew size={16} />
                 {label}
               </a>
             )

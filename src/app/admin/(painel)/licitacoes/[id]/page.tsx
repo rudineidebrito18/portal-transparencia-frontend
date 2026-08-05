@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
 
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -362,9 +363,9 @@ function AbaDocumentos({ licitacaoId }: { licitacaoId: number }) {
                   <td className="p-3">{d.tipoDocumento}</td>
                   <td className="p-3">{formatarData(d.dataEnvio)}</td>
                   <td className="p-3">
-                    <a href={d.caminhoPdf} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      Abrir
-                    </a>
+                    <AbrirPdf src={d.caminhoPdf} titulo={d.assunto} className="text-primary hover:underline">
+                      Ver documento
+                    </AbrirPdf>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'licitacoes') && (

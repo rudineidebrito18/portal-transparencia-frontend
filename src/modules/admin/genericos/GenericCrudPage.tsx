@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useMemo, useState } from 'react'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -280,9 +281,9 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
                   )}
                   <td className="p-3">
                     {registro.caminhoArquivo && (
-                      <a href={registro.caminhoArquivo} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                        Ver PDF
-                      </a>
+                      <AbrirPdf src={registro.caminhoArquivo} titulo={registro.descricao} className="text-accent hover:underline">
+                        Ver documento
+                      </AbrirPdf>
                     )}
                   </td>
                   <td className="p-3 text-right space-x-2">

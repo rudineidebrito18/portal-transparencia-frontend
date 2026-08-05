@@ -1,4 +1,4 @@
-import { MdDateRange, MdDescription, MdFileDownload } from 'react-icons/md'
+import { MdDateRange, MdDescription, MdOpenInNew } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { formatarData } from '@/utils/date'
@@ -34,8 +34,8 @@ export default function ConvenioCard({ documento }: Props) {
         rel="noopener noreferrer"
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
-        <MdFileDownload size={18} />
-        Baixar PDF
+        <MdOpenInNew size={18} />
+        Ver documento
       </a>
 
     </Card>

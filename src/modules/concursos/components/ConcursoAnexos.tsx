@@ -1,6 +1,6 @@
 'use client'
 
-import { MdDescription, MdFileDownload } from 'react-icons/md'
+import { MdDescription, MdOpenInNew } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -62,8 +62,8 @@ export default function ConcursoAnexos({ concursoId }: Props) {
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
           >
-            <MdFileDownload size={16} />
-            Baixar
+            <MdOpenInNew size={16} />
+            Ver documento
           </a>
         </Card>
       ))}

@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -270,9 +271,9 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
                   <td className="p-3">{d.tipoDocumento}</td>
                   <td className="p-3">{formatarData(d.dataEnvio)}</td>
                   <td className="p-3">
-                    <a href={d.caminhoPdf} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      Abrir
-                    </a>
+                    <AbrirPdf src={d.caminhoPdf} titulo={d.assunto} className="text-primary hover:underline">
+                      Ver documento
+                    </AbrirPdf>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'licitacoes') && (
@@ -475,7 +476,7 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
                 <th className="p-3">Assinatura</th>
                 <th className="p-3">Objeto</th>
                 <th className="p-3">Fornecedor</th>
-                <th className="p-3">PDF</th>
+                <th className="p-3">Documento</th>
                 <th className="p-3 text-right">Ações</th>
               </tr>
             </thead>
@@ -487,9 +488,9 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
                   <td className="p-3">{a.fornecedorNome}</td>
                   <td className="p-3">
                     {a.caminhoPdf ? (
-                      <a href={a.caminhoPdf} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                        Abrir
-                      </a>
+                      <AbrirPdf src={a.caminhoPdf} titulo={a.objeto} className="text-primary hover:underline">
+                        Ver documento
+                      </AbrirPdf>
                     ) : '—'}
                   </td>
                   <td className="p-3 text-right space-x-2">

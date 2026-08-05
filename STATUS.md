@@ -516,6 +516,58 @@ histórico na aba Gestores) e `AutoridadeView.tsx` (Prefeito/Vice-Prefeito). Nã
 mexido em fotos de outros contextos (notícias, avisos etc.) — escopo foi só
 "fotos de pessoa" a pedido do usuário.
 
+## 2.8 Padrão de abertura de PDF: público em nova guia, admin em modal (2026-08-05)
+
+Pedido original do usuário: em toda página que linka um PDF, abrir o arquivo com o
+visualizador nativo do navegador em vez de forçar download — já tem zoom/paginação/
+impressão/download na própria barra de ferramentas dele, então um botão "Baixar"
+próprio é redundante. Primeira versão abria tudo (público e admin) numa modal
+(`AbrirPdf.tsx` com `<iframe>`), mas o usuário identificou 3 problemas nesse padrão
+pro público: (1) quando o arquivo não existe/caminho quebrado, o iframe fica em
+branco *dentro* da moldura bonita da modal, parecendo bug em vez de "documento
+indisponível"; (2) depende do navegador ter visualizador de PDF nativo embutido —
+navegador antigo ou sem esse plugin pode não renderizar nada; (3) modal por cima da
+página é uma camada de UI a mais sem necessidade. Decisão final, por área:
+
+- **Público**: voltou a ser link direto (`<a href={caminho} target="_blank"
+  rel="noopener noreferrer">`), sem modal — o navegador decide sozinho como tratar
+  (visualizador nativo em navegador moderno, download normal em navegador antigo, sem
+  nenhuma UI nossa podendo "bugar" nesse meio-termo). Ícone trocou de
+  `MdFileDownload` pra `MdOpenInNew` (mesma convenção já usada em
+  `ItemAcessoCard.tsx`/`EmendaParlamentarCard.tsx` pra link externo) e o rótulo
+  genérico "PDF" virou "Ver documento" (ou "Ver anexo"/"Ver edição" conforme o
+  contexto) — isso não mudou da primeira versão. Cobre os ~12 arquivos públicos:
+  `DocumentList.tsx`, `DocumentoGenericoCard.tsx` (cobre os ~28 módulos genéricos tipo
+  Lei/Plano Estratégico/Competências/RGA etc. de uma vez), `ConcursoAnexos.tsx`,
+  `ContratoDetalhe.tsx`, `ConvenioCard.tsx`, `EdicaoCard.tsx` e
+  `UltimaEdicaoDestaque.tsx` (Diário Oficial), `EmpresaDividaAtivaCard.tsx`,
+  `EmpresaInidoneaCard.tsx`, `RelatorioMultiFormatoCard.tsx` (só o formato PDF —
+  Word/Excel continuam `<a download>` com `MdFileDownload`, não tem visualizador
+  nativo do navegador pra esses formatos), `TabelaValoresCard.tsx`,
+  `SecretariaDetalhe.tsx` (documentos institucionais).
+- **Admin**: manteve a modal (`src/components/ui/AbrirPdf.tsx`) — equipe interna,
+  navegador mais controlado, e não perder o estado da tabela/filtro ao conferir um
+  documento é uma vantagem real ali. Ganhou tratamento de erro: antes de renderizar o
+  `<iframe>`, faz um `fetch(src, { method: 'HEAD' })`; enquanto isso mostra
+  "Carregando documento...", se a resposta não for `ok` (ou o fetch falhar) mostra um
+  estado de erro explícito ("Não foi possível carregar o documento") em vez do iframe
+  em branco. `caminhoArquivo` normalmente é uma URL relativa servida via o rewrite de
+  `/api/*` do `next.config.ts` (mesma origem do frontend), então o `HEAD` não esbarra
+  em CORS. Usado em 12 arquivos: `GenericCrudPage.tsx` (cobre os ~28 módulos
+  genéricos), empresas em dívida ativa/inidôneas, convênios, tabela de valores,
+  unidades (decretos + documento-slot), licitações e contratos (documentos +
+  aditivos), obras (declarações + tabela de responsáveis), formulários da Ouvidoria,
+  anexos de concurso, publicações do Diário Oficial.
+- `src/components/ui/PdfViewer.tsx` não mudou nessa rodada — continua com `<iframe>`
+  fixo na página (sem botão de baixar próprio) em `/estrutura-organizacional`,
+  `/diarias-legislacao`, `/carta-de-servicos`; é um padrão diferente (visualizador
+  sempre visível, não um link que abre algo), fora do escopo dessa discussão.
+- `tsc --noEmit` e `npm run lint` limpos (só os 2 warnings pré-existentes de `<img>`
+  em `diario-oficial/config/page.tsx`, sem relação). Testado com `curl`: páginas
+  públicas e admin representativas de cada grupo (200 em todas), e confirmado que o
+  SSR de `/secretarias/1` já renderiza o novo `<a target="_blank">` pro documento
+  institucional existente naquele registro de teste.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useState } from 'react'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -246,9 +247,9 @@ export default function TabelaValoresAdminPage() {
                   <td className="p-3">{item.data}</td>
                   <td className="p-3">
                     {item.caminhoArquivo && (
-                      <a href={item.caminhoArquivo} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                        Ver PDF
-                      </a>
+                      <AbrirPdf src={item.caminhoArquivo} titulo={item.descricao} className="text-accent hover:underline">
+                        Ver documento
+                      </AbrirPdf>
                     )}
                   </td>
                   <td className="p-3 text-right space-x-2">

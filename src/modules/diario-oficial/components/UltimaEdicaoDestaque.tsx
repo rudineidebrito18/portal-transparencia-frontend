@@ -1,6 +1,6 @@
 'use client'
 
-import { MdFileDownload, MdNewReleases } from 'react-icons/md'
+import { MdNewReleases, MdOpenInNew } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
 import Skeleton from '@/components/ui/Skeleton'
@@ -52,8 +52,8 @@ export default function UltimaEdicaoDestaque() {
           rel="noopener noreferrer"
           className="flex items-center gap-2 px-5 py-3 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm whitespace-nowrap shrink-0"
         >
-          <MdFileDownload size={18} />
-          Baixar PDF
+          <MdOpenInNew size={18} />
+          Ver edição
         </a>
 
       </div>

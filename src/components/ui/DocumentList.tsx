@@ -1,4 +1,4 @@
-import { MdDescription, MdFileDownload } from 'react-icons/md'
+import { MdDescription, MdOpenInNew } from 'react-icons/md'
 
 import { Documento } from '@/modules/shared/types/Documento'
 import { formatarData } from '@/utils/date'
@@ -48,8 +48,8 @@ export default function DocumentList({ documentos, emptyMessage = 'Nenhum docume
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
           >
-            <MdFileDownload size={18} />
-            Baixar
+            <MdOpenInNew size={18} />
+            Ver documento
           </a>
 
         </Card>

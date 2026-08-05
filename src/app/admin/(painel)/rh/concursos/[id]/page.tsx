@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -160,9 +161,9 @@ export default function AnexosConcursoAdminPage() {
                   <td className="p-3 font-semibold">{a.descricao}</td>
                   <td className="p-3">{a.data}</td>
                   <td className="p-3">
-                    <a href={a.caminhoArquivo} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                      Ver PDF
-                    </a>
+                    <AbrirPdf src={a.caminhoArquivo} titulo={a.descricao} className="text-accent hover:underline">
+                      Ver documento
+                    </AbrirPdf>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'padrao') && (

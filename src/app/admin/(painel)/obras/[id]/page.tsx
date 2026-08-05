@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -605,14 +606,13 @@ function AbaAnexos({ obraId }: { obraId: number }) {
                   <td className="p-3">{a.descricao}</td>
                   <td className="p-3">{formatarData(a.data)}</td>
                   <td className="p-3">
-                    <a
-                      href={a.caminhoArquivo}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <AbrirPdf
+                      src={a.caminhoArquivo}
+                      titulo={a.descricao}
                       className="text-primary hover:underline"
                     >
-                      Abrir
-                    </a>
+                      Ver documento
+                    </AbrirPdf>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'obras-repasses') && (
@@ -776,7 +776,7 @@ function AbaArts({ obraId }: { obraId: number }) {
                 <th className="p-3">Número</th>
                 <th className="p-3">Data de expedição</th>
                 <th className="p-3">Responsável</th>
-                <th className="p-3">PDF</th>
+                <th className="p-3">Documento</th>
                 <th className="p-3 text-right">Ações</th>
               </tr>
             </thead>
@@ -787,14 +787,13 @@ function AbaArts({ obraId }: { obraId: number }) {
                   <td className="p-3">{formatarData(a.dataExpedicao)}</td>
                   <td className="p-3">{a.responsavel}</td>
                   <td className="p-3">
-                    <a
-                      href={a.caminhoPdf}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <AbrirPdf
+                      src={a.caminhoPdf}
+                      titulo={`Nº ${a.numero}`}
                       className="text-primary hover:underline"
                     >
-                      Abrir
-                    </a>
+                      Ver documento
+                    </AbrirPdf>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'padrao') && (

@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useState } from 'react'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -265,7 +266,7 @@ export default function EmpresasInidoneasAdminPage() {
                 <th className="p-3">CNPJ</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Data</th>
-                <th className="p-3">PDF</th>
+                <th className="p-3">Documento</th>
                 <th className="p-3 text-right">Ações</th>
               </tr>
             </thead>
@@ -278,9 +279,9 @@ export default function EmpresasInidoneasAdminPage() {
                   <td className="p-3">{formatarData(e.data)}</td>
                   <td className="p-3">
                     {e.caminhoPdf ? (
-                      <a href={e.caminhoPdf} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                        Ver PDF
-                      </a>
+                      <AbrirPdf src={e.caminhoPdf} titulo={e.empresa} className="text-accent hover:underline">
+                        Ver documento
+                      </AbrirPdf>
                     ) : (
                       <span className="text-text-secondary/50">-</span>
                     )}

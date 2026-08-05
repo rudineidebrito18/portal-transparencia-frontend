@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import ErrorState from '@/components/ui/ErrorState'
@@ -185,14 +186,13 @@ export default function PublicacaoDetalheAdminPage() {
         {solicitacao.edicaoDiarioId && (
           <div>
             <p className="text-text-secondary/60 text-xs">Edição publicada</p>
-            <a
-              href={`/api/edicoes/${solicitacao.numeroEdicao}/download`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <AbrirPdf
+              src={`/api/edicoes/${solicitacao.numeroEdicao}/download`}
+              titulo={`Edição Nº ${solicitacao.numeroEdicao}`}
               className="font-semibold text-primary hover:underline"
             >
-              Abrir PDF
-            </a>
+              Ver edição publicada
+            </AbrirPdf>
           </div>
         )}
       </Card>

@@ -5,8 +5,8 @@ import {
   MdBusiness,
   MdCalendarToday,
   MdDescription,
-  MdFileDownload,
   MdGavel,
+  MdOpenInNew,
   MdPerson
 } from 'react-icons/md'
 
@@ -126,8 +126,8 @@ export default function ContratoDetalhe({ contrato, documentos, aditivos }: Prop
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
                   >
-                    <MdFileDownload size={18} />
-                    Baixar
+                    <MdOpenInNew size={18} />
+                    Ver documento
                   </a>
                 </Card>
               ))}

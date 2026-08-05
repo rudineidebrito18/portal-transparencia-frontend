@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useState } from 'react'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -348,7 +349,7 @@ export default function ConveniosAdminPage() {
                 <th className="p-3">Convenente</th>
                 <th className="p-3">Vigência</th>
                 <th className="p-3">Valor total</th>
-                <th className="p-3">PDF</th>
+                <th className="p-3">Documento</th>
                 <th className="p-3 text-right">Ações</th>
               </tr>
             </thead>
@@ -361,9 +362,9 @@ export default function ConveniosAdminPage() {
                   <td className="p-3">{formatarMoeda(c.valorConvenio)}</td>
                   <td className="p-3">
                     {c.caminhoPdf ? (
-                      <a href={c.caminhoPdf} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                        Ver PDF
-                      </a>
+                      <AbrirPdf src={c.caminhoPdf} titulo={`Convênio Nº ${c.numero}`} className="text-accent hover:underline">
+                        Ver documento
+                      </AbrirPdf>
                     ) : (
                       <span className="text-text-secondary/50">-</span>
                     )}

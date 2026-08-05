@@ -1,4 +1,4 @@
-import { MdArticle, MdFileDownload } from 'react-icons/md'
+import { MdArticle, MdFileDownload, MdOpenInNew } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 
@@ -10,9 +10,12 @@ interface Props {
   caminhoXls?: string
 }
 
+const classeBotao = 'flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap'
+
+// PDF abre em nova guia (visualizador nativo do navegador) — Word/Excel não têm
+// visualizador confiável no navegador, então continuam como link de abrir/baixar normal.
 export default function RelatorioMultiFormatoCard({ titulo, subtitulo, caminhoPdf, caminhoWord, caminhoXls }: Props) {
-  const formatos = [
-    { label: 'PDF', caminho: caminhoPdf },
+  const outrosFormatos = [
     { label: 'Word', caminho: caminhoWord },
     { label: 'Excel', caminho: caminhoXls }
   ].filter(f => f.caminho)
@@ -32,13 +35,19 @@ export default function RelatorioMultiFormatoCard({ titulo, subtitulo, caminhoPd
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        {formatos.map(formato => (
+        {caminhoPdf && (
+          <a href={caminhoPdf} target="_blank" rel="noopener noreferrer" className={classeBotao}>
+            <MdOpenInNew size={16} />
+            Ver PDF
+          </a>
+        )}
+        {outrosFormatos.map(formato => (
           <a
             key={formato.label}
             href={formato.caminho}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
+            className={classeBotao}
           >
             <MdFileDownload size={16} />
             {formato.label}

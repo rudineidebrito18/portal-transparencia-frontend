@@ -3,6 +3,7 @@
 import { useCallback } from 'react'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
+import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -115,9 +116,9 @@ export default function OuvidoriaFormulariosAdminPage() {
                   <td className="p-3 max-w-lg">{item.comentario}</td>
                   <td className="p-3 whitespace-nowrap">
                     {item.caminhoArquivo ? (
-                      <a href={item.caminhoArquivo} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                        Abrir
-                      </a>
+                      <AbrirPdf src={item.caminhoArquivo} titulo={`Manifestação de ${item.nome ?? 'anônimo'}`} className="text-primary hover:underline">
+                        Ver anexo
+                      </AbrirPdf>
                     ) : (
                       <span className="text-text-secondary/40">—</span>
                     )}

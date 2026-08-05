@@ -1,4 +1,4 @@
-import { MdBusiness, MdFileDownload } from 'react-icons/md'
+import { MdBusiness, MdOpenInNew } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { formatarMoeda } from '@/utils/currency'
@@ -52,8 +52,8 @@ export default function EmpresaDividaAtivaCard({ empresa }: Props) {
           rel="noopener noreferrer"
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
-          <MdFileDownload size={18} />
-          Baixar PDF
+          <MdOpenInNew size={18} />
+          Ver documento
         </a>
       </div>
 
