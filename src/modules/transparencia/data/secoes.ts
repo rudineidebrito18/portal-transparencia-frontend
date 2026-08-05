@@ -81,6 +81,8 @@ import {
   MdPeopleAlt,
   MdAssignment,
   MdArchive,
+  MdPerson,
+  MdPersonOutline,
 } from 'react-icons/md'
 import { IconType } from 'react-icons'
 
@@ -101,6 +103,8 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     titulo: 'Informações Institucionais',
     icon: MdAccountBalance,
     itens: [
+      { label: 'Prefeito', icon: MdPerson, href: '/prefeito' },
+      { label: 'Vice-Prefeito', icon: MdPersonOutline, href: '/vice-prefeito' },
       { label: 'Estrutura organizacional', icon: MdAccountTree, href: '/estrutura-organizacional' },
       { label: 'Organograma', icon: MdHub, href: '/organograma' },
       { label: 'Atos normativos próprios', icon: MdArticle, href: '/legislacao' },

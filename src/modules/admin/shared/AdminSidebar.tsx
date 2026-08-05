@@ -45,6 +45,8 @@ const LINKS_ANTICORRUPCAO_BESPOKE = [
 const LINKS_INSTITUCIONAL_GERAL = [
   { href: '/admin/institucional/avisos', label: 'Avisos' },
   { href: '/admin/institucional/noticias', label: 'Notícias' },
+  { href: '/admin/geral/prefeito', label: 'Perfil do Prefeito' },
+  { href: '/admin/geral/vice-prefeito', label: 'Perfil do Vice-Prefeito' },
   { href: '/admin/geral/fornecedores', label: 'Fornecedores' },
   { href: '/admin/geral/unidades', label: 'Unidades' },
   { href: '/admin/geral/tabela-valores', label: 'Tabela de Valores de Diária' }

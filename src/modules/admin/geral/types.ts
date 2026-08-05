@@ -69,3 +69,18 @@ export interface SetorUnidadeRequest {
   nome: string
   descricao: string
 }
+
+// Mesmo padrão de reexport de Unidade acima — tipo canônico mora no módulo público
+// "Prefeitura" (sem vínculo/FK com Unidade, confirmado com o backend).
+export type { Autoridade } from '@/modules/prefeitura/types'
+
+export interface AutoridadeRequest {
+  nome: string
+  nomePopular?: string
+  cargo: string
+  atribuicoes: string
+  email: string
+  telefone?: string
+  dataInicioMandato?: string
+  dataFimMandato?: string
+}

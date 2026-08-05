@@ -7,6 +7,8 @@ import { secoesAcessoInformacao } from '@/modules/transparencia/data/secoes'
 
 const LINKS_INSTITUCIONAL = [
   { label: 'Início', href: '/' },
+  { label: 'Prefeito', href: '/prefeito' },
+  { label: 'Vice-Prefeito', href: '/vice-prefeito' },
   { label: 'Secretarias', href: '/secretarias' },
   { label: 'Notícias', href: '/noticias' },
   { label: 'Avisos', href: '/avisos' },

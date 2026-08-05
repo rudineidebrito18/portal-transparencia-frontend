@@ -116,6 +116,7 @@ sidebar junto no scroll.
 | Notícias | `/admin/institucional/noticias` | `institucional` | multipart (`dados`+`imagem` opcional), form próprio (não usa o genérico) |
 | Fornecedores | `/admin/geral/fornecedores` | `geral` | bespoke paginado (`usePageableResource`), filtro via `GET .../filtro` (`nome`, `cnpj`); `GeralSimplesCrudPage.tsx` genérico foi removido (só Fornecedores usava, virou página própria) |
 | Secretarias (Unidade + 5 sub-recursos) | `/admin/geral/unidades` + `/admin/geral/unidades/[id]` | `geral` | multipart na unidade; agora bespoke paginado (`GET` base já aceita `nome`/`vigencia` como query params direto, sem `/filtro` separado); detalhe com abas pros 5 sub-recursos; Documentos tipados são 3 slots fixos (Termo/EDTC/Declaração E-SIC), reenviar substitui; excluir a unidade dá `409` se tiver sub-recurso vinculado (sem cascade) — excluir os 5 primeiro |
+| Perfil do Prefeito / Vice-Prefeito | `/admin/geral/prefeito` + `/admin/geral/vice-prefeito` | `geral` | singleton (upsert, 404 antes de configurado), multipart com foto opcional (mantém a atual se omitida); dois recursos independentes, sem vínculo com `Unidade`; formulário compartilhado (`AutoridadeConfigPage.tsx`), só título/service mudam. Ver seção 2.5 |
 | Tabela de Valores de Diária | `/admin/geral/tabela-valores` | `geral` | multipart; **o OpenAPI documenta esse endpoint como JSON por engano, é multipart de verdade** |
 | E-SIC — Configuração | `/admin/esic/config` | `esic-ouvidoria` | singleton (upsert, 404 antes de configurado) |
 | E-SIC — Formulários recebidos | `/admin/esic/formularios` | `esic-ouvidoria` | somente leitura; bespoke paginado, filtro via `GET .../filtro` (`tipoSolicitacao`, `nome`, `email`, `dataInicial`, `dataFinal`) — `GET .../tipo` foi removido pelo backend, não usar mais |
@@ -380,6 +381,43 @@ correspondentes foram atualizados junto — Cargos, Diárias, Licitações e Con
 campos fake (`unidadeId` com um pool de 5 unidades fictícias) pra que o filtro por unidade
 também funcione em `NEXT_PUBLIC_USE_MOCK=true`, não só contra o backend real.
 
+## 2.5 Perfil do Prefeito e do Vice-Prefeito (2026-08-04) — concluído
+
+Usuário pediu as telas públicas "Prefeito" e "Vice-Prefeito" (referência funcional: páginas
+individuais do portal de Lago dos Rodrigues). Investigado antes de programar: `Unidade`
+"Gabinete do Prefeito" (`id: 1`) existe, mas o `gestorNome`/`gestorCargo` dela é a **Chefe
+de Gabinete**, não o Prefeito — não havia recurso de backend que modelasse Prefeito/Vice
+como pessoa. Virou pedido de backend (`prompt-backend-prefeito-vice-prefeito.md`) em vez de
+tela com conteúdo estático — implementado pelo backend no mesmo dia, exatamente no formato
+sugerido: dois singletons independentes, sem vínculo/FK entre si nem com `Unidade`
+(`GET`/`PUT /api/geral/prefeito` e `/api/geral/vice-prefeito`, mesmo upsert
+404-antes-de-configurar de `EsicInfo`/`OuvidoriaInfo`, `PUT` multipart com `foto` opcional
+igual `Unidade`).
+
+Frontend consumindo, testado contra o backend real (`curl` com token, incluindo `PUT` sem
+foto preservando a atual):
+- **Módulo público novo** `src/modules/prefeitura/` — `Autoridade` (tipo canônico),
+  `prefeituraService` fábrica (`criarServicoAutoridade('prefeito' | 'vice-prefeito')`, sem
+  mock, chama sempre o backend real — mesma convenção de Secretarias/Fornecedores).
+  `AutoridadeView.tsx` compartilhado entre as duas rotas (`/prefeito`, `/vice-prefeito`,
+  flat, mesmo padrão de `/estrutura-organizacional`/`/organograma` — não `/prefeitura/*`
+  aninhado, apesar da referência de Lago usar esse padrão).
+- **`telefone` pode vir `null`** (campo opcional no backend) — `AutoridadeView` cai pro
+  `telefone` da `Unidade` "Gabinete do Prefeito" como fallback (busca por `nome` exato via
+  `secretariasService.listar`, degrada bem se não achar). `endereco`/`horarioAtendimento`
+  **sempre** vêm da Unidade — `Autoridade` não tem esses campos (sem FK, decisão do
+  backend), diferente de `telefone`/`email` que são campos próprios do recurso.
+  Confirmado via `curl` que `GET /geral/unidades?nome=Gabinete do Prefeito` resolve certo.
+- **Admin**: `AutoridadeConfigPage.tsx` compartilhado (`src/modules/admin/geral/components/`)
+  entre `/admin/geral/prefeito` e `/admin/geral/vice-prefeito` — só título/cargo padrão/service
+  mudam entre as duas. RBAC grupo `geral` (fora do `EDITAR_ADMIN_ONLY`, `podeEditar` já
+  resolve pra `ROLE_MANAGER`+, batendo com o que o backend exige). `AutoridadeRequest` fica
+  em `admin/geral/types.ts` (o tipo de leitura `Autoridade` é reexportado do módulo
+  público, mesmo padrão de `Unidade`).
+- Links adicionados: dropdown "A PREFEITURA" do `Header.tsx`, coluna Institucional do
+  `Footer.tsx`, `mapa-do-site/page.tsx`, e seção "Informações Institucionais" do hub
+  `/transparencia` (`secoes.ts`).
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash
@@ -399,7 +437,7 @@ Formatos de DTO em uso, decida qual é **antes** de codar:
   padrão usado quando a lista é naturalmente pequena/escopada, ex.: aditivos de um contrato,
   folha de um mês). `useAsyncData` + `AsyncList`. Precedentes: `gestao-fiscal`, `secretarias`.
 - **Info singleton** — `GET` retorna um objeto único, não lista. `useAsyncData` com
-  `valorInicial: null`. Precedentes: `esic`, `ouvidoria`.
+  `valorInicial: null`. Precedentes: `esic`, `ouvidoria`, `prefeitura` (prefeito/vice-prefeito).
 - **PDF estático, sem backend** — `src/components/ui/PdfViewer.tsx` direto no `page.tsx`, com
   o caminho marcado `// TODO`. Precedentes: `estrutura-organizacional`, `organograma`.
 - **Multipart com sub-recursos filhos** (ex: Unidade/Secretarias, Obras) — página de detalhe

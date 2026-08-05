@@ -134,6 +134,8 @@ export default function Header() {
               <Link className="px-4 py-2 hover:bg-secondary" href="/" onClick={() => setMenuOpen(false)}><MdHome /></Link>
 
               <DropdownMenuItem label="A PREFEITURA">
+                <Link href="/prefeito" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Prefeito</Link>
+                <Link href="/vice-prefeito" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Vice-Prefeito</Link>
                 <Link href="/estrutura-organizacional" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Estrutura Organizacional</Link>
                 <Link href="/organograma" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Organograma</Link>
               </DropdownMenuItem>

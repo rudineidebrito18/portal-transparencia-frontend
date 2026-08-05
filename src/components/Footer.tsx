@@ -11,6 +11,8 @@ import {
 import { useInformacoesOuvidoria } from '@/modules/ouvidoria/hooks/useInformacoesOuvidoria'
 
 const LINKS_INSTITUCIONAL = [
+  { label: 'Prefeito', href: '/prefeito' },
+  { label: 'Vice-Prefeito', href: '/vice-prefeito' },
   { label: 'Estrutura Organizacional', href: '/estrutura-organizacional' },
   { label: 'Organograma', href: '/organograma' },
   { label: 'Secretarias', href: '/secretarias' },

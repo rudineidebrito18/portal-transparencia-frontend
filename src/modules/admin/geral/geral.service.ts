@@ -1,6 +1,7 @@
-import { api } from '@/services/api'
+import { ApiError, api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
-import { FiltroFornecedor, FiltroUnidade, Fornecedor, FornecedorRequest, Unidade, UnidadeRequest } from './types'
+import { TipoAutoridade } from '@/modules/prefeitura/types'
+import { Autoridade, AutoridadeRequest, FiltroFornecedor, FiltroUnidade, Fornecedor, FornecedorRequest, Unidade, UnidadeRequest } from './types'
 
 const FORNECEDORES_BASE = '/geral/fornecedores'
 
@@ -65,3 +66,38 @@ export const unidadesService = {
     return api.delete(`${UNIDADES_BASE}/${id}`).then(() => undefined)
   }
 }
+
+function montarFormDataAutoridade(dados: AutoridadeRequest, foto?: File | null): FormData {
+  const formData = new FormData()
+  formData.append('dados', new Blob([JSON.stringify(dados)], { type: 'application/json' }))
+  if (foto) formData.append('foto', foto)
+  return formData
+}
+
+// Sem vínculo/FK com Unidade — recurso novo, dois singletons independentes
+// (/geral/prefeito, /geral/vice-prefeito), mesmo padrão upsert 404-antes-de-configurar
+// de esicInfoService/ouvidoriaInfoService, com upload de foto igual Unidade.
+function criarServicoAutoridadeAdmin(tipo: TipoAutoridade) {
+  const base = `/geral/${tipo}`
+
+  return {
+    buscar(): Promise<Autoridade | null> {
+      return api.get<Autoridade>(base).then(
+        r => r.data,
+        (e: ApiError) => {
+          if (e.status === 404) return null
+          throw e
+        }
+      )
+    },
+
+    atualizar(dados: AutoridadeRequest, foto?: File | null): Promise<Autoridade> {
+      return api
+        .put<Autoridade>(base, montarFormDataAutoridade(dados, foto), { headers: { 'Content-Type': 'multipart/form-data' } })
+        .then(r => r.data)
+    }
+  }
+}
+
+export const prefeitoAdminService = criarServicoAutoridadeAdmin('prefeito')
+export const vicePrefeitoAdminService = criarServicoAutoridadeAdmin('vice-prefeito')
