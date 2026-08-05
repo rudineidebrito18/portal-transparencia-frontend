@@ -180,6 +180,12 @@ export default async function OrganogramaDiagrama() {
         alterada pela Lei nº 164/2016 — dispõe sobre a estrutura administrativa do
         Município de Lago dos Rodrigues – MA e dá outras providências.
       </p>
+
+      <p className="text-xs text-center mt-2">
+        <Link href="/competencias" className="text-primary font-semibold hover:underline">
+          Ver as competências detalhadas de cada órgão →
+        </Link>
+      </p>
     </div>
   )
 }

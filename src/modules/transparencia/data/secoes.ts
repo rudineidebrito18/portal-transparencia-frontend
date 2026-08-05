@@ -107,6 +107,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
       { label: 'Vice-Prefeito', icon: MdPersonOutline, href: '/vice-prefeito' },
       { label: 'Estrutura organizacional', icon: MdAccountTree, href: '/estrutura-organizacional' },
       { label: 'Organograma', icon: MdHub, href: '/organograma' },
+      { label: 'Competências', icon: MdListAlt, href: '/competencias' },
       { label: 'Atos normativos próprios', icon: MdArticle, href: '/legislacao' },
       { label: 'Perguntas frequentes (FAQ)', icon: MdHelpOutline, href: '/faq' },
       { label: 'Radar da transparência pública', icon: MdRadar, href: 'https://radardatransparencia.atricon.org.br/' },

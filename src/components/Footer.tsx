@@ -15,6 +15,7 @@ const LINKS_INSTITUCIONAL = [
   { label: 'Vice-Prefeito', href: '/vice-prefeito' },
   { label: 'Estrutura Organizacional', href: '/estrutura-organizacional' },
   { label: 'Organograma', href: '/organograma' },
+  { label: 'Competências', href: '/competencias' },
   { label: 'Secretarias', href: '/secretarias' },
   { label: 'Diário Oficial', href: '/diario-oficial' },
   { label: 'Notícias', href: '/noticias' }

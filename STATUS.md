@@ -115,6 +115,26 @@ Módulos com padrão bespoke (fogem do CRUD genérico, vale saber antes de mexer
   `/secretarias/{id}`. Lista vazia (nenhuma secretaria cadastrada ainda) mostra uma
   mensagem em vez de grupo vazio. `/estrutura-organizacional` continua com PDF
   placeholder, não mexida nessa rodada.
+- **`/competencias` (novo, 2026-08-05) — pendência de backend, front+admin já prontos.**
+  Referência de Lago dos Rodrigues tinha um anchor "COMPETÊNCIAS" na mesma página do
+  organograma, mas apontava pra um PDF quebrado no site deles. Decisão: em vez de
+  replicar o link quebrado, virou módulo genérico novo — mesmo padrão dos outros 27
+  (`slug: 'competencias'`, `categoria: 'Institucional'`, `basePath:
+  '/institucional/competencias'`, `comIntervalo: false`, `papelMinimoEdicao:
+  'ROLE_MANAGER'`, registry.ts). Front construído por completo seguindo `legislacao`
+  como molde exato (`criarServicoDocumentoGenerico`/`criarUseDocumentosGenerico`/
+  `criarMockDocumentoGenerico` — só 4 arquivos finos, ~10 linhas cada): `src/modules/competencias/`
+  + `src/app/competencias/{page,loading,error}.tsx`. **Admin não precisou de nenhum
+  arquivo novo** — só a linha no `registry.ts` já basta, `/admin/modulos/competencias`
+  funciona via a rota dinâmica `[slug]` + `GenericCrudPage` que já existiam. Linkado em
+  `Header.tsx` (dropdown "A PREFEITURA"), `Footer.tsx`, `mapa-do-site/page.tsx`,
+  `secoes.ts` (hub, seção "Informações Institucionais") e um link cruzado no fim do
+  `OrganogramaDiagrama.tsx`. **Endpoint não existe no backend ainda** — testado (`GET
+  /institucional/competencias/filtro` devolve `500`, não `404`, provavelmente o
+  catch-all de exceção de novo, ver seção de RBAC mais acima) — pedido completo
+  documentado em `prompt-backend-competencias.md` (scratchpad da sessão). Front já
+  degrada bem enquanto isso: `ErrorState` na tela pública, filtro/paginação funcionam
+  assim que o endpoint existir, sem precisar tocar em nada de novo.
 - `/diario-oficial` — fluxo de publicação mais simples (busca com filtros); o site público só
   lê `EdicaoDiario` já publicada. O fluxo de aprovação/assinatura em si é admin (seção seguinte).
 
