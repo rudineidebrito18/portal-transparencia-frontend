@@ -77,11 +77,25 @@ export default function Header() {
 
   return (
     <>
-      <div className="fixed top-0 left-0 w-full z-50">
+      {/* pointer-events: none aqui de propósito — sem altura própria, esse container
+          herdaria a altura "natural" (pré-translateY) do conteúdo, já que translateY só
+          reposiciona visualmente, não encolhe a caixa. Isso deixava uma faixa invisível
+          do header (ainda dentro da caixa fixed/z-50, ainda capturando clique por
+          padrão) sentada em cima do conteúdo da página logo abaixo do nav, sempre que o
+          header estava colapsado ou a meio caminho do scroll. Tentamos consertar dando
+          altura explícita à caixa (headerHeight + translateY), mas isso forçava reflow
+          (recalcular `height`, propriedade de layout) a cada pixel do scroll — offsetY
+          não tem throttle, então rodava em toda tick de scroll e causava tremida visível
+          na página. `pointer-events` não dispara layout/reflow (só afeta hit-testing),
+          então resolve o mesmo problema sem custo de performance: o container em si
+          vira "transparente" a clique, e só os filhos com pointer-events-auto (topbar e
+          logo+nav) voltam a capturar — clique na área vazia atravessa direto pro
+          conteúdo da página. */}
+      <div className="fixed top-0 left-0 w-full z-50 pointer-events-none">
 
         {/* 1. Topbar */}
         <div
-          className="sticky w-full bg-primary text-light text-sm flex justify-between items-center px-4 z-40"
+          className="sticky w-full bg-primary text-light text-sm flex justify-between items-center px-4 z-40 pointer-events-auto"
           style={{ height: topbarHeight, lineHeight: `${topbarHeight}px` }}
         >
           <div className="text-xs">Prefeitura Municipal de Lago dos Rodrigues</div>
@@ -101,7 +115,7 @@ export default function Header() {
         {/* 2. Logo e Nav (Com efeito de subida no scroll) */}
         <div
           ref={logoBackgroundRef}
-          className="w-full bg-light shadow"
+          className="w-full bg-light shadow pointer-events-auto"
           style={{
             transform: `translateY(${translateY}px)`,
           }}
