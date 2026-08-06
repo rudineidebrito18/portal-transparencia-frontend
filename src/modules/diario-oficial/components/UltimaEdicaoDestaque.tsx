@@ -1,10 +1,12 @@
 'use client'
 
-import { MdNewReleases, MdOpenInNew } from 'react-icons/md'
+import Link from 'next/link'
+import { MdNewReleases, MdVisibility } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { urlDownloadEdicao } from '../diario-oficial.service'
 import { TipoEdicaoDiario, TipoEdicaoDiarioDescricao, TipoEdicaoDiarioStyle } from '../enums'
 import { useUltimaEdicao } from '../hooks/useUltimaEdicao'
@@ -46,15 +48,13 @@ export default function UltimaEdicaoDestaque() {
           </div>
         </div>
 
-        <a
-          href={urlDownloadEdicao(edicao.numeroEdicao)}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href={hrefDocumento(urlDownloadEdicao(edicao.numeroEdicao), `Edição Nº ${edicao.numeroEdicao}`, { origemLabel: 'Diário Oficial', origemHref: '/diario-oficial' })}
           className="flex items-center gap-2 px-5 py-3 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm whitespace-nowrap shrink-0"
         >
-          <MdOpenInNew size={18} />
+          <MdVisibility size={18} />
           Ver edição
-        </a>
+        </Link>
 
       </div>
     </div>

@@ -5,6 +5,7 @@ import { useCompetencias } from '../hooks/useCompetencias'
 
 export default function CompetenciasListView() {
   const resource = useCompetencias()
+  const origem = { label: 'Competências', href: '/competencias' }
 
-  return <DocumentoGenericoListPanel {...resource} />
+  return <DocumentoGenericoListPanel {...resource} origem={origem} />
 }

@@ -1,8 +1,10 @@
-import { MdBusiness, MdOpenInNew } from 'react-icons/md'
+import Link from 'next/link'
+import { MdBusiness, MdVisibility } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { EmpresaDividaAtiva } from '../types'
 
 interface Props {
@@ -46,15 +48,13 @@ export default function EmpresaDividaAtivaCard({ empresa }: Props) {
       </div>
 
       <div className="flex items-center justify-end pt-3 border-t border-border/20">
-        <a
-          href={empresa.caminhoPdf}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href={hrefDocumento(empresa.caminhoPdf, empresa.nome, { origemLabel: 'Gestão Fiscal', origemHref: '/gestao-fiscal?categoria=divida-ativa' })}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
-          <MdOpenInNew size={18} />
+          <MdVisibility size={18} />
           Ver documento
-        </a>
+        </Link>
       </div>
 
     </Card>

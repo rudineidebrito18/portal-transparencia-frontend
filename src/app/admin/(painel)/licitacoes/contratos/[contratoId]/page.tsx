@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -17,6 +16,7 @@ import { ContratoLicitacao, Aditivo } from '@/modules/contratos/types'
 import { contratoService } from '@/modules/admin/licitacoes/contrato.service'
 import { aditivoService } from '@/modules/admin/licitacoes/aditivo.service'
 import { AditivoRequest, Documento, DocumentoUploadRequest } from '@/modules/admin/licitacoes/types'
+import { hrefDocumento } from '@/utils/documento'
 
 function formatarData(data?: string) {
   if (!data) return '—'
@@ -271,9 +271,9 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
                   <td className="p-3">{d.tipoDocumento}</td>
                   <td className="p-3">{formatarData(d.dataEnvio)}</td>
                   <td className="p-3">
-                    <AbrirPdf src={d.caminhoPdf} titulo={d.assunto} className="text-primary hover:underline">
+                    <Link href={hrefDocumento(d.caminhoPdf, d.assunto, { admin: true })} className="text-primary hover:underline">
                       Ver documento
-                    </AbrirPdf>
+                    </Link>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'licitacoes') && (
@@ -488,9 +488,9 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
                   <td className="p-3">{a.fornecedorNome}</td>
                   <td className="p-3">
                     {a.caminhoPdf ? (
-                      <AbrirPdf src={a.caminhoPdf} titulo={a.objeto} className="text-primary hover:underline">
+                      <Link href={hrefDocumento(a.caminhoPdf, a.objeto, { admin: true })} className="text-primary hover:underline">
                         Ver documento
-                      </AbrirPdf>
+                      </Link>
                     ) : '—'}
                   </td>
                   <td className="p-3 text-right space-x-2">

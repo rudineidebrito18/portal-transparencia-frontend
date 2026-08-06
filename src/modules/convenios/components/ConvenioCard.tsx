@@ -1,7 +1,9 @@
-import { MdDateRange, MdDescription, MdOpenInNew } from 'react-icons/md'
+import Link from 'next/link'
+import { MdDateRange, MdDescription, MdVisibility } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { ConvenioDocumento } from '../types'
 
 interface Props {
@@ -28,15 +30,13 @@ export default function ConvenioCard({ documento }: Props) {
         </div>
       </div>
 
-      <a
-        href={documento.caminhoArquivo}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href={hrefDocumento(documento.caminhoArquivo, documento.descricao, { origemLabel: 'Convênios e Transferências', origemHref: '/convenios' })}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
-        <MdOpenInNew size={18} />
+        <MdVisibility size={18} />
         Ver documento
-      </a>
+      </Link>
 
     </Card>
   )

@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { MdApartment } from 'react-icons/md'
 
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -33,6 +32,7 @@ import {
   TipoDocumentoUnidadeDescricao,
   Unidade
 } from '@/modules/admin/geral/types'
+import { hrefDocumento } from '@/utils/documento'
 
 function formatarData(data?: string | null) {
   if (!data) return '—'
@@ -285,9 +285,9 @@ function AbaDecretos({ unidadeId }: { unidadeId: number }) {
                   <td className="p-3">{d.descricao}</td>
                   <td className="p-3">{formatarData(d.data)}</td>
                   <td className="p-3">
-                    <AbrirPdf src={d.arquivoUrl} titulo={d.descricao} className="text-primary hover:underline">
+                    <Link href={hrefDocumento(d.arquivoUrl, d.descricao, { admin: true })} className="text-primary hover:underline">
                       Ver documento
-                    </AbrirPdf>
+                    </Link>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'geral') && (
@@ -403,9 +403,9 @@ function SlotDocumento({
       {atual ? (
         <div className="text-sm space-y-1">
           <p className="text-text-secondary/60 text-xs">Enviado em {formatarData(atual.dataEnvio)}</p>
-          <AbrirPdf src={atual.arquivoUrl} titulo={TipoDocumentoUnidadeDescricao[tipo]} className="text-primary hover:underline">
+          <Link href={hrefDocumento(atual.arquivoUrl, TipoDocumentoUnidadeDescricao[tipo], { admin: true })} className="text-primary hover:underline">
             Ver arquivo atual
-          </AbrirPdf>
+          </Link>
         </div>
       ) : (
         <p className="text-sm text-text-secondary/50">Nenhum arquivo enviado.</p>

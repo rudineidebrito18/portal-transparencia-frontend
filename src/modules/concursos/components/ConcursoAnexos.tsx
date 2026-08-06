@@ -1,6 +1,7 @@
 'use client'
 
-import { MdDescription, MdOpenInNew } from 'react-icons/md'
+import Link from 'next/link'
+import { MdDescription, MdVisibility } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -8,6 +9,7 @@ import ErrorState from '@/components/ui/ErrorState'
 import Skeleton from '@/components/ui/Skeleton'
 import { useAsyncData } from '@/hooks/useAsyncData'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { concursoService } from '../concurso.service'
 
 interface Props {
@@ -56,15 +58,13 @@ export default function ConcursoAnexos({ concursoId }: Props) {
             </div>
           </div>
 
-          <a
-            href={anexo.caminhoArquivo}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={hrefDocumento(anexo.caminhoArquivo, anexo.descricao, { origemLabel: 'Concursos e Seleções Públicas', origemHref: '/concursos' })}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
           >
-            <MdOpenInNew size={16} />
+            <MdVisibility size={16} />
             Ver documento
-          </a>
+          </Link>
         </Card>
       ))}
     </div>

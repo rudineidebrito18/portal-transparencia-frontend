@@ -2,8 +2,9 @@
 
 import { FormEvent, useCallback, useState } from 'react'
 
+import Link from 'next/link'
+
 import { usePageableResource } from '@/hooks/usePageableResource'
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -13,6 +14,7 @@ import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { empresaInidoneaService } from '@/modules/admin/anticorrupcao/empresaInidonea.service'
 import { EmpresaInidonea, EmpresaInidoneaRequest, FiltroEmpresaInidonea } from '@/modules/admin/anticorrupcao/types'
+import { hrefDocumento } from '@/utils/documento'
 
 interface FormState extends EmpresaInidoneaRequest {
   id: number | null
@@ -279,9 +281,9 @@ export default function EmpresasInidoneasAdminPage() {
                   <td className="p-3">{formatarData(e.data)}</td>
                   <td className="p-3">
                     {e.caminhoPdf ? (
-                      <AbrirPdf src={e.caminhoPdf} titulo={e.empresa} className="text-accent hover:underline">
+                      <Link href={hrefDocumento(e.caminhoPdf, e.empresa, { admin: true })} className="text-accent hover:underline">
                         Ver documento
-                      </AbrirPdf>
+                      </Link>
                     ) : (
                       <span className="text-text-secondary/50">-</span>
                     )}

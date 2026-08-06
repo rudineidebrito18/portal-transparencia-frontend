@@ -1,16 +1,19 @@
-import { MdDescription, MdOpenInNew } from 'react-icons/md'
+import Link from 'next/link'
+import { MdDescription, MdVisibility } from 'react-icons/md'
 
 import { Documento } from '@/modules/shared/types/Documento'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import Card from './Card'
 import EmptyState from './EmptyState'
 
 interface Props {
   documentos?: Documento[]
   emptyMessage?: string
+  origem?: { label: string; href: string }
 }
 
-export default function DocumentList({ documentos, emptyMessage = 'Nenhum documento disponível.' }: Props) {
+export default function DocumentList({ documentos, emptyMessage = 'Nenhum documento disponível.', origem }: Props) {
 
   if (!documentos?.length) {
     return <EmptyState message={emptyMessage} />
@@ -42,15 +45,13 @@ export default function DocumentList({ documentos, emptyMessage = 'Nenhum docume
           </div>
 
           {/* BOTÃO */}
-          <a
-            href={doc.caminhoPdf}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={hrefDocumento(doc.caminhoPdf, doc.assunto, { origemLabel: origem?.label, origemHref: origem?.href })}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
           >
-            <MdOpenInNew size={18} />
+            <MdVisibility size={18} />
             Ver documento
-          </a>
+          </Link>
 
         </Card>
       ))}

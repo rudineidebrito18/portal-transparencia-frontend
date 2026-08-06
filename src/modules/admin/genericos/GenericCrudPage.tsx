@@ -2,8 +2,9 @@
 
 import { FormEvent, useCallback, useMemo, useState } from 'react'
 
+import Link from 'next/link'
+
 import { usePageableResource } from '@/hooks/usePageableResource'
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -19,6 +20,7 @@ import {
   DocumentoGenericoRequest,
   FiltroDocumentoGenericoAdmin
 } from './types'
+import { hrefDocumento } from '@/utils/documento'
 
 type Registro = DocumentoGenericoAdmin & Partial<Pick<DocumentoGenericoComIntervaloAdmin, 'dataInicio' | 'dataFim'>>
 
@@ -281,9 +283,9 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
                   )}
                   <td className="p-3">
                     {registro.caminhoArquivo && (
-                      <AbrirPdf src={registro.caminhoArquivo} titulo={registro.descricao} className="text-accent hover:underline">
+                      <Link href={hrefDocumento(registro.caminhoArquivo, registro.descricao, { admin: true })} className="text-accent hover:underline">
                         Ver documento
-                      </AbrirPdf>
+                      </Link>
                     )}
                   </td>
                   <td className="p-3 text-right space-x-2">

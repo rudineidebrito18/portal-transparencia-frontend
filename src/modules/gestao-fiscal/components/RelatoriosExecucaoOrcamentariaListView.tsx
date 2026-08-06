@@ -58,6 +58,7 @@ export default function RelatoriosExecucaoOrcamentariaListView() {
             caminhoPdf={relatorio.caminhoPdf}
             caminhoWord={relatorio.caminhoWord}
             caminhoXls={relatorio.caminhoXls}
+            origem={{ label: 'Gestão Fiscal', href: '/gestao-fiscal?categoria=execucao-orcamentaria' }}
           />
         )}
       />

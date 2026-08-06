@@ -1,8 +1,10 @@
-import { MdOpenInNew, MdWarning } from 'react-icons/md'
+import Link from 'next/link'
+import { MdVisibility, MdWarning } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { EmpresaInidonea } from '../types'
 
 interface Props {
@@ -36,15 +38,13 @@ export default function EmpresaInidoneaCard({ empresa }: Props) {
           <p className="text-sm font-semibold text-text-secondary">{formatarData(empresa.data)}</p>
         </div>
 
-        <a
-          href={empresa.caminhoPdf}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href={hrefDocumento(empresa.caminhoPdf, empresa.empresa, { origemLabel: 'Gestão Fiscal', origemHref: '/gestao-fiscal?categoria=inidoneas' })}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
-          <MdOpenInNew size={18} />
+          <MdVisibility size={18} />
           Ver documento
-        </a>
+        </Link>
       </div>
 
     </Card>

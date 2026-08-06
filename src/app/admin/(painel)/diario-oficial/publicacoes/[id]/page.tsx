@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import ErrorState from '@/components/ui/ErrorState'
@@ -20,6 +19,7 @@ import {
   StatusPublicacaoDiarioDescricao,
   StatusPublicacaoDiarioStyle
 } from '@/modules/admin/diario-oficial/types'
+import { hrefDocumento } from '@/utils/documento'
 
 const ESTADOS_EM_PROCESSAMENTO = new Set<StatusPublicacaoDiario>([
   StatusPublicacaoDiario.RECEBIDO,
@@ -186,13 +186,12 @@ export default function PublicacaoDetalheAdminPage() {
         {solicitacao.edicaoDiarioId && (
           <div>
             <p className="text-text-secondary/60 text-xs">Edição publicada</p>
-            <AbrirPdf
-              src={`/api/edicoes/${solicitacao.numeroEdicao}/download`}
-              titulo={`Edição Nº ${solicitacao.numeroEdicao}`}
+            <Link
+              href={hrefDocumento(`/api/edicoes/${solicitacao.numeroEdicao}/download`, `Edição Nº ${solicitacao.numeroEdicao}`, { admin: true })}
               className="font-semibold text-primary hover:underline"
             >
               Ver edição publicada
-            </AbrirPdf>
+            </Link>
           </div>
         )}
       </Card>

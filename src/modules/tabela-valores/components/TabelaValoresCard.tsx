@@ -1,7 +1,9 @@
-import { MdListAlt, MdOpenInNew } from 'react-icons/md'
+import Link from 'next/link'
+import { MdListAlt, MdVisibility } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { TabelaValores, TipoViagemDescricao } from '../types'
 
 interface Props {
@@ -32,15 +34,13 @@ export default function TabelaValoresCard({ documento }: Props) {
         </div>
       </div>
 
-      <a
-        href={documento.caminhoArquivo}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href={hrefDocumento(documento.caminhoArquivo, documento.descricao, { origemLabel: 'Tabela de Valores das Diárias', origemHref: '/tabela-valores' })}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
-        <MdOpenInNew size={18} />
+        <MdVisibility size={18} />
         Ver documento
-      </a>
+      </Link>
 
     </Card>
   )

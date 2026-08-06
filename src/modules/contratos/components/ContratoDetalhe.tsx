@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {
   MdAccountBalance,
   MdAssignment,
@@ -6,8 +7,8 @@ import {
   MdCalendarToday,
   MdDescription,
   MdGavel,
-  MdOpenInNew,
-  MdPerson
+  MdPerson,
+  MdVisibility
 } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
@@ -18,6 +19,7 @@ import InfoBlock from '@/components/ui/InfoBlock'
 import { Documento } from '@/modules/shared/types/Documento'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { contratoStatusLabel, contratoStatusStyle } from '../status'
 import { Aditivo, ContratoLicitacao } from '../types'
 
@@ -28,6 +30,8 @@ interface Props {
 }
 
 export default function ContratoDetalhe({ contrato, documentos, aditivos }: Props) {
+  const origem = { label: `Contrato Nº ${contrato.numeroContrato}/${contrato.exercicio}`, href: `/contratos/${contrato.id}` }
+
   return (
     <div className="bg-light border border-border/30 rounded-2xl shadow-md overflow-hidden mb-10">
 
@@ -96,7 +100,7 @@ export default function ContratoDetalhe({ contrato, documentos, aditivos }: Prop
             <MdDescription /> Documentos do Contrato
           </h3>
 
-          <DocumentList documentos={documentos} emptyMessage="Nenhum documento disponível." />
+          <DocumentList documentos={documentos} emptyMessage="Nenhum documento disponível." origem={origem} />
         </div>
 
         {/* ADITIVOS */}
@@ -120,15 +124,13 @@ export default function ContratoDetalhe({ contrato, documentos, aditivos }: Prop
                     </p>
                   </div>
 
-                  <a
-                    href={aditivo.caminhoPdf}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href={hrefDocumento(aditivo.caminhoPdf, aditivo.objeto, { origemLabel: origem.label, origemHref: origem.href })}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
                   >
-                    <MdOpenInNew size={18} />
+                    <MdVisibility size={18} />
                     Ver documento
-                  </a>
+                  </Link>
                 </Card>
               ))}
             </div>

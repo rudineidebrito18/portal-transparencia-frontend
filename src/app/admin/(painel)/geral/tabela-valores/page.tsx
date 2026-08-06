@@ -2,8 +2,9 @@
 
 import { FormEvent, useCallback, useState } from 'react'
 
+import Link from 'next/link'
+
 import { usePageableResource } from '@/hooks/usePageableResource'
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -14,6 +15,7 @@ import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { tabelaValoresService } from '@/modules/admin/tabela-valores/tabela-valores.service'
 import { FiltroTabelaValores, TabelaValores, TabelaValoresRequest, TipoViagem } from '@/modules/admin/tabela-valores/types'
+import { hrefDocumento } from '@/utils/documento'
 
 interface FormState {
   id: number | null
@@ -247,9 +249,9 @@ export default function TabelaValoresAdminPage() {
                   <td className="p-3">{item.data}</td>
                   <td className="p-3">
                     {item.caminhoArquivo && (
-                      <AbrirPdf src={item.caminhoArquivo} titulo={item.descricao} className="text-accent hover:underline">
+                      <Link href={hrefDocumento(item.caminhoArquivo, item.descricao, { admin: true })} className="text-accent hover:underline">
                         Ver documento
-                      </AbrirPdf>
+                      </Link>
                     )}
                   </td>
                   <td className="p-3 text-right space-x-2">

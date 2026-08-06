@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useState } from 'react'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
-import AbrirPdf from '@/components/ui/AbrirPdf'
+import Link from 'next/link'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -13,6 +13,7 @@ import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { empresaDividaAtivaService } from '@/modules/admin/anticorrupcao/empresaDividaAtiva.service'
 import { EmpresaDividaAtiva, EmpresaDividaAtivaRequest, FiltroEmpresaDividaAtiva } from '@/modules/admin/anticorrupcao/types'
+import { hrefDocumento } from '@/utils/documento'
 
 interface FormState {
   id: number | null
@@ -310,9 +311,9 @@ export default function EmpresasDividaAtivaAdminPage() {
                   <td className="p-3">{formatarMoeda(e.valor)}</td>
                   <td className="p-3">
                     {e.caminhoPdf ? (
-                      <AbrirPdf src={e.caminhoPdf} titulo={e.nome} className="text-accent hover:underline">
+                      <Link href={hrefDocumento(e.caminhoPdf, e.nome, { admin: true })} className="text-accent hover:underline">
                         Ver documento
-                      </AbrirPdf>
+                      </Link>
                     ) : (
                       <span className="text-text-secondary/50">-</span>
                     )}

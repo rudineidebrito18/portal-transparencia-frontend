@@ -10,6 +10,7 @@ interface Props {
 
 export default function DocumentoListView({ recurso }: Props) {
   const resource = useDocumentosEducacao(recurso)
+  const origem = { label: 'Educação', href: `/educacao?categoria=${recurso}` }
 
-  return <DocumentoGenericoListPanel {...resource} />
+  return <DocumentoGenericoListPanel {...resource} origem={origem} />
 }

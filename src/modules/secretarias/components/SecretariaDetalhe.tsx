@@ -1,14 +1,15 @@
 'use client'
 
+import Link from 'next/link'
 import {
   MdApartment,
   MdBadge,
   MdDescription,
   MdEmail,
   MdLocationOn,
-  MdOpenInNew,
   MdPhone,
-  MdSchedule
+  MdSchedule,
+  MdVisibility
 } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
@@ -20,6 +21,7 @@ import InfoBlock from '@/components/ui/InfoBlock'
 import { Documento } from '@/modules/shared/types/Documento'
 import { useUrlState } from '@/hooks/useUrlState'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { SecretariaDetalhe as SecretariaDetalheType, TipoDocumentoUnidade, TipoDocumentoUnidadeDescricao } from '../types'
 import SecretariaObras from './SecretariaObras'
 import SelinhoVerificado from './SelinhoVerificado'
@@ -49,6 +51,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
   const { unidade, decretos, documentos, gestores, ordenadores, setores } = detalhe
   const [aba, setAba] = useUrlState<Aba>('secao', 'info')
   const gestor = unidade.gestorAtual
+  const origem = { label: unidade.nome, href: `/secretarias/${unidade.id}` }
 
   const decretosComoDocumento: Documento[] = decretos.map(d => ({
     id: d.id,
@@ -124,16 +127,14 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
             }
 
             return (
-              <a
+              <Link
                 key={tipo}
-                href={doc.arquivoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={hrefDocumento(doc.arquivoUrl, label, { origemLabel: origem.label, origemHref: origem.href })}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
               >
-                <MdOpenInNew size={16} />
+                <MdVisibility size={16} />
                 {label}
-              </a>
+              </Link>
             )
           })}
         </div>
@@ -194,7 +195,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
         )}
 
         {aba === 'decretos' && (
-          <DocumentList documentos={decretosComoDocumento} emptyMessage="Nenhum decreto cadastrado." />
+          <DocumentList documentos={decretosComoDocumento} emptyMessage="Nenhum decreto cadastrado." origem={origem} />
         )}
 
         {aba === 'obras' && (

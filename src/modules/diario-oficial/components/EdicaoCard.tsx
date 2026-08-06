@@ -1,8 +1,10 @@
-import { MdDescription, MdOpenInNew } from 'react-icons/md'
+import Link from 'next/link'
+import { MdDescription, MdVisibility } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { urlDownloadEdicao } from '../diario-oficial.service'
 import { TipoEdicaoDiario, TipoEdicaoDiarioDescricao, TipoEdicaoDiarioStyle } from '../enums'
 import { EdicaoDiario } from '../types'
@@ -37,15 +39,13 @@ export default function EdicaoCard({ edicao }: Props) {
         </div>
       </div>
 
-      <a
-        href={urlDownloadEdicao(edicao.numeroEdicao)}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href={hrefDocumento(urlDownloadEdicao(edicao.numeroEdicao), `Edição Nº ${edicao.numeroEdicao}`, { origemLabel: 'Diário Oficial', origemHref: '/diario-oficial' })}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
-        <MdOpenInNew size={18} />
+        <MdVisibility size={18} />
         Ver edição
-      </a>
+      </Link>
 
     </Card>
   )

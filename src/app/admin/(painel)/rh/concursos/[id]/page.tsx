@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -13,6 +12,7 @@ import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeExcluir } from '@/modules/auth/permissoes'
 import { anexoConcursoService, concursoService } from '@/modules/admin/rh/concurso.service'
 import { AnexoConcurso, Concurso } from '@/modules/admin/rh/types'
+import { hrefDocumento } from '@/utils/documento'
 
 export default function AnexosConcursoAdminPage() {
   const { usuario } = useAuth()
@@ -161,9 +161,9 @@ export default function AnexosConcursoAdminPage() {
                   <td className="p-3 font-semibold">{a.descricao}</td>
                   <td className="p-3">{a.data}</td>
                   <td className="p-3">
-                    <AbrirPdf src={a.caminhoArquivo} titulo={a.descricao} className="text-accent hover:underline">
+                    <Link href={hrefDocumento(a.caminhoArquivo, a.descricao, { admin: true })} className="text-accent hover:underline">
                       Ver documento
-                    </AbrirPdf>
+                    </Link>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'padrao') && (

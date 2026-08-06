@@ -2,8 +2,9 @@
 
 import { useCallback } from 'react'
 
+import Link from 'next/link'
+
 import { usePageableResource } from '@/hooks/usePageableResource'
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -12,6 +13,7 @@ import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { ouvidoriaFormularioService } from '@/modules/admin/esic-ouvidoria/esic-ouvidoria.service'
 import { FiltroFormularioOuvidoria, FinalidadeOuvidoria, FormularioOuvidoria, LABELS_FINALIDADE_OUVIDORIA } from '@/modules/admin/esic-ouvidoria/types'
+import { hrefDocumento } from '@/utils/documento'
 
 function formatarData(data?: string) {
   if (!data) return '—'
@@ -116,9 +118,9 @@ export default function OuvidoriaFormulariosAdminPage() {
                   <td className="p-3 max-w-lg">{item.comentario}</td>
                   <td className="p-3 whitespace-nowrap">
                     {item.caminhoArquivo ? (
-                      <AbrirPdf src={item.caminhoArquivo} titulo={`Manifestação de ${item.nome ?? 'anônimo'}`} className="text-primary hover:underline">
+                      <Link href={hrefDocumento(item.caminhoArquivo, `Manifestação de ${item.nome ?? 'anônimo'}`, { admin: true })} className="text-primary hover:underline">
                         Ver anexo
-                      </AbrirPdf>
+                      </Link>
                     ) : (
                       <span className="text-text-secondary/40">—</span>
                     )}

@@ -10,6 +10,7 @@ interface Props {
 
 export default function DocumentoRHListView({ recurso }: Props) {
   const resource = useDocumentosRH(recurso)
+  const origem = { label: 'Recursos Humanos', href: `/recursos-humanos?categoria=${recurso}` }
 
-  return <DocumentoGenericoListPanel {...resource} />
+  return <DocumentoGenericoListPanel {...resource} origem={origem} />
 }

@@ -2,8 +2,9 @@
 
 import { FormEvent, useCallback, useState } from 'react'
 
+import Link from 'next/link'
+
 import { usePageableResource } from '@/hooks/usePageableResource'
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -13,6 +14,7 @@ import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { convenioService } from '@/modules/admin/convenios/convenio.service'
 import { Convenio, ConvenioRequest, FiltroConvenio } from '@/modules/admin/convenios/types'
+import { hrefDocumento } from '@/utils/documento'
 
 interface FormState {
   id: number | null
@@ -362,9 +364,9 @@ export default function ConveniosAdminPage() {
                   <td className="p-3">{formatarMoeda(c.valorConvenio)}</td>
                   <td className="p-3">
                     {c.caminhoPdf ? (
-                      <AbrirPdf src={c.caminhoPdf} titulo={`Convênio Nº ${c.numero}`} className="text-accent hover:underline">
+                      <Link href={hrefDocumento(c.caminhoPdf, `Convênio Nº ${c.numero}`, { admin: true })} className="text-accent hover:underline">
                         Ver documento
-                      </AbrirPdf>
+                      </Link>
                     ) : (
                       <span className="text-text-secondary/50">-</span>
                     )}

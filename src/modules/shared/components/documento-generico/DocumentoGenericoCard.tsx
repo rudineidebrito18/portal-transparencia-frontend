@@ -1,14 +1,17 @@
-import { MdDescription, MdOpenInNew } from 'react-icons/md'
+import Link from 'next/link'
+import { MdDescription, MdVisibility } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { formatarData } from '@/utils/date'
+import { hrefDocumento } from '@/utils/documento'
 import { DocumentoGenerico } from '../../types/DocumentoGenerico'
 
 interface Props {
   documento: DocumentoGenerico
+  origem?: { label: string; href: string }
 }
 
-export default function DocumentoGenericoCard({ documento }: Props) {
+export default function DocumentoGenericoCard({ documento, origem }: Props) {
   return (
     <Card className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
@@ -27,15 +30,13 @@ export default function DocumentoGenericoCard({ documento }: Props) {
         </div>
       </div>
 
-      <a
-        href={documento.caminhoArquivo}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href={hrefDocumento(documento.caminhoArquivo, documento.descricao, { origemLabel: origem?.label, origemHref: origem?.href })}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
-        <MdOpenInNew size={18} />
+        <MdVisibility size={18} />
         Ver documento
-      </a>
+      </Link>
 
     </Card>
   )

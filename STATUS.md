@@ -516,57 +516,110 @@ histórico na aba Gestores) e `AutoridadeView.tsx` (Prefeito/Vice-Prefeito). Nã
 mexido em fotos de outros contextos (notícias, avisos etc.) — escopo foi só
 "fotos de pessoa" a pedido do usuário.
 
-## 2.8 Padrão de abertura de PDF: público em nova guia, admin em modal (2026-08-05)
+## 2.8 Padrão de abertura de PDF: rota dedicada /documento (2026-08-05)
 
 Pedido original do usuário: em toda página que linka um PDF, abrir o arquivo com o
 visualizador nativo do navegador em vez de forçar download — já tem zoom/paginação/
 impressão/download na própria barra de ferramentas dele, então um botão "Baixar"
-próprio é redundante. Primeira versão abria tudo (público e admin) numa modal
-(`AbrirPdf.tsx` com `<iframe>`), mas o usuário identificou 3 problemas nesse padrão
-pro público: (1) quando o arquivo não existe/caminho quebrado, o iframe fica em
-branco *dentro* da moldura bonita da modal, parecendo bug em vez de "documento
-indisponível"; (2) depende do navegador ter visualizador de PDF nativo embutido —
-navegador antigo ou sem esse plugin pode não renderizar nada; (3) modal por cima da
-página é uma camada de UI a mais sem necessidade. Decisão final, por área:
+próprio é redundante. A ideia passou por várias rodadas (modal, depois link em nova
+guia, depois card expansível inline) até o usuário fechar no formato final: clicar em
+"Ver documento" **navega pra uma página** que mostra o PDF embutido (mesma guia, não
+nova aba, não modal, não expansão in-place) — o padrão que já existia em
+`/estrutura-organizacional` só que agora genérico pra qualquer documento do sistema.
+Registrado aqui só o resultado, não o histórico de idas e vindas:
 
-- **Público**: voltou a ser link direto (`<a href={caminho} target="_blank"
-  rel="noopener noreferrer">`), sem modal — o navegador decide sozinho como tratar
-  (visualizador nativo em navegador moderno, download normal em navegador antigo, sem
-  nenhuma UI nossa podendo "bugar" nesse meio-termo). Ícone trocou de
-  `MdFileDownload` pra `MdOpenInNew` (mesma convenção já usada em
-  `ItemAcessoCard.tsx`/`EmendaParlamentarCard.tsx` pra link externo) e o rótulo
-  genérico "PDF" virou "Ver documento" (ou "Ver anexo"/"Ver edição" conforme o
-  contexto) — isso não mudou da primeira versão. Cobre os ~12 arquivos públicos:
-  `DocumentList.tsx`, `DocumentoGenericoCard.tsx` (cobre os ~28 módulos genéricos tipo
-  Lei/Plano Estratégico/Competências/RGA etc. de uma vez), `ConcursoAnexos.tsx`,
-  `ContratoDetalhe.tsx`, `ConvenioCard.tsx`, `EdicaoCard.tsx` e
-  `UltimaEdicaoDestaque.tsx` (Diário Oficial), `EmpresaDividaAtivaCard.tsx`,
-  `EmpresaInidoneaCard.tsx`, `RelatorioMultiFormatoCard.tsx` (só o formato PDF —
-  Word/Excel continuam `<a download>` com `MdFileDownload`, não tem visualizador
-  nativo do navegador pra esses formatos), `TabelaValoresCard.tsx`,
-  `SecretariaDetalhe.tsx` (documentos institucionais).
-- **Admin**: manteve a modal (`src/components/ui/AbrirPdf.tsx`) — equipe interna,
-  navegador mais controlado, e não perder o estado da tabela/filtro ao conferir um
-  documento é uma vantagem real ali. Ganhou tratamento de erro: antes de renderizar o
-  `<iframe>`, faz um `fetch(src, { method: 'HEAD' })`; enquanto isso mostra
-  "Carregando documento...", se a resposta não for `ok` (ou o fetch falhar) mostra um
-  estado de erro explícito ("Não foi possível carregar o documento") em vez do iframe
-  em branco. `caminhoArquivo` normalmente é uma URL relativa servida via o rewrite de
-  `/api/*` do `next.config.ts` (mesma origem do frontend), então o `HEAD` não esbarra
-  em CORS. Usado em 12 arquivos: `GenericCrudPage.tsx` (cobre os ~28 módulos
-  genéricos), empresas em dívida ativa/inidôneas, convênios, tabela de valores,
-  unidades (decretos + documento-slot), licitações e contratos (documentos +
-  aditivos), obras (declarações + tabela de responsáveis), formulários da Ouvidoria,
-  anexos de concurso, publicações do Diário Oficial.
-- `src/components/ui/PdfViewer.tsx` não mudou nessa rodada — continua com `<iframe>`
-  fixo na página (sem botão de baixar próprio) em `/estrutura-organizacional`,
-  `/diarias-legislacao`, `/carta-de-servicos`; é um padrão diferente (visualizador
-  sempre visível, não um link que abre algo), fora do escopo dessa discussão.
+- **`src/components/ui/PdfViewer.tsx`** é o motor único de exibição — cabeçalho com
+  ícone+título seguido de `<iframe>` com o visualizador nativo do navegador, sem botão
+  de baixar. Virou client component nessa rodada: antes de montar o iframe faz
+  `fetch(src, { method: 'HEAD' })` — mostra "Carregando documento..." e, se a resposta
+  não for `ok` (ou o fetch falhar), um estado de erro explícito em vez do iframe em
+  branco (problema visto numa versão anterior: arquivo quebrado/removido ficava com o
+  quadro em branco dentro da moldura, parecendo bug).
+- **Duas rotas novas, só leem `?src=&titulo=` da query string e renderizam
+  `PdfViewer`**: `src/app/documento/page.tsx` (público, com `PageHeader`/breadcrumb
+  igual ao resto do site) e `src/app/admin/(painel)/documento/page.tsx` (herda a
+  sidebar do painel automaticamente por estar dentro do route group
+  `admin/(painel)`). Ambas são client components com `useSearchParams` dentro de
+  `<Suspense>` (exigência do Next 15 pra esse hook). Botão "Voltar" usa
+  `router.back()`.
+- **`src/utils/documento.ts`** — helper `hrefDocumento(src, titulo, opcoes?)` que monta
+  a URL (`/documento?...` ou `/admin/documento?...`) com os parâmetros
+  URL-encoded. Todo trigger de PDF do sistema virou um `<Link href={hrefDocumento(...)}>`
+  simples — nada de estado local, modal ou toggle. Isso também resolveu de graça o
+  problema de células de tabela no admin (não dá pra expandir um iframe de 80vh dentro
+  de uma `<td>`, mas navegar pra outra página a partir de um link numa célula é
+  trivial) — os componentes antigos `AbrirPdf.tsx` (modal) e `AbrirPdfInline.tsx`
+  (expansível) foram deletados, sem mais uso depois da troca.
+- Cobre ~26 arquivos: público — `DocumentList.tsx`, `DocumentoGenericoCard.tsx` (cobre
+  os ~28 módulos genéricos tipo Lei/Plano Estratégico/Competências/RGA etc. de uma
+  vez), `ConcursoAnexos.tsx`, `ContratoDetalhe.tsx`, `ConvenioCard.tsx`,
+  `EdicaoCard.tsx` e `UltimaEdicaoDestaque.tsx` (Diário Oficial),
+  `EmpresaDividaAtivaCard.tsx`, `EmpresaInidoneaCard.tsx`,
+  `RelatorioMultiFormatoCard.tsx` (só o formato PDF — Word/Excel continuam
+  `<a download>` com `MdFileDownload`, não tem visualizador nativo do navegador pra
+  esses formatos), `TabelaValoresCard.tsx`, `SecretariaDetalhe.tsx` (documentos
+  institucionais); admin — `GenericCrudPage.tsx` (cobre os ~28 módulos genéricos),
+  empresas em dívida ativa/inidôneas, convênios, tabela de valores, unidades
+  (decretos + documento-slot), licitações e contratos (documentos + aditivos), obras
+  (declarações + tabela de responsáveis), formulários da Ouvidoria, anexos de
+  concurso, publicações do Diário Oficial. Os ajustes de `flex-wrap`/`col-span` feitos
+  numa rodada intermediária (pra acomodar um card que expandia in-place) foram
+  revertidos — não fazem mais sentido com o gatilho sendo um link simples.
+- Em todo lugar, ícone é `MdVisibility` (não mais `MdFileDownload` nem
+  `MdOpenInNew` — não abre em nova aba) e o rótulo genérico "PDF" virou "Ver
+  documento" (ou "Ver anexo"/"Ver edição" conforme o contexto).
 - `tsc --noEmit` e `npm run lint` limpos (só os 2 warnings pré-existentes de `<img>`
-  em `diario-oficial/config/page.tsx`, sem relação). Testado com `curl`: páginas
-  públicas e admin representativas de cada grupo (200 em todas), e confirmado que o
-  SSR de `/secretarias/1` já renderiza o novo `<a target="_blank">` pro documento
-  institucional existente naquele registro de teste.
+  em `diario-oficial/config/page.tsx`, sem relação). Testado com `curl`: `/documento`
+  e `/admin/documento` respondendo 200 com `?src=&titulo=` reais, SSR de
+  `/secretarias/1` confirmando `href="/documento?src=...&titulo=Termo"` no HTML, e
+  páginas públicas/admin representativas de cada grupo (200 em todas).
+
+## 2.9 Breadcrumb da rota /documento com o caminho de origem (2026-08-05)
+
+Usuário reportou que `/documento` sempre mostrava "Início > título do documento" —
+faltava o nível intermediário (de onde o clique veio), já que a rota é genérica e não
+tem como saber sozinha o contexto de origem.
+
+- `hrefDocumento(src, titulo, opcoes?)` ganhou `opcoes.origemLabel`/`opcoes.origemHref`
+  (além de `opcoes.admin`, que já existia — a assinatura virou um objeto de opções em
+  vez de 3 parâmetros posicionais). Quando presentes, viram query params extras
+  (`&origemLabel=...&origemHref=...`) que `src/app/documento/page.tsx` lê pra montar
+  `breadcrumbItems={[{label: origemLabel, href: origemHref}, {label: titulo}]}` em vez
+  de só `[{label: titulo}]`. Rota admin não usa breadcrumb (o painel não tem esse
+  padrão em nenhuma tela), então `origemLabel`/`origemHref` só se aplicam no público.
+- Cada chamador manda a origem que já conhece do próprio contexto: `ConvenioCard.tsx`
+  → "Convênios e Transferências"/`/convenios`; `EdicaoCard.tsx`/`UltimaEdicaoDestaque.tsx`
+  → "Diário Oficial"/`/diario-oficial`; `TabelaValoresCard.tsx` → "Tabela de Valores das
+  Diárias"/`/tabela-valores`; `ConcursoAnexos.tsx` → "Concursos e Seleções
+  Públicas"/`/concursos`; `EmpresaDividaAtivaCard.tsx`/`EmpresaInidoneaCard.tsx` →
+  "Gestão Fiscal" com `?categoria=divida-ativa`/`inidoneas`.
+- Componentes reaproveitados em vários contextos ganharam um prop opcional `origem?:
+  {label, href}` que o pai calcula e repassa (em vez de o componente genérico tentar
+  adivinhar de onde veio):
+  - `DocumentList.tsx` — usado por `ContratoDetalhe.tsx` (origem = a própria página do
+    contrato, `Contrato Nº X/ano` @ `/contratos/{id}`, calculada a partir do prop
+    `contrato` que o componente já recebia) e por `SecretariaDetalhe.tsx` na aba
+    Decretos (origem = `unidade.nome` @ `/secretarias/{id}`, mesma origem usada nos
+    links de documentos institucionais da mesma página).
+  - `DocumentoGenericoCard.tsx` (usado por 25 dos ~28 módulos genéricos via
+    `DocumentoGenericoListPanel.tsx`, que só repassa o prop adiante) — cada um dos 10
+    componentes `*ListView.tsx` que envolvem o painel (`LegislacaoListView`,
+    `CompetenciasListView`, `FiscalContratoListView`,
+    `TransferenciaVoluntariaListView`, `RenunciaFiscalListView`,
+    `DocumentoListView.tsx` de planejamento/prestação de contas/educação/saúde, e
+    `DocumentoRHListView.tsx`) calcula sua própria origem — módulos de página única
+    apontam pra própria rota (ex: "Legislação"/`/legislacao`); módulos dentro de hub
+    com abas (Planejamento, Prestação de Contas, Educação, Saúde, Recursos Humanos)
+    apontam pro hub com `?categoria={recurso}` usando o mesmo valor que o hub já usa
+    internamente pra `useUrlState('categoria', ...)` (confirmado por módulo, não
+    assumido).
+  - `RelatorioMultiFormatoCard.tsx` (usado por `RelatoriosExecucaoOrcamentariaListView.tsx`
+    e `RelatoriosGestaoFiscalListView.tsx`) — cada um passa "Gestão Fiscal" com
+    `?categoria=execucao-orcamentaria`/`rgf` respectivamente (valores confirmados em
+    `GestaoFiscalView.tsx`, que é quem de fato define as abas dessa página).
+- `tsc --noEmit` e `npm run lint` limpos. Testado via `curl` no SSR: `/secretarias/1`
+  e `/contratos/1` confirmando `origemLabel`/`origemHref` corretos no HTML gerado
+  (ex: `origemLabel=Contrato+Nº+123%2F2025&origemHref=%2Fcontratos%2F1`).
 
 ## 3. Como decidir o padrão de um módulo novo
 

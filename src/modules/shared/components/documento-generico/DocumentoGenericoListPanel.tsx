@@ -12,7 +12,9 @@ import { DocumentoGenerico, FiltroDocumentoGenerico } from '../../types/Document
 import DocumentoGenericoCard from './DocumentoGenericoCard'
 import DocumentoGenericoFiltro from './DocumentoGenericoFiltro'
 
-type Props = ReturnType<typeof usePageableResource<DocumentoGenerico, FiltroDocumentoGenerico>>
+type Props = ReturnType<typeof usePageableResource<DocumentoGenerico, FiltroDocumentoGenerico>> & {
+  origem?: { label: string; href: string }
+}
 
 export default function DocumentoGenericoListPanel({
   data: documentos,
@@ -26,7 +28,8 @@ export default function DocumentoGenericoListPanel({
   filtros,
   setFiltros,
   setOrdenacao,
-  ordenacao
+  ordenacao,
+  origem
 }: Props) {
   return (
     <div className="space-y-6">
@@ -79,7 +82,7 @@ export default function DocumentoGenericoListPanel({
           <div className="grid gap-4">
             {documentos.length > 0 ? (
               documentos.map(item => (
-                <DocumentoGenericoCard key={item.id} documento={item} />
+                <DocumentoGenericoCard key={item.id} documento={item} origem={origem} />
               ))
             ) : (
               <EmptyState message="Nenhum documento encontrado com os filtros aplicados." />

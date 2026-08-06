@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
-import AbrirPdf from '@/components/ui/AbrirPdf'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
@@ -28,6 +27,7 @@ import {
   StatusObraDescricao,
   StatusObraStyle
 } from '@/modules/admin/obras/types'
+import { hrefDocumento } from '@/utils/documento'
 
 function formatarMoeda(valor?: number | null) {
   return (valor ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -606,13 +606,12 @@ function AbaAnexos({ obraId }: { obraId: number }) {
                   <td className="p-3">{a.descricao}</td>
                   <td className="p-3">{formatarData(a.data)}</td>
                   <td className="p-3">
-                    <AbrirPdf
-                      src={a.caminhoArquivo}
-                      titulo={a.descricao}
+                    <Link
+                      href={hrefDocumento(a.caminhoArquivo, a.descricao, { admin: true })}
                       className="text-primary hover:underline"
                     >
                       Ver documento
-                    </AbrirPdf>
+                    </Link>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'obras-repasses') && (
@@ -787,13 +786,12 @@ function AbaArts({ obraId }: { obraId: number }) {
                   <td className="p-3">{formatarData(a.dataExpedicao)}</td>
                   <td className="p-3">{a.responsavel}</td>
                   <td className="p-3">
-                    <AbrirPdf
-                      src={a.caminhoPdf}
-                      titulo={`Nº ${a.numero}`}
+                    <Link
+                      href={hrefDocumento(a.caminhoPdf, `Nº ${a.numero}`, { admin: true })}
                       className="text-primary hover:underline"
                     >
                       Ver documento
-                    </AbrirPdf>
+                    </Link>
                   </td>
                   <td className="p-3 text-right">
                     {podeExcluir(usuario, 'padrao') && (

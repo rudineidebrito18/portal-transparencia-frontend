@@ -5,6 +5,7 @@ import { useLegislacao } from '../hooks/useLegislacao'
 
 export default function LegislacaoListView() {
   const resource = useLegislacao()
+  const origem = { label: 'Legislação', href: '/legislacao' }
 
-  return <DocumentoGenericoListPanel {...resource} />
+  return <DocumentoGenericoListPanel {...resource} origem={origem} />
 }

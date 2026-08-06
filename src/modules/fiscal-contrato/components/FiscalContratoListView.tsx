@@ -5,6 +5,7 @@ import { useFiscalContrato } from '../hooks/useFiscalContrato'
 
 export default function FiscalContratoListView() {
   const resource = useFiscalContrato()
+  const origem = { label: 'Fiscal de Contrato', href: '/fiscal-contrato' }
 
-  return <DocumentoGenericoListPanel {...resource} />
+  return <DocumentoGenericoListPanel {...resource} origem={origem} />
 }
