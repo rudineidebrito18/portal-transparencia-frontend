@@ -2,8 +2,7 @@ import { Suspense } from 'react'
 
 import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
-import DiarioOficialListView from '@/modules/diario-oficial/components/DiarioOficialListView'
-import UltimaEdicaoDestaque from '@/modules/diario-oficial/components/UltimaEdicaoDestaque'
+import DiarioOficialView from '@/modules/diario-oficial/components/DiarioOficialView'
 
 export default function DiarioOficialPage() {
   return (
@@ -12,12 +11,8 @@ export default function DiarioOficialPage() {
           { label: 'Diário Oficial' }
         ]} />
 
-      <Suspense fallback={<Skeleton className="h-28 mb-6" />}>
-        <UltimaEdicaoDestaque />
-      </Suspense>
-
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
-        <DiarioOficialListView />
+        <DiarioOficialView />
       </Suspense>
     </div>
   )

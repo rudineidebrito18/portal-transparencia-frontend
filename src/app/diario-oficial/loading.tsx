@@ -8,6 +8,12 @@ export default function LoadingDiarioOficial() {
           { label: 'Diário Oficial' }
         ]} />
 
+      <div className="flex flex-wrap gap-2 mb-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-9 w-28 rounded-full" />
+        ))}
+      </div>
+
       <Skeleton className="h-28 mb-6" />
 
       <div className="grid gap-4">

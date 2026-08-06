@@ -1,19 +1,23 @@
-export type { EdicaoDiario, FiltroEdicaoDiario } from '@/modules/diario-oficial/types'
+export type {
+  EdicaoDiario,
+  EdicaoNaoEletronica,
+  FiltroEdicaoDiario,
+  FiltroEdicaoNaoEletronica
+} from '@/modules/diario-oficial/types'
 export { TipoEdicaoDiario, TipoEdicaoDiarioDescricao, TipoEdicaoDiarioStyle } from '@/modules/diario-oficial/enums'
 
-export interface DiarioOficialInfo {
-  name: string
-  issn: string
-  email: string
-  telefone: string
-  editorChefe: string
-  redacao: string
-  endereco: string
-  pathBrasao: string
-  pathLogo: string
-}
+import { DiarioOficialInfo } from '@/modules/diario-oficial/types'
+
+export type { DiarioOficialInfo }
 
 export type DiarioOficialInfoRequest = Omit<DiarioOficialInfo, 'pathBrasao' | 'pathLogo'>
+
+export interface EdicaoNaoEletronicaRequest {
+  volume: string
+  descricao: string
+  data: string
+  tipo: string
+}
 
 export enum StatusPublicacaoDiario {
   RECEBIDO = 'RECEBIDO',
