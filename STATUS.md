@@ -621,6 +621,86 @@ tem como saber sozinha o contexto de origem.
   e `/contratos/1` confirmando `origemLabel`/`origemHref` corretos no HTML gerado
   (ex: `origemLabel=Contrato+Nº+123%2F2025&origemHref=%2Fcontratos%2F1`).
 
+## 2.10 Acessibilidade, navegação e infraestrutura (2026-08-05) — concluído
+
+Leva de 11 commits do mesmo dia (cronologicamente **antes** das seções 2.4–2.9, mas
+documentados aqui porque ficaram de fora do STATUS.md na hora — resultado de uma sessão
+em outra máquina, ver seção 4). Cobre acessibilidade, consolidação visual e alguns gaps
+de navegação/formulário do hub público.
+
+**Acessibilidade** (`5b37fe6`, `cf181a0`, `1f94b81`, `75b2602`, `31c27d3`, `a1665ad`):
+- `src/components/AcessibilidadeMenu.tsx` — menu novo (contraste, tamanho de fonte,
+  Libras), montado dentro de `Header.tsx`, substituiu um widget flutuante antigo.
+- `src/components/VLibrasWidget.tsx` — passou por 3 iterações no mesmo dia até estabilizar:
+  (1) injeção via `useEffect` (perdia o preload scanner do navegador), (2) markup
+  estático renderizado no servidor (igual ao snippet oficial do gov.br) + `try/catch`
+  em torno de `VLibras.Widget()`, (3) problema novo: `RootLayoutSwitch` re-renderiza a
+  cada troca de rota (`usePathname()`), resetando o `<div vw>` que o plugin usa —
+  tentativa de corrigir com um `VLibrasReinit.tsx` (reinvocava `window.onload()`)
+  quebrava se o avatar 3D já estivesse aberto (reinstanciar `Widget()` corrompia o
+  estado). **Solução final**: `VLibrasReinit.tsx` deletado, `VLibrasWidget.tsx` envolto
+  em `React.memo` — o componente nunca re-renderiza com a navegação, então o DOM do
+  plugin nunca é tocado. Montado uma vez em `src/layouts/PublicLayout.tsx`.
+- Skip-link (`href="#conteudo"`) direto no `PublicLayout.tsx`; `aria-label`/
+  `aria-expanded`/`aria-current` em ~16 selects de ordenação, no `FiltroCard.tsx` e nas
+  abas ativas de 9+ módulos com abas.
+- `src/components/DropdownMenuItem.tsx` — era `<div onClick>` sem suporte a teclado e
+  submenu só por hover; virou `role="button"` + `tabIndex` + `onKeyDown` +
+  `group-focus-within`.
+- Contraste WCAG AA: `text-secondary/50` (3.95:1, abaixo do mínimo) → `/60` (5.74:1) em
+  **147 usos, 52 arquivos** — inclui os `*Filtro.tsx`/`FolhaPagamentoMesView.tsx`
+  criados nesta mesma sessão (rótulos de campo).
+- Novas páginas `/acessibilidade` e `/mapa-do-site`, linkadas no footer.
+
+**`PageHeader` — consolidação de cabeçalho** (`cf181a0`): `src/components/PageHeader.tsx`
+já existia mas **não tinha nenhum consumidor** (código morto, com estilo divergente do
+que as páginas realmente usavam — `font-black` vs. `font-bold` em produção). Corrigido
+pra bater com o padrão real e depois **migrado em 60 arquivos** (pares `page.tsx`/
+`loading.tsx` de praticamente toda rota pública), trocando breadcrumb+h1+barrinha
+duplicados à mão por `<PageHeader>`. Hoje **66 arquivos** referenciam o componente — é o
+padrão a seguir em qualquer página nova. De quebra: `text-gray-800` → token
+`text-text-secondary`, correção de comentário de cor invertido em `globals.css`, e 2
+páginas estáticas novas (`/regulamentacao-lai`, `/carta-de-servicos`).
+
+**Navegação morta + páginas de erro** (`89784ac`): `src/app/not-found.tsx` (404) e
+`src/app/global-error.tsx` (500) novos, com a identidade visual do site (antes era o
+genérico do Next). `Footer.tsx` reescrito (era só uma linha de copyright, virou +113
+linhas de conteúdo real — links institucionais, redes, endereço). `Header.tsx` podado.
+`src/components/Navbar.tsx` e `Hero.tsx` **deletados** (código morto, não referenciados
+por nada).
+
+**`b7ee6d6`** — bug de clique fantasma: o header fixo mantinha a altura da caixa mesmo
+colapsado (`translateY` só reposiciona visualmente, não encolhe a box), então uma faixa
+invisível do header continuava capturando clique no conteúdo logo abaixo do nav.
+Corrigido com `pointer-events: none` no container + `pointer-events-auto` nos filhos de
+verdade (topbar, logo+nav) — mais simples que recalcular a altura a cada scroll.
+
+**Formulários públicos de e-SIC/Ouvidoria + gaps do hub** (`b629349`): até aqui só existia
+o *service*/tipo pra enviar solicitação — não tinha formulário de verdade na tela
+pública. Novos `src/modules/esic/components/FormularioEsicForm.tsx` e
+`src/modules/ouvidoria/components/FormularioOuvidoriaForm.tsx` (ambos com opção de envio
+anônimo), batendo em `POST /esic/formulario`/`POST /ouvidoria/formulario` (endpoints que
+já existiam). Módulo público novo `src/app/transferencia-voluntaria/` (+
+`src/modules/execucaoOrcamentaria` ganhou `useTransferenciaVoluntaria.ts`/service/mock)
+pra cobrir a EC nº 105 (Transferências Especiais), que só existia do lado admin antes.
+Busca por título e 4 abas antes órfãs (Educação, Prestação de Contas) adicionadas em
+`TransparenciaHub.tsx`/`secoes.ts`.
+
+**Timestamp, navegação cruzada, badges e glossário** (`6c80eea`): `usePageableResource`
+ganhou `atualizadoEm`, exibido em ~26 listagens públicas ("N encontrados · atualizado em
+..."). Novo `src/modules/shared/statusBadgeStyle.ts` unificando cor de badge de status
+entre Contratos/Licitações/Obras (`SUSPENSO` estava cinza num módulo e vermelho noutro —
+corrigido). Novo `src/modules/shared/components/GlossarioTermos.tsx` reaproveitado por
+`GestaoFiscalGlossario.tsx`/`PlanejamentoGlossario.tsx` (siglas tipo RGF/RREO/LDO
+explicadas). `SecretariaObras.tsx` — nova aba no detalhe de Secretaria mostrando as obras
+daquela unidade (Obras é o único módulo cujo filtro aceita `unidadeId` até aqui).
+
+**`c533fde`** — `npm audit fix`: só `package-lock.json` tocado, corrigiu 5 de 8
+vulnerabilidades (axios, brace-expansion, form-data, js-yaml, tar) dentro do range semver
+atual. As 3 restantes (postcss, sharp, next-internal) exigem `next@16` com `--force` —
+não aplicado, fica como decisão consciente adiada (upgrade maior, fora de escopo de uma
+correção de patch).
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash
