@@ -17,7 +17,9 @@ const FORM_VAZIO: DiarioOficialInfoRequest = {
   telefone: '',
   editorChefe: '',
   redacao: '',
-  endereco: ''
+  endereco: '',
+  periodicidade: '',
+  quemSomos: ''
 }
 
 export default function DiarioOficialConfigAdminPage() {
@@ -49,7 +51,9 @@ export default function DiarioOficialConfigAdminPage() {
           telefone: info.telefone,
           editorChefe: info.editorChefe,
           redacao: info.redacao,
-          endereco: info.endereco
+          endereco: info.endereco,
+          periodicidade: info.periodicidade ?? '',
+          quemSomos: info.quemSomos ?? ''
         })
       })
       .catch((e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao carregar'))
@@ -170,6 +174,29 @@ export default function DiarioOficialConfigAdminPage() {
                 required
                 value={form.endereco}
                 onChange={e => atualizarCampo('endereco', e.target.value)}
+                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Periodicidade</label>
+              <input
+                required
+                placeholder="Ex: Diariamente, exceto sábados, domingos e feriados"
+                value={form.periodicidade}
+                onChange={e => atualizarCampo('periodicidade', e.target.value)}
+                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Quem Somos</label>
+              <textarea
+                required
+                rows={4}
+                placeholder="Texto de apresentação exibido na aba &quot;Quem Somos&quot; do Diário Oficial público"
+                value={form.quemSomos}
+                onChange={e => atualizarCampo('quemSomos', e.target.value)}
                 className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
               />
             </div>

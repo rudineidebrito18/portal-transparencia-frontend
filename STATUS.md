@@ -701,6 +701,65 @@ atual. As 3 restantes (postcss, sharp, next-internal) exigem `next@16` com `--fo
 não aplicado, fica como decisão consciente adiada (upgrade maior, fora de escopo de uma
 correção de patch).
 
+## 2.11 Diário Oficial: abas Legislação/Edições Não Eletrônicas/Quem Somos/Expediente/Ajuda (2026-08-06)
+
+Pedido do usuário com screenshots do Diário Oficial de referência de Lago dos Rodrigues
+como inspiração (não cópia — conteúdo e visual próprios). `/diario-oficial` era uma
+página só (destaque + lista com filtro), virou abas seguindo o mesmo padrão de
+`GestaoFiscalView.tsx` (`useUrlState('categoria', ...)` + pílulas). Pedido explícito do
+usuário: **não** recriar os itens "Edição Atual"/"Edições Anteriores"/"Busca" da
+referência porque já existem cobertos de outro jeito — viraram a aba padrão "Edições"
+(`EdicoesTab.tsx`, só empacota o que já existia: `UltimaEdicaoDestaque` +
+`DiarioOficialListView`).
+
+- **`DiarioOficialView.tsx`** — 6 abas: Edições (padrão), Legislação, Edições Não
+  Eletrônicas, Quem Somos, Expediente, Ajuda. `src/app/diario-oficial/page.tsx` virou só
+  `PageHeader` + `Suspense` + `<DiarioOficialView />`, igual ao shell de
+  `gestao-fiscal/page.tsx`.
+- **Quem Somos / Expediente** — `DiarioOficialInfo` (o singleton que já existia só pro
+  admin, `GET`/`PUT /diario-oficial`, editorChefe/redação/endereço) ganhou 2 campos:
+  `periodicidade` e `quemSomos`. Confirmado via `curl` que `GET /diario-oficial` já é
+  público (sem auth) — só faltava um consumidor no site público, adicionado em
+  `diarioOficialInfoService.buscar()` (novo, em `src/modules/diario-oficial/`, o tipo
+  `DiarioOficialInfo` migrou pra lá e o admin passou a reexportar em vez de duplicar).
+  `periodicidade`/`quemSomos` ainda não existem no backend — campos opcionais no tipo,
+  telas degradam com `EmptyState`/campo omitido até o backend implementar (pedido no
+  prompt de backend). Admin `config/page.tsx` ganhou os 2 campos no formulário (só texto,
+  não mexe no multipart de brasão/logo).
+- **Legislação** — módulo genérico novo (`src/modules/diario-oficial/legislacao/`),
+  reaproveita a mesma factory dos outros ~28 módulos (`criarServicoDocumentoGenerico`
+  etc., idêntico ao `src/modules/legislacao/`) — é sobre legislação do próprio Diário
+  Oficial (ex: a lei que o criou), diferente do módulo `/legislacao` (legislação
+  municipal geral). Registry ganhou entrada `diario-oficial-legislacao` (categoria
+  "Diário Oficial", `basePath: /diario-oficial/legislacao`) — CRUD admin auto-gerado em
+  `/admin/modulos/diario-oficial-legislacao`. Endpoint não existe no backend ainda
+  (confirmado `500` via `curl`) — no prompt de backend.
+- **Edições Não Eletrônicas** — publicações físicas anteriores ao sistema eletrônico.
+  Não usa a factory genérica porque tem 2 campos a mais (`volume`, `tipo` — reaproveita o
+  mesmo enum `TipoEdicaoDiario` de `EdicaoDiario`, não criou um novo). Módulo bespoke
+  completo em `src/modules/diario-oficial/` (types/service/mock/hook/Card/Filtro/
+  ListView, mesmo padrão visual do `EdicaoCard.tsx`) + admin CRUD bespoke em
+  `/admin/diario-oficial/edicoes-nao-eletronicas` (não usa o registry genérico pelo mesmo
+  motivo). `AdminSidebar.tsx` — a seção "Diário Oficial" era um bloco fixo fora do loop
+  de categorias do registry; virou merge dentro do loop (`categoria === 'Diário
+  Oficial' && LINKS_DIARIO_OFICIAL_BESPOKE`), igual ao padrão já usado por RH/Licitações/
+  Convênios/Anticorrupção, pra caber o novo módulo genérico "Legislação do Diário
+  Oficial" na mesma seção sem duplicar cabeçalho. Endpoint não existe no backend ainda —
+  no prompt de backend.
+- **Ajuda** — accordion estático (mesmo padrão `<details>`/`<summary>` de
+  `src/app/faq/page.tsx`) com conteúdo próprio inspirado nos tópicos da referência
+  (assinatura digital, validade jurídica) **mais uma ferramenta real**:
+  `VerificarAutenticidade.tsx` chama `GET /edicoes/{numero}/validar` — endpoint público
+  que **já existia no backend** (é o destino do QR Code impresso na última página de
+  cada edição) mas não tinha nenhum consumidor no front até agora; achado ao levantar o
+  OpenAPI antes de planejar essa aba. Sem pedido de backend nesse item.
+- `tsc --noEmit`/`npm run lint` limpos. Testado via `curl`: todas as 6 abas (`?categoria=`)
+  200 no front, `GET /api/diario-oficial` e `GET /api/edicoes/1/validar` reais no backend
+  (200, confirmando o que já funciona), `GET /api/diario-oficial/legislacao/filtro` e
+  `GET /api/diario-oficial/edicoes-nao-eletronicas/filtro` confirmando `500` (recursos
+  genuinamente pendentes de backend, não bug do front). Prompt de backend em
+  `prompt-backend-diario-oficial.md`, enviado ao usuário.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

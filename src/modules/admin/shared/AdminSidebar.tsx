@@ -59,9 +59,12 @@ const LINKS_ESIC_OUVIDORIA = [
   { href: '/admin/ouvidoria/formularios', label: 'Ouvidoria — Formulários Recebidos' }
 ]
 
-const LINKS_DIARIO_OFICIAL = [
+// Mescla com a categoria "Diário Oficial" do registry genérico (Legislação do Diário
+// Oficial), mesmo motivo do LINKS_RH_BESPOKE acima.
+const LINKS_DIARIO_OFICIAL_BESPOKE = [
   { href: '/admin/diario-oficial/config', label: 'Diário Oficial — Configuração' },
-  { href: '/admin/diario-oficial/publicacoes', label: 'Diário Oficial — Publicações' }
+  { href: '/admin/diario-oficial/publicacoes', label: 'Diário Oficial — Publicações' },
+  { href: '/admin/diario-oficial/edicoes-nao-eletronicas', label: 'Diário Oficial — Edições Não Eletrônicas' }
 ]
 
 function agruparPorCategoria() {
@@ -144,21 +147,6 @@ export default function AdminSidebar() {
           ))}
         </div>
 
-        <div>
-          <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
-            Diário Oficial
-          </p>
-          {LINKS_DIARIO_OFICIAL.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-
         {[...grupos.entries()].map(([categoria, modulos]) => (
           <div key={categoria}>
             <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
@@ -204,6 +192,15 @@ export default function AdminSidebar() {
               </Link>
             ))}
             {categoria === 'Fiscal e Orçamentário' && LINKS_ANTICORRUPCAO_BESPOKE.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {categoria === 'Diário Oficial' && LINKS_DIARIO_OFICIAL_BESPOKE.map(link => (
               <Link
                 key={link.href}
                 href={link.href}

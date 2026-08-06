@@ -42,6 +42,7 @@ export const REGISTRY_MODULOS_GENERICOS: ModuloGenericoConfig[] = [
   { slug: 'rga', label: 'RGA (Relatório de Gestão de Atividade)', categoria: 'Planejamento', basePath: '/planejamento/rga', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'lista-alunos', label: 'Lista de Alunos', categoria: 'Educação', basePath: '/educacao/lista-alunos', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'plano-estrategico', label: 'Plano Estratégico', categoria: 'Planejamento', basePath: '/planejamento/plano-estrategico', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
+  { slug: 'diario-oficial-legislacao', label: 'Legislação do Diário Oficial', categoria: 'Diário Oficial', basePath: '/diario-oficial/legislacao', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
 
   // Forma com intervalo de data: acrescenta { dataInicio, dataFim }
   { slug: 'acordo-firmado-orgao', label: 'Acordo Firmado com Órgão', categoria: 'Convênios e Repasses', basePath: '/convenios/acordos-firmados-orgao', comIntervalo: true, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
