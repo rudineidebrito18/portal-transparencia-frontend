@@ -30,7 +30,7 @@ export default function EmpresaDividaAtivaCard({ empresa }: Props) {
 
       <p className="text-sm text-text-secondary leading-relaxed">{empresa.descricao}</p>
 
-      <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
         <div>
           <p className="text-[11px] uppercase text-text-secondary/60">CNPJ</p>
           <p className="font-semibold text-text-secondary">{empresa.cnpj}</p>

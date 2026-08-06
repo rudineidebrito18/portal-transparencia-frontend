@@ -135,7 +135,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             {/* DATAS DE ADMISSÃO */}
-            <div className="lg:col-span-2 grid grid-cols-2 gap-3">
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
                   Admissão (início)

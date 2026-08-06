@@ -760,6 +760,59 @@ referência porque já existem cobertos de outro jeito — viraram a aba padrão
   genuinamente pendentes de backend, não bug do front). Prompt de backend em
   `prompt-backend-diario-oficial.md`, enviado ao usuário.
 
+## 2.12 Varredura de compatibilidade mobile (2026-08-06) — concluído
+
+Usuário reportou abas sumindo no Diário Oficial no mobile (resolvido à parte — era
+código só existente numa máquina de casa, não commitado ainda; já mesclado na seção
+2.11) e pediu uma varredura geral do site público por problemas de mobile. Rodada de 3
+agentes Explore em paralelo (grep sistemático em componentes públicos, componentes
+customizados complexos, configuração global) achou o seguinte:
+
+- **Achado principal — não existia meta tag de viewport no projeto inteiro**
+  (`grep -rn "viewport" src/` não batia em lugar nenhum antes desta rodada). Sem
+  `width=device-width, initial-scale=1`, o navegador mobile renderiza a página numa
+  viewport virtual de ~980px e dá zoom out — isso sozinho explica sintomas de "elemento
+  sumindo/ilegível no celular" independente do CSS responsivo estar certo por baixo (e
+  explica por que o emulador headless usado pra testar o bug do Diário Oficial nunca
+  reproduziu nada — ele define a viewport CSS diretamente, sem depender da meta tag).
+  Corrigido com `export const viewport: Viewport = { width: 'device-width',
+  initialScale: 1 }` em `src/app/layout.tsx` (API padrão do Next.js 15/App Router) — vale
+  pro site inteiro (público e admin) por estar no root layout.
+- `src/components/ui/PdfViewer.tsx` — iframe de PDF sem nenhuma saída caso não
+  renderize (comum no Chrome/Safari mobile). Ganhou um link "Abrir em nova guia" sempre
+  visível no cabeçalho, ao lado do título (que também ganhou `truncate` — títulos longos
+  não estouravam o cabeçalho antes por acaso, não por design).
+- **9 grids `grid-cols-2` sem breakpoint nenhum** (forçavam 2 colunas até em 320–375px)
+  viraram `grid-cols-1 sm:grid-cols-2`: `ServidorCard.tsx`, `LicitacaoCard.tsx`,
+  `ContratoCard.tsx`, `EmendaParlamentarCard.tsx`, `EmpresaDividaAtivaCard.tsx`,
+  `InformacoesEsicView.tsx`, 3 grids internos de `LicitacaoFiltro.tsx`, 1 de
+  `ServidorFiltro.tsx`. **Não mexido** (risco baixo, já escalona em `sm:`, decisão
+  consciente de não expandir escopo): `DiariaCard.tsx`/`ObraCard.tsx`/`ConcursoCard.tsx`,
+  que usam `grid-cols-2 sm:grid-cols-4`.
+- `SecretariaDetalhe.tsx` (`PessoaCargoList`/`GestorList`, abas Ordenadores e Gestores) —
+  nome (tamanho variável) ao lado de um intervalo de datas `whitespace-nowrap`, sem
+  proteção contra nome comprido. Ganhou `min-w-0`+`truncate` no nome e `shrink-0` na
+  data, nos dois componentes.
+
+**Confirmado correto, sem necessidade de ação** (achados dos agentes): `OrganogramaDiagrama.tsx`
+(já `flex-wrap`, testado mobile-safe), `FotoAmpliavel.tsx` (lightbox viewport-relative),
+`VLibrasWidget.tsx` (sem conflito de posição com o botão hambúrguer), as 3 tabelas
+públicas existentes (`TabelaCargos.tsx`/`FolhaPagamentoMesView.tsx`/`ServidorDetalhe.tsx`,
+todas já com `overflow-x-auto`), `Footer.tsx` (grid responsivo), e nenhum `100vw`
+hardcoded em lugar nenhum do projeto.
+
+**Pendência consciente, fora de escopo desta rodada** (decisão do usuário): o menu de
+Acessibilidade (`AcessibilidadeMenu.tsx` — contraste, tamanho de fonte, atalho de
+Libras) e os links Ouvidoria/SIC/Acesso admin somem completamente no mobile hoje (ficam
+numa barra `hidden lg:flex`, sem equivalente no menu hambúrguer — confirmado lendo
+`Header.tsx`). Usuário está avaliando adotar o **UserWay** (widget de acessibilidade de
+terceiros) em vez de expandir o componente atual pro mobile, então isso não foi
+corrigido aqui — decidir isso antes de mexer nessa lacuna especificamente.
+
+`tsc --noEmit`/`eslint` limpos. Testado: `curl` confirmando a meta tag no HTML de
+`/obras`; componentes tocados reconferidos em viewport mobile (375×812) via
+`read_page`/`get_page_text` no Browser pane.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

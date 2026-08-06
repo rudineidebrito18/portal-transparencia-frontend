@@ -81,7 +81,7 @@ export default function InformacoesEsicView() {
 
       <Card className="p-5">
         <p className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-3">Prazos de resposta</p>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-text-secondary/60">Resposta padrão</p>
             <p className="font-bold text-primary">{info.prazoRespostaDisponivel} dias</p>

@@ -1,3 +1,4 @@
+import { Viewport } from 'next'
 import RootLayoutSwitch from '@/layouts/RootLayoutSwitch'
 import './globals.css'
 import { ReactNode } from 'react'
@@ -5,6 +6,11 @@ import { ReactNode } from 'react'
 export const metadata = {
   title: 'Portal da Transparência',
   description: 'Acompanhe os gastos, licitações e contratos públicos.',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

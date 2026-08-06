@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { MdErrorOutline, MdPictureAsPdf } from 'react-icons/md'
+import { MdErrorOutline, MdOpenInNew, MdPictureAsPdf } from 'react-icons/md'
 
 interface Props {
   src: string
@@ -34,9 +34,24 @@ export default function PdfViewer({ src, titulo }: Props) {
     <div className="bg-white border border-border/30 rounded-2xl shadow-sm overflow-hidden">
 
       {/* HEADER */}
-      <div className="flex items-center gap-2 px-6 py-4 border-b border-border/20 text-primary font-semibold text-sm">
-        <MdPictureAsPdf size={20} />
-        {titulo}
+      <div className="flex items-center justify-between gap-2 px-6 py-4 border-b border-border/20 text-sm">
+        <div className="flex items-center gap-2 text-primary font-semibold min-w-0">
+          <MdPictureAsPdf size={20} className="shrink-0" />
+          <span className="truncate">{titulo}</span>
+        </div>
+
+        {/* Alguns navegadores mobile (sobretudo Safari/Chrome iOS) não renderizam PDF
+            embutido em iframe de forma confiável — esse link garante uma saída mesmo
+            quando o visualizador nativo não funciona ali dentro. */}
+        <a
+          href={src}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-text-secondary hover:text-primary transition-colors shrink-0"
+        >
+          <MdOpenInNew size={16} />
+          Abrir em nova guia
+        </a>
       </div>
 
       {/* VISUALIZADOR */}

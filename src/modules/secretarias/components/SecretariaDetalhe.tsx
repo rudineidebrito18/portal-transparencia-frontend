@@ -213,11 +213,11 @@ function PessoaCargoList({ lista, emptyMessage }: { lista: SecretariaDetalheType
     <div className="space-y-3">
       {lista.map(p => (
         <Card key={p.id} className="p-4 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-text-secondary">{p.nome}</p>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-text-secondary truncate">{p.nome}</p>
             <p className="text-xs text-text-secondary/60">{p.cargo}</p>
           </div>
-          <p className="text-xs text-text-secondary/60 whitespace-nowrap">
+          <p className="text-xs text-text-secondary/60 whitespace-nowrap shrink-0">
             {formatarData(p.dataInicio)} — {formatarData(p.dataFim)}
           </p>
         </Card>
@@ -251,14 +251,14 @@ function GestorList({ lista }: { lista: SecretariaDetalheType['gestores'] }) {
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-sm font-semibold text-text-secondary">{g.nome}</p>
+              <p className="text-sm font-semibold text-text-secondary truncate">{g.nome}</p>
               {g.verificado && <SelinhoVerificado />}
               {g.ativo && <Badge className="bg-primary/10 text-primary">Vigente</Badge>}
             </div>
             <p className="text-xs text-text-secondary/60">{g.cargo}</p>
           </div>
 
-          <p className="text-xs text-text-secondary/60 whitespace-nowrap">
+          <p className="text-xs text-text-secondary/60 whitespace-nowrap shrink-0">
             {formatarData(g.dataInicio ?? undefined)} — {g.dataFim ? formatarData(g.dataFim) : 'o momento'}
           </p>
         </Card>
