@@ -813,6 +813,20 @@ corrigido aqui — decidir isso antes de mexer nessa lacuna especificamente.
 `/obras`; componentes tocados reconferidos em viewport mobile (375×812) via
 `read_page`/`get_page_text` no Browser pane.
 
+**Bug de performance encontrado pelo usuário na sequência**: o campo de busca de
+`TransparenciaHub.tsx` (`/transparencia`) usava `useUrlState` diretamente no
+`onChange` do `<input>` — cada tecla digitada disparava `router.replace` (dentro de
+`setValor` em `src/hooks/useUrlState.ts`), uma navegação do Next.js por caractere,
+deixando a busca visivelmente travada. `useUrlState` foi desenhado pra estado que muda
+pouco (aba ativa, filtro aplicado por um botão), não pra um campo de texto livre.
+Corrigido com `useState` local pro valor imediato do input (filtragem roda em cima
+dele, sem custo real — o array de itens é pequeno) + `useEffect` com `setTimeout` de
+300ms sincronizando pra URL só depois de uma pausa na digitação — mantém a busca
+compartilhável por link sem re-navegar a cada tecla. Vale conferir esse mesmo padrão em
+qualquer outro campo de texto livre que hoje use `useUrlState` diretamente no
+`onChange` (não achei outro caso na varredura desta rodada, mas o padrão errado é fácil
+de repetir).
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

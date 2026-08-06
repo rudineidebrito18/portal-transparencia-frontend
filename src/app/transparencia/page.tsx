@@ -17,13 +17,7 @@ export default function TransparenciaPage() {
       <h1 className="text-3xl font-bold mb-2 text-primary uppercase">
         Acesso à Informação
       </h1>
-      <div className="h-1 w-20 bg-secondary mb-4 rounded-full" />
-
-      <p className="text-sm text-text-secondary/70 max-w-3xl mb-10">
-        Reúne, por categoria, os dados e documentos que o município disponibiliza em
-        cumprimento à Lei de Acesso à Informação. Itens marcados como &quot;Em breve&quot;
-        ainda não possuem página própria e serão disponibilizados progressivamente.
-      </p>
+      <div className="h-1 w-20 bg-secondary mb-8 rounded-full" />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
         <TransparenciaHub />

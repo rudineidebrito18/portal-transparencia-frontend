@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { MdSearch } from 'react-icons/md'
 
 import EmptyState from '@/components/ui/EmptyState'
@@ -20,7 +21,18 @@ function normalizar(texto: string): string {
 export default function TransparenciaHub() {
   const [busca, setBusca] = useUrlState<string>('busca', '')
 
-  const termo = normalizar(busca.trim())
+  // O input digita numa cópia local — `setBusca` do useUrlState faz router.replace a
+  // cada chamada, e chamar isso por tecla digitada deixava a busca visivelmente
+  // travada. A URL (pra ficar compartilhável) só é atualizada depois de uma pausa.
+  const [buscaInput, setBuscaInput] = useState(busca)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setBusca(buscaInput), 300)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buscaInput])
+
+  const termo = normalizar(buscaInput.trim())
 
   const secoesFiltradas = termo
     ? secoesAcessoInformacao
@@ -37,8 +49,8 @@ export default function TransparenciaHub() {
         <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary/40" size={20} />
         <input
           type="text"
-          value={busca}
-          onChange={e => setBusca(e.target.value)}
+          value={buscaInput}
+          onChange={e => setBuscaInput(e.target.value)}
           placeholder="Buscar por título de item..."
           className="w-full border border-border/30 rounded-lg pl-10 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
         />
