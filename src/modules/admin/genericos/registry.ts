@@ -32,6 +32,7 @@ export const REGISTRY_MODULOS_GENERICOS: ModuloGenericoConfig[] = [
   { slug: 'prestacao-contas-anos-anteriores', label: 'Prestação de Contas — Anos Anteriores', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/prestacao-contas-anos-anteriores', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'lei', label: 'Lei', categoria: 'Legislação', basePath: '/legislacao/lei', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'competencias', label: 'Competências', categoria: 'Institucional', basePath: '/institucional/competencias', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
+  { slug: 'carta-servicos', label: 'Carta de Serviços', categoria: 'Institucional', basePath: '/institucional/carta-servicos', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'unidade-saude', label: 'Unidade de Saúde', categoria: 'Saúde', basePath: '/saude/unidade', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'medicamentos', label: 'Lista de Medicamentos', categoria: 'Saúde', basePath: '/saude/medicamentos', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'relatorios-saude', label: 'Relatório de Saúde', categoria: 'Saúde', basePath: '/saude/relatorios', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },

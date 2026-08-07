@@ -1,10 +1,7 @@
-import { Suspense } from 'react'
-
 import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
-import CartaServicosListView from '@/modules/carta-servicos/components/CartaServicosListView'
 
-export default function CartaDeServicos() {
+export default function LoadingCartaDeServicos() {
   return (
     <div className="max-w-6xl mx-auto p-2">
       <PageHeader title="Carta de Serviços" breadcrumbItems={[
@@ -12,9 +9,7 @@ export default function CartaDeServicos() {
           { label: 'Carta de Serviços' }
         ]} />
 
-      <Suspense fallback={<Skeleton className="h-24" />}>
-        <CartaServicosListView />
-      </Suspense>
+      <Skeleton className="h-24" />
     </div>
   )
 }

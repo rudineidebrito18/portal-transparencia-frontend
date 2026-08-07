@@ -944,6 +944,36 @@ Aproveitado o pedido do usuário ("não quero fácil acesso ao admin") pra remov
 de engrenagem (`MdSettings`, `<Link href="/admin/login">`) da topbar — a rota
 `/admin/login` continua existindo (não removida, só sem link visível no site público).
 
+## 2.14 Carta de Serviços vira módulo genérico de verdade (2026-08-06)
+
+`/carta-de-servicos` já existia (seção 2.10, `cf181a0`) como "PDF estático, sem
+backend" — `PdfViewer` direto no `page.tsx` apontando pra um `/test.pdf` placeholder
+com `// TODO`, texto explicativo acima do PDF, tudo numa página só (usuário confirmou
+que essa estrutura — texto acima do PDF, sem navegar pra uma segunda página só pra ver
+o arquivo — é exatamente o que quer manter, ao contrário do portal de referência de
+Lago dos Rodrigues que usa 2 páginas: lista → clique em "Visualizar" → PDF). Virou
+módulo genérico de verdade, mesmo padrão de Legislação/Competências
+(`criarServicoDocumentoGenerico`/`criarUseDocumentosGenerico`/`criarMockDocumentoGenerico`,
+`src/modules/carta-servicos/`, registry `slug: 'carta-servicos'`, categoria
+"Institucional") — admin ganha CRUD automático em `/admin/modulos/carta-servicos`, sem
+precisar de nenhum arquivo novo (rota dinâmica genérica já existente).
+
+**Única diferença do padrão "documento genérico" comum**: `CartaServicosListView.tsx`
+não usa `DocumentoGenericoListPanel` (que renderiza cards com link "Ver documento" pra
+`/documento`, ou seja, 2 páginas) — em vez disso, embute `PdfViewer` diretamente pra
+cada documento, na mesma página, mantendo a estrutura que já existia e que o usuário
+confirmou querer. Sem `FiltroCard`/busca de propósito (esse documento normalmente tem
+1, no máximo 2-3 versões, busca por título seria ruído nesse volume).
+
+Linkado nos mesmos lugares que Competências: dropdown "A Prefeitura" (`Header.tsx`),
+`Footer.tsx`, `mapa-do-site/page.tsx` — já estava linkado no hub `/transparencia`
+(`secoes.ts`) desde a criação da página estática original.
+
+Endpoint não existe no backend ainda (confirmado, `/v3/api-docs` sem nenhum path
+`carta`/`servico`) — pedido em `prompt-backend-carta-servicos.md` (scratchpad da
+sessão). Front degrada com `ErrorState` até existir, mesmo comportamento de
+Competências.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

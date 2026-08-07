@@ -15,7 +15,8 @@ const LINKS_INSTITUCIONAL = [
   { label: 'Diário Oficial', href: '/diario-oficial' },
   { label: 'Estrutura Organizacional', href: '/estrutura-organizacional' },
   { label: 'Organograma', href: '/organograma' },
-  { label: 'Competências', href: '/competencias' }
+  { label: 'Competências', href: '/competencias' },
+  { label: 'Carta de Serviços', href: '/carta-de-servicos' }
 ]
 
 const LINKS_ATENDIMENTO = [
