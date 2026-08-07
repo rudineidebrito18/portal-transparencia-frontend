@@ -42,6 +42,18 @@ api.interceptors.request.use((config) => {
   if (config.data instanceof FormData) {
     config.timeout = 60000;
     config.headers.delete("Content-Type");
+
+    // Upload vai direto pro backend, sem passar pelo proxy de rewrites() do Next — o
+    // proxy tem um buffer de ~10MB que trunca o corpo de arquivo maior SILENCIOSAMENTE
+    // (sem erro, só timeout ~30s depois), confirmado pelo backend que o Spring/Tomcat
+    // nunca foi o gargalo (uploads de até 30MB direto no backend: 0.12–0.29s). Backend
+    // já cobre CORS pra isso (preflight OPTIONS + POST/PUT liberados pra "/**",
+    // Authorization/Content-Type nos allowedHeaders, sem allowCredentials — não precisa
+    // de cookie, só o Authorization: Bearer que esse interceptor já anexa acima).
+    // Chamadas JSON continuam via "/api" (proxy), sem mudança.
+    if (typeof window !== "undefined") {
+      config.baseURL = process.env.NEXT_PUBLIC_API_URL;
+    }
   }
 
   return config;

@@ -1238,7 +1238,7 @@ produção real — vale investigar antes de ir pra produção de verdade (opç�
 timeout do proxy, ou apontar upload de arquivo direto pro backend, sem passar pelo
 `rewrites()`, exigindo CORS liberado lá).
 
-## 2.19 Regressão do próprio fix da seção 2.18 + timeout do proxy — INVESTIGAÇÃO EM ABERTO (2026-08-07)
+## 2.19 Regressão do próprio fix da seção 2.18 + timeout do proxy — RESOLVIDO (2026-08-07)
 
 **Regressão real, corrigida**: ao remover os headers manuais na seção 2.18, sobrou um
 efeito colateral — `src/services/api.ts` define `Content-Type: application/json` como
@@ -1287,10 +1287,46 @@ próprio parágrafo acima) e pediu pra tirar. `next.config.ts` voltou a não ter
   quando passa pelo fluxo completo (autenticação, gravação em disco em caminho diferente,
   etc. — os testes da seção 2.16 mediram o backend isolado, não necessariamente em
   condições idênticas), ou (c) outra coisa ainda não cogitada.
-- **Próximo passo, quando retomar**: medir tempo real de upload de 13MB direto no
-  backend vs. via proxy do Next (`time curl ...`) nas mesmas condições, pra isolar onde
-  está o gargalo antes de aplicar qualquer configuração — aumentar timeout sem saber a
-  causa só mascara o sintoma.
+
+**Causa raiz confirmada pelo backend (2026-08-07)**: era (a) — o proxy de `rewrites()`
+do Next tem um buffer de ~10MB que **trunca o corpo de arquivo maior silenciosamente**
+(sem erro nenhum), daí o timeout de ~30s sem mensagem útil. O Spring/Tomcat nunca foi o
+gargalo: testado pelo backend com `curl -H "Origin: http://localhost:3000"` simulando a
+chamada cross-origin real do navegador, uploads de 5/10/12/15/20/30MB direto no backend
+responderam em 0.12–0.29s, sem platô.
+
+**Correção aplicada**: `src/services/api.ts` — quando `config.data instanceof FormData`
+**e** a chamada acontece no navegador (`typeof window !== "undefined"`), o interceptor de
+request agora sobrescreve `config.baseURL` pra `process.env.NEXT_PUBLIC_API_URL` (o mesmo
+valor que o SSR já usa direto, sem proxy — `http://localhost:8080/api` em dev) em vez do
+`/api` relativo que passa pelo rewrite. Upload vai direto do navegador pro backend,
+contornando o buffer problemático; chamadas JSON continuam via `/api` normalmente, sem
+mudança. Único ponto de mudança — `src/services/authApi.ts` é a única outra instância
+axios do projeto e não faz upload (só login, JSON puro).
+
+Isso vira uma chamada cross-origin de verdade (frontend e backend em origens diferentes).
+Backend confirmou que CORS já cobre isso sem nenhuma mudança do lado deles: preflight
+`OPTIONS` responde 200 com os headers certos, POST/PUT liberados pra `/**` (cobre os ~30
+controllers com upload, incluindo os que herdam de `GenericDocumentoController`),
+`Authorization`/`Content-Type` nos `allowedHeaders` (o navegador seta o boundary do
+`multipart/form-data` sozinho — nunca setar isso manualmente no client, é exatamente o bug
+da seção 2.18), `allowCredentials` em `false` — sem problema, autenticação aqui é só
+`Authorization: Bearer <token>`, nunca dependeu de cookie.
+
+**Mudança de comportamento a favor**: arquivo acima do limite do backend
+(`spring.servlet.multipart.max-file-size`/`max-request-size`, 40MB) agora retorna
+imediato (~0.045s) com `413 Payload Too Large` e corpo `{ errors: ["Arquivo excede o
+tamanho máximo permitido."] }` — `parseApiError` (`src/services/apiError.ts`) já
+extrai `errors[]` genericamente, então toda tela de upload já mostra essa mensagem via
+`ErrorState`/`erroForm` sem precisar de nenhum tratamento especial pro 413. Antes
+(via proxy) o mesmo caso era truncamento silencioso seguido de timeout sem mensagem útil.
+
+`tsc --noEmit`/`npm run lint` limpos. Não testado em navegador de verdade nessa sessão
+(sem ferramenta de browser disponível) — a lógica (`typeof window !== "undefined"` +
+`NEXT_PUBLIC_API_URL` inlined no bundle do client pelo Next) é a mesma que o SSR já usa
+com sucesso pro mesmo valor de env var, e o lado do backend já foi validado ponta a ponta
+pelo próprio time de backend simulando a chamada cross-origin exata. Recomendado testar
+um upload real (qualquer módulo com anexo) antes de considerar 100% fechado.
 
 ## 3. Como decidir o padrão de um módulo novo
 
