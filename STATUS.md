@@ -1278,19 +1278,19 @@ minutos de verdade em vez de só falhar em 30s, o que seria uma UX ruim mesmo
 "funcionando". Última hipótese do usuário antes de pausar a sessão: **pode ser algo no
 backend**, não confirmado nem descartado.
 
-**Estado em que isso fica pendurado** (usuário pediu pra parar por aqui e comitar):
-- `experimental.proxyTimeout: 300000` está aplicado em `next.config.ts`, mas não
-  verificado se de fato resolve nem quanto tempo o upload de 13MB realmente leva com
-  essa config.
-- Não foi determinado se a lentidão é: (a) do proxy do Next em si (buffer/streaming do
-  corpo multipart), (b) do backend levando mais tempo do que os 0.13s medidos
-  anteriormente quando passa pelo fluxo completo (autenticação, gravação em disco em
-  caminho diferente, etc. — os testes anteriores da seção 2.16 mediram o backend isolado,
-  não necessariamente em condições idênticas), ou (c) outra coisa ainda não cogitada.
-- **Próximo passo, quando retomar**: repetir o teste cronometrado de upload de 13MB via
-  proxy com o `proxyTimeout` novo já ativo (`time curl ... http://localhost:3000/api/...`)
-  e comparar com o tempo direto no backend nas mesmas condições atuais — só aí dá pra
-  saber se o problema é proxy, backend, ou os dois.
+**`experimental.proxyTimeout: 300000` foi revertido (2026-08-07, sessão seguinte)** —
+usuário apontou que só fazer o proxy esperar mais não é a causa do erro (concorda com o
+próprio parágrafo acima) e pediu pra tirar. `next.config.ts` voltou a não ter a chave
+`experimental`. A investigação da causa real da lentidão continua em aberto:
+- Não foi determinado se é: (a) do proxy do Next em si (buffer/streaming do corpo
+  multipart), (b) do backend levando mais tempo do que os 0.13s medidos anteriormente
+  quando passa pelo fluxo completo (autenticação, gravação em disco em caminho diferente,
+  etc. — os testes da seção 2.16 mediram o backend isolado, não necessariamente em
+  condições idênticas), ou (c) outra coisa ainda não cogitada.
+- **Próximo passo, quando retomar**: medir tempo real de upload de 13MB direto no
+  backend vs. via proxy do Next (`time curl ...`) nas mesmas condições, pra isolar onde
+  está o gargalo antes de aplicar qualquer configuração — aumentar timeout sem saber a
+  causa só mascara o sintoma.
 
 ## 3. Como decidir o padrão de um módulo novo
 
