@@ -8,20 +8,60 @@ import {
   MdHeadsetMic,
   MdHome,
   MdInfo,
-  MdMenu,
-  MdSettings
+  MdMenu
 } from 'react-icons/md';
 import AcessibilidadeMenu from './AcessibilidadeMenu';
 import DropdownMenuItem from './DropdownMenuItem';
 import SecretariasDropdownItems from './SecretariasDropdownItems';
+
+const CHAVE_FONTE = 'acessibilidade-fonte';
+const CHAVE_CONTRASTE = 'acessibilidade-alto-contraste';
+const FONTE_MIN = 90;
+const FONTE_MAX = 130;
+const FONTE_PADRAO = 100;
+const PASSO = 10;
 
 export default function Header() {
   const [navMedidaHeight, setNavMedidaHeight] = useState(48);
   const [menuOpen, setMenuOpen] = useState(false);
   const [offsetY, setOffsetY] = useState(0);
 
+  // Dono único do estado de acessibilidade — AcessibilidadeMenu é renderizado 2x aqui
+  // embaixo (topbar desktop + menu mobile), cada instância só reflete esse estado em vez
+  // de ter o próprio (isso causava dessincronia: ativar num lugar não refletia no outro).
+  const [fonte, setFonte] = useState(FONTE_PADRAO);
+  const [altoContraste, setAltoContraste] = useState(false);
+
   const navRef = useRef<HTMLElement>(null);
   const logoBackgroundRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fonteSalva = Number(localStorage.getItem(CHAVE_FONTE));
+    if (fonteSalva) {
+      document.documentElement.style.fontSize = `${fonteSalva}%`;
+      setFonte(fonteSalva);
+    }
+
+    const contrasteSalvo = localStorage.getItem(CHAVE_CONTRASTE) === 'true';
+    if (contrasteSalvo) {
+      document.documentElement.classList.add('alto-contraste');
+      setAltoContraste(true);
+    }
+  }, []);
+
+  function aplicarFonte(valor: number) {
+    const novoValor = Math.min(FONTE_MAX, Math.max(FONTE_MIN, valor));
+    document.documentElement.style.fontSize = `${novoValor}%`;
+    localStorage.setItem(CHAVE_FONTE, String(novoValor));
+    setFonte(novoValor);
+  }
+
+  function alternarContraste() {
+    const novoValor = !altoContraste;
+    document.documentElement.classList.toggle('alto-contraste', novoValor);
+    localStorage.setItem(CHAVE_CONTRASTE, String(novoValor));
+    setAltoContraste(novoValor);
+  }
 
   // Observa só a altura do <nav> (varia com o menu mobile aberto/fechado e quebras de
   // linha responsivas). O restante do header (topbar + logo) tem altura previsível e é
@@ -107,8 +147,12 @@ export default function Header() {
               <Link href="/esic" className="hover:underline">SIC</Link>
             </div>
             <Link href="/transparencia" className="flex items-center gap-1 hover:underline"><MdInfo /> Transparência</Link>
-            <AcessibilidadeMenu />
-            <Link href="/admin/login" className="flex items-center gap-1 hover:underline" title="Acesso administrativo"><MdSettings /></Link>
+            <AcessibilidadeMenu
+              altoContraste={altoContraste}
+              onAumentarFonte={() => aplicarFonte(fonte + PASSO)}
+              onDiminuirFonte={() => aplicarFonte(fonte - PASSO)}
+              onAlternarContraste={alternarContraste}
+            />
           </div>
         </div>
 
@@ -178,12 +222,17 @@ export default function Header() {
                 <Link href="/avisos" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Avisos</Link>
               </DropdownMenuItem>
 
-              {/* Topbar (Ouvidoria/SIC/Acessibilidade/Acesso admin) é `hidden lg:flex` —
-                  some inteira no mobile. Só o menu de Acessibilidade tem equivalente aqui
-                  por enquanto (pedido explícito do usuário); os outros 3 links seguem sem
-                  alternativa mobile. */}
+              {/* Topbar (Ouvidoria/SIC/Acessibilidade) é `hidden lg:flex` — some inteira no
+                  mobile. Só o menu de Acessibilidade tem equivalente aqui por enquanto
+                  (pedido explícito do usuário); Ouvidoria/SIC seguem sem alternativa
+                  mobile. */}
               <div className="lg:hidden px-2 py-2">
-                <AcessibilidadeMenu />
+                <AcessibilidadeMenu
+                  altoContraste={altoContraste}
+                  onAumentarFonte={() => aplicarFonte(fonte + PASSO)}
+                  onDiminuirFonte={() => aplicarFonte(fonte - PASSO)}
+                  onAlternarContraste={alternarContraste}
+                />
               </div>
             </ul>
           </nav>

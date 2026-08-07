@@ -927,6 +927,23 @@ funciona certinho (nav/footer pretos, links amarelos, "Contraste: Ativo" visíve
   itens Sobre/Libras/Mapa do site e das funções `aplicarFonte`/`alternarContraste` —
   redundantes agora que o painel fecha tudo de uma vez).
 
+**Complemento 4 (mesmo dia)**: usuário achou mais um bug — alternar entre desktop e
+mobile (ou vice-versa) fazia o Contraste parecer "preso": tinha que desativar e ativar
+de novo pra sincronizar. Causa: `AcessibilidadeMenu.tsx` é renderizado **2 vezes** por
+`Header.tsx` (topbar desktop `hidden lg:flex` + menu mobile `lg:hidden`, seção 2.12) —
+cada instância tinha seu próprio `useState` de `fonte`/`altoContraste`, então ativar
+numa não atualizava a outra (cada uma só lia o `localStorage` uma vez, no mount).
+Corrigido tirando esse estado de dentro do componente: `Header.tsx` agora é o dono único
+(`fonte`/`altoContraste` + `aplicarFonte`/`alternarContraste`, incluindo o efeito que lê
+o `localStorage`), e `AcessibilidadeMenu.tsx` virou componente controlado (recebe
+`altoContraste` + os 3 callbacks como props) — as duas instâncias renderizadas
+refletem a mesma fonte de verdade agora, sem estado duplicado. `aberto` (dropdown
+aberto/fechado) continua local em cada instância, isso é intencional.
+
+Aproveitado o pedido do usuário ("não quero fácil acesso ao admin") pra remover o ícone
+de engrenagem (`MdSettings`, `<Link href="/admin/login">`) da topbar — a rota
+`/admin/login` continua existindo (não removida, só sem link visível no site público).
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

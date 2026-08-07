@@ -13,39 +13,29 @@ import {
   MdTextIncrease
 } from 'react-icons/md'
 
-const CHAVE_FONTE = 'acessibilidade-fonte'
-const CHAVE_CONTRASTE = 'acessibilidade-alto-contraste'
-const FONTE_MIN = 90
-const FONTE_MAX = 130
-const FONTE_PADRAO = 100
-const PASSO = 10
-
 const ITEM_CLASSNAME = 'w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary text-left hover:bg-primary/5 transition-colors'
 
-// Menu de acessibilidade da topbar: Sobre / Contraste / Aumentar / Diminuir / Libras /
-// Mapa do site. O widget do VLibras em si (div + script) mora em PublicLayout, não aqui —
-// esta topbar fica `hidden` em telas < lg, então o botão flutuante do VLibras (que já
-// existe em qualquer lugar da página) segue invisível em mobile. "Libras" aqui é só um
-// link informativo pro site oficial do projeto, não interage com o widget.
-export default function AcessibilidadeMenu() {
+interface Props {
+  altoContraste: boolean
+  onAumentarFonte: () => void
+  onDiminuirFonte: () => void
+  onAlternarContraste: () => void
+}
+
+// Menu de acessibilidade: Sobre / Contraste / Aumentar / Diminuir / Libras / Mapa do
+// site. Renderizado 2x por Header.tsx (topbar desktop + menu mobile, cada um visível só
+// no seu breakpoint) — por isso `fonte`/`altoContraste` vêm de fora como props em vez de
+// estado local: as duas instâncias são componentes React separados, cada uma com seu
+// próprio useState, então estado local dessincronizava entre elas (ativar o contraste
+// numa instância não atualizava a outra — usuário via a mesma opção como "inativa" ao
+// trocar de desktop pra mobile e vice-versa, precisando desativar e reativar pra
+// sincronizar de novo). Header.tsx é o dono único do estado agora, as duas instâncias só
+// refletem ele. O widget do VLibras em si (div + script) mora em PublicLayout, não aqui;
+// "Libras" aqui é só um link informativo pro site oficial do projeto, não interage com
+// o widget.
+export default function AcessibilidadeMenu({ altoContraste, onAumentarFonte, onDiminuirFonte, onAlternarContraste }: Props) {
   const [aberto, setAberto] = useState(false)
-  const [fonte, setFonte] = useState(FONTE_PADRAO)
-  const [altoContraste, setAltoContraste] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const fonteSalva = Number(localStorage.getItem(CHAVE_FONTE))
-    if (fonteSalva) {
-      document.documentElement.style.fontSize = `${fonteSalva}%`
-      setFonte(fonteSalva)
-    }
-
-    const contrasteSalvo = localStorage.getItem(CHAVE_CONTRASTE) === 'true'
-    if (contrasteSalvo) {
-      document.documentElement.classList.add('alto-contraste')
-      setAltoContraste(true)
-    }
-  }, [])
 
   useEffect(() => {
     function fecharAoClicarFora(event: MouseEvent) {
@@ -55,20 +45,6 @@ export default function AcessibilidadeMenu() {
     document.addEventListener('mousedown', fecharAoClicarFora)
     return () => document.removeEventListener('mousedown', fecharAoClicarFora)
   }, [])
-
-  function aplicarFonte(valor: number) {
-    const novoValor = Math.min(FONTE_MAX, Math.max(FONTE_MIN, valor))
-    document.documentElement.style.fontSize = `${novoValor}%`
-    localStorage.setItem(CHAVE_FONTE, String(novoValor))
-    setFonte(novoValor)
-  }
-
-  function alternarContraste() {
-    const novoValor = !altoContraste
-    document.documentElement.classList.toggle('alto-contraste', novoValor)
-    localStorage.setItem(CHAVE_CONTRASTE, String(novoValor))
-    setAltoContraste(novoValor)
-  }
 
   return (
     <div ref={ref} className="relative group">
@@ -107,7 +83,7 @@ export default function AcessibilidadeMenu() {
 
           <button
             type="button"
-            onClick={alternarContraste}
+            onClick={onAlternarContraste}
             aria-pressed={altoContraste}
             className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors ${
               altoContraste ? 'bg-gray-900 text-white hover:bg-gray-800' : 'text-text-secondary hover:bg-primary/5'
@@ -122,12 +98,12 @@ export default function AcessibilidadeMenu() {
             )}
           </button>
 
-          <button type="button" onClick={() => aplicarFonte(fonte + PASSO)} className={ITEM_CLASSNAME}>
+          <button type="button" onClick={onAumentarFonte} className={ITEM_CLASSNAME}>
             <MdTextIncrease size={18} className="shrink-0 text-primary" />
             Aumentar
           </button>
 
-          <button type="button" onClick={() => aplicarFonte(fonte - PASSO)} className={ITEM_CLASSNAME}>
+          <button type="button" onClick={onDiminuirFonte} className={ITEM_CLASSNAME}>
             <MdTextDecrease size={18} className="shrink-0 text-primary" />
             Diminuir
           </button>
