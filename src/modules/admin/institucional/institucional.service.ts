@@ -47,32 +47,21 @@ const NOTICIAS_BASE = '/institucional/noticias'
 
 // Notícias aceita N imagens (com uma marcada como principal) via sub-recurso —
 // confirmado contra o /v3/api-docs real do backend (implementado exatamente como
-// pedido em prompt-backend-imagens-noticias.md), com 2 detalhes de contrato:
-// - criar/atualizar só aceitam 1 imagem no multipart (campo "imagem", legado) — imagens
-//   extras entram depois, uma a uma, via POST .../imagens.
-// - POST .../imagens recebe "principal" como query param, não como campo do FormData.
-// - PUT .../{id} exige multipart mesmo sem imagem nova (dados é a única parte obrigatória).
-function montarFormDataDados(dados: ConteudoInstitucionalRequest): FormData {
-  const formData = new FormData()
-  formData.append('dados', new Blob([JSON.stringify(dados)], { type: 'application/json' }))
-  return formData
-}
-
+// pedido em prompt-backend-imagens-noticias.md, incluindo a atualização pedindo pra
+// simplificar sem se preocupar com compatibilidade): criar/atualizar não lidam mais com
+// arquivo nenhum, viraram JSON puro — imagens entram só depois, uma a uma, via
+// POST .../imagens (que recebe "principal" como query param, não campo do FormData).
 export const noticiaAdminService = {
   listar(params: ListarParams): Promise<Page<ConteudoInstitucional>> {
     return api.get<Page<ConteudoInstitucional>>(NOTICIAS_BASE, { params }).then(r => r.data)
   },
 
   criar(dados: ConteudoInstitucionalRequest): Promise<ConteudoInstitucional> {
-    return api
-      .post<ConteudoInstitucional>(NOTICIAS_BASE, montarFormDataDados(dados), { headers: { 'Content-Type': 'multipart/form-data' } })
-      .then(r => r.data)
+    return api.post<ConteudoInstitucional>(NOTICIAS_BASE, dados).then(r => r.data)
   },
 
   atualizar(id: number, dados: ConteudoInstitucionalRequest): Promise<ConteudoInstitucional> {
-    return api
-      .put<ConteudoInstitucional>(`${NOTICIAS_BASE}/${id}`, montarFormDataDados(dados), { headers: { 'Content-Type': 'multipart/form-data' } })
-      .then(r => r.data)
+    return api.put<ConteudoInstitucional>(`${NOTICIAS_BASE}/${id}`, dados).then(r => r.data)
   },
 
   excluir(id: number): Promise<void> {
@@ -84,8 +73,7 @@ export const noticiaAdminService = {
     formData.append('imagem', imagem)
     return api
       .post<ImagemNoticia>(`${NOTICIAS_BASE}/${noticiaId}/imagens`, formData, {
-        params: { principal },
-        headers: { 'Content-Type': 'multipart/form-data' }
+        params: { principal }
       })
       .then(r => r.data)
   },

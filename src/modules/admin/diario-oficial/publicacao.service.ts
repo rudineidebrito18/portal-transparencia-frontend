@@ -24,9 +24,7 @@ export const publicacaoService = {
 
   criar(dados: SolicitacaoPublicacaoRequest, arquivo: File): Promise<SolicitacaoPublicacao> {
     return api
-      .post<SolicitacaoPublicacao>(BASE, montarFormData(dados, arquivo), {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .post<SolicitacaoPublicacao>(BASE, montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 

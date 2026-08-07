@@ -19,13 +19,13 @@ export const artService = {
 
   criar(obraId: number, dados: ArtRequest, pdf: File): Promise<Art> {
     return api
-      .post<Art>(base(obraId), montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<Art>(base(obraId), montarFormData(dados, pdf))
       .then(r => r.data)
   },
 
   atualizar(obraId: number, id: number, dados: ArtRequest, pdf?: File | null): Promise<Art> {
     return api
-      .put<Art>(`${base(obraId)}/${id}`, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put<Art>(`${base(obraId)}/${id}`, montarFormData(dados, pdf))
       .then(r => r.data)
   },
 

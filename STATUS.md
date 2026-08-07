@@ -1172,6 +1172,126 @@ restantes em `src/`). Fix do lightbox revisado por leitura de código e conferê
 `position: fixed` é regra de CSS spec, não depende de teste visual pra confirmar que
 resolve.
 
+## 2.18 Bug real de upload: Content-Type manual quebra multipart em navegador de verdade (2026-08-07)
+
+Usuário reportou erro 500 tentando subir PDF em vários módulos (13MB, mas o tamanho era
+coincidência, não a causa). Investigação teve 3 pistas falsas antes da causa raiz real —
+registradas aqui porque cada uma ensinou algo, mesmo não sendo o problema principal:
+
+1. **Timeout de 10s do axios** — real, mas não a causa deste bug (era um bug diferente,
+   já corrigido na seção 2.16: `FormData` agora tem 60s).
+2. **Proxy do Next travando 30s em upload de 13MB** (`rewrites()` de `next.config.ts`,
+   reproduzido tanto em `next dev --turbopack` quanto em `next start` de produção real —
+   build limpo, testado isolado sem afetar o ambiente de dev, restaurado depois) — **isso
+   é real e seria um problema em produção**, mas só aparece em arquivos grandes, e o
+   usuário conseguia reproduzir o erro em qualquer tamanho. Registrado como pendência
+   separada, não investigado a fundo ainda (não travava a sessão atual).
+3. **`multipart/form-data;boundary=...;charset=UTF-8` sem espaços, rejeitado pelo
+   Spring** — descoberto lendo o log do backend (`tail`/polling a cada 5s enquanto uma
+   requisição ficava pendurada) e comparando com o que um `curl` direto no backend
+   enviava (que sempre funcionou, por isso a suspeita inicial recaiu sobre o proxy do
+   Next). O boundary `WebKitFormBoundary...` só existe em requisições geradas por um
+   navegador de verdade — reproduzido de propósito usando o Claude Browser (Chrome via
+   CDP) pra logar no admin e submeter o formulário real, confirmando que não era
+   artefato de teste.
+
+**Causa raiz real, confirmada comparando `/api/legislacao/lei` (funcionava) com
+`/api/institucional/noticias` (falhava) usando a mesma técnica de teste**: 17 services
+admin (`src/modules/**/*.service.ts`, 31 ocorrências) definiam manualmente
+`headers: { 'Content-Type': 'multipart/form-data' }` (sem `boundary`) em chamadas do
+axios com corpo `FormData`. Isso é um anti-padrão documentado do axios — só quebra em
+navegador de verdade (nunca em `curl`/Node, por isso nunca foi pego antes): ao ver um
+`Content-Type` já definido, o navegador completa o valor com o `boundary` que ele gerou
+pra montar o corpo, mas sem espaço antes do parâmetro seguinte, produzindo
+`multipart/form-data;boundary=----WebKitFormBoundaryXXXX;charset=UTF-8` — que o
+`AbstractMessageConverterMethodArgumentResolver` do Spring rejeita
+(`HttpMediaTypeNotSupportedException`, mapeado pro `GlobalExceptionHandler` como 500
+genérico). **Correção**: remover o header manual em todos os 17 arquivos — o axios/
+navegador monta o `Content-Type` inteiro sozinho, corretamente, quando você não
+interfere. Script único (Python, regex) aplicou a mesma correção nos 31 pontos de uma
+vez; `tsc`/`eslint` limpos depois.
+
+**Segunda causa raiz, específica de Notícias** (só apareceu depois de corrigir a
+primeira — o teste comparativo `/api/legislacao/lei` vs `/api/institucional/noticias`
+com uma requisição JS manual, sem `Content-Type` nenhum, **ainda** falhava só na
+Notícias): o backend, ao atender o pedido de simplificação da seção 2.17 (tirar
+compatibilidade com `imagemUrl`/`imagem` legado), foi além e trocou
+`POST/PUT /institucional/noticias` de multipart pra **JSON puro** (`@RequestBody
+NoticiaRequestDto`, confirmado no `NoticiaController.java` e no `/v3/api-docs` real —
+`content: application/json`, não mais `multipart/form-data`). O frontend ainda mandava
+`dados` embrulhado num `FormData` (`montarFormDataDados`, pensado pra quando criar
+precisava do campo `imagem` legado junto). Corrigido: `noticiaAdminService.criar()`/
+`atualizar()` agora mandam `dados` direto como corpo JSON (`api.post(url, dados)`, sem
+FormData nem header manual) — helper `montarFormDataDados` removido, não é mais usado
+em lugar nenhum.
+
+Verificado: `tsc`/`eslint` limpos; testado de ponta a ponta com o Claude Browser
+autenticado como admin de verdade (`admin@prefeitura.dev`/`admin123`, credencial de dev
+documentada na seção 4) — `POST /api/institucional/noticias` retornou 200 com o payload
+JSON correto. Registros de teste criados durante o diagnóstico (notícias e leis) foram
+excluídos via `DELETE` autenticado logo em seguida, sem deixar lixo no banco nem arquivo
+órfão em `/home/pc/portal-uploads-dev`.
+
+**Pendência registrada, não resolvida**: o proxy do Next.js (`rewrites()`) trava ~30s e
+falha em uploads grandes (13MB reproduzido, 6MB passa), tanto em dev quanto em build de
+produção real — vale investigar antes de ir pra produção de verdade (opções: configurar
+timeout do proxy, ou apontar upload de arquivo direto pro backend, sem passar pelo
+`rewrites()`, exigindo CORS liberado lá).
+
+## 2.19 Regressão do próprio fix da seção 2.18 + timeout do proxy — INVESTIGAÇÃO EM ABERTO (2026-08-07)
+
+**Regressão real, corrigida**: ao remover os headers manuais na seção 2.18, sobrou um
+efeito colateral — `src/services/api.ts` define `Content-Type: application/json` como
+default da instância inteira do axios (`axios.create({ headers: {...} })`). O axios só
+substitui automaticamente um `Content-Type` que **ele próprio** definiu por chamada
+quando detecta corpo `FormData`; um valor herdado do default da instância não é limpo
+sozinho. Depois de tirar o override manual por chamada, toda requisição com `FormData`
+passou a sair com `Content-Type: application/json` (herdado do default) — pior que o bug
+original, rejeitado pelo backend com `Content-Type 'application/json' is not supported`.
+**Corrigido**: o interceptor de request em `api.ts` agora chama
+`config.headers.delete("Content-Type")` quando `config.data instanceof FormData`,
+garantindo que nenhum `Content-Type` seja enviado nesses casos — só o navegador define.
+Testado de ponta a ponta (criar notícia via JSON + subir imagem via multipart, os dois
+contra o backend real): funcionou. Também apareceram durante a sessão 6 registros de
+teste ("gnsrmn", ids 11-16 em Notícias) que não foram criados por mim — provavelmente
+tentativas manuais do próprio usuário durante a investigação; não foram apagados,
+ficaram para o usuário decidir.
+
+**Timeout de 30s do proxy — investigação REAL mas INCOMPLETA, não confiar cegamente no
+que está escrito abaixo em sessões futuras**: confirmado via código-fonte do Next.js
+(`node_modules/next/dist/server/lib/router-utils/proxy-request.js:33` —
+`proxyTimeout: proxyTimeout || 30000`) que o proxy de `rewrites()` tem um timeout
+hardcoded de exatamente 30000ms, configurável só via uma flag `experimental.proxyTimeout`
+em `next.config.ts` (existe desde a PR vercel/next.js#40289, ainda não promovida pra
+fora do namespace `experimental` mesmo anos depois — aplicada aqui, `300000`, mas **sem
+confirmação de que realmente resolve**, porque o teste de tempo real foi interrompido
+pelo usuário antes de rodar).
+
+Isso NÃO explica por si só por que 13MB demora tanto — usuário questionou corretamente:
+"não deveria ser rápido subir um arquivo? por que 30s? não faz sentido" — e tem razão,
+30s pra 13MB é ~0.4MB/s, mais lento que qualquer conexão razoável, quando o mesmo
+arquivo direto no backend (sem passar pelo proxy) respondia em 0.13s (seção 2.16). Ou
+seja: **aumentar o timeout só faz o proxy esperar mais, não resolve a causa real da
+lentidão** — se o gargalo genuíno for do lado do proxy do Next (buffer ineficiente do
+corpo multipart antes de repassar, por exemplo), a requisição pode continuar demorando
+minutos de verdade em vez de só falhar em 30s, o que seria uma UX ruim mesmo
+"funcionando". Última hipótese do usuário antes de pausar a sessão: **pode ser algo no
+backend**, não confirmado nem descartado.
+
+**Estado em que isso fica pendurado** (usuário pediu pra parar por aqui e comitar):
+- `experimental.proxyTimeout: 300000` está aplicado em `next.config.ts`, mas não
+  verificado se de fato resolve nem quanto tempo o upload de 13MB realmente leva com
+  essa config.
+- Não foi determinado se a lentidão é: (a) do proxy do Next em si (buffer/streaming do
+  corpo multipart), (b) do backend levando mais tempo do que os 0.13s medidos
+  anteriormente quando passa pelo fluxo completo (autenticação, gravação em disco em
+  caminho diferente, etc. — os testes anteriores da seção 2.16 mediram o backend isolado,
+  não necessariamente em condições idênticas), ou (c) outra coisa ainda não cogitada.
+- **Próximo passo, quando retomar**: repetir o teste cronometrado de upload de 13MB via
+  proxy com o `proxyTimeout` novo já ativo (`time curl ... http://localhost:3000/api/...`)
+  e comparar com o tempo direto no backend nas mesmas condições atuais — só aí dá pra
+  saber se o problema é proxy, backend, ou os dois.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

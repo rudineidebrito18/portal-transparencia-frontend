@@ -22,13 +22,13 @@ export const convenioService = {
 
   criar(dados: ConvenioRequest, pdf?: File | null): Promise<Convenio> {
     return api
-      .post<Convenio>(BASE, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<Convenio>(BASE, montarFormData(dados, pdf))
       .then(r => r.data)
   },
 
   atualizar(id: number, dados: ConvenioRequest, pdf?: File | null): Promise<Convenio> {
     return api
-      .put<Convenio>(`${BASE}/${id}`, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put<Convenio>(`${BASE}/${id}`, montarFormData(dados, pdf))
       .then(r => r.data)
   },
 

@@ -20,9 +20,7 @@ export const diarioOficialInfoService = {
   // atuais editando só os campos de texto (ver STATUS.md, lacunas de backend).
   atualizar(dados: DiarioOficialInfoRequest, brasao: File, logo: File): Promise<DiarioOficialInfo> {
     return api
-      .put<DiarioOficialInfo>(BASE, montarFormData(dados, brasao, logo), {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .put<DiarioOficialInfo>(BASE, montarFormData(dados, brasao, logo))
       .then(r => r.data)
   }
 }

@@ -39,9 +39,7 @@ export const anexoConcursoService = {
     formData.append('arquivo', arquivo)
 
     return api
-      .post<AnexoConcurso>(`${BASE}/${concursoId}/anexos`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .post<AnexoConcurso>(`${BASE}/${concursoId}/anexos`, formData)
       .then(r => r.data)
   },
 

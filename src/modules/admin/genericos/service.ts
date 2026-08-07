@@ -38,17 +38,13 @@ export function criarServicoAdminDocumentoGenerico<
 
     criar(dados: DocumentoGenericoRequest, arquivo: File): Promise<T> {
       return api
-        .post<T>(basePath, montarFormData(dados, arquivo), {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        })
+        .post<T>(basePath, montarFormData(dados, arquivo))
         .then(r => r.data)
     },
 
     atualizar(id: number, dados: DocumentoGenericoRequest, arquivo?: File | null): Promise<T> {
       return api
-        .put<T>(`${basePath}/${id}`, montarFormData(dados, arquivo), {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        })
+        .put<T>(`${basePath}/${id}`, montarFormData(dados, arquivo))
         .then(r => r.data)
     },
 

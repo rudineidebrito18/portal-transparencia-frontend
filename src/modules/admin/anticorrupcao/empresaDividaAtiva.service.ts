@@ -20,13 +20,13 @@ export const empresaDividaAtivaService = {
 
   criar(dados: EmpresaDividaAtivaRequest, pdf?: File | null): Promise<EmpresaDividaAtiva> {
     return api
-      .post<EmpresaDividaAtiva>(BASE, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<EmpresaDividaAtiva>(BASE, montarFormData(dados, pdf))
       .then(r => r.data)
   },
 
   atualizar(id: number, dados: EmpresaDividaAtivaRequest, pdf?: File | null): Promise<EmpresaDividaAtiva> {
     return api
-      .put<EmpresaDividaAtiva>(`${BASE}/${id}`, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put<EmpresaDividaAtiva>(`${BASE}/${id}`, montarFormData(dados, pdf))
       .then(r => r.data)
   },
 

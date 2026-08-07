@@ -31,7 +31,18 @@ api.interceptors.request.use((config) => {
   // ("timeout of 10000ms exceeded"), mesmo problema em qualquer módulo que sobe
   // arquivo (Aditivos, Obras, Notícias etc). Só afeta requisições com FormData —
   // chamadas JSON continuam com o timeout curto de 10s.
-  if (config.data instanceof FormData) config.timeout = 60000;
+  //
+  // O "Content-Type": "application/json" lá em cima é o default da instância inteira.
+  // Pra FormData isso é errado — precisa ser multipart/form-data com um boundary que só
+  // o navegador sabe gerar — mas o axios só substitui automaticamente um Content-Type
+  // que ELE PRÓPRIO definiu; um valor vindo do default da instância (como este) não é
+  // limpo sozinho. Sem apagar aqui, toda chamada com FormData saía com
+  // "Content-Type: application/json" (rejeitado pelo backend) em vez de deixar o
+  // navegador montar o header multipart correto.
+  if (config.data instanceof FormData) {
+    config.timeout = 60000;
+    config.headers.delete("Content-Type");
+  }
 
   return config;
 });

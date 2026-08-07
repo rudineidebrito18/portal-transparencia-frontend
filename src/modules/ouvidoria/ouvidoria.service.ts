@@ -19,7 +19,7 @@ export const ouvidoriaService = {
     if (arquivo) formData.append('arquivo', arquivo)
 
     return api
-      .post('/ouvidoria/formulario', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post('/ouvidoria/formulario', formData)
       .then(() => undefined)
   }
 }

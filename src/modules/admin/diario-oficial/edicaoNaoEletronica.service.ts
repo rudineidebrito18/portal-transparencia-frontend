@@ -21,17 +21,13 @@ export const edicaoNaoEletronicaAdminService = {
 
   criar(dados: EdicaoNaoEletronicaRequest, arquivo: File): Promise<EdicaoNaoEletronica> {
     return api
-      .post<EdicaoNaoEletronica>(BASE, montarFormData(dados, arquivo), {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .post<EdicaoNaoEletronica>(BASE, montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 
   atualizar(id: number, dados: EdicaoNaoEletronicaRequest, arquivo?: File | null): Promise<EdicaoNaoEletronica> {
     return api
-      .put<EdicaoNaoEletronica>(`${BASE}/${id}`, montarFormData(dados, arquivo), {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .put<EdicaoNaoEletronica>(`${BASE}/${id}`, montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 

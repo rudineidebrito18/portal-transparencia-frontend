@@ -47,9 +47,7 @@ export const licitacaoService = {
 
   criarDocumento(id: number, dados: DocumentoUploadRequest, arquivo: File): Promise<void> {
     return api
-      .post(`${BASE}/${id}/documentos`, montarFormDataDocumento(dados, arquivo), {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .post(`${BASE}/${id}/documentos`, montarFormDataDocumento(dados, arquivo))
       .then(() => undefined)
   },
 

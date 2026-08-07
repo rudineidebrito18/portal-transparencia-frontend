@@ -20,13 +20,13 @@ export const empresaInidoneaService = {
 
   criar(dados: EmpresaInidoneaRequest, pdf?: File | null): Promise<EmpresaInidonea> {
     return api
-      .post<EmpresaInidonea>(BASE, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<EmpresaInidonea>(BASE, montarFormData(dados, pdf))
       .then(r => r.data)
   },
 
   atualizar(id: number, dados: EmpresaInidoneaRequest, pdf?: File | null): Promise<EmpresaInidonea> {
     return api
-      .put<EmpresaInidonea>(`${BASE}/${id}`, montarFormData(dados, pdf), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put<EmpresaInidonea>(`${BASE}/${id}`, montarFormData(dados, pdf))
       .then(r => r.data)
   },
 

@@ -80,7 +80,7 @@ function criarServicoAutoridadeAdmin(tipo: TipoAutoridade) {
 
     atualizar(dados: AutoridadeRequest, foto?: File | null): Promise<Autoridade> {
       return api
-        .put<Autoridade>(base, montarFormDataAutoridade(dados, foto), { headers: { 'Content-Type': 'multipart/form-data' } })
+        .put<Autoridade>(base, montarFormDataAutoridade(dados, foto))
         .then(r => r.data)
     }
   }

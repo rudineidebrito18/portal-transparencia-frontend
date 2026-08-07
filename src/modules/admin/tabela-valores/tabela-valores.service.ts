@@ -25,17 +25,13 @@ export const tabelaValoresService = {
 
   criar(dados: TabelaValoresRequest, arquivo: File): Promise<TabelaValores> {
     return api
-      .post<TabelaValores>(BASE, montarFormData(dados, arquivo), {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .post<TabelaValores>(BASE, montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 
   atualizar(id: number, dados: TabelaValoresRequest, arquivo?: File | null): Promise<TabelaValores> {
     return api
-      .put<TabelaValores>(`${BASE}/${id}`, montarFormData(dados, arquivo), {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .put<TabelaValores>(`${BASE}/${id}`, montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 

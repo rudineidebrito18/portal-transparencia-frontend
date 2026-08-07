@@ -15,13 +15,13 @@ function montarFormData(dados: AditivoRequest, arquivo?: File | null): FormData 
 export const aditivoService = {
   criar(dados: AditivoRequest, arquivo?: File | null): Promise<Aditivo> {
     return api
-      .post<Aditivo>(BASE, montarFormData(dados, arquivo), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<Aditivo>(BASE, montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 
   atualizar(id: number, dados: AditivoRequest, arquivo?: File | null): Promise<Aditivo> {
     return api
-      .put<Aditivo>(`${BASE}/${id}`, montarFormData(dados, arquivo), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put<Aditivo>(`${BASE}/${id}`, montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 

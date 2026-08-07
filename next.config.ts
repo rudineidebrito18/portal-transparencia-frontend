@@ -2,6 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@faker-js/faker"],
+  experimental: {
+    // O proxy de rewrites() do Next tem timeout fixo de 30s (hardcoded em
+    // next/dist/server/lib/router-utils/proxy-request.js) — estourava em upload de PDF
+    // grande (13MB+ já reproduz, 6MB passa), mesmo o backend respondendo em <1s quando
+    // testado direto — o gargalo é só esse timeout do proxy, não performance real.
+    proxyTimeout: 300000
+  },
   images: {
     // picsum.photos só é usado no mock local (NEXT_PUBLIC_USE_MOCK=true) para simular
     // fotos de notícias — imagens reais do backend passam pelo rewrite /api/* abaixo,

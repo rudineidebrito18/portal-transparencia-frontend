@@ -34,7 +34,7 @@ export const decretoUnidadeService = {
 
   criar(unidadeId: number, dados: DecretoRequest, arquivo: File): Promise<Decreto> {
     return api
-      .post<Decreto>(`${BASE}/${unidadeId}/decretos`, montarFormDataArquivo(dados, arquivo), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<Decreto>(`${BASE}/${unidadeId}/decretos`, montarFormDataArquivo(dados, arquivo))
       .then(r => r.data)
   },
 
@@ -51,7 +51,7 @@ export const documentoUnidadeService = {
   // Upsert por tipo: reenviar o mesmo tipo substitui o documento anterior.
   enviar(unidadeId: number, dados: DocumentoUnidadeRequest, arquivo: File): Promise<DocumentoUnidade> {
     return api
-      .post<DocumentoUnidade>(`${BASE}/${unidadeId}/documentos`, montarFormDataArquivo(dados, arquivo), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<DocumentoUnidade>(`${BASE}/${unidadeId}/documentos`, montarFormDataArquivo(dados, arquivo))
       .then(r => r.data)
   },
 
@@ -102,13 +102,13 @@ export const gestorUnidadeService = {
 
   criar(unidadeId: number, dados: GestorUnidadeRequest, foto?: File | null): Promise<GestorUnidade> {
     return api
-      .post<GestorUnidade>(`${BASE}/${unidadeId}/gestores`, montarFormDataGestor(dados, foto), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<GestorUnidade>(`${BASE}/${unidadeId}/gestores`, montarFormDataGestor(dados, foto))
       .then(r => r.data)
   },
 
   atualizar(unidadeId: number, gestorId: number, dados: GestorUnidadeRequest, foto?: File | null): Promise<GestorUnidade> {
     return api
-      .put<GestorUnidade>(`${BASE}/${unidadeId}/gestores/${gestorId}`, montarFormDataGestor(dados, foto), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put<GestorUnidade>(`${BASE}/${unidadeId}/gestores/${gestorId}`, montarFormDataGestor(dados, foto))
       .then(r => r.data)
   },
 

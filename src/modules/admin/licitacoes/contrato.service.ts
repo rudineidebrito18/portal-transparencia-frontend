@@ -45,9 +45,7 @@ export const contratoService = {
 
   criarDocumento(contratoId: number, dados: DocumentoUploadRequest, arquivo: File): Promise<void> {
     return api
-      .post(`${BASE}/contratos/${contratoId}/documento`, montarFormDataDocumento(dados, arquivo), {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .post(`${BASE}/contratos/${contratoId}/documento`, montarFormDataDocumento(dados, arquivo))
       .then(() => undefined)
   },
 

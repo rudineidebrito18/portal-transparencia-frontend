@@ -17,13 +17,13 @@ export const anexoObraService = {
 
   criar(obraId: number, dados: AnexoObraRequest, arquivo: File): Promise<AnexoObra> {
     return api
-      .post<AnexoObra>(base(obraId), montarFormData(dados, arquivo), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<AnexoObra>(base(obraId), montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 
   atualizar(obraId: number, id: number, dados: AnexoObraRequest, arquivo?: File | null): Promise<AnexoObra> {
     return api
-      .put<AnexoObra>(`${base(obraId)}/${id}`, montarFormData(dados, arquivo), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put<AnexoObra>(`${base(obraId)}/${id}`, montarFormData(dados, arquivo))
       .then(r => r.data)
   },
 
