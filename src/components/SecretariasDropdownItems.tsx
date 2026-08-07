@@ -25,7 +25,7 @@ export default function SecretariasDropdownItems({ onNavigate }: Props) {
         <Link
           key={unidade.id}
           href={`/secretarias/${unidade.id}`}
-          className="px-4 py-2 hover:bg-neutral-dark block"
+          className="px-4 py-2 hover:bg-primary/10 block"
           onClick={onNavigate}
         >
           {unidade.nome}
@@ -34,7 +34,7 @@ export default function SecretariasDropdownItems({ onNavigate }: Props) {
 
       <Link
         href="/secretarias"
-        className="px-4 py-2 hover:bg-neutral-dark block font-semibold border-t border-border/20"
+        className="px-4 py-2 hover:bg-primary/10 block font-semibold border-t border-border/20"
         onClick={onNavigate}
       >
         Todas as Secretarias

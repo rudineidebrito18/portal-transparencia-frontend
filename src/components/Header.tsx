@@ -148,11 +148,11 @@ export default function Header() {
               <Link className="px-4 py-2 hover:bg-secondary" href="/" onClick={() => setMenuOpen(false)}><MdHome /></Link>
 
               <DropdownMenuItem label="A PREFEITURA">
-                <Link href="/prefeito" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Prefeito</Link>
-                <Link href="/vice-prefeito" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Vice-Prefeito</Link>
-                <Link href="/estrutura-organizacional" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Estrutura Organizacional</Link>
-                <Link href="/organograma" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Organograma</Link>
-                <Link href="/competencias" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Competências</Link>
+                <Link href="/prefeito" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Prefeito</Link>
+                <Link href="/vice-prefeito" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Vice-Prefeito</Link>
+                <Link href="/estrutura-organizacional" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Estrutura Organizacional</Link>
+                <Link href="/organograma" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Organograma</Link>
+                <Link href="/competencias" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Competências</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="SECRETARIAS">
@@ -163,20 +163,28 @@ export default function Header() {
               <Link href="/transparencia" className="px-2 py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>TRANSPARÊNCIA</Link>
 
               <DropdownMenuItem label="RECURSOS HUMANOS">
-                <Link href="/servidores" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Servidores</Link>
-                <Link href="/folha-pagamento" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Folha de Pagamento</Link>
+                <Link href="/servidores" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Servidores</Link>
+                <Link href="/folha-pagamento" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Folha de Pagamento</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
-                <Link href="/gestao-fiscal" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Gestão Fiscal</Link>
-                <Link href="/prestacao-contas" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Prestação de Contas</Link>
-                <Link href="/planejamento" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Planejamento (LDO, LOA, PPA)</Link>
+                <Link href="/gestao-fiscal" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Gestão Fiscal</Link>
+                <Link href="/prestacao-contas" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Prestação de Contas</Link>
+                <Link href="/planejamento" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Planejamento (LDO, LOA, PPA)</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="PUBLICAÇÕES">
-                <Link href="/noticias" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Notícias</Link>
-                <Link href="/avisos" className="px-4 py-2 hover:bg-neutral-dark block" onClick={() => setMenuOpen(false)}>Avisos</Link>
+                <Link href="/noticias" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Notícias</Link>
+                <Link href="/avisos" className="px-4 py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Avisos</Link>
               </DropdownMenuItem>
+
+              {/* Topbar (Ouvidoria/SIC/Acessibilidade/Acesso admin) é `hidden lg:flex` —
+                  some inteira no mobile. Só o menu de Acessibilidade tem equivalente aqui
+                  por enquanto (pedido explícito do usuário); os outros 3 links seguem sem
+                  alternativa mobile. */}
+              <div className="lg:hidden px-2 py-2">
+                <AcessibilidadeMenu />
+              </div>
             </ul>
           </nav>
         </div>

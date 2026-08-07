@@ -49,8 +49,10 @@ export default function DropdownMenuItem({ label, children }: DropdownMenuItemPr
         <MdExpandMore />
       </div>
 
-      {/* Submenu */}
+      {/* Submenu — onClick fecha ao clicar em qualquer item (bubbling do <a>/<Link> filho,
+          não precisa que cada chamador feche individualmente). */}
       <ul
+        onClick={() => setIsOpen(false)}
         className={`
           absolute left-0 top-full w-48 rounded bg-white text-black shadow-md z-50
           max-h-96 overflow-y-auto

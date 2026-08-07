@@ -827,6 +827,106 @@ qualquer outro campo de texto livre que hoje use `useUrlState` diretamente no
 `onChange` (não achei outro caso na varredura desta rodada, mas o padrão errado é fácil
 de repetir).
 
+## 2.13 Refino do menu de Acessibilidade (2026-08-06)
+
+Usuário decidiu não adotar o UserWay (widget de acessibilidade de terceiro) — preferiu
+manter e refinar o `AcessibilidadeMenu.tsx` já existente. Quatro ajustes:
+
+- **Abre no hover** — mesmo padrão de `DropdownMenuItem.tsx` (`group-hover`/
+  `group-focus-within`), mantendo o clique como reforço (fecha ao clicar fora, continua
+  aberto depois que o mouse sai). O painel deixou de ser renderizado condicionalmente
+  (`{aberto && ...}`) e passou a usar `invisible`/`visible` sempre montado, senão hover
+  via CSS não tem como funcionar.
+- **"Libras" virou link informativo** pro site oficial do projeto
+  (`https://www.vlibras.gov.br/`, mesmo domínio já usado pelo script do plugin em
+  `VLibrasWidget.tsx`) em vez de clicar programaticamente no botão nativo do widget —
+  função `abrirLibras()` removida.
+- **Item "Contraste" ativo** ganhou fundo escuro + texto branco (antes só mostrava um
+  "Ativo" discreto sobre o mesmo fundo claro dos outros itens, sem indicar visualmente
+  que mudava o site inteiro).
+- **Tema de Alto Contraste virou escuro+amarelo** (antes era um "alto contraste claro":
+  fundo branco, texto preto). `html.alto-contraste` em `globals.css` agora escurece
+  `--color-neutral`/`--color-neutral-light`/`body` e clareia `--color-text-secondary`
+  (cascateia pelos tokens que os componentes já usam), e força `<a>`/`<h1-3>` pra amarelo
+  via seletor de tag com `!important` (precisa disso porque tag selector tem
+  especificidade menor que a classe Tailwind que normalmente define a cor).
+  **Limitação consciente**: não repontou `--color-primary` pra amarelo — esse token
+  também define `bg-primary`, usado em botões/abas com `text-white` fixo junto (ex.
+  "Aplicar" dos filtros); virar amarelo ali daria botão amarelo com texto branco, pior
+  contraste que o normal. Então elementos com fundo de marca própria (botões primary,
+  badges de status, abas ativas) continuam com a cor de marca original mesmo em alto
+  contraste — não é uma cobertura 100%, é o equilíbrio entre melhorar de verdade sem
+  reescrever cor de cada componente do site (mudança bem maior, fora de escopo aqui).
+
+`tsc --noEmit`/`eslint` limpos. Testado via `curl`: link do VLibras presente no HTML,
+página renderizando normal.
+
+**Complemento (mesmo dia)**: `AcessibilidadeMenu.tsx` adicionado também dentro do `<ul>`
+principal do menu mobile (`Header.tsx`, envolto em `lg:hidden` — só aparece abaixo de
+`lg`, não duplica na barra desktop), fechando a lacuna que a varredura mobile (seção
+2.12) tinha documentado como pendência consciente. Ouvidoria/SIC/Acesso admin da topbar
+continuam sem equivalente mobile (fora de escopo deste pedido).
+
+Também trocado `hover:bg-neutral-dark` (cinza claro `#cbd5e1`, achado "ruim" pelo
+usuário) por `hover:bg-primary/10` nos 13 links dos dropdowns do header (`Header.tsx` —
+A Prefeitura/RH/LRF/Publicações — e `SecretariasDropdownItems.tsx`), tema normal e alto
+contraste. Conferido que o Alto Contraste já cobria esses dropdowns sem precisar de CSS
+novo: o painel (`DropdownMenuItem.tsx`) usa a classe `bg-white` (pega pelo override
+`.bg-white` já existente) e os itens são `<a>` de verdade (pegos pelo `a { color:
+#ffd400 !important }` já existente) — só a cor de hover do tema normal precisava de
+ajuste.
+
+**Complemento — header/nav/footer pretos no Alto Contraste**: usuário comparou com o
+Alto Contraste de outra prefeitura (bomlugar.ma.gov.br/#altocontraste) — lá o header/nav/
+footer inteiro vira preto sólido com links amarelos; no nosso, esses containers ficavam
+com a cor de marca original (azul), só o resto do site escurecia. Adicionado
+`html.alto-contraste .bg-primary { background-color: #000 !important }` — cobre topbar,
+`<nav>` e `<footer>` (todos usam a classe `bg-primary`) e também botões/abas sólidas com
+`text-white` fixo (viram preto+branco, contraste melhor que o original, não pior).
+Deliberadamente **não** mexe na variável `--color-primary` (só a classe `.bg-primary`
+específica) — a variável também alimenta `text-primary`, usado como cor de ícone em
+vários "chips" (`bg-primary/10 text-primary`) espalhados pelo site; virar preto ali
+sumiria o ícone contra card escuro. Seletor de amarelo ganhou `nav [role="button"]` —
+os rótulos dos dropdowns do header ("A PREFEITURA", "SECRETARIAS" etc.) são `<div
+role="button">` em `DropdownMenuItem.tsx`, não `<a>` de verdade, então o seletor `a`
+sozinho não os alcançava. Testado via `javascript_tool`/`getComputedStyle`: nav e footer
+`rgb(0,0,0)`, `<h1>` e rótulo de dropdown `rgb(255,212,0)` — bate com a referência.
+
+**Complemento 2 (mesmo dia)**: usuário testou num navegador de verdade (print) e pediu 2
+ajustes finos: (1) hover dos itens de dropdown (header + `AcessibilidadeMenu.tsx`) tava
+difícil de ver no Alto Contraste — `hover:bg-primary/5`/`/10` é uma tinta azul
+translúcida quase invisível sobre o painel já escurecido; virou branco translúcido
+(`rgba(255,255,255,0.15)`) só dentro de `.alto-contraste`, funciona sobre qualquer fundo
+escuro em vez de brigar com a cor de marca. (2) `AcessibilidadeMenu.tsx` não fechava ao
+clicar em Contraste/Aumentar/Diminuir — corrigido via `onClick={() => setAberto(false)}`
+no painel (bubbling, fecha em qualquer clique dentro, item nenhum precisa fechar por
+conta própria — ver complemento 3 abaixo, mesmo padrão virou consistente nos dois
+menus).
+
+**Nota de ferramenta**: durante a depuração da seção 4 (pegadinhas de sandbox),
+`getComputedStyle()` via `javascript_tool` reportou um valor errado pra um `<a>`
+específico mesmo com `!important` inline confirmado no DOM — nenhum problema real de
+CSS, o usuário confirmou com print de navegador de verdade que a implementação
+funciona certinho (nav/footer pretos, links amarelos, "Contraste: Ativo" visível).
+
+**Complemento 3 (mesmo dia)**: usuário achou mais 2 problemas depois de testar de novo:
+- **Faixa morta no hover do `AcessibilidadeMenu`** — o painel tinha `mt-2` (8px de
+  margem) entre o botão e o painel; ao mover o mouse do botão pro painel, o cursor
+  atravessava esse espaço vazio e perdia o `:hover`, fechando o menu no meio do
+  caminho. `DropdownMenuItem.tsx` nunca teve esse problema porque o submenu já era
+  `top-full` sem margem (encostado no botão). Removido o `mt-2` do
+  `AcessibilidadeMenu.tsx` — mesmo comportamento agora.
+- **Dropdowns do header não fechavam ao clicar** — pedido original (antes do
+  complemento 2 acima) era sobre `DropdownMenuItem.tsx` (A Prefeitura/Secretarias/RH/
+  LRF/Publicações), não o `AcessibilidadeMenu` — mal-entendido corrigido. Adicionado
+  `onClick={() => setIsOpen(false)}` no `<ul>` do submenu (bubbling do `<a>`/`<Link>`
+  filho fecha o dropdown específico que foi clicado, sem precisar que cada chamador
+  feche individualmente — `Header.tsx`/`SecretariasDropdownItems.tsx` não precisaram
+  de nenhuma mudança). Aproveitado pra simplificar `AcessibilidadeMenu.tsx` pro mesmo
+  padrão de delegação (removidos os `onClick={() => setAberto(false)}` individuais dos
+  itens Sobre/Libras/Mapa do site e das funções `aplicarFonte`/`alternarContraste` —
+  redundantes agora que o painel fecha tudo de uma vez).
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash
@@ -958,6 +1058,16 @@ projeto (ex: no scratchpad da sessão), senão a resolução de módulo não enc
   `javascript_tool` (ex.: `getBoundingClientRect()`, `scrollTop`, `innerText`) pra confirmar
   comportamento — inclusive dá pra provar coisas como "a sidebar não rola junto" de forma mais
   precisa que uma screenshot.
+- `getComputedStyle()` via `javascript_tool` pode reportar um valor **desatualizado/errado pra
+  um elemento específico**, mesmo depois de `!important` inline (o override mais forte que
+  existe em CSS — se nem isso muda o valor lido, não é bug de CSS de verdade, é a leitura que
+  tá errada). Caso real: `getComputedStyle(linkÍnicio).color` continuava reportando a cor antiga
+  mesmo com `link.style.setProperty('color', ..., 'important')` confirmado no `outerHTML` e em
+  `link.style.getPropertyPriority('color')` — enquanto os outros 9+ links da mesma página liam
+  certo com a mesma técnica. Não vale a pena depurar mais fundo (não é algo que o app controla);
+  se `getComputedStyle` der um resultado que não bate com o CSS estático (`grep` no CSS
+  compilado, `.matches()` confirmando o seletor), desconfie da leitura antes de desconfiar do
+  CSS.
 - Diálogos nativos de `confirm()` (usados antes de excluir/ocultar) **travam a automação** — o
   clique no botão que dispara o `confirm()` nunca retorna. Pra testar esses fluxos, ou aceite
   que não dá pra automatizar esse clique específico (valide só que o handler dispara a request

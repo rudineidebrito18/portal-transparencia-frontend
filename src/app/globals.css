@@ -47,26 +47,63 @@ html, body {
   --color-shadow-dark: rgba(31, 62, 115, 0.3);
 }
 
-/* Alto contraste (menu de acessibilidade, src/components/AcessibilidadeMenu.tsx) —
-   sobrescreve os tokens de cor no <html>; como todo componente já usa esses tokens via
-   Tailwind (bg-primary, text-secondary etc.), a troca cascateia pro site inteiro sem
-   precisar tocar em nenhum componente.
+/* Alto contraste (menu de acessibilidade, src/components/AcessibilidadeMenu.tsx) — fundo
+   escuro, texto branco, links/títulos/nav em amarelo (esquema clássico de alto contraste
+   preto+amarelo, conferido contra referência real de outra prefeitura — bomlugar.ma.gov.br
+   #altocontraste — que faz exatamente isso: header/nav/footer viram preto sólido, links
+   amarelos).
+   `--color-primary` (variável) NÃO é sobrescrita — ela também alimenta `text-primary`,
+   usado como cor de ÍCONE em muitos "chips" (`bg-primary/10 text-primary`) espalhados
+   pelo site; virar amarelo ali brigaria com o fundo translúcido da própria cor, virar
+   preto sumiria o ícone contra card escuro. Em vez de mexer na variável (cascata difícil
+   de prever em todo componente que a usa), a classe `.bg-primary` (só o container que
+   literalmente tem essa classe — headers, nav, footer, botões/abas sólidas) é forçada pra
+   preto via seletor direto — não afeta `bg-primary/10` (classe diferente) nem `text-primary`
+   (variável intocada). Botões com `bg-primary text-white` viram preto+branco (contraste
+   melhor que o original, não pior). Link/título/rótulo de dropdown do nav vira amarelo via
+   seletor de tag (cobre `<a>`/`<h1-3>` e os `role="button"` de `DropdownMenuItem.tsx`, que
+   não são `<a>` de verdade).
+   **Limitação consciente**: badges de status e ícones em chip (`text-primary` fora de nav/
+   heading) seguem com a cor de marca original — reescrever cor de cada componente do site
+   é escopo bem maior que um toggle de contraste.
    --color-neutral-dark FICA DE FORA de propósito: é usado como fundo de hover em vários
    dropdowns (Header.tsx, SecretariasDropdownItems.tsx) que têm texto escuro fixo
    (`text-black`) — escurecer esse token também deixava o hover preto-sobre-preto,
    ilegível, exatamente nesses menus. */
 html.alto-contraste {
-  --color-primary: #000000;
-  --color-primary-light: #1a1a1a;
-  --color-primary-dark: #000000;
-  --color-secondary: #b30000;
-  --color-secondary-light: #ff0000;
-  --color-secondary-dark: #800000;
-  --color-accent: #00308f;
-  --color-text-secondary: #000000;
-  --color-border: #000000;
-  --color-neutral: #ffffff;
-  --color-neutral-light: #ffffff;
+  --color-neutral: #0a0a0a;
+  --color-neutral-light: #121212;
+  --color-text-secondary: #ffffff;
+  --color-border: #666666;
+}
+
+html.alto-contraste body {
+  background-color: #0a0a0a;
+}
+
+html.alto-contraste .bg-white {
+  background-color: #121212 !important;
+}
+
+html.alto-contraste .bg-primary {
+  background-color: #000000 !important;
+}
+
+html.alto-contraste a,
+html.alto-contraste h1,
+html.alto-contraste h2,
+html.alto-contraste h3,
+html.alto-contraste nav [role="button"] {
+  color: #ffd400 !important;
+}
+
+/* Hover dos itens de dropdown (header + AcessibilidadeMenu) usa `hover:bg-primary/5` ou
+   `/10` — tinta azul translúcida, quase invisível sobre o painel já escurecido pelo
+   `.bg-white` acima (usuário reportou "difícil ver qual opção tá selecionada"). Branco
+   translúcido junta com qualquer fundo escuro em vez de brigar com a cor de marca. */
+html.alto-contraste .hover\:bg-primary\/5:hover,
+html.alto-contraste .hover\:bg-primary\/10:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 html.alto-contraste a {
