@@ -1,8 +1,11 @@
-import { MdCampaign, MdNewspaper } from 'react-icons/md'
+import Link from 'next/link'
+import { MdArrowForward, MdCampaign, MdNewspaper } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
+import ImagemCarrossel from '@/components/ui/ImagemCarrossel'
 import { formatarData } from '@/utils/date'
 import { ConteudoInstitucional } from '../types'
+import { imagensOrdenadas } from '../utils'
 
 interface Props {
   item: ConteudoInstitucional
@@ -10,19 +13,16 @@ interface Props {
 }
 
 export default function ConteudoInstitucionalCard({ item, variant }: Props) {
-  const Icon = variant === 'aviso' ? MdCampaign : MdNewspaper
-  const iconStyle = variant === 'aviso' ? 'bg-secondary/10 text-secondary' : 'bg-primary/10 text-primary'
+  const ehNoticia = variant === 'noticia'
+  const Icon = ehNoticia ? MdNewspaper : MdCampaign
+  const iconStyle = ehNoticia ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
+  const imagens = imagensOrdenadas(item)
 
   return (
-    <Card className="p-5 flex flex-col gap-3">
+    <Card className="p-5 flex flex-col gap-3 h-full">
 
-      {item.imagemUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={item.imagemUrl}
-          alt={item.titulo}
-          className="w-full h-40 object-cover rounded-lg -mt-1"
-        />
+      {imagens.length > 0 && (
+        <ImagemCarrossel imagens={imagens} alt={item.titulo} className="h-40 -mt-1 rounded-lg" />
       )}
 
       <div className="flex items-start gap-3">
@@ -40,9 +40,21 @@ export default function ConteudoInstitucionalCard({ item, variant }: Props) {
         </div>
       </div>
 
-      <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+      {/* Notícias tem página de detalhe pra ler o texto inteiro — resume aqui pra
+          manter os cards do mesmo tamanho no grid. Avisos não tem detalhe (uso mais
+          pontual/curto), então continua mostrando o texto todo, como sempre foi. */}
+      <p className={`text-sm text-text-secondary leading-relaxed whitespace-pre-line ${ehNoticia ? 'line-clamp-4' : ''}`}>
         {item.texto}
       </p>
+
+      {ehNoticia && (
+        <Link
+          href={`/noticias/${item.id}`}
+          className="mt-auto self-start inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+        >
+          Ver detalhes <MdArrowForward size={16} />
+        </Link>
+      )}
 
     </Card>
   )

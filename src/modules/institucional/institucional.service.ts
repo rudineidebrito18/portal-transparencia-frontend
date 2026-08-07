@@ -20,6 +20,12 @@ function criarServicoInstitucional(recurso: RecursoInstitucional) {
       return api
         .get<Page<ConteudoInstitucional>>(`/institucional/${recurso}/filtro`, { params })
         .then(response => response.data)
+    },
+
+    buscarPorId(id: number): Promise<ConteudoInstitucional> {
+      if (USE_MOCK) return institucionalMock.buscarPorId(recurso, id)
+
+      return api.get<ConteudoInstitucional>(`/institucional/${recurso}/${id}`).then(response => response.data)
     }
   }
 }

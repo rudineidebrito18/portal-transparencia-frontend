@@ -25,6 +25,14 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = lerTokenCookie();
   if (token) config.headers.Authorization = `Bearer ${token}`;
+
+  // Upload de arquivo (multipart/form-data) precisa de mais tempo que os 10s
+  // padrão — PDFs/imagens maiores ou uma conexão mais lenta estouram isso fácil
+  // ("timeout of 10000ms exceeded"), mesmo problema em qualquer módulo que sobe
+  // arquivo (Aditivos, Obras, Notícias etc). Só afeta requisições com FormData —
+  // chamadas JSON continuam com o timeout curto de 10s.
+  if (config.data instanceof FormData) config.timeout = 60000;
+
   return config;
 });
 

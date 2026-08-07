@@ -54,9 +54,9 @@ export default function ConteudoInstitucionalListView({
       {erro && <ErrorState message={erro} />}
 
       {loading && (
-        <div className="grid gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-40" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-64" />
           ))}
         </div>
       )}
@@ -92,13 +92,13 @@ export default function ConteudoInstitucionalListView({
             </div>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.length > 0 ? (
               data.map(item => (
                 <ConteudoInstitucionalCard key={item.id} item={item} variant={variant} />
               ))
             ) : (
-              <EmptyState message={emptyMessage} />
+              <EmptyState message={emptyMessage} className="col-span-full" />
             )}
           </div>
 

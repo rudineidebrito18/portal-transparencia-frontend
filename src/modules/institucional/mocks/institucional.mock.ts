@@ -1,6 +1,6 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
-import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
+import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Page } from '@/modules/shared/types/Page'
 import { ConteudoInstitucional, FiltroConteudoInstitucional, RecursoInstitucional } from '../types'
 
@@ -27,17 +27,28 @@ const TITULOS_AVISO = [
   'Interdição temporária de via para obras'
 ]
 
+function gerarImagens(id: number, quantidade: number) {
+  return Array.from({ length: quantidade }, (_, i) => ({
+    id: id * 10 + i,
+    url: `https://picsum.photos/seed/noticia-${id}-${i}/800/450`,
+    principal: i === 0
+  }))
+}
+
 function gerarItem(recurso: RecursoInstitucional, id: number): ConteudoInstitucional {
   faker.seed(id + (recurso === 'avisos' ? 50_000 : 0))
 
   const titulos = recurso === 'noticias' ? TITULOS_NOTICIA : TITULOS_AVISO
+  const quantidadeImagens = recurso === 'noticias' ? faker.number.int({ min: 0, max: 4 }) : 0
+  const imagens = quantidadeImagens > 0 ? gerarImagens(id, quantidadeImagens) : undefined
 
   return {
     id,
     titulo: faker.helpers.arrayElement(titulos),
     texto: faker.lorem.paragraphs(2, '\n\n'),
     data: faker.date.recent({ days: 90 }).toISOString().split('T')[0],
-    ativo: faker.datatype.boolean({ probability: 0.85 })
+    ativo: faker.datatype.boolean({ probability: 0.85 }),
+    imagens
   }
 }
 
@@ -71,5 +82,11 @@ export const institucionalMock = {
     const ordenados = ordenar(itens as unknown as Record<string, unknown>[], sort) as unknown as ConteudoInstitucional[]
 
     return paginar(ordenados, page, size)
+  },
+
+  async buscarPorId(recurso: RecursoInstitucional, id: number): Promise<ConteudoInstitucional> {
+    const item = dados[recurso].find(item => item.id === id)
+    if (!item) throw criarErroNaoEncontrado(`${recurso === 'noticias' ? 'Notícia' : 'Aviso'} não encontrada`)
+    return item
   }
 }

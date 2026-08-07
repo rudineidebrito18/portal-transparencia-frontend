@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { MdClose, MdZoomIn } from 'react-icons/md'
 
 interface Props {
@@ -43,7 +44,12 @@ export default function FotoAmpliavel({ src, alt, width, height, className = '' 
         </span>
       </button>
 
-      {aberta && (
+      {/* Portal pro <body>: `position: fixed` só cobre a viewport de verdade se
+          nenhum ancestral tiver `transform` (cria um novo containing block pro fixed).
+          Card.tsx tem `hover:-translate-y-0.5` — sem o portal, abrir isso com o card
+          ainda "hovered" faz o diálogo se posicionar relativo ao card (não à tela),
+          ficando pequeno/deslocado, e pisca ao entrar/sair do hover. */}
+      {aberta && createPortal(
         <div
           role="dialog"
           aria-modal="true"
@@ -66,7 +72,8 @@ export default function FotoAmpliavel({ src, alt, width, height, className = '' 
           >
             <Image src={src} alt={alt} fill sizes="90vw" className="object-contain rounded-lg" />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

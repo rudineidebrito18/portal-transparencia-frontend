@@ -1,6 +1,6 @@
 import { api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
-import { ConteudoInstitucional, RecursoInstitucional } from '@/modules/institucional/types'
+import { ConteudoInstitucional, ImagemNoticia, RecursoInstitucional } from '@/modules/institucional/types'
 
 export interface ConteudoInstitucionalRequest {
   titulo: string
@@ -45,13 +45,16 @@ export const avisoAdminService = criarServicoAdminInstitucional('avisos')
 
 const NOTICIAS_BASE = '/institucional/noticias'
 
-// Notícias passou a aceitar imagem opcional (PNG/JPEG) em 2026-07-16 — o
-// backend exige multipart/form-data (parte "dados" + "imagem" opcional) pra
-// criar/atualizar, mesmo padrão de unidadesService em geral.service.ts.
-function montarFormData(dados: ConteudoInstitucionalRequest, imagem?: File | null): FormData {
+// Notícias aceita N imagens (com uma marcada como principal) via sub-recurso —
+// confirmado contra o /v3/api-docs real do backend (implementado exatamente como
+// pedido em prompt-backend-imagens-noticias.md), com 2 detalhes de contrato:
+// - criar/atualizar só aceitam 1 imagem no multipart (campo "imagem", legado) — imagens
+//   extras entram depois, uma a uma, via POST .../imagens.
+// - POST .../imagens recebe "principal" como query param, não como campo do FormData.
+// - PUT .../{id} exige multipart mesmo sem imagem nova (dados é a única parte obrigatória).
+function montarFormDataDados(dados: ConteudoInstitucionalRequest): FormData {
   const formData = new FormData()
   formData.append('dados', new Blob([JSON.stringify(dados)], { type: 'application/json' }))
-  if (imagem) formData.append('imagem', imagem)
   return formData
 }
 
@@ -60,19 +63,38 @@ export const noticiaAdminService = {
     return api.get<Page<ConteudoInstitucional>>(NOTICIAS_BASE, { params }).then(r => r.data)
   },
 
-  criar(dados: ConteudoInstitucionalRequest, imagem?: File | null): Promise<ConteudoInstitucional> {
+  criar(dados: ConteudoInstitucionalRequest): Promise<ConteudoInstitucional> {
     return api
-      .post<ConteudoInstitucional>(NOTICIAS_BASE, montarFormData(dados, imagem), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .post<ConteudoInstitucional>(NOTICIAS_BASE, montarFormDataDados(dados), { headers: { 'Content-Type': 'multipart/form-data' } })
       .then(r => r.data)
   },
 
-  atualizar(id: number, dados: ConteudoInstitucionalRequest, imagem?: File | null): Promise<ConteudoInstitucional> {
+  atualizar(id: number, dados: ConteudoInstitucionalRequest): Promise<ConteudoInstitucional> {
     return api
-      .put<ConteudoInstitucional>(`${NOTICIAS_BASE}/${id}`, montarFormData(dados, imagem), { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put<ConteudoInstitucional>(`${NOTICIAS_BASE}/${id}`, montarFormDataDados(dados), { headers: { 'Content-Type': 'multipart/form-data' } })
       .then(r => r.data)
   },
 
   excluir(id: number): Promise<void> {
     return api.delete(`${NOTICIAS_BASE}/${id}`).then(() => undefined)
+  },
+
+  adicionarImagem(noticiaId: number, imagem: File, principal: boolean): Promise<ImagemNoticia> {
+    const formData = new FormData()
+    formData.append('imagem', imagem)
+    return api
+      .post<ImagemNoticia>(`${NOTICIAS_BASE}/${noticiaId}/imagens`, formData, {
+        params: { principal },
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      .then(r => r.data)
+  },
+
+  removerImagem(noticiaId: number, imagemId: number): Promise<void> {
+    return api.delete(`${NOTICIAS_BASE}/${noticiaId}/imagens/${imagemId}`).then(() => undefined)
+  },
+
+  marcarPrincipal(noticiaId: number, imagemId: number): Promise<ImagemNoticia> {
+    return api.put<ImagemNoticia>(`${NOTICIAS_BASE}/${noticiaId}/imagens/${imagemId}/principal`).then(r => r.data)
   }
 }

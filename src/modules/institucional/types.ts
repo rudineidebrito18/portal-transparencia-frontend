@@ -1,3 +1,9 @@
+export interface ImagemNoticia {
+  id: number
+  url: string
+  principal: boolean
+}
+
 export interface ConteudoInstitucional {
   id: number
   titulo: string
@@ -5,7 +11,7 @@ export interface ConteudoInstitucional {
   data: string
   ativo: boolean
   // Só populado em Notícias — Avisos não tem imagem.
-  imagemUrl?: string | null
+  imagens?: ImagemNoticia[]
 }
 
 export type RecursoInstitucional = 'noticias' | 'avisos'

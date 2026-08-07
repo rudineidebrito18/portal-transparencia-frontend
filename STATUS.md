@@ -974,6 +974,204 @@ Endpoint não existe no backend ainda (confirmado, `/v3/api-docs` sem nenhum pat
 sessão). Front degrada com `ErrorState` até existir, mesmo comportamento de
 Competências.
 
+## 2.15 Notícias: múltiplas imagens + imagem principal (2026-08-07)
+
+`ConteudoInstitucional` (tipo compartilhado por Notícias e Avisos,
+`src/modules/institucional/types.ts`) tinha um único campo `imagemUrl?: string | null`
+(só populado em Notícias). Usuário pediu suporte a várias imagens por notícia, com uma
+marcada como "principal" — a que representa a notícia em qualquer lugar do site — e uma
+exibição melhor na listagem `/noticias`.
+
+**Isso é uma mudança de schema de backend**, não só de frontend — confirmado via
+`/v3/api-docs` que `NoticiaRequestDto`/`NoticiaResponseDto`/`NoticiaController` não têm
+nenhum campo de lista de imagens hoje. Pedido registrado em
+`prompt-backend-imagens-noticias.md` (scratchpad da sessão): nova entidade
+`NoticiaImagem` (mesmo padrão de `DocumentoLicitacao`/`AnexoObraPublica` — filho com
+`@ManyToOne` de volta pro pai, cascade + orphanRemoval), sub-recursos
+`POST/DELETE .../noticias/{id}/imagens` e `PUT .../imagens/{imagemId}/principal`, e
+`NoticiaResponseDto.imagens: NoticiaImagemDto[]` (`imagemUrl` mantido como conveniência
+derivada = URL da imagem principal, pra não quebrar consumidores antigos).
+
+Frontend implementado por inteiro contra um mock local, pronto pra consumir o endpoint
+assim que existir:
+
+- **Tipos**: `ImagemNoticia` (`{id, url, principal}`) novo; `ConteudoInstitucional`
+  ganha `imagens?: ImagemNoticia[]`, mantendo `imagemUrl` como legado/derivado.
+- **Helpers** novos em `src/modules/institucional/utils.ts`: `imagemPrincipal(item)`
+  (imagem marcada principal → primeira do array → `imagemUrl` legado → `null`) e
+  `imagensGaleria(item)` (demais imagens, pra tira de miniaturas).
+- **Mock** (`institucional.mock.ts`): Notícias ganham de 0 a 4 imagens fake
+  (`picsum.photos`, seed determinística), uma marcada `principal: true`. Avisos
+  continuam sem imagens — comportamento intocado.
+- **Card público** (`ConteudoInstitucionalCard.tsx`): imagem principal via `next/image`
+  (mesmo padrão de `FotoAmpliavel.tsx`, já usado nas fotos de gestores — imagens do
+  backend passam pelo rewrite `/api/*`, same-origin, não precisa de `remotePatterns`);
+  selo "+N fotos" sobre a miniatura quando há galeria; tira horizontal de miniaturas
+  abaixo do texto reaproveitando `FotoAmpliavel` como lightbox (nenhum componente novo
+  de zoom). `next.config.ts` ganhou `images.remotePatterns` só pro host `picsum.photos`
+  (mock local).
+- **Admin** (`src/app/admin/(painel)/institucional/noticias/page.tsx`, formulário
+  bespoke): upload múltiplo com preview local (`URL.createObjectURL`, revogado ao
+  trocar/cancelar/salvar pra não vazar memória) e seleção de imagem principal por
+  estrela. Criar manda tudo num multipart só (`dados` + N partes `imagens` +
+  `principalIndex`); editar age na hora sobre imagens já existentes — estrela chama
+  `marcarPrincipal` e "×" chama `removerImagem` direto, sem esperar o Salvar — e só
+  enfileira os arquivos novos, enviados via `adicionarImagem` no submit (mesmo espírito
+  do sub-recurso de Aditivos Contratuais, seção 2 acima). `noticiaAdminService.criar`
+  perdeu o parâmetro de imagem única; `atualizar` virou JSON puro (sem multipart) —
+  imagens são geridas só pelos 3 métodos novos (`adicionarImagem`/`removerImagem`/
+  `marcarPrincipal`).
+
+Verificado: `tsc`/`eslint` limpos; execução direta do mock via `tsx` confirmou a forma
+dos dados gerados (uma imagem principal por notícia, `imagemUrl` derivado
+corretamente); contrato real do backend (`curl` em `/api/institucional/noticias/filtro`)
+confirmado sem `imagens`, só `imagemUrl` — os helpers caem pro legado sem quebrar nada.
+Não foi possível conferir visualmente a galeria/lightbox no Browser pane desta sessão
+(mesma limitação de página com `usePageableResource` travando na composição da
+ferramenta headless, já documentada abaixo em "Pegadinhas específicas deste sandbox" —
+reproduzida também em `/avisos`, página não tocada nesta rodada, confirmando que não é
+regressão desta mudança).
+
+**Sugestão registrada, não implementada**: página de detalhe `/noticias/[id]` com
+resumo truncado na listagem + "leia mais" — hoje a listagem mostra o texto inteiro sem
+paginação de conteúdo; uma página própria daria mais espaço pra galeria de fotos e
+deixaria a lista mais enxuta. Fica pra decisão futura do usuário.
+
+## 2.16 Notícias, rodada 2: backend já implementou + página de detalhe + carrossel (2026-08-07)
+
+Usuário testou o upload e bateu em `timeout of 10000ms exceeded` — causa raiz não era
+específica de Notícias: `src/services/api.ts` tinha um único `timeout: 10000` (10s) pra
+toda e qualquer requisição do axios, curto demais pra upload de arquivo maior/conexão
+lenta (mesmo sintoma relatado em outro módulo com PDF). Corrigido no interceptor de
+request: `if (config.data instanceof FormData) config.timeout = 60000` — só upload
+multipart ganha mais tempo, chamadas JSON continuam com os 10s originais.
+
+Ao testar upload de verdade contra o backend real, descobrimos que o **time de backend
+já implementou** o sub-recurso de imagens pedido em `prompt-backend-imagens-noticias.md`
+(seção 2.15) — confirmado no `/v3/api-docs` real: `NoticiaResponseDto.imagens[]`
+(`{id, url, principal}`), `POST/GET/DELETE .../noticias/{id}/imagens[/{imagemId}]`,
+`PUT .../imagens/{imagemId}/principal`. Só que o contrato ficou **diferente** do que o
+frontend tinha implementado especulativamente contra mock, em 2 pontos reais — corrigidos
+em `institucional.service.ts` (admin):
+
+- `POST .../imagens` espera `principal` como **query param**, não como campo do
+  `FormData` (`{ params: { principal }, headers: {...} }` no lugar de
+  `formData.append('principal', ...)`).
+- `criar`/`atualizar` notícia só aceitam **1 imagem** no multipart (campo legado
+  `imagem`, não uma lista) — imagens extras entram uma a uma, depois, via
+  `POST .../imagens`. `criar()` perdeu os parâmetros `imagens[]`/`principalIndex` que
+  não existem no contrato real; o formulário admin agora sempre cria a notícia sem
+  imagem no multipart inicial e faz upload de cada uma via `adicionarImagem` logo em
+  seguida (mesmo fluxo usado na edição).
+- Bônus, bug real encontrado ao comparar com o schema: `atualizar()` mandava a notícia
+  como JSON puro, mas `PUT /institucional/noticias/{id}` exige `multipart/form-data`
+  mesmo sem imagem nova (`dados` é a única parte obrigatória) — corrigido, ou teria
+  quebrado contra o backend real assim que testado.
+
+Usuário também pediu, olhando a tela real (`localhost:3000/noticias`, screenshot):
+corpo mais largo, botão de detalhe no card, texto resumido pra cards do mesmo tamanho,
+e um carrossel. Implementado:
+
+- `src/app/noticias/page.tsx` e `avisos/page.tsx`: `max-w-4xl` → `max-w-6xl` (padrão já
+  usado na maioria das páginas de listagem do site).
+- **Novo componente reutilizável** `src/components/ui/ImagemCarrossel.tsx` — setas
+  prev/next + dots, cada slide usa `FotoAmpliavel` (lightbox já existente) como irmão,
+  não filho, das setas/dots, então não há conflito de clique nem propagação indevida pra
+  um `<Link>` ancestral. Setas em opacidade baixa sempre visíveis no mobile (sem hover) e
+  reveladas no hover a partir de `md:` (mouse) — dots sempre visíveis, servem de
+  navegação por toque.
+- `ConteudoInstitucionalCard.tsx` reescrito: troca a imagem principal + tira de
+  miniaturas (seção 2.15) pelo `ImagemCarrossel` com todas as imagens da notícia (helper
+  novo `imagensOrdenadas()` em `utils.ts`, substitui `imagensGaleria()` — bota a
+  principal primeiro). Texto ganha
+  `line-clamp-4` só pra Notícias (Avisos continua mostrando o texto inteiro — não tem
+  página de detalhe, então cortar esconderia informação sem ter pra onde "ver mais").
+  Card ganha `h-full` + `mt-auto` no botão "Ver detalhes", que junto com o `line-clamp`
+  deixa os cards com altura uniforme dentro do grid.
+- `ConteudoInstitucionalListView.tsx`: grid de 1 coluna virou
+  `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` (cards mais compactos + corpo mais largo
+  pediam mais colunas); skeleton de loading e `EmptyState` (agora com `col-span-full`)
+  acompanham o mesmo grid.
+- **Página de detalhe nova** `src/app/noticias/[id]/page.tsx` (Server Component, mesmo
+  padrão de `secretarias/[id]`: `notFound()` em 404 ou notícia inativa, `Breadcrumbs`,
+  `loading.tsx`/`error.tsx` espelhando o precedente) — título, data, `ImagemCarrossel`
+  grande (todas as imagens) e texto completo sem truncar. Novo `noticiaService
+  .buscarPorId(id)` (`GET /institucional/noticias/{id}`, com suporte a mock via
+  `institucionalMock.buscarPorId`, adicionado ao factory `criarServicoInstitucional` —
+  reaproveitável por Avisos no futuro se um dia ganhar detalhe também).
+
+Verificado: `tsc`/`eslint` limpos em todos os arquivos tocados; utilitários Tailwind
+novos (`line-clamp-4`, `grid-cols-3`) confirmados presentes no CSS compilado (`curl` no
+chunk `globals.css`). A página de detalhe é Server Component puro — confirmada
+funcionando de ponta a ponta contra o **backend real** via `curl` em
+`localhost:3000/noticias/2`: título, data e texto corretos, e a URL da imagem já vem no
+formato novo do sub-recurso (`/api/institucional/noticias/2/imagens/2`), confirmando que
+o backend já populou `imagens[]` de verdade pra pelo menos essa notícia. A listagem
+(`/noticias`, Client Component com `usePageableResource`) segue sem confirmação visual
+no Browser pane desta ferramenta — mesma limitação já documentada (seção 2.15 e
+"Pegadinhas específicas deste sandbox"), agravada desta vez por um comportamento extra
+estranho só nesta aba (navegação/`fetch()` dentro do browser retornando conteúdo da rota
+antiga mesmo com `cache: 'no-store'`, enquanto `curl` de fora do browser sempre retornou
+o conteúdo correto e atualizado) — não reproduzido fora da ferramenta, tratado como
+artefato dela, não bug de código.
+
+## 2.17 Notícias, rodada 3: bug real do lightbox + remoção do legado `imagemUrl` (2026-08-07)
+
+Usuário gravou um screencast (`~/Vídeos/Screencast 2026-08-07 10:23:22.mp4`, sem ffmpeg
+no ambiente pra extrair frames, então diagnosticado só pela descrição + leitura de
+código): ao clicar pra ampliar uma imagem no carrossel, o lightbox "fica piscando em
+sobreposição".
+
+**Causa raiz real, confirmada por CSS spec**: `Card.tsx` tem `hover:-translate-y-0.5`
+(um `transform` no hover). Qualquer ancestral com `transform` diferente de `none` cria
+um novo *containing block* pra descendentes `position: fixed` — então o diálogo
+`fixed inset-0` do `FotoAmpliavel.tsx` (antes renderizado inline, dentro da árvore do
+Card), ao abrir com o mouse ainda em cima do card (que é justamente quando dá pra
+clicar o botão de zoom, que só aparece no hover), passava a se posicionar relativo ao
+*card* em vez da viewport — ficando pequeno/deslocado, sobrepondo o card, e piscando ao
+entrar/sair do hover (o `transform` liga/desliga, mudando o containing block do diálogo
+a cada vez). `FotoAmpliavel` é usado em vários lugares do site (fotos de gestores,
+carrossel de notícias) — o bug só aparecia onde a miniatura fica dentro de um `Card`
+com hover ativo (caso do carrossel dentro do card de notícia; as fotos de gestor não
+ficam dentro de um `Card`, por isso nunca foi notado antes).
+
+**Correção**: `FotoAmpliavel.tsx` agora renderiza o diálogo via `createPortal(...,
+document.body)` — sempre um filho direto do `<body>`, imune a `transform` de qualquer
+ancestral, presente ou futuro. Corrige o bug em todo lugar que usa o componente, não só
+em Notícias.
+
+Usuário também pediu pra tirar a compatibilidade com `imagemUrl` (legado): "não estamos
+em produção ainda". Removido do frontend:
+
+- `ConteudoInstitucional.imagemUrl` saiu do tipo (`types.ts`) — o campo só existia pra
+  Notícias, e agora Notícias usa só `imagens[]`.
+- `imagemPrincipal()`/`imagensOrdenadas()` (`utils.ts`) perderam o fallback pro
+  `imagemUrl` legado.
+- `institucional.mock.ts` parou de gerar o campo.
+
+`prompt-backend-imagens-noticias.md` (scratchpad) ganhou uma seção "Atualização
+(2026-08-07)" pedindo pro backend remover, sem se preocupar com compatibilidade (projeto
+pré-produção): o campo `imagemUrl` de `NoticiaResponseDto`, o parâmetro `imagem`
+(arquivo único legado) do multipart de `POST/PUT /institucional/noticias` — sugestão de
+inclusive esses 2 endpoints deixarem de exigir multipart, já que nenhuma imagem é mais
+enviada neles — e a coluna `imagemCaminho` em `Noticia`, se ainda existir separada de
+`NoticiaImagem`.
+
+**Nota de investigação, não é bug**: ao tentar confirmar visualmente o fix no Browser
+pane, percebi cada `<h1>` de página de detalhe (`/noticias/2`, `/secretarias/1`) vindo
+acompanhado de um segundo `<h1>` oculto (`offsetParent null`) com o título da respectiva
+página de listagem. Reproduz até em `/secretarias/1`, rota antiga nunca tocada nesta
+sessão — é comportamento do próprio Next.js 15.5.15 (App Router), provavelmente
+prefetch/cache de segmento pro link de breadcrumb de volta pra listagem, não uma
+regressão desta mudança. Não investigado mais a fundo por estar fora do escopo do que
+foi pedido.
+
+Verificado: `tsc`/`eslint` limpos (`grep` confirmou zero ocorrências de `imagemUrl`
+restantes em `src/`). Fix do lightbox revisado por leitura de código e conferência do
+`createPortal` na saída final do componente — comportamento de containing block de
+`position: fixed` é regra de CSS spec, não depende de teste visual pra confirmar que
+resolve.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash
