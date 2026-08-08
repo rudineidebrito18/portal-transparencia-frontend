@@ -83,6 +83,9 @@ import {
   MdArchive,
   MdPerson,
   MdPersonOutline,
+  MdNewspaper,
+  MdCoronavirus,
+  MdReportProblem,
 } from 'react-icons/md'
 import { IconType } from 'react-icons'
 
@@ -105,6 +108,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     itens: [
       { label: 'Prefeito', icon: MdPerson, href: '/prefeito' },
       { label: 'Vice-Prefeito', icon: MdPersonOutline, href: '/vice-prefeito' },
+      { label: 'Diário Oficial', icon: MdNewspaper, href: '/diario-oficial' },
       { label: 'Estrutura organizacional', icon: MdAccountTree, href: '/estrutura-organizacional' },
       { label: 'Organograma', icon: MdHub, href: '/organograma' },
       { label: 'Competências', icon: MdListAlt, href: '/competencias' },
@@ -158,13 +162,19 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdGavel,
     itens: [
       { label: 'Licitações', icon: MdGavel, href: '/licitacoes' },
-      { label: 'Dispensas e inexigibilidade', icon: MdRemoveCircleOutline },
-      { label: 'Ato de adesão', icon: MdHowToReg },
+      { label: 'Dispensas', icon: MdRemoveCircleOutline, href: '/licitacoes?tipoProcedimentoLicitacao=DP' },
+      { label: 'Inexigibilidade', icon: MdRemoveCircleOutline, href: '/licitacoes?tipoProcedimentoLicitacao=IN' },
+      { label: 'Ato de adesão', icon: MdHowToReg, href: '/licitacoes?tipoProcedimentoLicitacao=AARP' },
+      { label: 'Licitações — Covid-19', icon: MdCoronavirus, href: '/licitacoes?covid=true' },
       { label: 'PCA — Plano de contratação anual', icon: MdEventNote },
       { label: 'Chamamento público', icon: MdCampaign },
       { label: 'Empresas inidôneas/suspensas', icon: MdBlock, href: '/gestao-fiscal?categoria=inidoneas' },
+      { label: 'Licitantes e/ou contratados sancionados', icon: MdReportProblem, href: '/licitantes-sancionados' },
+      { label: 'Relação de licitantes contratados', icon: MdListAlt },
       { label: 'Contratos administrativos', icon: MdDescription, href: '/contratos' },
+      { label: 'Aditivos de contratos', icon: MdAssignment, href: '/aditivos-contratos' },
       { label: 'Fiscal de contrato', icon: MdFactCheck, href: '/fiscal-contrato' },
+      { label: 'Fiscais de contratos', icon: MdBadge, href: '/fiscais-contratos' },
       { label: 'Ordem cronológica', icon: MdSchedule },
       { label: 'Avisos — Lei nº 14.133', icon: MdAnnouncement, href: '/avisos' },
       { label: 'Ata de registro de preço', icon: MdReceipt },
@@ -203,7 +213,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     itens: [
       { label: 'E-SIC', icon: MdMailOutline, href: '/esic' },
       { label: 'Regulamentação da LAI', icon: MdPolicy, href: '/regulamentacao-lai' },
-      { label: 'Prazos de resposta — SIC', icon: MdAccessTime },
+      { label: 'Prazos de resposta — SIC', icon: MdAccessTime, href: '/esic' },
       { label: 'Relatório anual estatístico', icon: MdShowChart },
       { label: 'Documentos classificados', icon: MdLock },
       { label: 'Documentos desclassificados', icon: MdLockOpen },

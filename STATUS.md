@@ -229,137 +229,79 @@ atualizado e testado contra elas):
 
 ## 2.1 Rodada de paginação em massa (2026-07-23) — concluída
 
-O backend rodou uma auditoria grande e adicionou paginação/filtro em ~12 módulos que antes
-devolviam `List` inteira, além de mudanças pontuais em Licitações e Diário Oficial (changelog
-completo recebido do agente do backend). Cada `GET` afetado passou de array puro (`[...]`) pra
-`Page<T>` (`{content, totalElements, totalPages, number, size, ...}`) — qualquer tela que lia a
-resposta como array quebrava (`.length`/`.map` num objeto não bate, geralmente sem erro visível:
-a tela só ficava sem tabela nem mensagem de vazio).
+Backend adicionou paginação/filtro em ~12 módulos que devolviam `List` pura — cada `GET`
+afetado passou de array puro pra `Page<T>`, quebrando qualquer tela que lia a resposta
+como array (geralmente sem erro visível: a tela ficava só sem tabela nem mensagem de
+vazio).
 
-**Tudo corrigido e testado** (dois commits, ver `git log`): e-SIC Formulários, Fornecedor,
-Unidade, Convênio (admin), Obra Pública (admin + público), Aditivo de Contrato (admin +
-público), Concurso (admin + público), Usuários (admin), Folha de Pagamento (aba "Por mês",
-admin + público), Relatório de Gestão Fiscal e Relatório de Execução Orçamentária (público) — ver
-observações de cada um na tabela de módulos acima. Módulos com filtro real no backend ganharam UI
-de filtro + `usePageableResource`; sub-listagens naturalmente pequenas sem `/filtro` dedicado
-(Aditivo por contrato, Folha por mês, os 4 endpoints de `gestao-fiscal`) só desembrulham
-`.content` pedindo uma página grande (`size: 200`–`500`), sem UI de paginação nova.
+**Corrigido e testado**: e-SIC Formulários, Fornecedor, Unidade, Convênio (admin), Obra
+Pública (admin+público), Aditivo de Contrato (admin+público), Concurso (admin+público),
+Usuários (admin), Folha de Pagamento ("Por mês"), RGF e RREO (público) — ver observações
+na tabela de módulos acima. Módulos com filtro real no backend ganharam UI de filtro +
+`usePageableResource`; sub-listagens naturalmente pequenas sem `/filtro` dedicado só
+desembrulham `.content` pedindo uma página grande (`size: 200`–`500`), sem UI de
+paginação nova. Dois endpoints novos do Diário Oficial (não-breaking): "Excluir da
+fila"/"Excluir edição publicada", admin-only.
 
-Também implementados os dois endpoints novos do Diário Oficial (feature nova, não era breaking
-change): "Excluir da fila" (`DELETE /edicoes/publicacoes/{id}`) e "Excluir edição publicada"
-(`DELETE /edicoes/{numero}`), ambos admin-only, na tela de detalhe da solicitação — ver a
-observação de "Diário Oficial — Publicações" na tabela de módulos.
+**Bug crítico corrigido**: `detectarPapeisEId` (`auth.service.ts`) descobre se quem
+logou é admin chamando `usuariosService.listar()` e fazia `.find(...)` direto esperando
+array — como `GET /api/admin/users` também virou `Page<T>`, `.find` falhava, caía no
+`catch` e **todo login de admin era rebaixado silenciosamente pra Gerente** (perdia
+botões de editar/excluir em qualquer grupo admin-only). Corrigido pra ler
+`pagina.content`. Se botões de admin sumirem sem motivo aparente, checar esse arquivo
+primeiro.
 
-**Bug crítico encontrado e corrigido no meio do caminho**: `src/modules/auth/auth.service.ts`
-(`detectarPapeisEId`) descobre se quem logou é admin chamando `usuariosService.listar()` e
-testando se a chamada teve sucesso (só admin pode listar usuários) — e fazia `.find(...)` direto
-no retorno esperando um array. Como `GET /api/admin/users` também virou `Page<T>`, `.find` falhava
-(`Page` não tem `.find`), a exceção caía no `catch` e **todo login de admin era silenciosamente
-rebaixado pra permissão de Gerente** (perdia botões de editar/excluir em qualquer grupo
-admin-only, tela `/admin` mostrava "Gerente" pro usuário admin). Corrigido pra ler `pagina.content`
-com `size: 500`. Se em algum teste futuro os botões de admin sumirem sem motivo aparente, checar
-esse arquivo primeiro.
-
-**Confirmado que NÃO precisava de ação**: `GET /api/licitacoes` (bare, sem filtro) foi removido
-pelo backend, mas nenhum arquivo do frontend chamava esse path — tanto o service público quanto o
-admin já usavam `GET /licitacoes/buscar` (`Page<LicitacaoResumo>` + `usePageableResource`) desde
-antes desta rodada.
-
-Ver também a pegadinha de sandbox sobre páginas públicas com `<Suspense>` travando na ferramenta
-de preview (seção 4) — isso limitou a verificação visual do lado público de Obras/Concursos/
-Relatórios de Gestão Fiscal nesta sessão; a correção foi validada por leitura de código +
-`tsc`/`eslint` limpos + `curl` direto no backend confirmando o formato da resposta + teste do
-lado admin (mesmo hook, mesmo padrão de service) sempre que existia um equivalente admin.
-
-Nenhuma pendência conhecida ficou aberta desta rodada.
+`GET /api/licitacoes` (bare) foi removido pelo backend, mas nenhum arquivo do frontend
+chamava esse path (já usava `/licitacoes/buscar`) — confirmado, nada a fazer.
 
 ## 2.2 Filtros públicos + bug de Secretarias (2026-07-24) — concluído/atualizado
 
-Continuação do dia seguinte à rodada de paginação + redesign de Secretarias. Duas
-pendências deixadas em aberto no fim daquela sessão, ambas fechadas nesta:
+**Filtro/busca nas telas públicas sem nenhum** (`/contratos`, `/obras`, `/concursos`,
+`/avisos`, `/noticias`) — só Obras e Concursos tinham suporte no backend.
+- **Obras e Concursos**: implementados — `ObraFiltro.tsx` (Número, Status, Tipo, Unidade,
+  Fornecedor, "Só paralisadas") e `ConcursoFiltro.tsx` (Número, Ano, Descrição, Abertura
+  início/fim), padrão `FiltroCard`. Criado `src/modules/fornecedores/` (módulo público
+  mínimo, só faltava o service — GET já é `permitAll()` no backend).
+- **Contratos e Avisos/Notícias**: sem suporte no backend — pedido documentado em
+  `prompt-backend-filtros-contratos-avisos.md` (generalizar filtro de Contrato pra
+  listagem global + intervalo de data; adicionar `titulo`+intervalo em Avisos/Notícias).
+  Nota à parte: `StatusLicitacao` real do backend tem mais valores do que o mapa
+  hardcoded do frontend (`src/modules/contratos/status.ts`) — rótulo errado pra parte
+  dos contratos, não bloqueante.
 
-**1. Filtro/busca nas telas públicas que não tinham nenhum** (`/contratos`, `/obras`,
-`/concursos`, `/avisos`, `/noticias`) — levantamento (2 agentes em paralelo, backend real
-via `/v3/api-docs` + leitura de controller) mostrou que só Obras e Concursos já tinham
-suporte a filtro no backend; Contratos e Avisos/Notícias não têm parâmetro de filtro
-nenhum além de paginação (e `ativo`, no caso de Avisos/Notícias).
-- **Obras e Concursos**: implementados de verdade — `ObraFiltro.tsx` (Número, Status, Tipo,
-  Unidade, Fornecedor, "Só paralisadas", substituindo as abas antigas) e
-  `ConcursoFiltro.tsx` (Número, Ano, Descrição, Abertura início/fim), ambos no padrão
-  `FiltroCard`. Precisou criar `src/modules/fornecedores/` (novo módulo público mínimo,
-  `fornecedor.service.ts`) porque só existia o service admin de Fornecedor — o GET já é
-  `permitAll()` no backend (`SecurityConfiguration.java`), confirmado via `curl` sem token.
-- **Contratos e Avisos/Notícias**: sem suporte no backend — não construí UI de filtro que
-  finge funcionar. Pedido de backend documentado em
-  `prompt-backend-filtros-contratos-avisos.md` (scratchpad da sessão, pra relay ao time de
-  backend): generalizar o filtro de Contrato (hoje só escopado por `licitacaoId`) pra
-  listagem global + trocar datas `equals` por intervalo; adicionar `titulo`+intervalo de
-  data em Avisos/Notícias (controllers idênticos, um DTO serve os dois). Nota à parte
-  incluída no pedido: `StatusLicitacao` real do backend tem mais valores do que o mapa de
-  exibição hardcoded do frontend (`src/modules/contratos/status.ts`) — rótulo errado pra
-  parte dos contratos, não bloqueante.
-
-**2. Bug relatado: filtro de `/secretarias` "não está funcionando"** — investigado com os
-dois servidores no ar (estavam ambos fora do ar no início desta sessão, sintoma de
-"nada funciona" bate com isso). Backend confirmado filtrando certo via `curl` direto e via
-`fetch()` no console do navegador pelo mesmo proxy `/api/*` que o app usa (`nome=Educa`
-devolve só "Secretaria de Educação"). Código revisado por leitura
-(`SecretariaFiltro.tsx`/`SecretariasListView.tsx`/`useSecretarias.ts`/
-`secretariasService.listar`) sem nenhum bug encontrado. **Conclusão**: mais provável que o
-teste original tenha coincidido com os servidores caídos, não um bug de código — considerar
-resolvido a menos que o usuário confirme que ainda está quebrado num teste novo.
+**Bug relatado "filtro de `/secretarias` não funciona"** — backend confirmado filtrando
+certo via `curl`/`fetch`; código revisado sem bug encontrado. Mais provável que o teste
+original tenha coincidido com os servidores fora do ar (ambos caídos no início desta
+sessão). Considerar resolvido a menos que reapareça num teste novo.
 
 ## 2.3 Auditoria de filtro em todo o hub `/transparencia` (2026-07-24) — concluído
 
-Usuário pediu, além do item 1 da seção 2.2, filtro em **todos** os itens do hub
-`/transparencia` onde for possível — não só Gestão Fiscal. Fiz o levantamento completo
-(1 agente Explore cobrindo as ~50 combinações rota/aba alcançáveis a partir de
-`src/modules/transparencia/data/secoes.ts`) e cruzei os poucos casos sem filtro contra o
-backend real (`/v3/api-docs`). Resultado: quase tudo já estava filtrado (Licitações,
-Diárias, Servidores, Emendas, Obras, Concursos, Tabela de Valores, e todos os módulos de
-"documento genérico" — Convênios, Educação, Saúde, Recursos Humanos, Planejamento,
-Prestação de Contas, Legislação, Fiscal de Contrato, Renúncia Fiscal). As únicas lacunas
-reais:
-- **4 abas de Gestão Fiscal** (Execução Orçamentária, RGF, Empresas em Dívida Ativa,
-  Empresas Inidôneas/Suspensas) — backend tinha `/filtro` público pronto, só faltava a UI.
-  Implementado nesta rodada (ver item novo na seção 2, bespoke module list).
+Levantamento completo (~50 combinações rota/aba de `secoes.ts`) cruzado contra o backend
+real. Quase tudo já estava filtrado (Licitações, Diárias, Servidores, Emendas, Obras,
+Concursos, Tabela de Valores, todos os módulos de "documento genérico"). Lacunas reais:
+- **4 abas de Gestão Fiscal** (Execução Orçamentária, RGF, Dívida Ativa, Inidôneas) —
+  backend já tinha `/filtro` pronto, só faltava a UI. Implementado nesta rodada.
 - **`/contratos` e `/avisos`/`/noticias`** — sem suporte no backend, já cobertos pelo
-  pedido de backend da seção 2.2 (`prompt-backend-filtros-contratos-avisos.md`).
-- **`/cargos`** — `GET /recursos-humanos/cargos` não tem parâmetro nenhum, nem paginação
-  (lacuna nova, descoberta nesta auditoria) — adicionado como 3ª seção no mesmo arquivo de
-  pedido de backend.
-- **`/folha-pagamento`** — só filtra por `mes`/`ano` no backend; a tela já expunha esse
-  seletor mas fora do padrão visual — `FolhaPagamentoMesView.tsx` migrado pro `FiltroCard`
-  (mês/ano continuam aplicando na hora, sem botão Aplicar — não é um filtro opcional tipo
-  busca, é sempre um período selecionado; ganhou botão "Voltar pro mês atual" em vez de um
-  Limpar tradicional). Não virou pedido de backend por ser baixo valor (não bloqueia nada,
-  já usa a única dimensão de filtro que existe).
-- `/esic`, `/ouvidoria` são páginas de informação (objeto único), filtro não se aplica;
-  `/diarias-legislacao`, `/estrutura-organizacional`, `/organograma`, `/faq`, `/lgpd` são
-  estáticas, sem backend.
+  pedido da seção 2.2.
+- **`/cargos`** — `GET /recursos-humanos/cargos` sem filtro nem paginação (lacuna nova) —
+  adicionado ao mesmo pedido de backend.
+- **`/folha-pagamento`** — só filtra `mes`/`ano`; `FolhaPagamentoMesView.tsx` migrado pro
+  padrão visual `FiltroCard` (mês/ano continuam aplicando na hora, ganhou botão "Voltar
+  pro mês atual" em vez de Limpar). Baixo valor pra virar pedido de backend.
+- `/esic`, `/ouvidoria` são objeto único (filtro não se aplica); páginas estáticas
+  (`/diarias-legislacao`, `/estrutura-organizacional`, `/organograma`, `/faq`, `/lgpd`)
+  não têm backend.
 
-Não fica pendência de "auditar o resto" pra próxima sessão — já foi feito.
+**Header "N encontrados + Ordenar"** adicionado nas listagens que faltavam (Concursos,
+Obras, os 4 de Gestão Fiscal, Avisos/Notícias, `<select>` de Emendas) — só UI consumindo
+dado que o hook já calculava.
 
-**Complemento — header "N encontrados + Ordenar" (mesmo dia)**: `usePageableResource`
-sempre devolveu `totalElements`/`ordenacao`/`setOrdenacao`, mas nem todo `*ListView.tsx`
-renderizava esse header (só `DocumentoGenericoListPanel.tsx`, Diárias, Licitações,
-Servidores, Tabela de Valores e Contratos já tinham). Adicionado nos que faltavam:
-Concursos, Obras, os 4 itens de Gestão Fiscal, Avisos/Notícias (precisou passar
-`totalElements`/`ordenacao`/`setOrdenacao` como prop nova em
-`ConteudoInstitucionalListView.tsx`, compartilhado pelos dois) e o `<select>` de
-ordenação em Emendas Parlamentares (que já tinha a contagem, só faltava o dropdown).
-Sem mudança de tipo/service/backend — é só UI consumindo dado que o hook já calculava.
-
-**Bug real encontrado pelo usuário nessa mesma rodada**: `obra.mock.ts` e
-`concurso.mock.ts` (migrados pra `usePageableResource` mais cedo hoje) filtravam e
-paginavam mas **ignoravam completamente o parâmetro `sort`** — o `<select>` de Ordenar
-não fazia nada em dev (`NEXT_PUBLIC_USE_MOCK=true`), só contra o backend real. O
-`gestaoFiscal.mock.ts` novo copiou esse mesmo padrão quebrado. Existe um helper
-compartilhado pra isso desde antes (`ordenar()`/`paginar()` em
-`src/modules/shared/mocks/mockUtils.ts`, já usado certo em `institucional.mock.ts` e
-`emendaParlamentar.mock.ts`) — os 3 mocks quebrados foram migrados pra usá-lo. Vale
-conferir qualquer mock novo/futuro que pagine em memória usa esse helper em vez de
-reimplementar paginação na mão sem ordenar.
+**Bug encontrado**: `obra.mock.ts`/`concurso.mock.ts` (e o `gestaoFiscal.mock.ts` novo,
+que copiou o mesmo padrão) ignoravam completamente o parâmetro `sort` — o `<select>` de
+Ordenar não fazia nada em mock (`NEXT_PUBLIC_USE_MOCK=true`). Migrados pro helper
+compartilhado `ordenar()`/`paginar()` (`src/modules/shared/mocks/mockUtils.ts`, já usado
+certo em outros mocks) — checar que qualquer mock novo que pagine em memória usa esse
+helper em vez de reimplementar paginação na mão.
 
 ## 2.4 Adaptação aos 5 itens de prioridade alta do backend (2026-08-04) — concluído
 
@@ -631,16 +573,11 @@ de navegação/formulário do hub público.
 **Acessibilidade** (`5b37fe6`, `cf181a0`, `1f94b81`, `75b2602`, `31c27d3`, `a1665ad`):
 - `src/components/AcessibilidadeMenu.tsx` — menu novo (contraste, tamanho de fonte,
   Libras), montado dentro de `Header.tsx`, substituiu um widget flutuante antigo.
-- `src/components/VLibrasWidget.tsx` — passou por 3 iterações no mesmo dia até estabilizar:
-  (1) injeção via `useEffect` (perdia o preload scanner do navegador), (2) markup
-  estático renderizado no servidor (igual ao snippet oficial do gov.br) + `try/catch`
-  em torno de `VLibras.Widget()`, (3) problema novo: `RootLayoutSwitch` re-renderiza a
-  cada troca de rota (`usePathname()`), resetando o `<div vw>` que o plugin usa —
-  tentativa de corrigir com um `VLibrasReinit.tsx` (reinvocava `window.onload()`)
-  quebrava se o avatar 3D já estivesse aberto (reinstanciar `Widget()` corrompia o
-  estado). **Solução final**: `VLibrasReinit.tsx` deletado, `VLibrasWidget.tsx` envolto
-  em `React.memo` — o componente nunca re-renderiza com a navegação, então o DOM do
-  plugin nunca é tocado. Montado uma vez em `src/layouts/PublicLayout.tsx`.
+- `src/components/VLibrasWidget.tsx` — `RootLayoutSwitch` re-renderiza a cada troca de
+  rota (`usePathname()`), resetando o `<div vw>` que o plugin usa; reinstanciar o
+  `Widget()` pra corrigir quebrava se o avatar 3D já estivesse aberto. **Solução**:
+  componente envolto em `React.memo` — nunca re-renderiza com a navegação, então o DOM
+  do plugin nunca é tocado. Montado uma vez em `src/layouts/PublicLayout.tsx`.
 - Skip-link (`href="#conteudo"`) direto no `PublicLayout.tsx`; `aria-label`/
   `aria-expanded`/`aria-current` em ~16 selects de ordenação, no `FiltroCard.tsx` e nas
   abas ativas de 9+ módulos com abas.
@@ -829,120 +766,44 @@ de repetir).
 
 ## 2.13 Refino do menu de Acessibilidade (2026-08-06)
 
-Usuário decidiu não adotar o UserWay (widget de acessibilidade de terceiro) — preferiu
-manter e refinar o `AcessibilidadeMenu.tsx` já existente. Quatro ajustes:
+Usuário decidiu não adotar o UserWay (widget de terceiro) — preferiu manter e refinar o
+`AcessibilidadeMenu.tsx` já existente. Estado final, depois de várias rodadas de ajuste
+fino guiadas por prints de navegador real do usuário:
 
-- **Abre no hover** — mesmo padrão de `DropdownMenuItem.tsx` (`group-hover`/
-  `group-focus-within`), mantendo o clique como reforço (fecha ao clicar fora, continua
-  aberto depois que o mouse sai). O painel deixou de ser renderizado condicionalmente
-  (`{aberto && ...}`) e passou a usar `invisible`/`visible` sempre montado, senão hover
-  via CSS não tem como funcionar.
-- **"Libras" virou link informativo** pro site oficial do projeto
-  (`https://www.vlibras.gov.br/`, mesmo domínio já usado pelo script do plugin em
-  `VLibrasWidget.tsx`) em vez de clicar programaticamente no botão nativo do widget —
-  função `abrirLibras()` removida.
-- **Item "Contraste" ativo** ganhou fundo escuro + texto branco (antes só mostrava um
-  "Ativo" discreto sobre o mesmo fundo claro dos outros itens, sem indicar visualmente
-  que mudava o site inteiro).
-- **Tema de Alto Contraste virou escuro+amarelo** (antes era um "alto contraste claro":
-  fundo branco, texto preto). `html.alto-contraste` em `globals.css` agora escurece
-  `--color-neutral`/`--color-neutral-light`/`body` e clareia `--color-text-secondary`
-  (cascateia pelos tokens que os componentes já usam), e força `<a>`/`<h1-3>` pra amarelo
-  via seletor de tag com `!important` (precisa disso porque tag selector tem
-  especificidade menor que a classe Tailwind que normalmente define a cor).
-  **Limitação consciente**: não repontou `--color-primary` pra amarelo — esse token
-  também define `bg-primary`, usado em botões/abas com `text-white` fixo junto (ex.
-  "Aplicar" dos filtros); virar amarelo ali daria botão amarelo com texto branco, pior
-  contraste que o normal. Então elementos com fundo de marca própria (botões primary,
-  badges de status, abas ativas) continuam com a cor de marca original mesmo em alto
-  contraste — não é uma cobertura 100%, é o equilíbrio entre melhorar de verdade sem
-  reescrever cor de cada componente do site (mudança bem maior, fora de escopo aqui).
+- **Abre no hover** (mesmo padrão de `DropdownMenuItem.tsx`), clique reforça/fecha.
+  Painel sempre montado (`invisible`/`visible`, não `{aberto && ...}`, senão hover via
+  CSS não funciona) e **sem `mt-2`** entre botão e painel — com margem, o cursor perdia
+  o `:hover` atravessando o espaço vazio entre os dois.
+- "Libras" é link informativo pro site oficial (`vlibras.gov.br`), não aciona o widget
+  programaticamente.
+- Item "Contraste" ativo tem fundo escuro + texto branco (indica visualmente que muda o
+  site inteiro).
+- **Alto Contraste virou escuro+amarelo** (era fundo branco/texto preto — usuário
+  comparou com outra prefeitura de referência que usa esse padrão). `html.alto-contraste`
+  em `globals.css`: escurece `--color-neutral`/`body`, força `<a>`/`<h1-3>`/
+  `nav [role="button"]` pra amarelo via seletor de tag (`role="button"` porque os
+  rótulos de dropdown do header são `<div>`, não `<a>` de verdade), e escurece
+  `.bg-primary` pra preto sólido (cobre topbar/nav/footer). Hover de dropdown usa branco
+  translúcido (`rgba(255,255,255,0.15)`) em vez da tinta azul da marca — mais visível
+  sobre fundo escuro. **Limitação consciente**: a variável `--color-primary` (não a
+  classe `.bg-primary`) não foi repontada — evitaria botão amarelo+texto branco
+  ilegível; elementos com fundo de marca própria (botões primary, badges, abas ativas)
+  mantêm a cor original mesmo em alto contraste.
+- Estado (`fonte`/`altoContraste`) centralizado em `Header.tsx` — o menu é renderizado 2x
+  (desktop+mobile, seção 2.12) e cada instância tinha seu próprio `useState` antes,
+  dessincronizando entre os dois (ativar num não refletia no outro até reload).
+  `AcessibilidadeMenu.tsx` virou componente controlado.
+- Dropdowns do header (`DropdownMenuItem.tsx`) ganharam `onClick` no `<ul>` do submenu
+  pra fechar ao clicar num link (bubbling — nenhum chamador precisa fechar
+  individualmente). Trocado `hover:bg-neutral-dark` (cinza pouco visível) por
+  `hover:bg-primary/10` nos dropdowns do header, tema normal e alto contraste.
+- Adicionado também no menu mobile (`Header.tsx`, `lg:hidden`) — Ouvidoria/SIC/Acesso
+  admin da topbar continuam sem equivalente mobile (fora de escopo).
+- Ícone de engrenagem (`/admin/login`) removido da topbar a pedido do usuário ("não
+  quero fácil acesso ao admin") — rota continua existindo, só sem link visível.
 
-`tsc --noEmit`/`eslint` limpos. Testado via `curl`: link do VLibras presente no HTML,
-página renderizando normal.
-
-**Complemento (mesmo dia)**: `AcessibilidadeMenu.tsx` adicionado também dentro do `<ul>`
-principal do menu mobile (`Header.tsx`, envolto em `lg:hidden` — só aparece abaixo de
-`lg`, não duplica na barra desktop), fechando a lacuna que a varredura mobile (seção
-2.12) tinha documentado como pendência consciente. Ouvidoria/SIC/Acesso admin da topbar
-continuam sem equivalente mobile (fora de escopo deste pedido).
-
-Também trocado `hover:bg-neutral-dark` (cinza claro `#cbd5e1`, achado "ruim" pelo
-usuário) por `hover:bg-primary/10` nos 13 links dos dropdowns do header (`Header.tsx` —
-A Prefeitura/RH/LRF/Publicações — e `SecretariasDropdownItems.tsx`), tema normal e alto
-contraste. Conferido que o Alto Contraste já cobria esses dropdowns sem precisar de CSS
-novo: o painel (`DropdownMenuItem.tsx`) usa a classe `bg-white` (pega pelo override
-`.bg-white` já existente) e os itens são `<a>` de verdade (pegos pelo `a { color:
-#ffd400 !important }` já existente) — só a cor de hover do tema normal precisava de
-ajuste.
-
-**Complemento — header/nav/footer pretos no Alto Contraste**: usuário comparou com o
-Alto Contraste de outra prefeitura (bomlugar.ma.gov.br/#altocontraste) — lá o header/nav/
-footer inteiro vira preto sólido com links amarelos; no nosso, esses containers ficavam
-com a cor de marca original (azul), só o resto do site escurecia. Adicionado
-`html.alto-contraste .bg-primary { background-color: #000 !important }` — cobre topbar,
-`<nav>` e `<footer>` (todos usam a classe `bg-primary`) e também botões/abas sólidas com
-`text-white` fixo (viram preto+branco, contraste melhor que o original, não pior).
-Deliberadamente **não** mexe na variável `--color-primary` (só a classe `.bg-primary`
-específica) — a variável também alimenta `text-primary`, usado como cor de ícone em
-vários "chips" (`bg-primary/10 text-primary`) espalhados pelo site; virar preto ali
-sumiria o ícone contra card escuro. Seletor de amarelo ganhou `nav [role="button"]` —
-os rótulos dos dropdowns do header ("A PREFEITURA", "SECRETARIAS" etc.) são `<div
-role="button">` em `DropdownMenuItem.tsx`, não `<a>` de verdade, então o seletor `a`
-sozinho não os alcançava. Testado via `javascript_tool`/`getComputedStyle`: nav e footer
-`rgb(0,0,0)`, `<h1>` e rótulo de dropdown `rgb(255,212,0)` — bate com a referência.
-
-**Complemento 2 (mesmo dia)**: usuário testou num navegador de verdade (print) e pediu 2
-ajustes finos: (1) hover dos itens de dropdown (header + `AcessibilidadeMenu.tsx`) tava
-difícil de ver no Alto Contraste — `hover:bg-primary/5`/`/10` é uma tinta azul
-translúcida quase invisível sobre o painel já escurecido; virou branco translúcido
-(`rgba(255,255,255,0.15)`) só dentro de `.alto-contraste`, funciona sobre qualquer fundo
-escuro em vez de brigar com a cor de marca. (2) `AcessibilidadeMenu.tsx` não fechava ao
-clicar em Contraste/Aumentar/Diminuir — corrigido via `onClick={() => setAberto(false)}`
-no painel (bubbling, fecha em qualquer clique dentro, item nenhum precisa fechar por
-conta própria — ver complemento 3 abaixo, mesmo padrão virou consistente nos dois
-menus).
-
-**Nota de ferramenta**: durante a depuração da seção 4 (pegadinhas de sandbox),
-`getComputedStyle()` via `javascript_tool` reportou um valor errado pra um `<a>`
-específico mesmo com `!important` inline confirmado no DOM — nenhum problema real de
-CSS, o usuário confirmou com print de navegador de verdade que a implementação
-funciona certinho (nav/footer pretos, links amarelos, "Contraste: Ativo" visível).
-
-**Complemento 3 (mesmo dia)**: usuário achou mais 2 problemas depois de testar de novo:
-- **Faixa morta no hover do `AcessibilidadeMenu`** — o painel tinha `mt-2` (8px de
-  margem) entre o botão e o painel; ao mover o mouse do botão pro painel, o cursor
-  atravessava esse espaço vazio e perdia o `:hover`, fechando o menu no meio do
-  caminho. `DropdownMenuItem.tsx` nunca teve esse problema porque o submenu já era
-  `top-full` sem margem (encostado no botão). Removido o `mt-2` do
-  `AcessibilidadeMenu.tsx` — mesmo comportamento agora.
-- **Dropdowns do header não fechavam ao clicar** — pedido original (antes do
-  complemento 2 acima) era sobre `DropdownMenuItem.tsx` (A Prefeitura/Secretarias/RH/
-  LRF/Publicações), não o `AcessibilidadeMenu` — mal-entendido corrigido. Adicionado
-  `onClick={() => setIsOpen(false)}` no `<ul>` do submenu (bubbling do `<a>`/`<Link>`
-  filho fecha o dropdown específico que foi clicado, sem precisar que cada chamador
-  feche individualmente — `Header.tsx`/`SecretariasDropdownItems.tsx` não precisaram
-  de nenhuma mudança). Aproveitado pra simplificar `AcessibilidadeMenu.tsx` pro mesmo
-  padrão de delegação (removidos os `onClick={() => setAberto(false)}` individuais dos
-  itens Sobre/Libras/Mapa do site e das funções `aplicarFonte`/`alternarContraste` —
-  redundantes agora que o painel fecha tudo de uma vez).
-
-**Complemento 4 (mesmo dia)**: usuário achou mais um bug — alternar entre desktop e
-mobile (ou vice-versa) fazia o Contraste parecer "preso": tinha que desativar e ativar
-de novo pra sincronizar. Causa: `AcessibilidadeMenu.tsx` é renderizado **2 vezes** por
-`Header.tsx` (topbar desktop `hidden lg:flex` + menu mobile `lg:hidden`, seção 2.12) —
-cada instância tinha seu próprio `useState` de `fonte`/`altoContraste`, então ativar
-numa não atualizava a outra (cada uma só lia o `localStorage` uma vez, no mount).
-Corrigido tirando esse estado de dentro do componente: `Header.tsx` agora é o dono único
-(`fonte`/`altoContraste` + `aplicarFonte`/`alternarContraste`, incluindo o efeito que lê
-o `localStorage`), e `AcessibilidadeMenu.tsx` virou componente controlado (recebe
-`altoContraste` + os 3 callbacks como props) — as duas instâncias renderizadas
-refletem a mesma fonte de verdade agora, sem estado duplicado. `aberto` (dropdown
-aberto/fechado) continua local em cada instância, isso é intencional.
-
-Aproveitado o pedido do usuário ("não quero fácil acesso ao admin") pra remover o ícone
-de engrenagem (`MdSettings`, `<Link href="/admin/login">`) da topbar — a rota
-`/admin/login` continua existindo (não removida, só sem link visível no site público).
+`tsc --noEmit`/`eslint` limpos. Testado via `curl` + confirmação em navegador real do
+usuário (nav/footer pretos, links amarelos, "Contraste: Ativo" visível).
 
 ## 2.14 Carta de Serviços vira módulo genérico de verdade (2026-08-06)
 
@@ -1174,159 +1035,164 @@ resolve.
 
 ## 2.18 Bug real de upload: Content-Type manual quebra multipart em navegador de verdade (2026-08-07)
 
-Usuário reportou erro 500 tentando subir PDF em vários módulos (13MB, mas o tamanho era
-coincidência, não a causa). Investigação teve 3 pistas falsas antes da causa raiz real —
-registradas aqui porque cada uma ensinou algo, mesmo não sendo o problema principal:
+Usuário reportou erro 500 tentando subir PDF em vários módulos. 3 pistas investigadas
+antes da causa raiz real: timeout de 10s do axios (real, mas já corrigido antes —
+`FormData` tem 60s desde a seção 2.16); proxy do Next travando em upload grande (real,
+mas separado — ver seção 2.19); boundary do navegador sem espaço antes do parâmetro
+seguinte (sintoma visível no log do backend, não a causa raiz).
 
-1. **Timeout de 10s do axios** — real, mas não a causa deste bug (era um bug diferente,
-   já corrigido na seção 2.16: `FormData` agora tem 60s).
-2. **Proxy do Next travando 30s em upload de 13MB** (`rewrites()` de `next.config.ts`,
-   reproduzido tanto em `next dev --turbopack` quanto em `next start` de produção real —
-   build limpo, testado isolado sem afetar o ambiente de dev, restaurado depois) — **isso
-   é real e seria um problema em produção**, mas só aparece em arquivos grandes, e o
-   usuário conseguia reproduzir o erro em qualquer tamanho. Registrado como pendência
-   separada, não investigado a fundo ainda (não travava a sessão atual).
-3. **`multipart/form-data;boundary=...;charset=UTF-8` sem espaços, rejeitado pelo
-   Spring** — descoberto lendo o log do backend (`tail`/polling a cada 5s enquanto uma
-   requisição ficava pendurada) e comparando com o que um `curl` direto no backend
-   enviava (que sempre funcionou, por isso a suspeita inicial recaiu sobre o proxy do
-   Next). O boundary `WebKitFormBoundary...` só existe em requisições geradas por um
-   navegador de verdade — reproduzido de propósito usando o Claude Browser (Chrome via
-   CDP) pra logar no admin e submeter o formulário real, confirmando que não era
-   artefato de teste.
+**Causa raiz**: 17 services admin (31 ocorrências) definiam manualmente
+`headers: { 'Content-Type': 'multipart/form-data' }` (sem `boundary`) em chamadas com
+corpo `FormData` — anti-padrão do axios que só quebra em navegador de verdade (nunca em
+`curl`/Node, por isso nunca foi pego antes): o navegador completa o `Content-Type` já
+definido com o boundary que ele gerou, sem espaço antes do parâmetro seguinte,
+produzindo `multipart/form-data;boundary=...;charset=UTF-8` — que o Spring rejeita
+(`HttpMediaTypeNotSupportedException` → 500 genérico). **Correção**: header manual
+removido nos 17 arquivos — o axios/navegador monta o `Content-Type` sozinho, corretamente,
+quando você não interfere.
 
-**Causa raiz real, confirmada comparando `/api/legislacao/lei` (funcionava) com
-`/api/institucional/noticias` (falhava) usando a mesma técnica de teste**: 17 services
-admin (`src/modules/**/*.service.ts`, 31 ocorrências) definiam manualmente
-`headers: { 'Content-Type': 'multipart/form-data' }` (sem `boundary`) em chamadas do
-axios com corpo `FormData`. Isso é um anti-padrão documentado do axios — só quebra em
-navegador de verdade (nunca em `curl`/Node, por isso nunca foi pego antes): ao ver um
-`Content-Type` já definido, o navegador completa o valor com o `boundary` que ele gerou
-pra montar o corpo, mas sem espaço antes do parâmetro seguinte, produzindo
-`multipart/form-data;boundary=----WebKitFormBoundaryXXXX;charset=UTF-8` — que o
-`AbstractMessageConverterMethodArgumentResolver` do Spring rejeita
-(`HttpMediaTypeNotSupportedException`, mapeado pro `GlobalExceptionHandler` como 500
-genérico). **Correção**: remover o header manual em todos os 17 arquivos — o axios/
-navegador monta o `Content-Type` inteiro sozinho, corretamente, quando você não
-interfere. Script único (Python, regex) aplicou a mesma correção nos 31 pontos de uma
-vez; `tsc`/`eslint` limpos depois.
+**Segunda causa, específica de Notícias**: o backend, ao atender o pedido de
+simplificação da seção 2.17, foi além e trocou `POST/PUT /institucional/noticias` de
+multipart pra **JSON puro**, mas o frontend ainda mandava `dados` embrulhado num
+`FormData`. Corrigido: `criar()`/`atualizar()` mandam `dados` direto como corpo JSON.
 
-**Segunda causa raiz, específica de Notícias** (só apareceu depois de corrigir a
-primeira — o teste comparativo `/api/legislacao/lei` vs `/api/institucional/noticias`
-com uma requisição JS manual, sem `Content-Type` nenhum, **ainda** falhava só na
-Notícias): o backend, ao atender o pedido de simplificação da seção 2.17 (tirar
-compatibilidade com `imagemUrl`/`imagem` legado), foi além e trocou
-`POST/PUT /institucional/noticias` de multipart pra **JSON puro** (`@RequestBody
-NoticiaRequestDto`, confirmado no `NoticiaController.java` e no `/v3/api-docs` real —
-`content: application/json`, não mais `multipart/form-data`). O frontend ainda mandava
-`dados` embrulhado num `FormData` (`montarFormDataDados`, pensado pra quando criar
-precisava do campo `imagem` legado junto). Corrigido: `noticiaAdminService.criar()`/
-`atualizar()` agora mandam `dados` direto como corpo JSON (`api.post(url, dados)`, sem
-FormData nem header manual) — helper `montarFormDataDados` removido, não é mais usado
-em lugar nenhum.
+Testado de ponta a ponta com Claude Browser autenticado como admin real
+(`admin@prefeitura.dev`/`admin123`, seção 4) — `POST` retornou 200. Registros de teste
+criados durante o diagnóstico foram excluídos via `DELETE` logo em seguida.
 
-Verificado: `tsc`/`eslint` limpos; testado de ponta a ponta com o Claude Browser
-autenticado como admin de verdade (`admin@prefeitura.dev`/`admin123`, credencial de dev
-documentada na seção 4) — `POST /api/institucional/noticias` retornou 200 com o payload
-JSON correto. Registros de teste criados durante o diagnóstico (notícias e leis) foram
-excluídos via `DELETE` autenticado logo em seguida, sem deixar lixo no banco nem arquivo
-órfão em `/home/pc/portal-uploads-dev`.
+**Pendência registrada nesta rodada** (resolvida na seção 2.19): proxy do Next
+(`rewrites()`) travando/falhando em upload grande.
 
-**Pendência registrada, não resolvida**: o proxy do Next.js (`rewrites()`) trava ~30s e
-falha em uploads grandes (13MB reproduzido, 6MB passa), tanto em dev quanto em build de
-produção real — vale investigar antes de ir pra produção de verdade (opções: configurar
-timeout do proxy, ou apontar upload de arquivo direto pro backend, sem passar pelo
-`rewrites()`, exigindo CORS liberado lá).
+## 2.19 Regressão do próprio fix da seção 2.18 + timeout/truncamento do proxy — RESOLVIDO (2026-08-07)
 
-## 2.19 Regressão do próprio fix da seção 2.18 + timeout do proxy — RESOLVIDO (2026-08-07)
+**Regressão do próprio fix da 2.18**: `src/services/api.ts` define
+`Content-Type: application/json` como default da instância inteira do axios — remover o
+header manual por chamada deixou esse default vazar pra requisições `FormData` (pior que
+o bug original: `Content-Type 'application/json' is not supported`). **Corrigido**: o
+interceptor de request agora chama `config.headers.delete("Content-Type")` quando
+`config.data instanceof FormData`, garantindo que só o navegador defina esse header.
 
-**Regressão real, corrigida**: ao remover os headers manuais na seção 2.18, sobrou um
-efeito colateral — `src/services/api.ts` define `Content-Type: application/json` como
-default da instância inteira do axios (`axios.create({ headers: {...} })`). O axios só
-substitui automaticamente um `Content-Type` que **ele próprio** definiu por chamada
-quando detecta corpo `FormData`; um valor herdado do default da instância não é limpo
-sozinho. Depois de tirar o override manual por chamada, toda requisição com `FormData`
-passou a sair com `Content-Type: application/json` (herdado do default) — pior que o bug
-original, rejeitado pelo backend com `Content-Type 'application/json' is not supported`.
-**Corrigido**: o interceptor de request em `api.ts` agora chama
-`config.headers.delete("Content-Type")` quando `config.data instanceof FormData`,
-garantindo que nenhum `Content-Type` seja enviado nesses casos — só o navegador define.
-Testado de ponta a ponta (criar notícia via JSON + subir imagem via multipart, os dois
-contra o backend real): funcionou. Também apareceram durante a sessão 6 registros de
-teste ("gnsrmn", ids 11-16 em Notícias) que não foram criados por mim — provavelmente
-tentativas manuais do próprio usuário durante a investigação; não foram apagados,
-ficaram para o usuário decidir.
+**Causa raiz do timeout em upload grande, confirmada pelo backend**: o proxy de
+`rewrites()` do Next tem um buffer de ~10MB que **trunca o corpo silenciosamente** acima
+disso (sem erro), daí o timeout de ~30s sem mensagem útil — Spring/Tomcat nunca foi o
+gargalo (testado pelo backend simulando a chamada cross-origin real: uploads de
+5–30MB direto no backend, 0.12–0.29s, sem platô). Uma tentativa intermediária de só
+aumentar `experimental.proxyTimeout` foi revertida a pedido do usuário — só fazia o
+proxy esperar mais, não resolvia a causa real da lentidão.
 
-**Timeout de 30s do proxy — investigação REAL mas INCOMPLETA, não confiar cegamente no
-que está escrito abaixo em sessões futuras**: confirmado via código-fonte do Next.js
-(`node_modules/next/dist/server/lib/router-utils/proxy-request.js:33` —
-`proxyTimeout: proxyTimeout || 30000`) que o proxy de `rewrites()` tem um timeout
-hardcoded de exatamente 30000ms, configurável só via uma flag `experimental.proxyTimeout`
-em `next.config.ts` (existe desde a PR vercel/next.js#40289, ainda não promovida pra
-fora do namespace `experimental` mesmo anos depois — aplicada aqui, `300000`, mas **sem
-confirmação de que realmente resolve**, porque o teste de tempo real foi interrompido
-pelo usuário antes de rodar).
+**Correção aplicada**: `api.ts` — upload (`FormData`, só no navegador,
+`typeof window !== "undefined"`) sobrescreve `config.baseURL` pra
+`process.env.NEXT_PUBLIC_API_URL` direto (o mesmo valor que o SSR já usa, sem proxy) em
+vez do `/api` relativo que passa pelo `rewrites()`. Upload vai direto do navegador pro
+backend, contornando o buffer; chamadas JSON continuam via `/api` normalmente.
+`src/services/authApi.ts` é a única outra instância axios do projeto e não faz upload,
+não precisou de mudança.
 
-Isso NÃO explica por si só por que 13MB demora tanto — usuário questionou corretamente:
-"não deveria ser rápido subir um arquivo? por que 30s? não faz sentido" — e tem razão,
-30s pra 13MB é ~0.4MB/s, mais lento que qualquer conexão razoável, quando o mesmo
-arquivo direto no backend (sem passar pelo proxy) respondia em 0.13s (seção 2.16). Ou
-seja: **aumentar o timeout só faz o proxy esperar mais, não resolve a causa real da
-lentidão** — se o gargalo genuíno for do lado do proxy do Next (buffer ineficiente do
-corpo multipart antes de repassar, por exemplo), a requisição pode continuar demorando
-minutos de verdade em vez de só falhar em 30s, o que seria uma UX ruim mesmo
-"funcionando". Última hipótese do usuário antes de pausar a sessão: **pode ser algo no
-backend**, não confirmado nem descartado.
-
-**`experimental.proxyTimeout: 300000` foi revertido (2026-08-07, sessão seguinte)** —
-usuário apontou que só fazer o proxy esperar mais não é a causa do erro (concorda com o
-próprio parágrafo acima) e pediu pra tirar. `next.config.ts` voltou a não ter a chave
-`experimental`. A investigação da causa real da lentidão continua em aberto:
-- Não foi determinado se é: (a) do proxy do Next em si (buffer/streaming do corpo
-  multipart), (b) do backend levando mais tempo do que os 0.13s medidos anteriormente
-  quando passa pelo fluxo completo (autenticação, gravação em disco em caminho diferente,
-  etc. — os testes da seção 2.16 mediram o backend isolado, não necessariamente em
-  condições idênticas), ou (c) outra coisa ainda não cogitada.
-
-**Causa raiz confirmada pelo backend (2026-08-07)**: era (a) — o proxy de `rewrites()`
-do Next tem um buffer de ~10MB que **trunca o corpo de arquivo maior silenciosamente**
-(sem erro nenhum), daí o timeout de ~30s sem mensagem útil. O Spring/Tomcat nunca foi o
-gargalo: testado pelo backend com `curl -H "Origin: http://localhost:3000"` simulando a
-chamada cross-origin real do navegador, uploads de 5/10/12/15/20/30MB direto no backend
-responderam em 0.12–0.29s, sem platô.
-
-**Correção aplicada**: `src/services/api.ts` — quando `config.data instanceof FormData`
-**e** a chamada acontece no navegador (`typeof window !== "undefined"`), o interceptor de
-request agora sobrescreve `config.baseURL` pra `process.env.NEXT_PUBLIC_API_URL` (o mesmo
-valor que o SSR já usa direto, sem proxy — `http://localhost:8080/api` em dev) em vez do
-`/api` relativo que passa pelo rewrite. Upload vai direto do navegador pro backend,
-contornando o buffer problemático; chamadas JSON continuam via `/api` normalmente, sem
-mudança. Único ponto de mudança — `src/services/authApi.ts` é a única outra instância
-axios do projeto e não faz upload (só login, JSON puro).
-
-Isso vira uma chamada cross-origin de verdade (frontend e backend em origens diferentes).
-Backend confirmou que CORS já cobre isso sem nenhuma mudança do lado deles: preflight
-`OPTIONS` responde 200 com os headers certos, POST/PUT liberados pra `/**` (cobre os ~30
-controllers com upload, incluindo os que herdam de `GenericDocumentoController`),
+Isso vira chamada cross-origin de verdade — backend confirmou que CORS já cobre sem
+nenhuma mudança do lado deles: preflight `OPTIONS` 200, POST/PUT liberados pra `/**`,
 `Authorization`/`Content-Type` nos `allowedHeaders` (o navegador seta o boundary do
-`multipart/form-data` sozinho — nunca setar isso manualmente no client, é exatamente o bug
-da seção 2.18), `allowCredentials` em `false` — sem problema, autenticação aqui é só
-`Authorization: Bearer <token>`, nunca dependeu de cookie.
+`multipart/form-data` sozinho — nunca setar isso manualmente no client, é o bug da seção
+2.18), `allowCredentials` em `false` (autenticação é só `Bearer <token>`, nunca dependeu
+de cookie).
 
-**Mudança de comportamento a favor**: arquivo acima do limite do backend
-(`spring.servlet.multipart.max-file-size`/`max-request-size`, 40MB) agora retorna
-imediato (~0.045s) com `413 Payload Too Large` e corpo `{ errors: ["Arquivo excede o
-tamanho máximo permitido."] }` — `parseApiError` (`src/services/apiError.ts`) já
-extrai `errors[]` genericamente, então toda tela de upload já mostra essa mensagem via
-`ErrorState`/`erroForm` sem precisar de nenhum tratamento especial pro 413. Antes
-(via proxy) o mesmo caso era truncamento silencioso seguido de timeout sem mensagem útil.
+**A favor**: arquivo acima do limite do backend (40MB) agora retorna `413` imediato
+(~0.045s) com mensagem útil (`parseApiError` já extrai `errors[]` genericamente, toda
+tela de upload já mostra isso via `ErrorState`/`erroForm` sem tratamento especial) — em
+vez do truncamento silencioso + timeout sem mensagem de antes.
 
-`tsc --noEmit`/`npm run lint` limpos. Não testado em navegador de verdade nessa sessão
-(sem ferramenta de browser disponível) — a lógica (`typeof window !== "undefined"` +
-`NEXT_PUBLIC_API_URL` inlined no bundle do client pelo Next) é a mesma que o SSR já usa
-com sucesso pro mesmo valor de env var, e o lado do backend já foi validado ponta a ponta
-pelo próprio time de backend simulando a chamada cross-origin exata. Recomendado testar
-um upload real (qualquer módulo com anexo) antes de considerar 100% fechado.
+`tsc --noEmit`/`npm run lint` limpos. Não testado em navegador de verdade nesta sessão
+(sem ferramenta de browser disponível) — lógica se apoia no mesmo padrão que o SSR já
+usa com sucesso pro mesmo valor de env var, e o lado do backend já foi validado ponta a
+ponta pelo próprio time de backend. Recomendado testar um upload real antes de
+considerar 100% fechado.
+
+## 2.20 Auditoria do hub `/transparencia` vs. o portal de referência (2026-08-07)
+
+Usuário pediu comparação entre o menu completo do portal real de Lago dos Rodrigues
+(PDF exportado da home) e o que `secoes.ts` já cobre, pra levantar o que falta. Achados
+completos (~30 itens auditados) ficam só na conversa por ora — aqui só o que foi
+resolvido nessa rodada, a "vitória rápida" (dado/rota já existia, só faltava linkar no
+hub):
+
+- **Diário Oficial não tinha item nenhum no hub**, apesar do módulo estar 100% pronto
+  (seção 2.11) — adicionado em "Informações Institucionais" → `/diario-oficial`.
+- **Licitações — Covid-19**: campo `covid` já existe em `LicitacaoDetalhe`/filtro público
+  — item novo → `/licitacoes?covid=true`.
+- **Dispensas** e **Inexigibilidade** — eram um item só ("Dispensas e inexigibilidade")
+  sem link; viraram 2 itens separados (`TipoProcedimentoLicitacao.DP`/`.IN` já existem e
+  são filtráveis, um valor por vez, então não dava pra manter num link só) →
+  `/licitacoes?tipoProcedimentoLicitacao=DP` e `=IN`.
+- **Ato de adesão** → `/licitacoes?tipoProcedimentoLicitacao=AARP` (idem, enum já existe).
+- **Prazos de resposta — SIC** → `/esic` (`InformacoesEsicView` já renderiza
+  `prazoRespostaDisponivel`/`prazoRespostaBusca`, só faltava o link no hub).
+- Confirmado que `usePageableResource` lê **todo** query param da URL direto pro filtro
+  inicial (`searchParams.forEach`, seção "PARAMS_RESERVADOS" exclui só `page`/`sort`/
+  `categoria`) — por isso um deep link tipo `?covid=true` já filtra a lista certa no
+  carregamento, sem precisar de nenhum código novo além do item no hub.
+- `tsc --noEmit`/`npm run lint` limpos. Testado com `curl`: as 5 rotas novas/editadas
+  200, e SSR de `/transparencia` confirmando os novos `href`s no HTML.
+
+**Gaps reais identificados na auditoria (não implementados, nada a fazer aqui ainda —
+aguardando priorização)**: Lista de Fiscais de Contrato (roster de pessoas, diferente do
+módulo de documentos que já existe em `/fiscal-contrato`), Licitantes Sancionados
+(diferente de Empresas Inidôneas), Relação de Licitantes Contratados, Aditivos de
+Contratos como lista global (hoje só existe aninhado no contrato específico), PCA,
+Chamamento Público, Ordem Cronológica, Ata de Registro de Preço como entidade própria,
+Audiências Públicas, Relatório Anual Estatístico do SIC, Documentos Classificados/
+Desclassificados, Dados Abertos de verdade (hoje `/lgpd` é só texto), Emendas
+Parlamentares por esfera (Federal/Estadual/Municipal — hoje é uma lista só), Saúde
+(lista de espera consultas/exames, estoque de medicamentos, conselho de saúde),
+Educação/Assistência Social (conselho do FUNDEB, conselho de assistência social,
+conselho municipal de educação).
+
+## 2.21 Licitações/Contratos: 3 gaps da auditoria 2.20, com prints reais de referência (2026-08-07)
+
+Usuário colou 15 screenshots do site de referência cobrindo especificamente o cluster
+"Licitações e Contratos" da auditoria da seção 2.20. Os prints mudaram a estimativa de
+esforço pra baixo em 2 dos 3 itens — o que parecia precisar de recurso novo no backend
+na verdade já tinha os dados prontos, só faltava expor de outro jeito no front:
+
+- **Aditivos de Contratos (lista global)** — o print "Listagem de Aditivos de
+  Contratos" mostrou que é uma lista simples (Nº Ato Licitação, Nº Contrato, Assinatura,
+  Objeto, Fornecedor). Descoberto via `curl` que `GET /licitacoes/contratos/aditivos`
+  **já aceita ser chamado sem `contratoLicitacaoId`** (parâmetro documentado como
+  opcional no OpenAPI) e retorna todos os aditivos paginados, endpoint já público (200
+  sem token) — **zero mudança de backend**. Novo:
+  `src/modules/contratos/aditivo.service.ts` (`aditivoGlobalService`, service público
+  separado do `contratoService.listarAditivos` existente que é escopado por contrato),
+  `hooks/useAditivosGlobal.ts`, `components/AditivoGlobalCard.tsx` +
+  `AditivosGlobalListView.tsx`, rota `/aditivos-contratos`. Sem filtro dedicado — o
+  endpoint só aceita paginação/ordenação quando chamado sem `contratoLicitacaoId`.
+- **Fiscais de Contratos** — o print mostrou uma tabela (Nome do Fiscal, Nº Contrato,
+  Vigência Inicial/Final, Fornecedor) com busca por nome. Confirmado via `curl` que
+  `ContratoLicitacao.gestorContrato` (já existia no tipo, usado como "Gestor do
+  Contrato" em `ContratoDetalhe.tsx`) **já é filtrável** em
+  `GET /licitacoes/contratos/filtro?gestorContrato=...`. **Zero mudança de backend** —
+  "Fiscais de Contratos" é só uma reprojeção do mesmo `contratoService.listarTodos` já
+  usado por `/contratos`, com `gestorContrato` em destaque como "Nome do Fiscal" em vez
+  de escondido dentro do detalhe. Novo: `hooks/useFiscaisContratos.ts`,
+  `components/FiscalContratoFiltro.tsx` + `FiscalContratoCard.tsx` +
+  `FiscaisContratosListView.tsx`, rota `/fiscais-contratos`. **Não confundir com**
+  `/fiscal-contrato` (já existia) — esse é documento genérico (portaria de designação em
+  PDF, ato normativo), o novo é o cadastro estruturado de nomes por contrato; são dois
+  itens distintos no site de referência também.
+- **Licitantes e/ou Contratados Sancionados** — print mostrou que, ao contrário do que a
+  auditoria 2.20 supôs (achava que precisava de um modelo de sanção por licitação), é só
+  documento genérico (Descrição/Data/Arquivo — "LICITANTES SANCIONADOS" por ano,
+  "DECLARAÇÃO DE INEXISTÊNCIA..."), mesmo padrão de `legislacao`/`competencias`. Módulo
+  novo completo em `src/modules/licitantes-sancionados/` (service via
+  `criarServicoDocumentoGenerico`, mock, hook, ListView) + rota pública
+  `/licitantes-sancionados` + entrada no registry (`slug: 'licitantes-sancionados'`,
+  categoria "Licitações", `basePath: /licitacoes/licitantes-sancionados`) — CRUD admin
+  auto-gerado em `/admin/modulos/licitantes-sancionados`. **Esse precisa de backend**
+  (confirmado `500` via `curl` — endpoint não existe) — prompt em
+  `prompt-backend-licitantes-sancionados.md`, enviado ao usuário.
+- `secoes.ts` ("Licitações e Contratos") ganhou os 3 itens linkados, mais "Relação de
+  licitantes contratados" como placeholder sem link (gap real, ainda sem página de
+  referência pra desenhar o shape — aguardando print).
+- `tsc --noEmit`/`npm run lint` limpos. Testado com `curl`: as 4 rotas novas/editadas
+  (`/aditivos-contratos`, `/fiscais-contratos`, `/licitantes-sancionados`,
+  `/admin/modulos/licitantes-sancionados`) 200, sem marcador de erro no HTML.
 
 ## 3. Como decidir o padrão de um módulo novo
 
