@@ -50,7 +50,10 @@ api.interceptors.request.use((config) => {
     // já cobre CORS pra isso (preflight OPTIONS + POST/PUT liberados pra "/**",
     // Authorization/Content-Type nos allowedHeaders, sem allowCredentials — não precisa
     // de cookie, só o Authorization: Bearer que esse interceptor já anexa acima).
-    // Chamadas JSON continuam via "/api" (proxy), sem mudança.
+    // Chamadas JSON continuam via "/api" (proxy), sem mudança. Essa é a única proteção —
+    // não há flag experimental.middlewareClientMaxBodySize em next.config.ts como rede de
+    // segurança: seria redundante (nenhum upload passa pelo rewrite pra precisar disso) e
+    // arriscaria confundir quem ler o config achando que é ela que resolve o problema.
     if (typeof window !== "undefined") {
       config.baseURL = process.env.NEXT_PUBLIC_API_URL;
     }
