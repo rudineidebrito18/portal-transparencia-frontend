@@ -36,7 +36,7 @@ export default function DropdownMenuItem({ label, children }: DropdownMenuItemPr
         tabIndex={0}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="flex items-center gap-1 cursor-pointer hover:bg-secondary px-2 py-2"
+        className="flex items-center gap-1 cursor-pointer hover:bg-secondary px-2 py-3 lg:py-2"
         onClick={() => setIsOpen((prev) => !prev)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -51,6 +51,10 @@ export default function DropdownMenuItem({ label, children }: DropdownMenuItemPr
 
       {/* Submenu — onClick fecha ao clicar em qualquer item (bubbling do <a>/<Link> filho,
           não precisa que cada chamador feche individualmente). */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions --
+          mesmo padrão de delegação: os filhos (<Link>) já são focáveis e ativá-los por
+          teclado dispara um `click` nativo que borbulha até aqui, então já funciona sem
+          handler próprio no <ul>. */}
       <ul
         onClick={() => setIsOpen(false)}
         className={`

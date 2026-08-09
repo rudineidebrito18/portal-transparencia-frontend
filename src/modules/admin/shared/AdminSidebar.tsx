@@ -118,7 +118,7 @@ export default function AdminSidebar() {
         )}
 
         <div>
-          <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+          <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wide text-white/50">
             Institucional e Geral
           </p>
           {LINKS_INSTITUCIONAL_GERAL.map(link => (
@@ -133,7 +133,7 @@ export default function AdminSidebar() {
         </div>
 
         <div>
-          <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+          <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wide text-white/50">
             ESIC e Ouvidoria
           </p>
           {LINKS_ESIC_OUVIDORIA.map(link => (
@@ -149,7 +149,7 @@ export default function AdminSidebar() {
 
         {[...grupos.entries()].map(([categoria, modulos]) => (
           <div key={categoria}>
-            <p className="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+            <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wide text-white/50">
               {categoria}
             </p>
             {modulos.map(modulo => {

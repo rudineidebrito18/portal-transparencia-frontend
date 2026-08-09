@@ -48,7 +48,7 @@ export default function FiltroCard({ subtituloPadrao, filtrosAtivosCount, childr
 
         <div className="flex items-center gap-3">
           {filtrosAtivosCount > 0 && !isExpanded && (
-            <span className="bg-primary text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">
+            <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full font-semibold">
               {filtrosAtivosCount}
             </span>
           )}

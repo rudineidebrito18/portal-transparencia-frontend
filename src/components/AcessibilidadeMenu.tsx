@@ -66,12 +66,18 @@ export default function AcessibilidadeMenu({ altoContraste, onAumentarFonte, onD
           no meio do caminho. `onClick` no painel fecha ao clicar em qualquer item (bubbling,
           mesmo padrão de DropdownMenuItem.tsx) — os itens não precisam fechar cada um por
           conta própria. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions --
+          delegação de clique, não é um controle em si: fecha o painel quando QUALQUER
+          item real (Link/button, todos focáveis e com seu próprio onClick) é ativado.
+          Ativar um item por teclado (Enter/Espaço) já dispara um evento `click` nativo do
+          navegador, que borbulha até aqui — funciona igual para mouse e teclado sem
+          precisar de handler próprio neste div. */}
       <div
         onClick={() => setAberto(false)}
         className={`absolute right-0 top-full w-56 bg-white rounded-xl shadow-lg border border-border/10 overflow-hidden z-50
           ${aberto ? 'visible' : 'invisible group-hover:visible group-focus-within:visible'}`}
       >
-        <p className="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-text-secondary/60 bg-neutral-light">
+        <p className="px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-text-secondary/60 bg-neutral-light">
           Acessibilidade
         </p>
 

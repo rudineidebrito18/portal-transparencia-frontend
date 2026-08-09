@@ -32,14 +32,14 @@ export default function ServidorCard({ servidor }: Props) {
       {/* GRID INFO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Admissão</p>
+          <p className="text-xs uppercase text-text-secondary/60">Admissão</p>
           <p className="font-semibold text-text-secondary">
             {formatarData(servidor.dataAdmissao)}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60 flex items-center gap-1">
+          <p className="text-xs uppercase text-text-secondary/60 flex items-center gap-1">
             <MdSchedule size={12} /> Carga Horária
           </p>
           <p className="font-semibold text-text-secondary">
@@ -48,7 +48,7 @@ export default function ServidorCard({ servidor }: Props) {
         </div>
 
         <div className="col-span-2">
-          <p className="text-[11px] uppercase text-text-secondary/60">Unidade</p>
+          <p className="text-xs uppercase text-text-secondary/60">Unidade</p>
           <p className="font-semibold text-text-secondary truncate">
             {servidor.unidade?.nome || 'Não informada'}
           </p>

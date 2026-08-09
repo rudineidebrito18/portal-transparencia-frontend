@@ -18,7 +18,7 @@ export default function ItemAcessoCard({ label, href, icon: Icon, cor }: ItemAce
           <Icon size={18} />
         </span>
         <span className="text-sm font-medium text-text-secondary flex-1">{label}</span>
-        <span className="flex items-center gap-1 text-[11px] font-semibold text-text-secondary/60 whitespace-nowrap">
+        <span className="flex items-center gap-1 text-xs font-semibold text-text-secondary/60 whitespace-nowrap">
           <MdOutlineHourglassEmpty size={14} />
           Em breve
         </span>

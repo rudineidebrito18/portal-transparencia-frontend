@@ -50,6 +50,9 @@ export default function FotoAmpliavel({ src, alt, width, height, className = '' 
           ainda "hovered" faz o diálogo se posicionar relativo ao card (não à tela),
           ficando pequeno/deslocado, e pisca ao entrar/sair do hover. */}
       {aberta && createPortal(
+        // Backdrop de modal, fechar ao clicar fora é padrão (WAI-ARIA dialog pattern); o
+        // equivalente por teclado já existe — tecla Esc, tratada no useEffect acima.
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
         <div
           role="dialog"
           aria-modal="true"
@@ -66,6 +69,10 @@ export default function FotoAmpliavel({ src, alt, width, height, className = '' 
             <MdClose size={32} />
           </button>
 
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions --
+              não é um controle: só barra o bubbling do clique pro backdrop (senão clicar
+              na própria imagem fecharia o modal). Sem ação, sem equivalente de teclado
+              a fornecer. */}
           <div
             onClick={e => e.stopPropagation()}
             className="relative w-full h-full max-w-2xl max-h-[80vh]"

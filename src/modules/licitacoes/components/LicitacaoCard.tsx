@@ -53,14 +53,14 @@ export default function LicitacaoCard({ licitacao }: Props) {
       {/* GRID INFO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Abertura</p>
+          <p className="text-xs uppercase text-text-secondary/60">Abertura</p>
           <p className="font-semibold text-text-secondary">
             {formatarData(licitacao.dataAbertura)}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Valor</p>
+          <p className="text-xs uppercase text-text-secondary/60">Valor</p>
           <p className="font-semibold text-accent">
             {licitacao.valorTotalDespesa
               ? formatarMoeda(licitacao.valorTotalDespesa)
@@ -69,7 +69,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
         </div>
 
         <div className="col-span-2">
-          <p className="text-[11px] uppercase text-text-secondary/60">Unidade</p>
+          <p className="text-xs uppercase text-text-secondary/60">Unidade</p>
           <p className="font-semibold text-text-secondary truncate">
             {licitacao.unidade || "Não informada"}
           </p>

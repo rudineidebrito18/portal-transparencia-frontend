@@ -45,7 +45,7 @@ export default function Pagination({ pagina, totalPaginas, onChange, className =
         <button
           onClick={() => onChange(pagina - 1)}
           disabled={pagina === 0}
-          className="px-3 py-2 rounded-lg border border-border/30 text-sm font-medium hover:bg-neutral-light disabled:opacity-40 transition whitespace-nowrap"
+          className="min-h-11 px-3 flex items-center rounded-lg border border-border/30 text-sm font-medium hover:bg-neutral-light disabled:opacity-40 transition whitespace-nowrap"
         >
           Anterior
         </button>
@@ -57,7 +57,7 @@ export default function Pagination({ pagina, totalPaginas, onChange, className =
             <button
               key={i}
               onClick={() => onChange(p as number)}
-              className={`px-3 py-2 rounded-md text-sm font-semibold transition whitespace-nowrap
+              className={`min-h-11 min-w-11 px-3 flex items-center justify-center rounded-md text-sm font-semibold transition whitespace-nowrap
                 ${p === pagina
                   ? 'bg-primary text-white'
                   : 'hover:bg-neutral-light text-text-secondary'
@@ -71,7 +71,7 @@ export default function Pagination({ pagina, totalPaginas, onChange, className =
         <button
           onClick={() => onChange(pagina + 1)}
           disabled={pagina + 1 >= totalPaginas}
-          className="px-3 py-2 rounded-lg border border-border/30 text-sm font-medium hover:bg-neutral-light disabled:opacity-40 transition whitespace-nowrap"
+          className="min-h-11 px-3 flex items-center rounded-lg border border-border/30 text-sm font-medium hover:bg-neutral-light disabled:opacity-40 transition whitespace-nowrap"
         >
           Próxima
         </button>

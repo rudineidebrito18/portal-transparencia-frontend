@@ -35,42 +35,42 @@ export default function EmendaParlamentarCard({ emenda }: Props) {
       {/* GRID INFO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Autoridade</p>
+          <p className="text-xs uppercase text-text-secondary/60">Autoridade</p>
           <p className="font-semibold text-text-secondary truncate">
             {emenda.autoridade}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Publicação</p>
+          <p className="text-xs uppercase text-text-secondary/60">Publicação</p>
           <p className="font-semibold text-text-secondary">
             {formatarData(emenda.dataPublicacao)}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Valor Previsto</p>
+          <p className="text-xs uppercase text-text-secondary/60">Valor Previsto</p>
           <p className="font-semibold text-accent">
             {formatarMoeda(emenda.valorPrevisto)}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Valor Repassado</p>
+          <p className="text-xs uppercase text-text-secondary/60">Valor Repassado</p>
           <p className="font-semibold text-accent">
             {formatarMoeda(emenda.valorRepassado)}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Origem</p>
+          <p className="text-xs uppercase text-text-secondary/60">Origem</p>
           <p className="font-semibold text-text-secondary truncate">
             {emenda.origem}
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] uppercase text-text-secondary/60">Forma de Repasse</p>
+          <p className="text-xs uppercase text-text-secondary/60">Forma de Repasse</p>
           <p className="font-semibold text-text-secondary truncate">
             {formaRepasseLabel}
           </p>

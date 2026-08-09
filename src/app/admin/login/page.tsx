@@ -46,7 +46,6 @@ function LoginForm() {
           id="email"
           type="email"
           required
-          autoFocus
           value={email}
           onChange={e => setEmail(e.target.value)}
           className="w-full border border-border/30 rounded-lg px-3 py-2 mb-4 text-sm"

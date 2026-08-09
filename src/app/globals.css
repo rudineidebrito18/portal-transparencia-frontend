@@ -113,16 +113,15 @@ html.alto-contraste a {
 /* Indicador de foco padrão para todo o site. A maioria dos links/botões/nav (Header,
    Footer, Card usado como link, DropdownMenuItem, AcessibilidadeMenu) não define nenhum
    estado de :focus próprio — dependiam só do outline default do navegador, que varia
-   entre browsers e é fácil de suprimir sem querer. Os ~40 inputs de filtro já têm seu
-   próprio anel via `focus-visible:ring-*` (ver *Filtro.tsx) e não são afetados por esta
-   regra genérica (outline e box-shadow são propriedades diferentes, convivem sem
-   conflito). `:focus-visible` (não `:focus`) para não mostrar o anel em clique de
-   mouse/touch, só em navegação por teclado — WCAG 2.4.7/2.4.11. */
+   entre browsers e é fácil de suprimir sem querer. `input`/`select`/`textarea` ficam de
+   fora de propósito: os ~40 campos de filtro já têm seu próprio anel via
+   `focus-visible:ring-*` + `focus-visible:border-primary` — incluí-los aqui também
+   empilhava outline + ring + borda ao mesmo tempo (checado via getComputedStyle, os três
+   ativos simultaneamente), o oposto de "padronizar". `:focus-visible` (não `:focus`) pra
+   não mostrar o anel em clique de mouse/touch, só em navegação por teclado — WCAG
+   2.4.7/2.4.11. */
 a:focus-visible,
 button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
 [role="button"]:focus-visible,
 [tabindex]:not([tabindex="-1"]):focus-visible {
   outline: 3px solid var(--color-accent);

@@ -7,7 +7,7 @@ interface BadgeProps {
 }
 
 const sizeClasses: Record<NonNullable<BadgeProps['size']>, string> = {
-  sm: 'text-[11px] px-3 py-1',
+  sm: 'text-xs px-3 py-1',
   md: 'text-xs px-4 py-1.5 shadow-sm'
 }
 

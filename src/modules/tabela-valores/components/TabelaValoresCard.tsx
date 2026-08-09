@@ -24,7 +24,7 @@ export default function TabelaValoresCard({ documento }: Props) {
             <h2 className="text-base font-bold text-primary leading-tight">
               {documento.descricao}
             </h2>
-            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primary/10 text-primary whitespace-nowrap">
+            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary whitespace-nowrap">
               {TipoViagemDescricao[documento.tipo]}
             </span>
           </div>

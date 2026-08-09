@@ -31,7 +31,7 @@ export default function UltimaEdicaoDestaque() {
           </div>
 
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wide text-primary/70">
+            <span className="text-xs font-bold uppercase tracking-wide text-primary/70">
               Última Edição Publicada
             </span>
 

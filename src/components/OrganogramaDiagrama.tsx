@@ -99,7 +99,7 @@ function GrupoNos({ nos, titulo: tituloGrupo }: { nos: (No & { href?: string })[
   return (
     <div className="border-t-2 border-border/30 pt-6">
       {tituloGrupo && (
-        <p className="text-center text-[11px] font-bold uppercase tracking-wide text-text-secondary/50 mb-4">
+        <p className="text-center text-xs font-bold uppercase tracking-wide text-text-secondary/50 mb-4">
           {tituloGrupo}
         </p>
       )}

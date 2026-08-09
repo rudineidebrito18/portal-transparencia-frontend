@@ -78,7 +78,7 @@ export default function ServidorDetalhe({ servidor }: Props) {
             <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
               <table className="w-full text-sm bg-white">
                 <thead>
-                  <tr className="bg-neutral-light/60 text-text-secondary/60 text-[11px] uppercase">
+                  <tr className="bg-neutral-light/60 text-text-secondary/60 text-xs uppercase">
                     <th className="text-left px-4 py-3 font-semibold">Referência</th>
                     <th className="text-right px-4 py-3 font-semibold">Salário Bruto</th>
                     <th className="text-right px-4 py-3 font-semibold">Descontos</th>
