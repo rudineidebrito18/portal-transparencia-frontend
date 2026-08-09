@@ -168,8 +168,9 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
             <h2 className="font-semibold text-sm">{form.id ? 'Editar registro' : 'Novo registro'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Descrição</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
               <input
+                id="descricao"
                 required
                 value={form.descricao}
                 onChange={e => setForm({ ...form, descricao: e.target.value })}
@@ -179,9 +180,10 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
 
             <div className="flex gap-3 flex-wrap">
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
                   type="date"
+                  id="data"
                   required
                   value={form.data}
                   onChange={e => setForm({ ...form, data: e.target.value })}
@@ -192,9 +194,10 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
               {config.comIntervalo && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Início</label>
+                    <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Início</label>
                     <input
                       type="date"
+                      id="dataInicio"
                       required
                       value={form.dataInicio}
                       onChange={e => setForm({ ...form, dataInicio: e.target.value })}
@@ -202,9 +205,10 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Fim</label>
+                    <label className="block text-sm font-medium mb-1" htmlFor="dataFim">Fim</label>
                     <input
                       type="date"
+                      id="dataFim"
                       required
                       value={form.dataFim}
                       onChange={e => setForm({ ...form, dataFim: e.target.value })}
@@ -216,10 +220,11 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">
                 Arquivo PDF {form.id && '(opcional — mantém o atual se vazio)'}
               </label>
               <input
+                id="arquivo"
                 type="file"
                 accept="application/pdf"
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}

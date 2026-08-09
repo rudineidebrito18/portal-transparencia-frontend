@@ -238,8 +238,9 @@ export default function ObrasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Número</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numero">Número</label>
                 <input
+                  id="numero"
                   type="number"
                   min={1}
                   required
@@ -249,8 +250,9 @@ export default function ObrasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Local</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="local">Local</label>
                 <input
+                  id="local"
                   required
                   value={form.local}
                   onChange={e => setForm({ ...form, local: e.target.value })}
@@ -260,8 +262,9 @@ export default function ObrasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Objeto</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="objeto">Objeto</label>
               <textarea
+                id="objeto"
                 required
                 value={form.objeto}
                 onChange={e => setForm({ ...form, objeto: e.target.value })}
@@ -272,8 +275,9 @@ export default function ObrasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Unidade responsável</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Unidade responsável</label>
                 <select
+                  id="unidadeId"
                   required
                   value={form.unidadeId || ''}
                   onChange={e => setForm({ ...form, unidadeId: Number(e.target.value) })}
@@ -286,8 +290,9 @@ export default function ObrasAdminPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Fornecedor responsável</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="fornecedorId">Fornecedor responsável</label>
                 <select
+                  id="fornecedorId"
                   required
                   value={form.fornecedorId || ''}
                   onChange={e => setForm({ ...form, fornecedorId: Number(e.target.value) })}
@@ -303,8 +308,9 @@ export default function ObrasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipo">Tipo</label>
                 <select
+                  id="tipo"
                   value={form.tipo}
                   onChange={e => setForm({ ...form, tipo: e.target.value as TipoObra })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -315,8 +321,9 @@ export default function ObrasAdminPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="status">Status</label>
                 <select
+                  id="status"
                   value={form.status}
                   onChange={e => setForm({ ...form, status: e.target.value as StatusObra })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -330,8 +337,9 @@ export default function ObrasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de início</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Data de início</label>
                 <input
+                  id="dataInicio"
                   type="date"
                   required
                   value={form.dataInicio}
@@ -340,8 +348,9 @@ export default function ObrasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Previsão de término</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataPrevistaTermino">Previsão de término</label>
                 <input
+                  id="dataPrevistaTermino"
                   type="date"
                   required
                   value={form.dataPrevistaTermino}
@@ -350,8 +359,9 @@ export default function ObrasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Término real (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataTermino">Término real (opcional)</label>
                 <input
+                  id="dataTermino"
                   type="date"
                   value={form.dataTermino}
                   onChange={e => setForm({ ...form, dataTermino: e.target.value })}
@@ -362,8 +372,9 @@ export default function ObrasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Fonte de recursos</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="fonte">Fonte de recursos</label>
                 <input
+                  id="fonte"
                   required
                   value={form.fonte}
                   onChange={e => setForm({ ...form, fonte: e.target.value })}
@@ -371,8 +382,9 @@ export default function ObrasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor total</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorTotal">Valor total</label>
                 <input
+                  id="valorTotal"
                   type="number"
                   step="0.01"
                   min={0}

@@ -184,8 +184,9 @@ export default function DiariasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Beneficiário</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="beneficiario">Beneficiário</label>
                 <input
+                  id="beneficiario"
                   required
                   value={form.beneficiario}
                   onChange={e => setForm({ ...form, beneficiario: e.target.value })}
@@ -193,8 +194,9 @@ export default function DiariasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Cargo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
                 <input
+                  id="cargo"
                   required
                   value={form.cargo}
                   onChange={e => setForm({ ...form, cargo: e.target.value })}
@@ -205,8 +207,9 @@ export default function DiariasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de início</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Data de início</label>
                 <input
+                  id="dataInicio"
                   type="date"
                   required
                   value={form.dataInicio}
@@ -215,8 +218,9 @@ export default function DiariasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de término</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataTermino">Data de término</label>
                 <input
+                  id="dataTermino"
                   type="date"
                   required
                   value={form.dataTermino}
@@ -227,8 +231,9 @@ export default function DiariasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Destino</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="destino">Destino</label>
               <input
+                id="destino"
                 required
                 value={form.destino}
                 onChange={e => setForm({ ...form, destino: e.target.value })}
@@ -237,8 +242,9 @@ export default function DiariasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Unidade</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Unidade</label>
               <select
+                id="unidadeId"
                 value={form.unidadeId ?? ''}
                 onChange={e => setForm({ ...form, unidadeId: e.target.value ? Number(e.target.value) : undefined })}
                 className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -251,8 +257,9 @@ export default function DiariasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Motivo</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="motivo">Motivo</label>
               <textarea
+                id="motivo"
                 required
                 value={form.motivo}
                 onChange={e => setForm({ ...form, motivo: e.target.value })}
@@ -263,8 +270,9 @@ export default function DiariasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Quantidade de diárias</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="quantDiarias">Quantidade de diárias</label>
                 <input
+                  id="quantDiarias"
                   type="number"
                   min={1}
                   required
@@ -274,8 +282,9 @@ export default function DiariasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor concedido</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorConcedido">Valor concedido</label>
                 <input
+                  id="valorConcedido"
                   type="number"
                   step="0.01"
                   min={0}

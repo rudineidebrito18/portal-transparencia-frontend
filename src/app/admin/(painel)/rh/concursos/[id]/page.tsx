@@ -95,8 +95,9 @@ export default function AnexosConcursoAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Descrição</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
                 <input
+                  id="descricao"
                   required
                   value={descricao}
                   onChange={e => setDescricao(e.target.value)}
@@ -104,8 +105,9 @@ export default function AnexosConcursoAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
+                  id="data"
                   type="date"
                   required
                   value={data}
@@ -116,8 +118,9 @@ export default function AnexosConcursoAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Arquivo PDF</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">Arquivo PDF</label>
               <input
+                id="arquivo"
                 type="file"
                 required
                 accept="application/pdf"

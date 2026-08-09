@@ -98,8 +98,9 @@ export default function PublicacoesDiarioAdminPage() {
 
       <Card className="p-4 flex flex-wrap items-end gap-3" hoverable={false}>
         <div>
-          <label className="block text-sm font-medium mb-1">Status</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="status">Status</label>
           <select
+            id="status"
             value={filtros.status ?? ''}
             onChange={e => setFiltros({ ...filtros, status: (e.target.value || undefined) as StatusPublicacaoDiario | undefined })}
             className="border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -113,8 +114,9 @@ export default function PublicacoesDiarioAdminPage() {
 
         <form onSubmit={buscarPorId} className="flex items-end gap-2 ml-auto">
           <div>
-            <label className="block text-sm font-medium mb-1">Ir direto pro ID</label>
+            <label className="block text-sm font-medium mb-1" htmlFor="buscaId">Ir direto pro ID</label>
             <input
+              id="buscaId"
               type="number"
               placeholder="Ex: 12"
               value={buscaId}
@@ -143,8 +145,9 @@ export default function PublicacoesDiarioAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nº da edição</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numeroEdicao">Nº da edição</label>
                 <input
+                  id="numeroEdicao"
                   type="number"
                   required
                   value={form.numeroEdicao || ''}
@@ -153,8 +156,9 @@ export default function PublicacoesDiarioAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de publicação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataPublicacao">Data de publicação</label>
                 <input
+                  id="dataPublicacao"
                   type="date"
                   required
                   value={form.dataPublicacao}
@@ -163,8 +167,9 @@ export default function PublicacoesDiarioAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipo">Tipo</label>
                 <select
+                  id="tipo"
                   required
                   value={form.tipo}
                   onChange={e => setForm({ ...form, tipo: e.target.value })}
@@ -179,8 +184,9 @@ export default function PublicacoesDiarioAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Volume (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="volume">Volume (opcional)</label>
                 <input
+                  id="volume"
                   type="number"
                   value={form.volume ?? ''}
                   onChange={e => setForm({ ...form, volume: e.target.value ? Number(e.target.value) : undefined })}
@@ -188,8 +194,9 @@ export default function PublicacoesDiarioAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Descrição (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição (opcional)</label>
                 <input
+                  id="descricao"
                   value={form.descricao ?? ''}
                   onChange={e => setForm({ ...form, descricao: e.target.value })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -198,8 +205,9 @@ export default function PublicacoesDiarioAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Arquivo (PDF pronto da edição)</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">Arquivo (PDF pronto da edição)</label>
               <input
+                id="arquivo"
                 type="file"
                 accept="application/pdf"
                 required

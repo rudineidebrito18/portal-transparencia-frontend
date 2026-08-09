@@ -221,8 +221,9 @@ function AbaDecretos({ unidadeId }: { unidadeId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Descrição</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
                 <input
+                  id="descricao"
                   required
                   value={descricao}
                   onChange={e => setDescricao(e.target.value)}
@@ -230,8 +231,9 @@ function AbaDecretos({ unidadeId }: { unidadeId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
+                  id="data"
                   type="date"
                   required
                   value={data}
@@ -242,8 +244,9 @@ function AbaDecretos({ unidadeId }: { unidadeId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Arquivo (PDF, DOC, DOCX, XLS ou XLSX)</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">Arquivo (PDF, DOC, DOCX, XLS ou XLSX)</label>
               <input
+                id="arquivo"
                 type="file"
                 required
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}
@@ -510,8 +513,9 @@ function AbaPessoaCargo({ unidadeId }: { unidadeId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nome</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome</label>
                 <input
+                  id="nome"
                   required
                   value={nome}
                   onChange={e => setNome(e.target.value)}
@@ -519,8 +523,9 @@ function AbaPessoaCargo({ unidadeId }: { unidadeId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Cargo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
                 <input
+                  id="cargo"
                   required
                   value={cargo}
                   onChange={e => setCargo(e.target.value)}
@@ -531,8 +536,9 @@ function AbaPessoaCargo({ unidadeId }: { unidadeId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de início</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Data de início</label>
                 <input
+                  id="dataInicio"
                   type="date"
                   required
                   value={dataInicio}
@@ -541,8 +547,9 @@ function AbaPessoaCargo({ unidadeId }: { unidadeId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de término</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataFim">Data de término</label>
                 <input
+                  id="dataFim"
                   type="date"
                   required
                   value={dataFim}
@@ -748,8 +755,9 @@ function AbaGestores({ unidadeId }: { unidadeId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nome</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome</label>
                 <input
+                  id="nome"
                   required
                   value={form.nome}
                   onChange={e => setForm({ ...form, nome: e.target.value })}
@@ -757,8 +765,9 @@ function AbaGestores({ unidadeId }: { unidadeId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Cargo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
                 <input
+                  id="cargo"
                   required
                   value={form.cargo}
                   onChange={e => setForm({ ...form, cargo: e.target.value })}
@@ -769,8 +778,9 @@ function AbaGestores({ unidadeId }: { unidadeId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de início (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Data de início (opcional)</label>
                 <input
+                  id="dataInicio"
                   type="date"
                   value={form.dataInicio}
                   onChange={e => setForm({ ...form, dataInicio: e.target.value })}
@@ -778,8 +788,9 @@ function AbaGestores({ unidadeId }: { unidadeId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de término (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataFim">Data de término (opcional)</label>
                 <input
+                  id="dataFim"
                   type="date"
                   min={form.dataInicio || undefined}
                   value={form.dataFim}
@@ -799,10 +810,11 @@ function AbaGestores({ unidadeId }: { unidadeId: number }) {
             </label>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="foto">
                 Foto {form.id && '(opcional — mantém a atual se vazio)'}
               </label>
               <input
+                id="foto"
                 type="file"
                 accept="image/*"
                 onChange={e => setFoto(e.target.files?.[0] ?? null)}
@@ -957,8 +969,9 @@ function AbaSetores({ unidadeId }: { unidadeId: number }) {
             <h2 className="font-semibold text-sm">Novo setor</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Nome</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome</label>
               <input
+                id="nome"
                 required
                 value={nome}
                 onChange={e => setNome(e.target.value)}
@@ -967,8 +980,9 @@ function AbaSetores({ unidadeId }: { unidadeId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Descrição</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
               <textarea
+                id="descricao"
                 required
                 rows={2}
                 value={descricao}

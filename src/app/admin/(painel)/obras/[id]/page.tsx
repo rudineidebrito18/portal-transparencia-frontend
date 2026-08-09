@@ -293,8 +293,9 @@ function AbaMedicoes({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Número</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numero">Número</label>
                 <input
+                  id="numero"
                   type="number"
                   min={1}
                   required
@@ -304,8 +305,9 @@ function AbaMedicoes({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de início</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Data de início</label>
                 <input
+                  id="dataInicio"
                   type="date"
                   required
                   value={form.dataInicio}
@@ -314,8 +316,9 @@ function AbaMedicoes({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de fim</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataFim">Data de fim</label>
                 <input
+                  id="dataFim"
                   type="date"
                   required
                   value={form.dataFim}
@@ -327,8 +330,9 @@ function AbaMedicoes({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Fornecedor</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="fornecedorId">Fornecedor</label>
                 <select
+                  id="fornecedorId"
                   required
                   value={form.fornecedorId || ''}
                   onChange={e => setForm({ ...form, fornecedorId: Number(e.target.value) })}
@@ -341,8 +345,9 @@ function AbaMedicoes({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Situação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="situacao">Situação</label>
                 <input
+                  id="situacao"
                   required
                   value={form.situacao}
                   onChange={e => setForm({ ...form, situacao: e.target.value })}
@@ -353,8 +358,9 @@ function AbaMedicoes({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Responsável execução</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="responsavelExecucao">Responsável execução</label>
                 <input
+                  id="responsavelExecucao"
                   required
                   value={form.responsavelExecucao}
                   onChange={e => setForm({ ...form, responsavelExecucao: e.target.value })}
@@ -362,8 +368,9 @@ function AbaMedicoes({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Responsável fiscalização</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="responsavelFiscalizacao">Responsável fiscalização</label>
                 <input
+                  id="responsavelFiscalizacao"
                   required
                   value={form.responsavelFiscalizacao}
                   onChange={e => setForm({ ...form, responsavelFiscalizacao: e.target.value })}
@@ -371,8 +378,9 @@ function AbaMedicoes({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Responsável pasta</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="responsavelPasta">Responsável pasta</label>
                 <input
+                  id="responsavelPasta"
                   required
                   value={form.responsavelPasta}
                   onChange={e => setForm({ ...form, responsavelPasta: e.target.value })}
@@ -383,8 +391,9 @@ function AbaMedicoes({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Percentual (%)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="percentual">Percentual (%)</label>
                 <input
+                  id="percentual"
                   type="number"
                   step="0.01"
                   min={0}
@@ -396,8 +405,9 @@ function AbaMedicoes({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valor">Valor</label>
                 <input
+                  id="valor"
                   type="number"
                   step="0.01"
                   min={0}
@@ -542,8 +552,9 @@ function AbaAnexos({ obraId }: { obraId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Descrição</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
                 <input
+                  id="descricao"
                   required
                   value={descricao}
                   onChange={e => setDescricao(e.target.value)}
@@ -551,8 +562,9 @@ function AbaAnexos({ obraId }: { obraId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
+                  id="data"
                   type="date"
                   required
                   value={data}
@@ -563,8 +575,9 @@ function AbaAnexos({ obraId }: { obraId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Arquivo</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">Arquivo</label>
               <input
+                id="arquivo"
                 type="file"
                 required
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}
@@ -700,8 +713,9 @@ function AbaArts({ obraId }: { obraId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Número</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numero">Número</label>
                 <input
+                  id="numero"
                   required
                   value={numero}
                   onChange={e => setNumero(e.target.value)}
@@ -709,8 +723,9 @@ function AbaArts({ obraId }: { obraId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de expedição</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataExpedicao">Data de expedição</label>
                 <input
+                  id="dataExpedicao"
                   type="date"
                   required
                   value={dataExpedicao}
@@ -719,8 +734,9 @@ function AbaArts({ obraId }: { obraId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Responsável</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="responsavel">Responsável</label>
                 <input
+                  id="responsavel"
                   required
                   value={responsavel}
                   onChange={e => setResponsavel(e.target.value)}
@@ -730,8 +746,9 @@ function AbaArts({ obraId }: { obraId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Observações</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="observacoes">Observações</label>
               <textarea
+                id="observacoes"
                 value={observacoes}
                 onChange={e => setObservacoes(e.target.value)}
                 className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -740,8 +757,9 @@ function AbaArts({ obraId }: { obraId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">PDF</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="pdf">PDF</label>
               <input
+                id="pdf"
                 type="file"
                 accept="application/pdf"
                 required

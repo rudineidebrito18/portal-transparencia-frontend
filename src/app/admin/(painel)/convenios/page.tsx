@@ -186,8 +186,9 @@ export default function ConveniosAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Número</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numero">Número</label>
                 <input
+                  id="numero"
                   type="number"
                   min={1}
                   required
@@ -197,8 +198,9 @@ export default function ConveniosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Convenente</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="convenente">Convenente</label>
                 <input
+                  id="convenente"
                   required
                   value={form.convenente}
                   onChange={e => setForm({ ...form, convenente: e.target.value })}
@@ -208,8 +210,9 @@ export default function ConveniosAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Objeto</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="objeto">Objeto</label>
               <textarea
+                id="objeto"
                 required
                 value={form.objeto}
                 onChange={e => setForm({ ...form, objeto: e.target.value })}
@@ -219,8 +222,9 @@ export default function ConveniosAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Interveniente</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="internveniente">Interveniente</label>
               <input
+                id="internveniente"
                 required
                 value={form.internveniente}
                 onChange={e => setForm({ ...form, internveniente: e.target.value })}
@@ -230,8 +234,9 @@ export default function ConveniosAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de assinatura</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataAssinatura">Data de assinatura</label>
                 <input
+                  id="dataAssinatura"
                   type="date"
                   required
                   value={form.dataAssinatura}
@@ -240,8 +245,9 @@ export default function ConveniosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Início da vigência</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="inicioVigencia">Início da vigência</label>
                 <input
+                  id="inicioVigencia"
                   type="date"
                   required
                   value={form.inicioVigencia}
@@ -250,8 +256,9 @@ export default function ConveniosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Fim da vigência</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="fimVigencia">Fim da vigência</label>
                 <input
+                  id="fimVigencia"
                   type="date"
                   required
                   value={form.fimVigencia}
@@ -263,8 +270,9 @@ export default function ConveniosAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Valor do convênio</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorConvenio">Valor do convênio</label>
                 <input
+                  id="valorConvenio"
                   type="number"
                   step="0.01"
                   min={0}
@@ -275,8 +283,9 @@ export default function ConveniosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor da contrapartida</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorContrapartida">Valor da contrapartida</label>
                 <input
+                  id="valorContrapartida"
                   type="number"
                   step="0.01"
                   min={0}
@@ -287,8 +296,9 @@ export default function ConveniosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor do concedente</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorConcedente">Valor do concedente</label>
                 <input
+                  id="valorConcedente"
                   type="number"
                   step="0.01"
                   min={0}
@@ -301,10 +311,11 @@ export default function ConveniosAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="pdf">
                 PDF do convênio (opcional{form.id && ' — mantém o atual se vazio'})
               </label>
               <input
+                id="pdf"
                 type="file"
                 accept="application/pdf"
                 onChange={e => setPdf(e.target.files?.[0] ?? null)}

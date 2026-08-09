@@ -180,8 +180,9 @@ export default function NoticiasAdminPage() {
       </div>
 
       <Card className="p-4 flex flex-wrap gap-3 items-center" hoverable={false}>
-        <label className="text-sm font-medium">Status:</label>
+        <label className="text-sm font-medium" htmlFor="filtro-status">Status:</label>
         <select
+          id="filtro-status"
           value={filtros.ativo === undefined ? '' : String(filtros.ativo)}
           onChange={e =>
             setFiltros({ ativo: e.target.value === '' ? undefined : e.target.value === 'true' })
@@ -200,8 +201,9 @@ export default function NoticiasAdminPage() {
             <h2 className="font-semibold text-sm">{form.id ? 'Editar notícia' : 'Nova notícia'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Título</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="titulo">Título</label>
               <input
+                id="titulo"
                 required
                 value={form.titulo}
                 onChange={e => setForm({ ...form, titulo: e.target.value })}
@@ -210,8 +212,9 @@ export default function NoticiasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Texto</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="texto">Texto</label>
               <textarea
+                id="texto"
                 required
                 rows={4}
                 value={form.texto}
@@ -222,8 +225,9 @@ export default function NoticiasAdminPage() {
 
             <div className="flex gap-3 flex-wrap items-end">
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
+                  id="data"
                   type="date"
                   required
                   value={form.data}
@@ -242,8 +246,8 @@ export default function NoticiasAdminPage() {
               </label>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Imagens</label>
+            <fieldset className="border-0 p-0 m-0 min-w-0">
+              <legend className="block text-sm font-medium mb-1 p-0">Imagens</legend>
 
               {form.imagensExistentes.length > 0 && (
                 <div className="flex flex-wrap gap-3 mb-3">
@@ -252,7 +256,7 @@ export default function NoticiasAdminPage() {
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={imagem.url}
-                        alt=""
+                        alt={`Imagem da notícia${form.titulo ? `: ${form.titulo}` : ''}`}
                         className={`h-20 w-20 rounded-lg object-cover border-2 ${imagem.principal ? 'border-primary' : 'border-transparent'}`}
                       />
                       <div className="absolute -top-2 -right-2 flex gap-1">
@@ -289,7 +293,7 @@ export default function NoticiasAdminPage() {
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={imagem.preview}
-                        alt=""
+                        alt={`Nova imagem: ${imagem.file.name}`}
                         className={`h-20 w-20 rounded-lg object-cover border-2 ${index === principalNovaIndex ? 'border-primary' : 'border-transparent'}`}
                       />
                       <div className="absolute -top-2 -right-2 flex gap-1">
@@ -333,7 +337,7 @@ export default function NoticiasAdminPage() {
               <p className="text-xs text-text-secondary/50 mt-1">
                 Clique na estrela pra marcar a imagem principal — é a que aparece nas listagens do site.
               </p>
-            </div>
+            </fieldset>
 
             {erroForm && <ErrorState message={erroForm} />}
 
@@ -380,7 +384,7 @@ export default function NoticiasAdminPage() {
                     {imagemPrincipal(item) ? (
                       <div className="relative inline-block">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={imagemPrincipal(item)!} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                        <img src={imagemPrincipal(item)!} alt={`Imagem da notícia: ${item.titulo}`} className="h-10 w-10 rounded-lg object-cover" />
                         {(item.imagens?.length ?? 0) > 1 && (
                           <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] leading-none rounded-full w-4 h-4 flex items-center justify-center">
                             {item.imagens!.length}

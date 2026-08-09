@@ -116,8 +116,9 @@ export default function OuvidoriaConfigAdminPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <fieldset disabled={!podeSalvar} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Endereço</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="endereco">Endereço</label>
               <input
+                id="endereco"
                 required
                 value={form.endereco}
                 onChange={e => atualizarCampo('endereco', e.target.value)}
@@ -126,8 +127,9 @@ export default function OuvidoriaConfigAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Horário de atendimento</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="horarioAtendimento">Horário de atendimento</label>
               <input
+                id="horarioAtendimento"
                 required
                 placeholder="Ex: 08:00 às 14:00"
                 value={form.horarioAtendimento}
@@ -138,8 +140,9 @@ export default function OuvidoriaConfigAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Telefone</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="telefone">Telefone</label>
                 <input
+                  id="telefone"
                   required
                   value={form.telefone}
                   onChange={e => atualizarCampo('telefone', e.target.value)}
@@ -147,8 +150,9 @@ export default function OuvidoriaConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">E-mail</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
                 <input
+                  id="email"
                   type="email"
                   required
                   value={form.email}
@@ -160,8 +164,9 @@ export default function OuvidoriaConfigAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Responsável</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="responsavel">Responsável</label>
                 <input
+                  id="responsavel"
                   required
                   value={form.responsavel}
                   onChange={e => atualizarCampo('responsavel', e.target.value)}
@@ -169,8 +174,9 @@ export default function OuvidoriaConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Unidade</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Unidade</label>
                 <select
+                  id="unidadeId"
                   required
                   value={form.unidadeId || ''}
                   onChange={e => atualizarCampo('unidadeId', Number(e.target.value))}
@@ -185,8 +191,9 @@ export default function OuvidoriaConfigAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Prazos para resposta</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="prazos">Prazos para resposta</label>
               <input
+                id="prazos"
                 required
                 placeholder="Ex: Até 20 dias úteis"
                 value={form.prazos}

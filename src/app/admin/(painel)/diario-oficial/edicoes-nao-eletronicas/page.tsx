@@ -161,8 +161,9 @@ export default function EdicoesNaoEletronicasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Volume</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="volume">Volume</label>
                 <input
+                  id="volume"
                   required
                   placeholder="Ex: Vol. 2 - Nº 93 / 2021"
                   value={form.volume}
@@ -171,8 +172,9 @@ export default function EdicoesNaoEletronicasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Descrição</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
                 <input
+                  id="descricao"
                   required
                   value={form.descricao}
                   onChange={e => setForm({ ...form, descricao: e.target.value })}
@@ -183,8 +185,9 @@ export default function EdicoesNaoEletronicasAdminPage() {
 
             <div className="flex gap-3 flex-wrap">
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipo">Tipo</label>
                 <select
+                  id="tipo"
                   value={form.tipo}
                   onChange={e => setForm({ ...form, tipo: e.target.value })}
                   className="border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -196,8 +199,9 @@ export default function EdicoesNaoEletronicasAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
+                  id="data"
                   type="date"
                   required
                   value={form.data}
@@ -208,10 +212,11 @@ export default function EdicoesNaoEletronicasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">
                 Arquivo PDF {form.id && '(opcional — mantém o atual se vazio)'}
               </label>
               <input
+                id="arquivo"
                 type="file"
                 accept="application/pdf"
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}

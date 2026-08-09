@@ -63,7 +63,7 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
   }
 
   const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
 
   return (
     <FiltroCard subtituloPadrao="Refine por nome, CPF, cargo e mais" filtrosAtivosCount={filtrosAtivosCount}>
@@ -72,10 +72,11 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* NOME */}
             <div className="md:col-span-2">
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="name">
                 Nome
               </label>
               <input
+                id="name"
                 name="name"
                 value={filtros.name ?? ''}
                 onChange={handleChange}
@@ -87,10 +88,11 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* CPF */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cpf">
                 CPF
               </label>
               <input
+                id="cpf"
                 name="cpf"
                 value={filtros.cpf ?? ''}
                 onChange={handleChange}
@@ -102,10 +104,11 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* CARGO */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cargo">
                 Cargo
               </label>
               <input
+                id="cargo"
                 name="cargo"
                 value={filtros.cargo ?? ''}
                 onChange={handleChange}
@@ -117,10 +120,11 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* CARGA HORÁRIA */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cargaHoraria">
                 Carga Horária
               </label>
               <select
+                id="cargaHoraria"
                 name="cargaHoraria"
                 value={filtros.cargaHoraria ?? ''}
                 onChange={handleChange}
@@ -137,11 +141,12 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* DATAS DE ADMISSÃO */}
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAdmissaoInicio">
                   Admissão (início)
                 </label>
                 <input
                   type="date"
+                  id="dataAdmissaoInicio"
                   name="dataAdmissaoInicio"
                   value={filtros.dataAdmissaoInicio ?? ''}
                   onChange={handleChange}
@@ -150,11 +155,12 @@ export default function ServidorFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAdmissaoFim">
                   Admissão (fim)
                 </label>
                 <input
                   type="date"
+                  id="dataAdmissaoFim"
                   name="dataAdmissaoFim"
                   value={filtros.dataAdmissaoFim ?? ''}
                   onChange={handleChange}

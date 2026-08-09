@@ -287,8 +287,9 @@ function AbaDocumentos({ licitacaoId }: { licitacaoId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Assunto</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="assunto">Assunto</label>
                 <input
+                  id="assunto"
                   required
                   value={dados.assunto}
                   onChange={e => setDados({ ...dados, assunto: e.target.value })}
@@ -296,8 +297,9 @@ function AbaDocumentos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo de documento</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipoDocumento">Tipo de documento</label>
                 <input
+                  id="tipoDocumento"
                   required
                   value={dados.tipoDocumento}
                   onChange={e => setDados({ ...dados, tipoDocumento: e.target.value })}
@@ -305,8 +307,9 @@ function AbaDocumentos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de envio</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataEnvio">Data de envio</label>
                 <input
+                  id="dataEnvio"
                   type="date"
                   required
                   value={dados.dataEnvio}
@@ -317,8 +320,9 @@ function AbaDocumentos({ licitacaoId }: { licitacaoId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Arquivo (PDF)</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">Arquivo (PDF)</label>
               <input
+                id="arquivo"
                 type="file"
                 accept="application/pdf"
                 required
@@ -489,8 +493,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nº do contrato</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numeroContrato">Nº do contrato</label>
                 <input
+                  id="numeroContrato"
                   type="number"
                   required
                   value={form.numeroContrato}
@@ -499,8 +504,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Exercício</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="exercicio">Exercício</label>
                 <input
+                  id="exercicio"
                   type="number"
                   required
                   value={form.exercicio}
@@ -509,8 +515,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Fornecedor</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="fornecedor">Fornecedor</label>
                 <input
+                  id="fornecedor"
                   required
                   value={form.fornecedor}
                   onChange={e => setForm({ ...form, fornecedor: e.target.value })}
@@ -521,8 +528,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de assinatura</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataAssinatura">Data de assinatura</label>
                 <input
+                  id="dataAssinatura"
                   type="date"
                   required
                   value={form.dataAssinatura}
@@ -531,8 +539,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de publicação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataPublicacao">Data de publicação</label>
                 <input
+                  id="dataPublicacao"
                   type="date"
                   required
                   value={form.dataPublicacao}
@@ -541,8 +550,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Meio de publicação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="meioPublicacao">Meio de publicação</label>
                 <input
+                  id="meioPublicacao"
                   required
                   value={form.meioPublicacao}
                   onChange={e => setForm({ ...form, meioPublicacao: e.target.value })}
@@ -553,8 +563,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de início</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Data de início</label>
                 <input
+                  id="dataInicio"
                   type="date"
                   required
                   value={form.dataInicio}
@@ -563,8 +574,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de término</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataTermino">Data de término</label>
                 <input
+                  id="dataTermino"
                   type="date"
                   required
                   value={form.dataTermino}
@@ -573,8 +585,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor do contrato</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorContrato">Valor do contrato</label>
                 <input
+                  id="valorContrato"
                   type="number"
                   step="0.01"
                   required
@@ -587,8 +600,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Unidade</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="unidade">Unidade</label>
                 <input
+                  id="unidade"
                   required
                   value={form.unidade}
                   onChange={e => setForm({ ...form, unidade: e.target.value })}
@@ -596,8 +610,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Gestor do contrato</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="gestorContrato">Gestor do contrato</label>
                 <input
+                  id="gestorContrato"
                   required
                   value={form.gestorContrato}
                   onChange={e => setForm({ ...form, gestorContrato: e.target.value })}
@@ -605,8 +620,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="status">Status</label>
                 <select
+                  id="status"
                   required
                   value={form.status}
                   onChange={e => setForm({ ...form, status: e.target.value as StatusLicitacao })}
@@ -620,8 +636,9 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Objeto</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="objeto">Objeto</label>
               <textarea
+                id="objeto"
                 required
                 rows={2}
                 value={form.objeto}
@@ -804,8 +821,9 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Unidade</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Unidade</label>
                 <select
+                  id="unidadeId"
                   required
                   value={form.unidadeId || ''}
                   onChange={e => setForm({ ...form, unidadeId: Number(e.target.value) })}
@@ -818,8 +836,9 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Ordenador</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="ordenador">Ordenador</label>
                 <input
+                  id="ordenador"
                   required
                   value={form.ordenador}
                   onChange={e => setForm({ ...form, ordenador: e.target.value })}
@@ -828,8 +847,9 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipo">Tipo</label>
                 <select
+                  id="tipo"
                   required
                   value={form.tipo}
                   onChange={e => setForm({ ...form, tipo: e.target.value as TipoOrgao })}

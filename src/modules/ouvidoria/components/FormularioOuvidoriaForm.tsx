@@ -90,8 +90,9 @@ export default function FormularioOuvidoriaForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Órgão destinatário</label>
+            <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Órgão destinatário</label>
             <select
+              id="unidadeId"
               value={form.unidadeId || ''}
               onChange={e => setForm({ ...form, unidadeId: Number(e.target.value) })}
               className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -104,8 +105,9 @@ export default function FormularioOuvidoriaForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Finalidade</label>
+            <label className="block text-sm font-medium mb-1" htmlFor="finalidade">Finalidade</label>
             <select
+              id="finalidade"
               value={form.finalidade}
               onChange={e => setForm({ ...form, finalidade: e.target.value as FinalidadeOuvidoria })}
               className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -118,8 +120,9 @@ export default function FormularioOuvidoriaForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Comentário</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="comentario">Comentário</label>
           <textarea
+            id="comentario"
             required
             rows={4}
             value={form.comentario}
@@ -140,8 +143,9 @@ export default function FormularioOuvidoriaForm() {
         {!form.anonima && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Nome</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome</label>
               <input
+                id="nome"
                 required
                 value={form.nome}
                 onChange={e => setForm({ ...form, nome: e.target.value })}
@@ -149,8 +153,9 @@ export default function FormularioOuvidoriaForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">E-mail</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
               <input
+                id="email"
                 type="email"
                 required
                 value={form.email}
@@ -162,8 +167,9 @@ export default function FormularioOuvidoriaForm() {
         )}
 
         <div>
-          <label className="block text-sm font-medium mb-1">Anexo (opcional — PDF, DOC ou XLS)</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="anexo">Anexo (opcional — PDF, DOC ou XLS)</label>
           <input
+            id="anexo"
             type="file"
             accept=".pdf,.doc,.docx,.xls,.xlsx"
             onChange={e => setArquivo(e.target.files?.[0] ?? null)}

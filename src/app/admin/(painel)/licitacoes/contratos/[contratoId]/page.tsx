@@ -195,8 +195,9 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Assunto</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="assunto">Assunto</label>
                 <input
+                  id="assunto"
                   required
                   value={dados.assunto}
                   onChange={e => setDados({ ...dados, assunto: e.target.value })}
@@ -204,8 +205,9 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo de documento</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipoDocumento">Tipo de documento</label>
                 <input
+                  id="tipoDocumento"
                   required
                   value={dados.tipoDocumento}
                   onChange={e => setDados({ ...dados, tipoDocumento: e.target.value })}
@@ -213,8 +215,9 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de envio</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataEnvio">Data de envio</label>
                 <input
+                  id="dataEnvio"
                   type="date"
                   required
                   value={dados.dataEnvio}
@@ -225,8 +228,9 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Arquivo (PDF)</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">Arquivo (PDF)</label>
               <input
+                id="arquivo"
                 type="file"
                 accept="application/pdf"
                 required
@@ -394,8 +398,9 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de assinatura</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataAssinatura">Data de assinatura</label>
                 <input
+                  id="dataAssinatura"
                   type="date"
                   required
                   value={form.dataAssinatura}
@@ -404,8 +409,9 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Fornecedor</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="fornecedorId">Fornecedor</label>
                 <select
+                  id="fornecedorId"
                   required
                   value={form.fornecedorId || ''}
                   onChange={e => setForm({ ...form, fornecedorId: Number(e.target.value) })}
@@ -420,8 +426,9 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Objeto</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="objeto">Objeto</label>
               <textarea
+                id="objeto"
                 required
                 rows={2}
                 value={form.objeto}
@@ -431,10 +438,11 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">
                 Arquivo (PDF) {form.id && <span className="font-normal text-text-secondary/60">— opcional, mantém o atual se não enviar um novo</span>}
               </label>
               <input
+                id="arquivo"
                 type="file"
                 accept="application/pdf"
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}

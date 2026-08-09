@@ -16,7 +16,7 @@ export default function InfoBlock({ label, value, icon: Icon }: InfoBlockProps) 
         </div>
       )}
       <div className="overflow-hidden">
-        <p className="text-[11px] uppercase font-semibold text-text-secondary/60 tracking-wide">
+        <p className="text-xs uppercase font-semibold text-text-secondary/60 tracking-wide">
           {label}
         </p>
         <p className="text-sm font-bold text-text-secondary truncate">

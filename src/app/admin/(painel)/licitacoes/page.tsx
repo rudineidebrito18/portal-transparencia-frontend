@@ -254,8 +254,9 @@ export default function LicitacoesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nº do instrumento</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numeroInstrumento">Nº do instrumento</label>
                 <input
+                  id="numeroInstrumento"
                   required
                   value={form.numeroInstrumento}
                   onChange={e => setForm({ ...form, numeroInstrumento: e.target.value })}
@@ -263,8 +264,9 @@ export default function LicitacoesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Ano</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="ano">Ano</label>
                 <input
+                  id="ano"
                   type="number"
                   required
                   value={form.ano}
@@ -273,8 +275,9 @@ export default function LicitacoesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Nº do processo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numeroProcesso">Nº do processo</label>
                 <input
+                  id="numeroProcesso"
                   required
                   value={form.numeroProcesso}
                   onChange={e => setForm({ ...form, numeroProcesso: e.target.value })}
@@ -285,8 +288,9 @@ export default function LicitacoesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de publicação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataPublicacao">Data de publicação</label>
                 <input
+                  id="dataPublicacao"
                   type="date"
                   required
                   value={form.dataPublicacao}
@@ -295,8 +299,9 @@ export default function LicitacoesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data da sessão</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataSessao">Data da sessão</label>
                 <input
+                  id="dataSessao"
                   type="date"
                   required
                   value={form.dataSessao}
@@ -305,8 +310,9 @@ export default function LicitacoesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de abertura</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataAbertura">Data de abertura</label>
                 <input
+                  id="dataAbertura"
                   type="date"
                   required
                   value={form.dataAbertura}
@@ -318,8 +324,9 @@ export default function LicitacoesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de homologação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataHomologacao">Data de homologação</label>
                 <input
+                  id="dataHomologacao"
                   type="date"
                   value={form.dataHomologacao ?? ''}
                   onChange={e => setForm({ ...form, dataHomologacao: e.target.value || undefined })}
@@ -327,8 +334,9 @@ export default function LicitacoesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo de procedimento</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipoProcedimentoLicitacao">Tipo de procedimento</label>
                 <select
+                  id="tipoProcedimentoLicitacao"
                   required
                   value={form.tipoProcedimentoLicitacao}
                   onChange={e => setForm({ ...form, tipoProcedimentoLicitacao: e.target.value as TipoProcedimentoLicitacao })}
@@ -340,8 +348,9 @@ export default function LicitacoesAdminPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="status">Status</label>
                 <select
+                  id="status"
                   required
                   value={form.status}
                   onChange={e => setForm({ ...form, status: e.target.value as StatusLicitacao })}
@@ -356,8 +365,9 @@ export default function LicitacoesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Valor estimado</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorEstimado">Valor estimado</label>
                 <input
+                  id="valorEstimado"
                   type="number"
                   step="0.01"
                   value={form.valorEstimado ?? ''}
@@ -366,8 +376,9 @@ export default function LicitacoesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor adjudicado</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorAdjudicado">Valor adjudicado</label>
                 <input
+                  id="valorAdjudicado"
                   type="number"
                   step="0.01"
                   value={form.valorAdjudicado ?? ''}
@@ -376,8 +387,9 @@ export default function LicitacoesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor da dotação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorDotacao">Valor da dotação</label>
                 <input
+                  id="valorDotacao"
                   type="number"
                   step="0.01"
                   value={form.valorDotacao ?? ''}
@@ -389,24 +401,27 @@ export default function LicitacoesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Unidade responsável</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="unidade">Unidade responsável</label>
                 <input
+                  id="unidade"
                   value={form.unidade ?? ''}
                   onChange={e => setForm({ ...form, unidade: e.target.value })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Autoridade responsável</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="nomeAutoridade">Autoridade responsável</label>
                 <input
+                  id="nomeAutoridade"
                   value={form.nomeAutoridade ?? ''}
                   onChange={e => setForm({ ...form, nomeAutoridade: e.target.value })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Sistema eletrônico</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="sistemaEletronico">Sistema eletrônico</label>
                 <input
+                  id="sistemaEletronico"
                   value={form.sistemaEletronico ?? ''}
                   onChange={e => setForm({ ...form, sistemaEletronico: e.target.value })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -416,16 +431,18 @@ export default function LicitacoesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Lei</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="lei">Lei</label>
                 <input
+                  id="lei"
                   value={form.lei ?? ''}
                   onChange={e => setForm({ ...form, lei: e.target.value })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Regime de execução</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="regimeExecucao">Regime de execução</label>
                 <input
+                  id="regimeExecucao"
                   value={form.regimeExecucao ?? ''}
                   onChange={e => setForm({ ...form, regimeExecucao: e.target.value })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -444,8 +461,9 @@ export default function LicitacoesAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Objeto</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="objeto">Objeto</label>
               <textarea
+                id="objeto"
                 required
                 rows={2}
                 value={form.objeto}

@@ -119,8 +119,9 @@ export default function InstitucionalCrudPage({ label, servico }: { label: strin
       </div>
 
       <Card className="p-4 flex flex-wrap gap-3 items-center" hoverable={false}>
-        <label className="text-sm font-medium">Status:</label>
+        <label className="text-sm font-medium" htmlFor="status">Status:</label>
         <select
+          id="status"
           value={filtros.ativo === undefined ? '' : String(filtros.ativo)}
           onChange={e =>
             setFiltros({ ativo: e.target.value === '' ? undefined : e.target.value === 'true' })
@@ -139,8 +140,9 @@ export default function InstitucionalCrudPage({ label, servico }: { label: strin
             <h2 className="font-semibold text-sm">{form.id ? 'Editar registro' : 'Novo registro'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Título</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="titulo">Título</label>
               <input
+                id="titulo"
                 required
                 value={form.titulo}
                 onChange={e => setForm({ ...form, titulo: e.target.value })}
@@ -149,8 +151,9 @@ export default function InstitucionalCrudPage({ label, servico }: { label: strin
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Texto</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="texto">Texto</label>
               <textarea
+                id="texto"
                 required
                 rows={4}
                 value={form.texto}
@@ -161,9 +164,10 @@ export default function InstitucionalCrudPage({ label, servico }: { label: strin
 
             <div className="flex gap-3 flex-wrap items-end">
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
                   type="date"
+                  id="data"
                   required
                   value={form.data}
                   onChange={e => setForm({ ...form, data: e.target.value })}

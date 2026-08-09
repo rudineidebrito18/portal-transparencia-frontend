@@ -74,7 +74,7 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
   }
 
   const inputClass =
-    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all'
+    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all'
 
   return (
     <FiltroCard subtituloPadrao="Refine por número, status, tipo e mais" filtrosAtivosCount={filtrosAtivosCount}>
@@ -82,10 +82,11 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numero">
             Número
           </label>
           <input
+            id="numero"
             name="numero"
             value={filtros.numero ?? ''}
             onChange={handleChange}
@@ -96,10 +97,10 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
             Status
           </label>
-          <select name="status" value={filtros.status ?? ''} onChange={handleChange} className={inputClass}>
+          <select id="status" name="status" value={filtros.status ?? ''} onChange={handleChange} className={inputClass}>
             <option value="">Todos</option>
             {Object.values(StatusObra).map(s => (
               <option key={s} value={s}>{StatusObraDescricao[s]}</option>
@@ -108,10 +109,10 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipo">
             Tipo
           </label>
-          <select name="tipo" value={filtros.tipo ?? ''} onChange={handleChange} className={inputClass}>
+          <select id="tipo" name="tipo" value={filtros.tipo ?? ''} onChange={handleChange} className={inputClass}>
             <option value="">Todos</option>
             {Object.values(TipoObra).map(t => (
               <option key={t} value={t}>{TipoObraDescricao[t]}</option>
@@ -120,10 +121,10 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
             Unidade
           </label>
-          <select name="unidadeId" value={filtros.unidadeId ?? ''} onChange={handleChange} className={inputClass}>
+          <select id="unidadeId" name="unidadeId" value={filtros.unidadeId ?? ''} onChange={handleChange} className={inputClass}>
             <option value="">Todas</option>
             {unidades.map(u => (
               <option key={u.id} value={u.id}>{u.nome}</option>
@@ -132,10 +133,10 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="fornecedorId">
             Fornecedor
           </label>
-          <select name="fornecedorId" value={filtros.fornecedorId ?? ''} onChange={handleChange} className={inputClass}>
+          <select id="fornecedorId" name="fornecedorId" value={filtros.fornecedorId ?? ''} onChange={handleChange} className={inputClass}>
             <option value="">Todos</option>
             {fornecedores.map(f => (
               <option key={f.id} value={f.id}>{f.nome}</option>

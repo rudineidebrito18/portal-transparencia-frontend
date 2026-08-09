@@ -49,17 +49,18 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
   }
 
   const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
 
   return (
     <FiltroCard subtituloPadrao="Refine por descrição e datas" filtrosAtivosCount={filtrosAtivosCount}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
         <div className="md:col-span-2">
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
             Descrição
           </label>
           <input
+            id="descricao"
             name="descricao"
             value={filtros.descricao ?? ''}
             onChange={handleChange}
@@ -70,10 +71,11 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
             Data inicial
           </label>
           <input
+            id="dataInicial"
             type="date"
             name="dataInicial"
             value={filtros.dataInicial ?? ''}
@@ -83,10 +85,11 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
             Data final
           </label>
           <input
+            id="dataFinal"
             type="date"
             name="dataFinal"
             value={filtros.dataFinal ?? ''}

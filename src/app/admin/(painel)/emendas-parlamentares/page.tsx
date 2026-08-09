@@ -134,8 +134,9 @@ export default function EmendasParlamentaresAdminPage() {
 
       <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
         <div>
-          <label className="block text-sm font-medium mb-1">Tipo</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="filtro-tipo">Tipo</label>
           <select
+            id="filtro-tipo"
             value={filtros.tipo ?? ''}
             onChange={e => setFiltros({ ...filtros, tipo: (e.target.value || undefined) as TipoEmenda | undefined, ano: undefined })}
             className="border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -147,8 +148,9 @@ export default function EmendasParlamentaresAdminPage() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Ano de publicação</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="ano">Ano de publicação</label>
           <select
+            id="ano"
             value={filtros.ano ?? ''}
             onChange={e => setFiltros({ ...filtros, ano: e.target.value ? Number(e.target.value) : undefined, tipo: undefined })}
             className="border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -171,8 +173,9 @@ export default function EmendasParlamentaresAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Número (emenda/empenho)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numero">Número (emenda/empenho)</label>
                 <input
+                  id="numero"
                   required
                   value={form.numero}
                   onChange={e => setForm({ ...form, numero: e.target.value })}
@@ -180,8 +183,9 @@ export default function EmendasParlamentaresAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Data de publicação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataPublicacao">Data de publicação</label>
                 <input
+                  id="dataPublicacao"
                   type="date"
                   required
                   value={form.dataPublicacao}
@@ -192,8 +196,9 @@ export default function EmendasParlamentaresAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Objeto</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="objeto">Objeto</label>
               <textarea
+                id="objeto"
                 required
                 value={form.objeto}
                 onChange={e => setForm({ ...form, objeto: e.target.value })}
@@ -204,8 +209,9 @@ export default function EmendasParlamentaresAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Autoridade</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="autoridade">Autoridade</label>
                 <input
+                  id="autoridade"
                   required
                   value={form.autoridade}
                   onChange={e => setForm({ ...form, autoridade: e.target.value })}
@@ -213,8 +219,9 @@ export default function EmendasParlamentaresAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Origem do recurso</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="origem">Origem do recurso</label>
                 <input
+                  id="origem"
                   required
                   value={form.origem}
                   onChange={e => setForm({ ...form, origem: e.target.value })}
@@ -225,8 +232,9 @@ export default function EmendasParlamentaresAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipo">Tipo</label>
                 <select
+                  id="tipo"
                   value={form.tipo}
                   onChange={e => setForm({ ...form, tipo: e.target.value as TipoEmenda })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -237,8 +245,9 @@ export default function EmendasParlamentaresAdminPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Forma de repasse</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="formaRepasse">Forma de repasse</label>
                 <select
+                  id="formaRepasse"
                   value={form.formaRepasse}
                   onChange={e => setForm({ ...form, formaRepasse: e.target.value as FormaRepasseEmenda })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -252,8 +261,9 @@ export default function EmendasParlamentaresAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Valor previsto</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorPrevisto">Valor previsto</label>
                 <input
+                  id="valorPrevisto"
                   type="number"
                   step="0.01"
                   min={0}
@@ -264,8 +274,9 @@ export default function EmendasParlamentaresAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor já repassado</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorRepassado">Valor já repassado</label>
                 <input
+                  id="valorRepassado"
                   type="number"
                   step="0.01"
                   min={0}
@@ -278,8 +289,9 @@ export default function EmendasParlamentaresAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Link para detalhes</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="linkDetalhes">Link para detalhes</label>
               <input
+                id="linkDetalhes"
                 type="url"
                 value={form.linkDetalhes}
                 onChange={e => setForm({ ...form, linkDetalhes: e.target.value })}

@@ -54,7 +54,7 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
   }
 
   const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
 
   return (
     <FiltroCard subtituloPadrao="Refine por cargo e faixa de valor bruto" filtrosAtivosCount={filtrosAtivosCount}>
@@ -62,10 +62,11 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cargo">
             Cargo
           </label>
           <input
+            id="cargo"
             name="cargo"
             value={filtros.cargo ?? ''}
             onChange={handleChangeTexto}
@@ -76,13 +77,14 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="valorBrutoMin">
             Valor bruto (mínimo)
           </label>
           <input
             type="number"
             step="0.01"
             min={0}
+            id="valorBrutoMin"
             name="valorBrutoMin"
             value={filtros.valorBrutoMin ?? ''}
             onChange={handleChangeNumero}
@@ -93,13 +95,14 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="valorBrutoMax">
             Valor bruto (máximo)
           </label>
           <input
             type="number"
             step="0.01"
             min={0}
+            id="valorBrutoMax"
             name="valorBrutoMax"
             value={filtros.valorBrutoMax ?? ''}
             onChange={handleChangeNumero}

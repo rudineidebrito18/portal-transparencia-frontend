@@ -183,8 +183,9 @@ export default function EmpresasDividaAtivaAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nome</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome</label>
                 <input
+                  id="nome"
                   required
                   value={form.nome}
                   onChange={e => setForm({ ...form, nome: e.target.value })}
@@ -192,8 +193,9 @@ export default function EmpresasDividaAtivaAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Razão social</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="razaoSocial">Razão social</label>
                 <input
+                  id="razaoSocial"
                   required
                   value={form.razaoSocial}
                   onChange={e => setForm({ ...form, razaoSocial: e.target.value })}
@@ -201,8 +203,9 @@ export default function EmpresasDividaAtivaAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">CNPJ</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cnpj">CNPJ</label>
                 <input
+                  id="cnpj"
                   required
                   value={form.cnpj}
                   onChange={e => setForm({ ...form, cnpj: e.target.value })}
@@ -212,8 +215,9 @@ export default function EmpresasDividaAtivaAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Descrição da dívida</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição da dívida</label>
               <textarea
+                id="descricao"
                 required
                 rows={2}
                 value={form.descricao}
@@ -224,8 +228,9 @@ export default function EmpresasDividaAtivaAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
+                  id="data"
                   type="date"
                   required
                   value={form.data}
@@ -234,8 +239,9 @@ export default function EmpresasDividaAtivaAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valor">Valor</label>
                 <input
+                  id="valor"
                   type="number"
                   step="0.01"
                   min={0}
@@ -248,10 +254,11 @@ export default function EmpresasDividaAtivaAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="pdf">
                 PDF (opcional{form.id && ' — mantém o atual se vazio'})
               </label>
               <input
+                id="pdf"
                 type="file"
                 accept="application/pdf"
                 onChange={e => setPdf(e.target.files?.[0] ?? null)}

@@ -37,7 +37,7 @@ export default function RelatoriosGestaoFiscalListView() {
             value={ordenacao || 'ano,desc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none"
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
           >
             <option value="ano,desc">Mais recentes</option>
             <option value="ano,asc">Mais antigos</option>

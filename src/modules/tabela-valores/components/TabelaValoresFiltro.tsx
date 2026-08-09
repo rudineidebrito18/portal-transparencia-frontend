@@ -50,17 +50,18 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
   }
 
   const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
 
   return (
     <FiltroCard subtituloPadrao="Refine por descrição, tipo de viagem e datas" filtrosAtivosCount={filtrosAtivosCount}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
         <div className="md:col-span-2">
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
             Descrição
           </label>
           <input
+            id="descricao"
             name="descricao"
             value={filtros.descricao ?? ''}
             onChange={handleChange}
@@ -71,10 +72,11 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipoViagem">
             Tipo de viagem
           </label>
           <select
+            id="tipoViagem"
             name="tipoViagem"
             value={filtros.tipoViagem ?? ''}
             onChange={handleChange}
@@ -88,11 +90,12 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
             Data inicial
           </label>
           <input
             type="date"
+            id="dataInicial"
             name="dataInicial"
             value={filtros.dataInicial ?? ''}
             onChange={handleChange}
@@ -101,11 +104,12 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
             Data final
           </label>
           <input
             type="date"
+            id="dataFinal"
             name="dataFinal"
             value={filtros.dataFinal ?? ''}
             onChange={handleChange}

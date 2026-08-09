@@ -57,7 +57,7 @@ export default function TabelaCargos() {
             value={ordenacao || 'cargo,asc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none"
+            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
           >
             <option value="cargo,asc">Cargo (A-Z)</option>
             <option value="cargo,desc">Cargo (Z-A)</option>

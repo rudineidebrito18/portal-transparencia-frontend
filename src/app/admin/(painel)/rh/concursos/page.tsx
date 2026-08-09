@@ -168,8 +168,9 @@ export default function ConcursosAdminPage() {
             <h2 className="font-semibold text-sm">{form.id ? 'Editar concurso' : 'Novo concurso'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Descrição</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
               <input
+                id="descricao"
                 required
                 value={form.descricao}
                 onChange={e => setForm({ ...form, descricao: e.target.value })}
@@ -179,8 +180,9 @@ export default function ConcursosAdminPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Número</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="numero">Número</label>
                 <input
+                  id="numero"
                   type="number"
                   min={1}
                   required
@@ -190,8 +192,9 @@ export default function ConcursosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Ano</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="ano">Ano</label>
                 <input
+                  id="ano"
                   type="number"
                   required
                   value={form.ano}
@@ -203,8 +206,9 @@ export default function ConcursosAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de abertura</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataAbertura">Data de abertura</label>
                 <input
+                  id="dataAbertura"
                   type="date"
                   required
                   value={form.dataAbertura}
@@ -213,8 +217,9 @@ export default function ConcursosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Validade</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="validate">Validade</label>
                 <input
+                  id="validate"
                   type="date"
                   required
                   value={form.validate}
@@ -226,8 +231,9 @@ export default function ConcursosAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Início das inscrições</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInscricoes">Início das inscrições</label>
                 <input
+                  id="dataInscricoes"
                   type="date"
                   required
                   value={form.dataInscricoes}
@@ -236,8 +242,9 @@ export default function ConcursosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Término das inscrições</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataTerminoInscricoes">Término das inscrições</label>
                 <input
+                  id="dataTerminoInscricoes"
                   type="date"
                   required
                   value={form.dataTerminoInscricoes}
@@ -248,8 +255,9 @@ export default function ConcursosAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Resumo</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="resumo">Resumo</label>
               <textarea
+                id="resumo"
                 required
                 value={form.resumo}
                 onChange={e => setForm({ ...form, resumo: e.target.value })}

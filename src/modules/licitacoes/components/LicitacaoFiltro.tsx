@@ -81,7 +81,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
   }
 
   const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
 
   return (
     <FiltroCard subtituloPadrao="Refine por modalidade, status, datas e mais" filtrosAtivosCount={filtrosAtivosCount}>
@@ -90,10 +90,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* NÚMERO DO PROCESSO */}
             <div className="md:col-span-2">
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroProcesso">
                 Número do Processo
               </label>
               <input
+                id="numeroProcesso"
                 name="numeroProcesso"
                 value={filtros.numeroProcesso ?? ''}
                 onChange={handleChange}
@@ -105,10 +106,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* MODALIDADE */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipoProcedimentoLicitacao">
                 Modalidade
               </label>
               <select
+                id="tipoProcedimentoLicitacao"
                 name="tipoProcedimentoLicitacao"
                 value={filtros.tipoProcedimentoLicitacao ?? ''}
                 onChange={handleChange}
@@ -125,10 +127,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* STATUS */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
                 Status
               </label>
               <select
+                id="status"
                 name="status"
                 value={filtros.status ?? ''}
                 onChange={handleChange}
@@ -146,10 +149,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* NÚMERO + ANO */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroInstrumento">
                   Número
                 </label>
                 <input
+                  id="numeroInstrumento"
                   name="numeroInstrumento"
                   value={filtros.numeroInstrumento ?? ''}
                   onChange={handleChange}
@@ -160,10 +164,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
                   Ano
                 </label>
                 <select
+                  id="ano"
                   name="ano"
                   value={filtros.ano ?? ''}
                   onChange={handleChange}
@@ -181,10 +186,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* UNIDADE */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
                 Unidade
               </label>
               <select
+                id="unidadeId"
                 name="unidadeId"
                 value={filtros.unidadeId ?? ''}
                 onChange={handleChange}
@@ -200,11 +206,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* DATAS DE ABERTURA */}
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAberturaInicio">
                   Abertura (início)
                 </label>
                 <input
                   type="date"
+                  id="dataAberturaInicio"
                   name="dataAberturaInicio"
                   value={filtros.dataAberturaInicio ?? ''}
                   onChange={handleChange}
@@ -213,11 +220,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAberturaFim">
                   Abertura (fim)
                 </label>
                 <input
                   type="date"
+                  id="dataAberturaFim"
                   name="dataAberturaFim"
                   value={filtros.dataAberturaFim ?? ''}
                   onChange={handleChange}
@@ -229,11 +237,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* DATAS DE PUBLICAÇÃO */}
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataPublicacaoInicio">
                   Publicação (início)
                 </label>
                 <input
                   type="date"
+                  id="dataPublicacaoInicio"
                   name="dataPublicacaoInicio"
                   value={filtros.dataPublicacaoInicio ?? ''}
                   onChange={handleChange}
@@ -242,11 +251,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataPublicacaoFim">
                   Publicação (fim)
                 </label>
                 <input
                   type="date"
+                  id="dataPublicacaoFim"
                   name="dataPublicacaoFim"
                   value={filtros.dataPublicacaoFim ?? ''}
                   onChange={handleChange}
@@ -257,10 +267,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* COVID */}
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 flex items-center gap-1">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 flex items-center gap-1" htmlFor="covid">
                 <MdCoronavirus size={14} /> COVID-19
               </label>
               <select
+                id="covid"
                 name="covid"
                 value={filtros.covid === undefined ? '' : String(filtros.covid)}
                 onChange={handleChange}

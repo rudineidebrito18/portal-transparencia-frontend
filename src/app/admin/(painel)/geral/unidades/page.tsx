@@ -145,8 +145,9 @@ export default function UnidadesAdminPage() {
 
       <Card className="p-4 flex flex-wrap gap-3 items-end" hoverable={false}>
         <div>
-          <label className="block text-xs font-medium mb-1">Buscar por nome</label>
+          <label className="block text-xs font-medium mb-1" htmlFor="filtroNome">Buscar por nome</label>
           <input
+            id="filtroNome"
             placeholder="Buscar por nome..."
             defaultValue={filtros.nome ?? ''}
             onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, nome: (e.target as HTMLInputElement).value || undefined }) }}
@@ -154,8 +155,9 @@ export default function UnidadesAdminPage() {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium mb-1">Vigente em</label>
+          <label className="block text-xs font-medium mb-1" htmlFor="vigencia">Vigente em</label>
           <input
+            id="vigencia"
             type="date"
             value={filtros.vigencia ?? ''}
             onChange={e => setFiltros({ ...filtros, vigencia: e.target.value || undefined })}
@@ -179,8 +181,9 @@ export default function UnidadesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nome</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome</label>
                 <input
+                  id="nome"
                   required
                   value={form.nome}
                   onChange={e => setForm({ ...form, nome: e.target.value })}
@@ -188,8 +191,9 @@ export default function UnidadesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">CNPJ</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cnpj">CNPJ</label>
                 <input
+                  id="cnpj"
                   value={form.cnpj}
                   onChange={e => setForm({ ...form, cnpj: e.target.value })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -199,16 +203,18 @@ export default function UnidadesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Telefone</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="telefone">Telefone</label>
                 <input
+                  id="telefone"
                   value={form.telefone}
                   onChange={e => setForm({ ...form, telefone: e.target.value })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">E-mail</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
                 <input
+                  id="email"
                   type="email"
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
@@ -218,8 +224,9 @@ export default function UnidadesAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Horário de atendimento</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="horarioAtendimento">Horário de atendimento</label>
               <input
+                id="horarioAtendimento"
                 value={form.horarioAtendimento}
                 onChange={e => setForm({ ...form, horarioAtendimento: e.target.value })}
                 className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -227,8 +234,9 @@ export default function UnidadesAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Endereço</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="endereco">Endereço</label>
               <input
+                id="endereco"
                 value={form.endereco}
                 onChange={e => setForm({ ...form, endereco: e.target.value })}
                 className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -236,8 +244,9 @@ export default function UnidadesAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Atribuições</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="atribuicoes">Atribuições</label>
               <textarea
+                id="atribuicoes"
                 value={form.atribuicoes}
                 onChange={e => setForm({ ...form, atribuicoes: e.target.value })}
                 className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -247,10 +256,11 @@ export default function UnidadesAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">
                   Data de criação do órgão (opcional)
                 </label>
                 <input
+                  id="dataInicio"
                   type="date"
                   value={form.dataInicio}
                   onChange={e => setForm({ ...form, dataInicio: e.target.value })}
@@ -258,10 +268,11 @@ export default function UnidadesAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-medium mb-1" htmlFor="dataFim">
                   Data de extinção do órgão (opcional)
                 </label>
                 <input
+                  id="dataFim"
                   type="date"
                   min={form.dataInicio || undefined}
                   value={form.dataFim}

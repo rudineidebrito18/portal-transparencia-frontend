@@ -58,7 +58,7 @@ export default function VerificarAutenticidade() {
           value={numeroEdicao}
           onChange={e => setNumeroEdicao(e.target.value)}
           placeholder="Número da edição"
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm flex-1 min-w-[160px] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+          className="border border-border/30 rounded-lg px-3 py-2 text-sm flex-1 min-w-[160px] focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
         />
         <button
           type="submit"

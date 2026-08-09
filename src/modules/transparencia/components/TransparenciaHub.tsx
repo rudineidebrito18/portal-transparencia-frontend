@@ -52,7 +52,7 @@ export default function TransparenciaHub() {
           value={buscaInput}
           onChange={e => setBuscaInput(e.target.value)}
           placeholder="Buscar por título de item..."
-          className="w-full border border-border/30 rounded-lg pl-10 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+          className="w-full border border-border/30 rounded-lg pl-10 pr-3 py-2.5 text-sm focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
         />
       </div>
 

@@ -92,8 +92,9 @@ export default function UsuariosPage() {
       <Card className="p-4" hoverable={false}>
         <form onSubmit={handleCriar} className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="block text-sm font-medium mb-1">E-mail</label>
+            <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
             <input
+              id="email"
               type="email"
               required
               value={form.email}
@@ -102,8 +103,9 @@ export default function UsuariosPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Senha</label>
+            <label className="block text-sm font-medium mb-1" htmlFor="password">Senha</label>
             <input
+              id="password"
               type="password"
               required
               value={form.password}
@@ -112,8 +114,9 @@ export default function UsuariosPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Papel</label>
+            <label className="block text-sm font-medium mb-1" htmlFor="role">Papel</label>
             <select
+              id="role"
               value={form.role}
               onChange={e => setForm({ ...form, role: e.target.value as Papel })}
               className="border border-border/30 rounded-lg px-3 py-2 text-sm"

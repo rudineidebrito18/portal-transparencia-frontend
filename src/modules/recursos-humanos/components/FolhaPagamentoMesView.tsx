@@ -51,7 +51,7 @@ export default function FolhaPagamentoMesView() {
   } = useFolhaPorMes(mes, ano, pagina)
 
   const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
 
   const filtrosAtivosCount = mes !== mesAtual || ano !== anoAtual ? 1 : 0
 
@@ -64,10 +64,11 @@ export default function FolhaPagamentoMesView() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
           <div>
-            <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+            <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="mes">
               Mês
             </label>
             <select
+              id="mes"
               value={mes}
               onChange={(e) => atualizarUrl({ mes: Number(e.target.value), page: undefined })}
               className={inputClass}
@@ -79,10 +80,11 @@ export default function FolhaPagamentoMesView() {
           </div>
 
           <div>
-            <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+            <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
               Ano
             </label>
             <select
+              id="ano"
               value={ano}
               onChange={(e) => atualizarUrl({ ano: Number(e.target.value), page: undefined })}
               className={inputClass}

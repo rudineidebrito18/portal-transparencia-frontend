@@ -18,7 +18,7 @@ export default function SecretariaFiltro({ valoresIniciais, onFiltrar }: Props) 
   const filtrosAtivosCount = [nome, vigencia].filter(v => v !== '').length
 
   const inputClass =
-    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all'
+    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all'
 
   function handleFiltrar() {
     onFiltrar({
@@ -38,10 +38,11 @@ export default function SecretariaFiltro({ valoresIniciais, onFiltrar }: Props) 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="nome">
             Nome
           </label>
           <input
+            id="nome"
             value={nome}
             onChange={e => setNome(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') handleFiltrar() }}
@@ -51,11 +52,12 @@ export default function SecretariaFiltro({ valoresIniciais, onFiltrar }: Props) 
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="vigencia">
             Vigência
           </label>
           <input
             type="date"
+            id="vigencia"
             value={vigencia}
             onChange={e => setVigencia(e.target.value)}
             className={inputClass}

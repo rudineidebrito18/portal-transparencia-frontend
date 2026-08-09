@@ -146,8 +146,9 @@ export default function CargosAdminPage() {
             <h2 className="font-semibold text-sm">{form.id ? 'Editar cargo' : 'Novo cargo'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Cargo</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
               <input
+                id="cargo"
                 required
                 value={form.cargo}
                 onChange={e => setForm({ ...form, cargo: e.target.value })}
@@ -157,8 +158,9 @@ export default function CargosAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Quantidade</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="quantidade">Quantidade</label>
                 <input
+                  id="quantidade"
                   type="number"
                   min={1}
                   required
@@ -168,8 +170,9 @@ export default function CargosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor bruto</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorBruto">Valor bruto</label>
                 <input
+                  id="valorBruto"
                   type="number"
                   step="0.01"
                   min={0}
@@ -180,8 +183,9 @@ export default function CargosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Valor de desconto</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="valorDesconto">Valor de desconto</label>
                 <input
+                  id="valorDesconto"
                   type="number"
                   step="0.01"
                   min={0}

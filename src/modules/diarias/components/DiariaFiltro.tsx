@@ -66,7 +66,7 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
   }
 
   const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
 
   return (
     <FiltroCard subtituloPadrao="Refine por beneficiário, cargo, destino e mais" filtrosAtivosCount={filtrosAtivosCount}>
@@ -74,10 +74,11 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
             <div className="md:col-span-2">
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="beneficiario">
                 Beneficiário
               </label>
               <input
+                id="beneficiario"
                 name="beneficiario"
                 value={filtros.beneficiario ?? ''}
                 onChange={handleChange}
@@ -88,10 +89,11 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cargo">
                 Cargo
               </label>
               <input
+                id="cargo"
                 name="cargo"
                 value={filtros.cargo ?? ''}
                 onChange={handleChange}
@@ -102,10 +104,11 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="destino">
                 Destino
               </label>
               <input
+                id="destino"
                 name="destino"
                 value={filtros.destino ?? ''}
                 onChange={handleChange}
@@ -116,10 +119,11 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
                 Unidade
               </label>
               <select
+                id="unidadeId"
                 name="unidadeId"
                 value={filtros.unidadeId ?? ''}
                 onChange={handleChange}
@@ -133,10 +137,11 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="motivo">
                 Motivo
               </label>
               <input
+                id="motivo"
                 name="motivo"
                 value={filtros.motivo ?? ''}
                 onChange={handleChange}
@@ -147,11 +152,12 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicio">
                 Viagem (início)
               </label>
               <input
                 type="date"
+                id="dataInicio"
                 name="dataInicio"
                 value={filtros.dataInicio ?? ''}
                 onChange={handleChange}
@@ -160,11 +166,12 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataTermino">
                 Viagem (término)
               </label>
               <input
                 type="date"
+                id="dataTermino"
                 name="dataTermino"
                 value={filtros.dataTermino ?? ''}
                 onChange={handleChange}

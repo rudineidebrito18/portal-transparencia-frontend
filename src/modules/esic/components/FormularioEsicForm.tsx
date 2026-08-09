@@ -74,8 +74,9 @@ export default function FormularioEsicForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Tipo de solicitação</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="tipoSolicitacao">Tipo de solicitação</label>
           <select
+            id="tipoSolicitacao"
             value={form.tipoSolicitacao}
             onChange={e => setForm({ ...form, tipoSolicitacao: e.target.value as TipoSolicitacaoEsic })}
             className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -87,8 +88,9 @@ export default function FormularioEsicForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Descreva sua solicitação</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="solicitacao">Descreva sua solicitação</label>
           <textarea
+            id="solicitacao"
             required
             rows={4}
             value={form.solicitacao}
@@ -109,8 +111,9 @@ export default function FormularioEsicForm() {
         {!form.anonima && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Nome</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome</label>
               <input
+                id="nome"
                 required
                 value={form.nome}
                 onChange={e => setForm({ ...form, nome: e.target.value })}
@@ -118,8 +121,9 @@ export default function FormularioEsicForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">E-mail</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
               <input
+                id="email"
                 type="email"
                 required
                 value={form.email}

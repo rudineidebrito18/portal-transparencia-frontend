@@ -21,7 +21,7 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
   const filtrosAtivosCount = [descricao, tipo, dataInicial, dataFinal].filter(v => v !== '').length
 
   const inputClass =
-    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all'
+    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all'
 
   function handleFiltrar() {
     onFiltrar({
@@ -52,10 +52,11 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
             Descrição
           </label>
           <input
+            id="descricao"
             value={descricao}
             onChange={(e) => setDescricao(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -65,10 +66,11 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipo">
             Tipo
           </label>
           <select
+            id="tipo"
             value={tipo}
             onChange={(e) => setTipo(e.target.value)}
             className={inputClass}
@@ -81,10 +83,11 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
             Publicação (início)
           </label>
           <input
+            id="dataInicial"
             type="date"
             value={dataInicial}
             onChange={(e) => setDataInicial(e.target.value)}
@@ -93,10 +96,11 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
             Publicação (fim)
           </label>
           <input
+            id="dataFinal"
             type="date"
             value={dataFinal}
             onChange={(e) => setDataFinal(e.target.value)}

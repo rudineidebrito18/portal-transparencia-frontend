@@ -106,8 +106,9 @@ export default function DiarioOficialConfigAdminPage() {
           <fieldset disabled={!podeSalvar} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nome</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="name">Nome</label>
                 <input
+                  id="name"
                   required
                   value={form.name}
                   onChange={e => atualizarCampo('name', e.target.value)}
@@ -115,8 +116,9 @@ export default function DiarioOficialConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">ISSN</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="issn">ISSN</label>
                 <input
+                  id="issn"
                   required
                   value={form.issn}
                   onChange={e => atualizarCampo('issn', e.target.value)}
@@ -127,8 +129,9 @@ export default function DiarioOficialConfigAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">E-mail</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
                 <input
+                  id="email"
                   type="email"
                   required
                   value={form.email}
@@ -137,8 +140,9 @@ export default function DiarioOficialConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Telefone</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="telefone">Telefone</label>
                 <input
+                  id="telefone"
                   required
                   value={form.telefone}
                   onChange={e => atualizarCampo('telefone', e.target.value)}
@@ -149,8 +153,9 @@ export default function DiarioOficialConfigAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Editor-chefe</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="editorChefe">Editor-chefe</label>
                 <input
+                  id="editorChefe"
                   required
                   value={form.editorChefe}
                   onChange={e => atualizarCampo('editorChefe', e.target.value)}
@@ -158,8 +163,9 @@ export default function DiarioOficialConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Redação</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="redacao">Redação</label>
                 <input
+                  id="redacao"
                   required
                   value={form.redacao}
                   onChange={e => atualizarCampo('redacao', e.target.value)}
@@ -169,8 +175,9 @@ export default function DiarioOficialConfigAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Endereço</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="endereco">Endereço</label>
               <input
+                id="endereco"
                 required
                 value={form.endereco}
                 onChange={e => atualizarCampo('endereco', e.target.value)}
@@ -179,8 +186,9 @@ export default function DiarioOficialConfigAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Periodicidade</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="periodicidade">Periodicidade</label>
               <input
+                id="periodicidade"
                 required
                 placeholder="Ex: Diariamente, exceto sábados, domingos e feriados"
                 value={form.periodicidade}
@@ -190,8 +198,9 @@ export default function DiarioOficialConfigAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Quem Somos</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="quemSomos">Quem Somos</label>
               <textarea
+                id="quemSomos"
                 required
                 rows={4}
                 placeholder="Texto de apresentação exibido na aba &quot;Quem Somos&quot; do Diário Oficial público"
@@ -203,11 +212,12 @@ export default function DiarioOficialConfigAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Brasão</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="brasao">Brasão</label>
                 {atual && (
                   <img src={atual.pathBrasao} alt="Brasão atual" className="h-16 mb-2 object-contain" />
                 )}
                 <input
+                  id="brasao"
                   type="file"
                   accept="image/*"
                   required
@@ -216,11 +226,12 @@ export default function DiarioOficialConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Logomarca</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="logo">Logomarca</label>
                 {atual && (
                   <img src={atual.pathLogo} alt="Logomarca atual" className="h-16 mb-2 object-contain" />
                 )}
                 <input
+                  id="logo"
                   type="file"
                   accept="image/*"
                   required

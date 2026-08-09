@@ -118,8 +118,9 @@ export default function FornecedoresAdminPage() {
             <h2 className="w-full font-semibold text-sm">{form.id ? 'Editar fornecedor' : 'Novo fornecedor'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Nome</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome</label>
               <input
+                id="nome"
                 required
                 value={form.nome}
                 onChange={e => setForm({ ...form, nome: e.target.value })}
@@ -127,8 +128,9 @@ export default function FornecedoresAdminPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">CNPJ</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="cnpj">CNPJ</label>
               <input
+                id="cnpj"
                 required
                 value={form.cnpj}
                 onChange={e => setForm({ ...form, cnpj: e.target.value })}

@@ -60,7 +60,7 @@ export default function RelatorioExecucaoOrcamentariaFiltro({ valoresIniciais, o
   }
 
   const inputClass =
-    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all'
+    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all'
 
   return (
     <FiltroCard subtituloPadrao="Refine por ano, bimestre e descrição" filtrosAtivosCount={filtrosAtivosCount}>
@@ -68,10 +68,11 @@ export default function RelatorioExecucaoOrcamentariaFiltro({ valoresIniciais, o
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
         <div className="md:col-span-1 lg:col-span-1">
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
             Descrição
           </label>
           <input
+            id="descricao"
             name="descricao"
             value={filtros.descricao ?? ''}
             onChange={handleChange}
@@ -82,10 +83,11 @@ export default function RelatorioExecucaoOrcamentariaFiltro({ valoresIniciais, o
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
             Ano
           </label>
           <input
+            id="ano"
             name="ano"
             value={filtros.ano ?? ''}
             onChange={handleChange}
@@ -96,10 +98,11 @@ export default function RelatorioExecucaoOrcamentariaFiltro({ valoresIniciais, o
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="bimestre">
             Bimestre
           </label>
           <input
+            id="bimestre"
             name="bimestre"
             value={filtros.bimestre ?? ''}
             onChange={handleChange}

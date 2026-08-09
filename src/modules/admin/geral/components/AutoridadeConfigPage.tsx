@@ -138,8 +138,9 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
           <fieldset disabled={!podeSalvar} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Nome completo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome completo</label>
                 <input
+                  id="nome"
                   required
                   value={form.nome}
                   onChange={e => atualizarCampo('nome', e.target.value)}
@@ -147,8 +148,9 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Nome popular (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="nomePopular">Nome popular (opcional)</label>
                 <input
+                  id="nomePopular"
                   value={form.nomePopular ?? ''}
                   onChange={e => atualizarCampo('nomePopular', e.target.value)}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -158,8 +160,9 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Cargo</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
               <input
+                id="cargo"
                 required
                 value={form.cargo}
                 onChange={e => atualizarCampo('cargo', e.target.value)}
@@ -168,8 +171,9 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Atribuições</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="atribuicoes">Atribuições</label>
               <textarea
+                id="atribuicoes"
                 required
                 rows={4}
                 value={form.atribuicoes}
@@ -180,9 +184,10 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">E-mail</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
                 <input
                   type="email"
+                  id="email"
                   required
                   value={form.email}
                   onChange={e => atualizarCampo('email', e.target.value)}
@@ -190,8 +195,9 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Telefone (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="telefone">Telefone (opcional)</label>
                 <input
+                  id="telefone"
                   value={form.telefone ?? ''}
                   onChange={e => atualizarCampo('telefone', e.target.value)}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -202,18 +208,20 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Início do mandato (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataInicioMandato">Início do mandato (opcional)</label>
                 <input
                   type="date"
+                  id="dataInicioMandato"
                   value={form.dataInicioMandato ?? ''}
                   onChange={e => atualizarCampo('dataInicioMandato', e.target.value)}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Fim do mandato (opcional)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataFimMandato">Fim do mandato (opcional)</label>
                 <input
                   type="date"
+                  id="dataFimMandato"
                   min={form.dataInicioMandato || undefined}
                   value={form.dataFimMandato ?? ''}
                   onChange={e => atualizarCampo('dataFimMandato', e.target.value)}
@@ -223,7 +231,7 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="foto">
                 Foto {fotoAtualUrl && '(opcional — mantém a atual se vazio)'}
               </label>
               {fotoAtualUrl && (
@@ -236,6 +244,7 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
                 />
               )}
               <input
+                id="foto"
                 type="file"
                 accept="image/*"
                 onChange={e => setFoto(e.target.files?.[0] ?? null)}

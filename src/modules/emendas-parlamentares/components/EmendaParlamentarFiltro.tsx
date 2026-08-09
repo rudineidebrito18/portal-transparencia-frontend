@@ -24,7 +24,7 @@ export default function EmendaParlamentarFiltro({ valoresIniciais, onFiltrar }: 
   const filtrosAtivosCount = [tipo, ano].filter(v => v !== '').length
 
   const inputClass =
-    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all'
+    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all'
 
   function handleFiltrar() {
     onFiltrar({
@@ -44,10 +44,11 @@ export default function EmendaParlamentarFiltro({ valoresIniciais, onFiltrar }: 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipo">
             Tipo
           </label>
           <select
+            id="tipo"
             value={tipo}
             onChange={(e) => { setTipo(e.target.value); setAno('') }}
             className={inputClass}
@@ -60,10 +61,11 @@ export default function EmendaParlamentarFiltro({ valoresIniciais, onFiltrar }: 
         </div>
 
         <div>
-          <label className="text-[11px] uppercase font-semibold text-text-secondary/60 mb-1 block">
+          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
             Ano de Publicação
           </label>
           <select
+            id="ano"
             value={ano}
             onChange={(e) => { setAno(e.target.value); setTipo('') }}
             className={inputClass}

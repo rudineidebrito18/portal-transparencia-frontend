@@ -166,8 +166,9 @@ export default function EmpresasInidoneasAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Empresa</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="empresa">Empresa</label>
                 <input
+                  id="empresa"
                   required
                   value={form.empresa}
                   onChange={e => setForm({ ...form, empresa: e.target.value })}
@@ -175,8 +176,9 @@ export default function EmpresasInidoneasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">CNPJ</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cnpj">CNPJ</label>
                 <input
+                  id="cnpj"
                   required
                   value={form.cnpj}
                   onChange={e => setForm({ ...form, cnpj: e.target.value })}
@@ -184,8 +186,9 @@ export default function EmpresasInidoneasAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="status">Status</label>
                 <input
+                  id="status"
                   required
                   placeholder="Ex: Inidônea, Suspensa"
                   value={form.status}
@@ -196,8 +199,9 @@ export default function EmpresasInidoneasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Descrição da situação</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição da situação</label>
               <textarea
+                id="descricao"
                 required
                 rows={2}
                 value={form.descricao}
@@ -207,8 +211,9 @@ export default function EmpresasInidoneasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Data da ocorrência</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="data">Data da ocorrência</label>
               <input
+                id="data"
                 type="date"
                 required
                 value={form.data}
@@ -218,10 +223,11 @@ export default function EmpresasInidoneasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="pdf">
                 PDF (opcional{form.id && ' — mantém o atual se vazio'})
               </label>
               <input
+                id="pdf"
                 type="file"
                 accept="application/pdf"
                 onChange={e => setPdf(e.target.files?.[0] ?? null)}

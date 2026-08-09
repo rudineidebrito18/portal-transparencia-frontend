@@ -81,8 +81,9 @@ function AbaPorServidor() {
   return (
     <div className="space-y-4">
       <Card className="p-4" hoverable={false}>
-        <label className="block text-sm font-medium mb-1">Servidor</label>
+        <label className="block text-sm font-medium mb-1" htmlFor="servidor">Servidor</label>
         <select
+          id="servidor"
           value={servidorId}
           onChange={e => setServidorId(e.target.value ? Number(e.target.value) : '')}
           className="w-full md:w-96 border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -101,8 +102,9 @@ function AbaPorServidor() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Mês</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="mes">Mês</label>
                 <select
+                  id="mes"
                   value={novaFolha.mes}
                   onChange={e => setNovaFolha({ ...novaFolha, mes: Number(e.target.value) })}
                   className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -113,8 +115,9 @@ function AbaPorServidor() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Ano</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="ano">Ano</label>
                 <input
+                  id="ano"
                   type="number"
                   required
                   value={novaFolha.ano}
@@ -123,8 +126,9 @@ function AbaPorServidor() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Salário bruto</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="salarioBruto">Salário bruto</label>
                 <input
+                  id="salarioBruto"
                   type="number"
                   step="0.01"
                   min={0}
@@ -135,8 +139,9 @@ function AbaPorServidor() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Desconto</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="desconto">Desconto</label>
                 <input
+                  id="desconto"
                   type="number"
                   step="0.01"
                   min={0}
@@ -225,8 +230,9 @@ function AbaPorMes() {
     <div className="space-y-4">
       <Card className="p-4 flex flex-wrap items-end gap-3" hoverable={false}>
         <div>
-          <label className="block text-sm font-medium mb-1">Mês</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="mes">Mês</label>
           <select
+            id="mes"
             value={mes}
             onChange={e => setMes(Number(e.target.value))}
             className="border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -237,8 +243,9 @@ function AbaPorMes() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Ano</label>
+          <label className="block text-sm font-medium mb-1" htmlFor="ano">Ano</label>
           <input
+            id="ano"
             type="number"
             value={ano}
             onChange={e => setAno(Number(e.target.value))}

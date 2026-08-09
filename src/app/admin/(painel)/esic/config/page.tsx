@@ -121,8 +121,9 @@ export default function EsicConfigAdminPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <fieldset disabled={!podeSalvar} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Endereço de atendimento</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="enderecoAtendimento">Endereço de atendimento</label>
               <input
+                id="enderecoAtendimento"
                 required
                 value={form.enderecoAtendimento}
                 onChange={e => atualizarCampo('enderecoAtendimento', e.target.value)}
@@ -132,8 +133,9 @@ export default function EsicConfigAdminPage() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Início manhã</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="horarioInicioManha">Início manhã</label>
                 <input
+                  id="horarioInicioManha"
                   type="time"
                   required
                   value={form.horarioInicioManha}
@@ -142,8 +144,9 @@ export default function EsicConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Fim manhã</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="horarioFimManha">Fim manhã</label>
                 <input
+                  id="horarioFimManha"
                   type="time"
                   required
                   value={form.horarioFimManha}
@@ -152,8 +155,9 @@ export default function EsicConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Início tarde</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="horarioInicioTarde">Início tarde</label>
                 <input
+                  id="horarioInicioTarde"
                   type="time"
                   required
                   value={form.horarioInicioTarde}
@@ -162,8 +166,9 @@ export default function EsicConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Fim tarde</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="horarioFimTarde">Fim tarde</label>
                 <input
+                  id="horarioFimTarde"
                   type="time"
                   required
                   value={form.horarioFimTarde}
@@ -175,8 +180,9 @@ export default function EsicConfigAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Telefone</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="telefone">Telefone</label>
                 <input
+                  id="telefone"
                   required
                   value={form.telefone}
                   onChange={e => atualizarCampo('telefone', e.target.value)}
@@ -184,8 +190,9 @@ export default function EsicConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">E-mail</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
                 <input
+                  id="email"
                   type="email"
                   required
                   value={form.email}
@@ -197,8 +204,9 @@ export default function EsicConfigAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Responsável</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="nomeResponsavel">Responsável</label>
                 <input
+                  id="nomeResponsavel"
                   required
                   value={form.nomeResponsavel}
                   onChange={e => atualizarCampo('nomeResponsavel', e.target.value)}
@@ -206,8 +214,9 @@ export default function EsicConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Unidade responsável</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="unidadeResponsavelId">Unidade responsável</label>
                 <select
+                  id="unidadeResponsavelId"
                   required
                   value={form.unidadeResponsavelId || ''}
                   onChange={e => atualizarCampo('unidadeResponsavelId', Number(e.target.value))}
@@ -223,8 +232,9 @@ export default function EsicConfigAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Prazo de resposta (dias)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="prazoRespostaDisponivel">Prazo de resposta (dias)</label>
                 <input
+                  id="prazoRespostaDisponivel"
                   type="number"
                   min={1}
                   required
@@ -234,8 +244,9 @@ export default function EsicConfigAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Prazo de busca/prorrogação (dias)</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="prazoRespostaBusca">Prazo de busca/prorrogação (dias)</label>
                 <input
+                  id="prazoRespostaBusca"
                   type="number"
                   min={1}
                   required

@@ -74,7 +74,7 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
               </div>
 
               <div className="overflow-hidden">
-                <p className="text-[11px] uppercase font-semibold text-text-secondary/60 tracking-wide">
+                <p className="text-xs uppercase font-semibold text-text-secondary/60 tracking-wide">
                   Fornecedor
                 </p>
                 <p className="text-sm font-semibold text-text-secondary truncate">
@@ -90,7 +90,7 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
               </div>
 
               <div>
-                <p className="text-[11px] uppercase font-semibold text-text-secondary/60 tracking-wide">
+                <p className="text-xs uppercase font-semibold text-text-secondary/60 tracking-wide">
                   Vigência Final
                 </p>
                 <p className="text-sm font-semibold text-text-secondary">
@@ -102,7 +102,7 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
             {/* VALOR + AÇÃO */}
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-[11px] uppercase font-semibold text-text-secondary/60 tracking-wide">
+                <p className="text-xs uppercase font-semibold text-text-secondary/60 tracking-wide">
                   Valor Total
                 </p>
                 <p className="text-base font-bold text-accent">

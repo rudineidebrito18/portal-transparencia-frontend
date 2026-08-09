@@ -182,8 +182,9 @@ export default function ServidoresAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">CPF</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cpf">CPF</label>
                 <input
+                  id="cpf"
                   required
                   value={form.cpf}
                   onChange={e => setForm({ ...form, cpf: e.target.value })}
@@ -191,8 +192,9 @@ export default function ServidoresAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Nome</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="name">Nome</label>
                 <input
+                  id="name"
                   required
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
@@ -203,8 +205,9 @@ export default function ServidoresAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Cargo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
                 <input
+                  id="cargo"
                   required
                   value={form.cargo}
                   onChange={e => setForm({ ...form, cargo: e.target.value })}
@@ -212,8 +215,9 @@ export default function ServidoresAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Unidade</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Unidade</label>
                 <select
+                  id="unidadeId"
                   required
                   value={form.unidadeId || ''}
                   onChange={e => setForm({ ...form, unidadeId: Number(e.target.value) })}
@@ -229,8 +233,9 @@ export default function ServidoresAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Data de admissão</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="dataAdmissao">Data de admissão</label>
                 <input
+                  id="dataAdmissao"
                   type="date"
                   required
                   value={form.dataAdmissao}
@@ -239,8 +244,9 @@ export default function ServidoresAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Carga horária semanal</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="cargaHoraria">Carga horária semanal</label>
                 <input
+                  id="cargaHoraria"
                   type="number"
                   min={1}
                   required

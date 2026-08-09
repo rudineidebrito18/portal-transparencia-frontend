@@ -149,8 +149,9 @@ export default function TabelaValoresAdminPage() {
             <h2 className="font-semibold text-sm">{form.id ? 'Editar registro' : 'Novo registro'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Descrição</label>
+              <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
               <input
+                id="descricao"
                 required
                 value={form.descricao}
                 onChange={e => setForm({ ...form, descricao: e.target.value })}
@@ -160,8 +161,9 @@ export default function TabelaValoresAdminPage() {
 
             <div className="flex gap-3 flex-wrap">
               <div>
-                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="tipo">Tipo</label>
                 <select
+                  id="tipo"
                   value={form.tipo}
                   onChange={e => setForm({ ...form, tipo: e.target.value as TipoViagem })}
                   className="border border-border/30 rounded-lg px-3 py-2 text-sm"
@@ -172,8 +174,9 @@ export default function TabelaValoresAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Data</label>
+                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
                 <input
+                  id="data"
                   type="date"
                   required
                   value={form.data}
@@ -184,10 +187,11 @@ export default function TabelaValoresAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">
                 Arquivo PDF {form.id && '(opcional — mantém o atual se vazio)'}
               </label>
               <input
+                id="arquivo"
                 type="file"
                 accept="application/pdf"
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}
