@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
 import { FiltroDocumentoGenerico } from '../../types/DocumentoGenerico'
 
 interface Props {
@@ -48,9 +50,6 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
     onFiltrar({})
   }
 
-  const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
-
   return (
     <FiltroCard subtituloPadrao="Refine por descrição e datas" filtrosAtivosCount={filtrosAtivosCount}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
@@ -59,13 +58,12 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
             Descrição
           </label>
-          <input
+          <Input
             id="descricao"
             name="descricao"
             value={filtros.descricao ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: Balanço 2024"
           />
         </div>
@@ -74,13 +72,12 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
             Data inicial
           </label>
-          <input
+          <Input
             id="dataInicial"
             type="date"
             name="dataInicial"
             value={filtros.dataInicial ?? ''}
             onChange={handleChange}
-            className={inputClass}
           />
         </div>
 
@@ -88,34 +85,27 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
             Data final
           </label>
-          <input
+          <Input
             id="dataFinal"
             type="date"
             name="dataFinal"
             value={filtros.dataFinal ?? ''}
             onChange={handleChange}
-            className={inputClass}
           />
         </div>
 
       </div>
 
       <div className="flex items-center justify-end gap-3 mt-5 pt-4 border-t border-border/20">
-        <button
-          onClick={limparFiltros}
-          className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-        >
+        <Button onClick={limparFiltros} variant="ghost">
           <MdRestartAlt />
           Limpar
-        </button>
+        </Button>
 
-        <button
-          onClick={handleFiltrar}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-        >
+        <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
           <MdSearch />
           Aplicar
-        </button>
+        </Button>
       </div>
     </FiltroCard>
   )

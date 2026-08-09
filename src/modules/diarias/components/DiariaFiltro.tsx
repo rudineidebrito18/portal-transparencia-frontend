@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 import { secretariasService } from '@/modules/secretarias/secretarias.service'
 import { Unidade } from '@/modules/secretarias/types'
 import { FiltroDiaria } from '../types'
@@ -65,9 +68,6 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
     onFiltrar({})
   }
 
-  const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
-
   return (
     <FiltroCard subtituloPadrao="Refine por beneficiário, cargo, destino e mais" filtrosAtivosCount={filtrosAtivosCount}>
 
@@ -77,13 +77,12 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="beneficiario">
                 Beneficiário
               </label>
-              <input
+              <Input
                 id="beneficiario"
                 name="beneficiario"
                 value={filtros.beneficiario ?? ''}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                className={inputClass}
                 placeholder="Ex: Maria"
               />
             </div>
@@ -92,13 +91,12 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cargo">
                 Cargo
               </label>
-              <input
+              <Input
                 id="cargo"
                 name="cargo"
                 value={filtros.cargo ?? ''}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                className={inputClass}
                 placeholder="Ex: Secretário"
               />
             </div>
@@ -107,13 +105,12 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="destino">
                 Destino
               </label>
-              <input
+              <Input
                 id="destino"
                 name="destino"
                 value={filtros.destino ?? ''}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                className={inputClass}
                 placeholder="Ex: São Luís - MA"
               />
             </div>
@@ -122,31 +119,29 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
                 Unidade
               </label>
-              <select
+              <Select
                 id="unidadeId"
                 name="unidadeId"
                 value={filtros.unidadeId ?? ''}
                 onChange={handleChange}
-                className={inputClass}
               >
                 <option value="">Todas</option>
                 {unidades.map(u => (
                   <option key={u.id} value={u.id}>{u.nome}</option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div className="md:col-span-2">
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="motivo">
                 Motivo
               </label>
-              <input
+              <Input
                 id="motivo"
                 name="motivo"
                 value={filtros.motivo ?? ''}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                className={inputClass}
                 placeholder="Ex: Capacitação técnica"
               />
             </div>
@@ -155,13 +150,12 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicio">
                 Viagem (início)
               </label>
-              <input
+              <Input
                 type="date"
                 id="dataInicio"
                 name="dataInicio"
                 value={filtros.dataInicio ?? ''}
                 onChange={handleChange}
-                className={inputClass}
               />
             </div>
 
@@ -169,13 +163,12 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataTermino">
                 Viagem (término)
               </label>
-              <input
+              <Input
                 type="date"
                 id="dataTermino"
                 name="dataTermino"
                 value={filtros.dataTermino ?? ''}
                 onChange={handleChange}
-                className={inputClass}
               />
             </div>
 
@@ -184,21 +177,15 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
           {/* ACTIONS */}
           <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-border/20">
 
-            <button
-              onClick={limparFiltros}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-            >
+            <Button onClick={limparFiltros} variant="ghost">
               <MdRestartAlt />
               Limpar
-            </button>
+            </Button>
 
-            <button
-              onClick={handleFiltrar}
-              className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-            >
+            <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
               <MdSearch />
               Aplicar
-            </button>
+            </Button>
 
           </div>
 

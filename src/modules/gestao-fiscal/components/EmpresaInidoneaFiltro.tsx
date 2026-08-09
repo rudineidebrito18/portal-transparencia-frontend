@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
 import { FiltroEmpresaInidonea } from '../types'
 
 interface Props {
@@ -50,9 +52,6 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
     onFiltrar({})
   }
 
-  const inputClass =
-    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all'
-
   return (
     <FiltroCard subtituloPadrao="Refine por empresa, CNPJ, status e datas" filtrosAtivosCount={filtrosAtivosCount}>
 
@@ -62,13 +61,12 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="empresa">
             Empresa
           </label>
-          <input
+          <Input
             id="empresa"
             name="empresa"
             value={filtros.empresa ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: Macedo-Franco"
           />
         </div>
@@ -77,13 +75,12 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cnpj">
             CNPJ
           </label>
-          <input
+          <Input
             id="cnpj"
             name="cnpj"
             value={filtros.cnpj ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Somente números"
           />
         </div>
@@ -92,13 +89,12 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
             Status
           </label>
-          <input
+          <Input
             id="status"
             name="status"
             value={filtros.status ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: Suspensa"
           />
         </div>
@@ -107,13 +103,12 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
             Data (início)
           </label>
-          <input
+          <Input
             id="dataInicial"
             type="date"
             name="dataInicial"
             value={filtros.dataInicial ?? ''}
             onChange={handleChange}
-            className={inputClass}
           />
         </div>
 
@@ -121,34 +116,27 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
             Data (fim)
           </label>
-          <input
+          <Input
             id="dataFinal"
             type="date"
             name="dataFinal"
             value={filtros.dataFinal ?? ''}
             onChange={handleChange}
-            className={inputClass}
           />
         </div>
 
       </div>
 
       <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-border/20">
-        <button
-          onClick={limparFiltros}
-          className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-        >
+        <Button onClick={limparFiltros} variant="ghost">
           <MdRestartAlt />
           Limpar
-        </button>
+        </Button>
 
-        <button
-          onClick={handleFiltrar}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-        >
+        <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
           <MdSearch />
           Aplicar
-        </button>
+        </Button>
       </div>
 
     </FiltroCard>

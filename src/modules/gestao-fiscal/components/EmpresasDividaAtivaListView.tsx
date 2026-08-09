@@ -4,6 +4,7 @@ import { MdSwapVert } from 'react-icons/md'
 
 import AsyncList from '@/components/ui/AsyncList'
 import Pagination from '@/components/ui/Pagination'
+import Select from '@/components/ui/Select'
 import { formatarDataHora } from '@/utils/date'
 import { useEmpresasDividaAtiva } from '../hooks/useGestaoFiscal'
 import EmpresaDividaAtivaCard from './EmpresaDividaAtivaCard'
@@ -33,17 +34,17 @@ export default function EmpresasDividaAtivaListView() {
             Ordenar
           </div>
 
-          <select
+          <Select
             value={ordenacao || 'data,desc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
+            fullWidth={false}
           >
             <option value="data,desc">Mais recentes</option>
             <option value="data,asc">Mais antigas</option>
             <option value="valor,desc">Maior valor</option>
             <option value="valor,asc">Menor valor</option>
-          </select>
+          </Select>
         </div>
       </div>
 

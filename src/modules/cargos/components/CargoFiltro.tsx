@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
 import { FiltroCargo } from '../types'
 
 interface Props {
@@ -53,9 +55,6 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
     onFiltrar({})
   }
 
-  const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
-
   return (
     <FiltroCard subtituloPadrao="Refine por cargo e faixa de valor bruto" filtrosAtivosCount={filtrosAtivosCount}>
 
@@ -65,13 +64,12 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cargo">
             Cargo
           </label>
-          <input
+          <Input
             id="cargo"
             name="cargo"
             value={filtros.cargo ?? ''}
             onChange={handleChangeTexto}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: Professor"
           />
         </div>
@@ -80,7 +78,7 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="valorBrutoMin">
             Valor bruto (mínimo)
           </label>
-          <input
+          <Input
             type="number"
             step="0.01"
             min={0}
@@ -89,7 +87,6 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
             value={filtros.valorBrutoMin ?? ''}
             onChange={handleChangeNumero}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="R$ 0,00"
           />
         </div>
@@ -98,7 +95,7 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="valorBrutoMax">
             Valor bruto (máximo)
           </label>
-          <input
+          <Input
             type="number"
             step="0.01"
             min={0}
@@ -107,7 +104,6 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
             value={filtros.valorBrutoMax ?? ''}
             onChange={handleChangeNumero}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="R$ 0,00"
           />
         </div>
@@ -117,21 +113,15 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
       {/* ACTIONS */}
       <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-border/20">
 
-        <button
-          onClick={limparFiltros}
-          className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-        >
+        <Button onClick={limparFiltros} variant="ghost">
           <MdRestartAlt />
           Limpar
-        </button>
+        </Button>
 
-        <button
-          onClick={handleFiltrar}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-        >
+        <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
           <MdSearch />
           Aplicar
-        </button>
+        </Button>
 
       </div>
 

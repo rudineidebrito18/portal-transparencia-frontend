@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import { MdCoronavirus, MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 import { secretariasService } from '@/modules/secretarias/secretarias.service'
 import { Unidade } from '@/modules/secretarias/types'
 import { StatusLicitacao, StatusLicitacaoDescricao, TipoProcedimentoDescricao, TipoProcedimentoLicitacao } from '../enums'
@@ -80,9 +83,6 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
     onFiltrar({})
   }
 
-  const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
-
   return (
     <FiltroCard subtituloPadrao="Refine por modalidade, status, datas e mais" filtrosAtivosCount={filtrosAtivosCount}>
 
@@ -93,13 +93,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroProcesso">
                 Número do Processo
               </label>
-              <input
+              <Input
                 id="numeroProcesso"
                 name="numeroProcesso"
                 value={filtros.numeroProcesso ?? ''}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                className={inputClass}
                 placeholder="Ex: 456/2025"
               />
             </div>
@@ -109,12 +108,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipoProcedimentoLicitacao">
                 Modalidade
               </label>
-              <select
+              <Select
                 id="tipoProcedimentoLicitacao"
                 name="tipoProcedimentoLicitacao"
                 value={filtros.tipoProcedimentoLicitacao ?? ''}
                 onChange={handleChange}
-                className={inputClass}
               >
                 <option value="">Todas</option>
                 {Object.values(TipoProcedimentoLicitacao).map(tipo => (
@@ -122,7 +120,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                     {TipoProcedimentoDescricao[tipo]}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* STATUS */}
@@ -130,12 +128,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
                 Status
               </label>
-              <select
+              <Select
                 id="status"
                 name="status"
                 value={filtros.status ?? ''}
                 onChange={handleChange}
-                className={inputClass}
               >
                 <option value="">Todos</option>
                 {Object.values(StatusLicitacao).map(status => (
@@ -143,7 +140,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                     {StatusLicitacaoDescricao[status]}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* NÚMERO + ANO */}
@@ -152,13 +149,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                 <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroInstrumento">
                   Número
                 </label>
-                <input
+                <Input
                   id="numeroInstrumento"
                   name="numeroInstrumento"
                   value={filtros.numeroInstrumento ?? ''}
                   onChange={handleChange}
                   onKeyDown={handleKeyDown}
-                  className={inputClass}
                   placeholder="001"
                 />
               </div>
@@ -167,12 +163,11 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                 <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
                   Ano
                 </label>
-                <select
+                <Select
                   id="ano"
                   name="ano"
                   value={filtros.ano ?? ''}
                   onChange={handleChange}
-                  className={inputClass}
                 >
                   <option value="">Todos</option>
                   {anos.map(ano => (
@@ -180,7 +175,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                       {ano}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             </div>
 
@@ -189,18 +184,17 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
                 Unidade
               </label>
-              <select
+              <Select
                 id="unidadeId"
                 name="unidadeId"
                 value={filtros.unidadeId ?? ''}
                 onChange={handleChange}
-                className={inputClass}
               >
                 <option value="">Todas</option>
                 {unidades.map(u => (
                   <option key={u.id} value={u.id}>{u.nome}</option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* DATAS DE ABERTURA */}
@@ -209,13 +203,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                 <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAberturaInicio">
                   Abertura (início)
                 </label>
-                <input
+                <Input
                   type="date"
                   id="dataAberturaInicio"
                   name="dataAberturaInicio"
                   value={filtros.dataAberturaInicio ?? ''}
                   onChange={handleChange}
-                  className={inputClass}
                 />
               </div>
 
@@ -223,13 +216,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                 <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAberturaFim">
                   Abertura (fim)
                 </label>
-                <input
+                <Input
                   type="date"
                   id="dataAberturaFim"
                   name="dataAberturaFim"
                   value={filtros.dataAberturaFim ?? ''}
                   onChange={handleChange}
-                  className={inputClass}
                 />
               </div>
             </div>
@@ -240,13 +232,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                 <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataPublicacaoInicio">
                   Publicação (início)
                 </label>
-                <input
+                <Input
                   type="date"
                   id="dataPublicacaoInicio"
                   name="dataPublicacaoInicio"
                   value={filtros.dataPublicacaoInicio ?? ''}
                   onChange={handleChange}
-                  className={inputClass}
                 />
               </div>
 
@@ -254,13 +245,12 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
                 <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataPublicacaoFim">
                   Publicação (fim)
                 </label>
-                <input
+                <Input
                   type="date"
                   id="dataPublicacaoFim"
                   name="dataPublicacaoFim"
                   value={filtros.dataPublicacaoFim ?? ''}
                   onChange={handleChange}
-                  className={inputClass}
                 />
               </div>
             </div>
@@ -270,17 +260,16 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 flex items-center gap-1" htmlFor="covid">
                 <MdCoronavirus size={14} /> COVID-19
               </label>
-              <select
+              <Select
                 id="covid"
                 name="covid"
                 value={filtros.covid === undefined ? '' : String(filtros.covid)}
                 onChange={handleChange}
-                className={inputClass}
               >
                 <option value="">Não filtrar</option>
                 <option value="true">Sim</option>
                 <option value="false">Não</option>
-              </select>
+              </Select>
             </div>
 
           </div>
@@ -288,21 +277,15 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
           {/* ACTIONS */}
           <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-border/20">
 
-            <button
-              onClick={limparFiltros}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-            >
+            <Button onClick={limparFiltros} variant="ghost">
               <MdRestartAlt />
               Limpar
-            </button>
+            </Button>
 
-            <button
-              onClick={handleFiltrar}
-              className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-            >
+            <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
               <MdSearch />
               Aplicar
-            </button>
+            </Button>
 
           </div>
 

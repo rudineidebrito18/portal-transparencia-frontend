@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 import { secretariasService } from '@/modules/secretarias/secretarias.service'
 import { Unidade } from '@/modules/secretarias/types'
 import { FiltroContrato } from '../types'
@@ -72,9 +75,6 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
     onFiltrar({})
   }
 
-  const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
-
   return (
     <FiltroCard subtituloPadrao="Refine por número, fornecedor, unidade e mais" filtrosAtivosCount={filtrosAtivosCount}>
 
@@ -84,13 +84,12 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroContrato">
             Número do contrato
           </label>
-          <input
+          <Input
             id="numeroContrato"
             name="numeroContrato"
             value={filtros.numeroContrato ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: 12"
           />
         </div>
@@ -99,13 +98,12 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="exercicio">
             Exercício
           </label>
-          <input
+          <Input
             id="exercicio"
             name="exercicio"
             value={filtros.exercicio ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: 2026"
           />
         </div>
@@ -114,13 +112,12 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="fornecedor">
             Fornecedor
           </label>
-          <input
+          <Input
             id="fornecedor"
             name="fornecedor"
             value={filtros.fornecedor ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: Construtora ABC Ltda"
           />
         </div>
@@ -129,31 +126,29 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
             Unidade
           </label>
-          <select
+          <Select
             id="unidadeId"
             name="unidadeId"
             value={filtros.unidadeId ?? ''}
             onChange={handleChange}
-            className={inputClass}
           >
             <option value="">Todas</option>
             {unidades.map(u => (
               <option key={u.id} value={u.id}>{u.nome}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
             Status
           </label>
-          <input
+          <Input
             id="status"
             name="status"
             value={filtros.status ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: EM_ANDAMENTO"
           />
         </div>
@@ -162,13 +157,12 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="gestorContrato">
             Gestor do contrato
           </label>
-          <input
+          <Input
             id="gestorContrato"
             name="gestorContrato"
             value={filtros.gestorContrato ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: Maria"
           />
         </div>
@@ -177,13 +171,12 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="objeto">
             Objeto
           </label>
-          <input
+          <Input
             id="objeto"
             name="objeto"
             value={filtros.objeto ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: reforma"
           />
         </div>
@@ -192,13 +185,12 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
             Assinatura (início)
           </label>
-          <input
+          <Input
             type="date"
             id="dataInicial"
             name="dataInicial"
             value={filtros.dataInicial ?? ''}
             onChange={handleChange}
-            className={inputClass}
           />
         </div>
 
@@ -206,13 +198,12 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
             Assinatura (fim)
           </label>
-          <input
+          <Input
             type="date"
             id="dataFinal"
             name="dataFinal"
             value={filtros.dataFinal ?? ''}
             onChange={handleChange}
-            className={inputClass}
           />
         </div>
 
@@ -220,21 +211,15 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
       <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-border/20">
 
-        <button
-          onClick={limparFiltros}
-          className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-        >
+        <Button onClick={limparFiltros} variant="ghost">
           <MdRestartAlt />
           Limpar
-        </button>
+        </Button>
 
-        <button
-          onClick={handleFiltrar}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-        >
+        <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
           <MdSearch />
           Aplicar
-        </button>
+        </Button>
 
       </div>
 

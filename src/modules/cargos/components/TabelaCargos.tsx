@@ -6,6 +6,7 @@ import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
+import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarDataHora } from '@/utils/date'
 import { formatarMoeda } from '@/utils/currency'
@@ -53,17 +54,17 @@ export default function TabelaCargos() {
             Ordenar
           </div>
 
-          <select
+          <Select
             value={ordenacao || 'cargo,asc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
+            fullWidth={false}
           >
             <option value="cargo,asc">Cargo (A-Z)</option>
             <option value="cargo,desc">Cargo (Z-A)</option>
             <option value="valorBruto,desc">Maior valor bruto</option>
             <option value="valorBruto,asc">Menor valor bruto</option>
-          </select>
+          </Select>
         </div>
 
       </div>
@@ -89,7 +90,7 @@ export default function TabelaCargos() {
                 <MdGroups size={22} />
               </div>
               <div>
-                <p className="text-[11px] uppercase text-text-secondary/60">Servidores nesta página</p>
+                <p className="text-xs uppercase text-text-secondary/60">Servidores nesta página</p>
                 <p className="text-xl font-bold text-primary">{totalServidores}</p>
               </div>
             </Card>
@@ -99,7 +100,7 @@ export default function TabelaCargos() {
                 <MdPayments size={22} />
               </div>
               <div>
-                <p className="text-[11px] uppercase text-text-secondary/60">Total líquido nesta página</p>
+                <p className="text-xs uppercase text-text-secondary/60">Total líquido nesta página</p>
                 <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolhaLiquida)}</p>
               </div>
             </Card>
@@ -109,7 +110,7 @@ export default function TabelaCargos() {
           <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
             <table className="w-full text-sm bg-white">
               <thead>
-                <tr className="bg-neutral-light/60 text-text-secondary/60 text-[11px] uppercase">
+                <tr className="bg-neutral-light/60 text-text-secondary/60 text-xs uppercase">
                   <th className="text-left px-4 py-3 font-semibold">Cargo</th>
                   <th className="text-right px-4 py-3 font-semibold">Quantidade</th>
                   <th className="text-right px-4 py-3 font-semibold">Valor Bruto</th>

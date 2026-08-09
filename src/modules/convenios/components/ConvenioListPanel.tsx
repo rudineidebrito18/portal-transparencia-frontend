@@ -5,6 +5,7 @@ import { MdSwapVert } from 'react-icons/md'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
+import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { usePageableResource } from '@/hooks/usePageableResource'
 import { formatarDataHora } from '@/utils/date'
@@ -53,15 +54,15 @@ export default function ConvenioListPanel({
             Ordenar
           </div>
 
-          <select
+          <Select
             value={ordenacao || 'data,desc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
+            fullWidth={false}
           >
             <option value="data,desc">Mais recentes</option>
             <option value="data,asc">Mais antigos</option>
-          </select>
+          </Select>
         </div>
 
       </div>

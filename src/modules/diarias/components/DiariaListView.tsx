@@ -5,6 +5,7 @@ import { MdSwapVert } from 'react-icons/md'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
+import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarDataHora } from '@/utils/date'
 import { useDiarias } from '../hooks/useDiarias'
@@ -49,17 +50,17 @@ export default function DiariaListView() {
             Ordenar
           </div>
 
-          <select
+          <Select
             value={ordenacao || 'dataInicio,desc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
+            fullWidth={false}
           >
             <option value="dataInicio,desc">Mais recentes</option>
             <option value="dataInicio,asc">Mais antigas</option>
             <option value="valorConcedido,desc">Maior valor</option>
             <option value="valorConcedido,asc">Menor valor</option>
-          </select>
+          </Select>
         </div>
 
       </div>

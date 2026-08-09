@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 import { fornecedorService } from '@/modules/fornecedores/fornecedor.service'
 import { Fornecedor } from '@/modules/fornecedores/types'
 import { secretariasService } from '@/modules/secretarias/secretarias.service'
@@ -73,9 +76,6 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
     onFiltrar({})
   }
 
-  const inputClass =
-    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all'
-
   return (
     <FiltroCard subtituloPadrao="Refine por número, status, tipo e mais" filtrosAtivosCount={filtrosAtivosCount}>
 
@@ -85,13 +85,12 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numero">
             Número
           </label>
-          <input
+          <Input
             id="numero"
             name="numero"
             value={filtros.numero ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder="Ex: 12"
           />
         </div>
@@ -100,48 +99,48 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
             Status
           </label>
-          <select id="status" name="status" value={filtros.status ?? ''} onChange={handleChange} className={inputClass}>
+          <Select id="status" name="status" value={filtros.status ?? ''} onChange={handleChange}>
             <option value="">Todos</option>
             {Object.values(StatusObra).map(s => (
               <option key={s} value={s}>{StatusObraDescricao[s]}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipo">
             Tipo
           </label>
-          <select id="tipo" name="tipo" value={filtros.tipo ?? ''} onChange={handleChange} className={inputClass}>
+          <Select id="tipo" name="tipo" value={filtros.tipo ?? ''} onChange={handleChange}>
             <option value="">Todos</option>
             {Object.values(TipoObra).map(t => (
               <option key={t} value={t}>{TipoObraDescricao[t]}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
             Unidade
           </label>
-          <select id="unidadeId" name="unidadeId" value={filtros.unidadeId ?? ''} onChange={handleChange} className={inputClass}>
+          <Select id="unidadeId" name="unidadeId" value={filtros.unidadeId ?? ''} onChange={handleChange}>
             <option value="">Todas</option>
             {unidades.map(u => (
               <option key={u.id} value={u.id}>{u.nome}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="fornecedorId">
             Fornecedor
           </label>
-          <select id="fornecedorId" name="fornecedorId" value={filtros.fornecedorId ?? ''} onChange={handleChange} className={inputClass}>
+          <Select id="fornecedorId" name="fornecedorId" value={filtros.fornecedorId ?? ''} onChange={handleChange}>
             <option value="">Todos</option>
             {fornecedores.map(f => (
               <option key={f.id} value={f.id}>{f.nome}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex items-end">
@@ -158,21 +157,15 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
       </div>
 
       <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-border/20">
-        <button
-          onClick={limparFiltros}
-          className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-        >
+        <Button onClick={limparFiltros} variant="ghost">
           <MdRestartAlt />
           Limpar
-        </button>
+        </Button>
 
-        <button
-          onClick={handleFiltrar}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-        >
+        <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
           <MdSearch />
           Aplicar
-        </button>
+        </Button>
       </div>
 
     </FiltroCard>

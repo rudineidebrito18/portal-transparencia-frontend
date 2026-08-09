@@ -3,11 +3,13 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { MdGroups, MdPayments, MdRestartAlt } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import FiltroCard from '@/components/ui/FiltroCard'
 import Pagination from '@/components/ui/Pagination'
+import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarMoeda } from '@/utils/currency'
 import { nomeMes } from '@/utils/date'
@@ -50,9 +52,6 @@ export default function FolhaPagamentoMesView() {
     totalPaginas
   } = useFolhaPorMes(mes, ano, pagina)
 
-  const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
-
   const filtrosAtivosCount = mes !== mesAtual || ano !== anoAtual ? 1 : 0
 
   return (
@@ -67,44 +66,39 @@ export default function FolhaPagamentoMesView() {
             <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="mes">
               Mês
             </label>
-            <select
+            <Select
               id="mes"
               value={mes}
               onChange={(e) => atualizarUrl({ mes: Number(e.target.value), page: undefined })}
-              className={inputClass}
             >
               {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
                 <option key={m} value={m}>{nomeMes(m)}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
             <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
               Ano
             </label>
-            <select
+            <Select
               id="ano"
               value={ano}
               onChange={(e) => atualizarUrl({ ano: Number(e.target.value), page: undefined })}
-              className={inputClass}
             >
               {anos.map(a => (
                 <option key={a} value={a}>{a}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
         </div>
 
         <div className="flex items-center justify-end mt-6 pt-4 border-t border-border/20">
-          <button
-            onClick={() => atualizarUrl({ mes: undefined, ano: undefined, page: undefined })}
-            className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-          >
+          <Button onClick={() => atualizarUrl({ mes: undefined, ano: undefined, page: undefined })} variant="ghost">
             <MdRestartAlt />
             Voltar pro mês atual
-          </button>
+          </Button>
         </div>
 
       </FiltroCard>
@@ -132,7 +126,7 @@ export default function FolhaPagamentoMesView() {
                     <MdGroups size={22} />
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase text-text-secondary/60">Servidores na Folha</p>
+                    <p className="text-xs uppercase text-text-secondary/60">Servidores na Folha</p>
                     <p className="text-xl font-bold text-primary">{totalRegistros}</p>
                   </div>
                 </Card>
@@ -142,7 +136,7 @@ export default function FolhaPagamentoMesView() {
                     <MdPayments size={22} />
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase text-text-secondary/60">Total Líquido no Mês</p>
+                    <p className="text-xs uppercase text-text-secondary/60">Total Líquido no Mês</p>
                     <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolha)}</p>
                   </div>
                 </Card>
@@ -152,7 +146,7 @@ export default function FolhaPagamentoMesView() {
               <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
                 <table className="w-full text-sm bg-white">
                   <thead>
-                    <tr className="bg-neutral-light/60 text-text-secondary/60 text-[11px] uppercase">
+                    <tr className="bg-neutral-light/60 text-text-secondary/60 text-xs uppercase">
                       <th className="text-left px-4 py-3 font-semibold">Servidor</th>
                       <th className="text-left px-4 py-3 font-semibold">CPF</th>
                       <th className="text-right px-4 py-3 font-semibold">Salário Bruto</th>

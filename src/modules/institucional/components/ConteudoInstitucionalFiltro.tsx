@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
 import { FiltroConteudoInstitucional } from '../types'
 
 interface Props {
@@ -49,9 +51,6 @@ export default function ConteudoInstitucionalFiltro({ valoresIniciais, onFiltrar
     onFiltrar({})
   }
 
-  const inputClass =
-    "w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
-
   return (
     <FiltroCard
       subtituloPadrao="Refine por título e período de publicação"
@@ -64,13 +63,12 @@ export default function ConteudoInstitucionalFiltro({ valoresIniciais, onFiltrar
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="titulo">
             Título
           </label>
-          <input
+          <Input
             id="titulo"
             name="titulo"
             value={filtros.titulo ?? ''}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={inputClass}
             placeholder={variant === 'aviso' ? 'Ex: Ponto facultativo' : 'Ex: Vacinação'}
           />
         </div>
@@ -79,13 +77,12 @@ export default function ConteudoInstitucionalFiltro({ valoresIniciais, onFiltrar
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
             Publicação (início)
           </label>
-          <input
+          <Input
             type="date"
             id="dataInicial"
             name="dataInicial"
             value={filtros.dataInicial ?? ''}
             onChange={handleChange}
-            className={inputClass}
           />
         </div>
 
@@ -93,13 +90,12 @@ export default function ConteudoInstitucionalFiltro({ valoresIniciais, onFiltrar
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
             Publicação (fim)
           </label>
-          <input
+          <Input
             type="date"
             id="dataFinal"
             name="dataFinal"
             value={filtros.dataFinal ?? ''}
             onChange={handleChange}
-            className={inputClass}
           />
         </div>
 
@@ -107,21 +103,15 @@ export default function ConteudoInstitucionalFiltro({ valoresIniciais, onFiltrar
 
       <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-border/20">
 
-        <button
-          onClick={limparFiltros}
-          className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-        >
+        <Button onClick={limparFiltros} variant="ghost">
           <MdRestartAlt />
           Limpar
-        </button>
+        </Button>
 
-        <button
-          onClick={handleFiltrar}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-        >
+        <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
           <MdSearch />
           Aplicar
-        </button>
+        </Button>
 
       </div>
 

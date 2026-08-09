@@ -4,6 +4,7 @@ import { MdSwapVert } from 'react-icons/md'
 
 import AsyncList from '@/components/ui/AsyncList'
 import Pagination from '@/components/ui/Pagination'
+import Select from '@/components/ui/Select'
 import { formatarDataHora } from '@/utils/date'
 import { useRelatoriosExecucaoOrcamentaria } from '../hooks/useGestaoFiscal'
 import RelatorioExecucaoOrcamentariaFiltro from './RelatorioExecucaoOrcamentariaFiltro'
@@ -33,15 +34,15 @@ export default function RelatoriosExecucaoOrcamentariaListView() {
             Ordenar
           </div>
 
-          <select
+          <Select
             value={ordenacao || 'ano,desc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
+            fullWidth={false}
           >
             <option value="ano,desc">Mais recentes</option>
             <option value="ano,asc">Mais antigos</option>
-          </select>
+          </Select>
         </div>
       </div>
 

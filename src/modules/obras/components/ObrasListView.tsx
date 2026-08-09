@@ -4,6 +4,7 @@ import { MdSwapVert } from 'react-icons/md'
 
 import AsyncList from '@/components/ui/AsyncList'
 import Pagination from '@/components/ui/Pagination'
+import Select from '@/components/ui/Select'
 import { formatarDataHora } from '@/utils/date'
 import { useObras } from '../hooks/useObras'
 import ObraCard from './ObraCard'
@@ -33,17 +34,17 @@ export default function ObrasListView() {
             Ordenar
           </div>
 
-          <select
+          <Select
             value={ordenacao || 'numero,desc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
+            fullWidth={false}
           >
             <option value="dataInicio,desc">Mais recentes</option>
             <option value="dataInicio,asc">Mais antigas</option>
             <option value="valorTotal,desc">Maior valor</option>
             <option value="valorTotal,asc">Menor valor</option>
-          </select>
+          </Select>
         </div>
       </div>
 

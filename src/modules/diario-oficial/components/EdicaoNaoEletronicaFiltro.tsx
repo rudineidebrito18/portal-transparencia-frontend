@@ -3,7 +3,10 @@
 import { useState } from 'react'
 import { MdRestartAlt, MdSearch } from 'react-icons/md'
 
+import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 import { TipoEdicaoDiario, TipoEdicaoDiarioDescricao } from '../enums'
 import { FiltroEdicaoNaoEletronica } from '../types'
 
@@ -19,9 +22,6 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
   const [dataFinal, setDataFinal] = useState(valoresIniciais?.dataFinal ?? '')
 
   const filtrosAtivosCount = [descricao, tipo, dataInicial, dataFinal].filter(v => v !== '').length
-
-  const inputClass =
-    'w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-white focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all'
 
   function handleFiltrar() {
     onFiltrar({
@@ -55,13 +55,12 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
             Descrição
           </label>
-          <input
+          <Input
             id="descricao"
             value={descricao}
             onChange={(e) => setDescricao(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ex: Decreto 12/2018"
-            className={inputClass}
           />
         </div>
 
@@ -69,29 +68,27 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipo">
             Tipo
           </label>
-          <select
+          <Select
             id="tipo"
             value={tipo}
             onChange={(e) => setTipo(e.target.value)}
-            className={inputClass}
           >
             <option value="">Todos</option>
             {Object.values(TipoEdicaoDiario).map(t => (
               <option key={t} value={t}>{TipoEdicaoDiarioDescricao[t]}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
             Publicação (início)
           </label>
-          <input
+          <Input
             id="dataInicial"
             type="date"
             value={dataInicial}
             onChange={(e) => setDataInicial(e.target.value)}
-            className={inputClass}
           />
         </div>
 
@@ -99,31 +96,24 @@ export default function EdicaoNaoEletronicaFiltro({ valoresIniciais, onFiltrar }
           <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
             Publicação (fim)
           </label>
-          <input
+          <Input
             id="dataFinal"
             type="date"
             value={dataFinal}
             onChange={(e) => setDataFinal(e.target.value)}
-            className={inputClass}
           />
         </div>
 
         <div className="flex items-end gap-3">
-          <button
-            onClick={limparFiltros}
-            className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-red-600 transition-colors"
-          >
+          <Button onClick={limparFiltros} variant="ghost">
             <MdRestartAlt />
             Limpar
-          </button>
+          </Button>
 
-          <button
-            onClick={handleFiltrar}
-            className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm active:scale-95"
-          >
+          <Button onClick={handleFiltrar} variant="primary" size="lg" className="shadow-sm active:scale-95">
             <MdSearch />
             Aplicar
-          </button>
+          </Button>
         </div>
 
       </div>
