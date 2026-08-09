@@ -1194,6 +1194,81 @@ na verdade já tinha os dados prontos, só faltava expor de outro jeito no front
   (`/aditivos-contratos`, `/fiscais-contratos`, `/licitantes-sancionados`,
   `/admin/modulos/licitantes-sancionados`) 200, sem marcador de erro no HTML.
 
+## 2.22 Auditoria de UI/UX, Design System e Acessibilidade (2026-08-09) — concluído
+
+Pedido explícito do usuário: análise rigorosa de consistência visual, responsividade e
+WCAG, com correção direta. Achados de que o projeto já estava bem cuidado (zero cor hex
+solta fora de `globals.css`, skip-link, modo alto contraste, `PageHeader` consolidado —
+seções 2.10/2.16) não foram mexidos. O que mudou:
+
+- **Achado principal — 344 campos em 51 arquivos com `<label>` sem `htmlFor`/`id`**
+  (WCAG 1.3.1/4.1.2: leitor de tela não anunciava o rótulo ao focar o campo). Corrigido
+  em todo `*Filtro.tsx` do site público, `FormularioOuvidoriaForm.tsx`/
+  `FormularioEsicForm.tsx`, e ~30 telas do painel admin — `id` reaproveita o `name` do
+  campo quando existe, senão deriva da variável de estado. Um caso (`label` "Imagens" em
+  `admin/institucional/noticias/page.tsx`, sem um único input adjacente) virou
+  `<fieldset>`/`<legend>` em vez de um `htmlFor` forçado.
+- **`eslint-plugin-jsx-a11y` ativado com `plugin:jsx-a11y/recommended`** em
+  `eslint.config.mjs` — o `next/core-web-vitals` só trazia um subconjunto mínimo (sem
+  `label-has-associated-control`), por isso o achado acima nunca apareceu no lint. Isso
+  vai pegar regressões de acessibilidade automaticamente daqui pra frente. Corrigidas as
+  7 violações que surgiram: `autoFocus` removido do campo de e-mail do login
+  (`no-autofocus`); 3 padrões de "fecha o painel ao clicar em qualquer item filho"
+  (bubbling de clique de `<Link>`/`<button>` reais, que já funcionam por teclado) em
+  `AcessibilidadeMenu.tsx`, `DropdownMenuItem.tsx` e `FotoAmpliavel.tsx` — não
+  reescritos, só documentados com `eslint-disable-next-line <regra> ` + comentário
+  explicando por quê (**convenção a seguir**: se o lint apontar
+  `click-events-have-key-events`/`no-static-element-interactions` num handler que só
+  delega fechamento pra filhos reais já acessíveis, essa é a saída correta, não trocar
+  a estrutura).
+- **`:focus-visible` global** adicionado em `globals.css` pra `a`/`button`/
+  `[role="button"]`/`[tabindex]` — a maioria dos links/nav/cards-como-link não tinha
+  nenhum indicador de foco próprio. **Gotcha real, já corrigido**: a primeira versão
+  dessa regra incluía `input`/`select`/`textarea` também, empilhando outline global +
+  `focus-visible:ring-*` do Tailwind + `focus-visible:border-primary` ao mesmo tempo
+  (confirmado via `getComputedStyle` real no navegador, não só leitura de código) — os
+  três elementos de formulário foram **removidos** da regra genérica de propósito,
+  porque já têm tratamento de foco próprio. Não readicionar sem verificar visualmente.
+- Componentes novos **`src/components/ui/Button.tsx`, `Input.tsx`, `Select.tsx`** —
+  reproduzem exatamente as classes que se repetiam copiadas/coladas em ~40
+  `*Filtro.tsx`/`*ListView.tsx` (84+ botões `primary` quase idênticos, 24+ `outline`,
+  10+ `ghost` tipo "Limpar"). `Button` tem `variant`
+  (`primary`/`outline`/`danger`/`ghost`) e `size` (`sm`/`md`/`lg`); `Select` tem
+  `fullWidth` (`false` nos selects de "Ordenar" das `*ListView.tsx`, que ficam em
+  largura natural ao lado do rótulo). **Migrados 38 arquivos** (todo `*Filtro.tsx`
+  público + `*ListView.tsx`/`*ListPanel.tsx`/`TabelaCargos.tsx`) — validado com
+  screenshot antes/depois pixel-idêntico na prova de conceito (`ContratoFiltro.tsx`/
+  `ContratoListView.tsx`) antes de estender pro resto via 3 agentes em paralelo.
+  **Convenção a seguir em qualquer `*Filtro.tsx`/`*ListView.tsx` novo ou editado**: usar
+  esses 3 componentes em vez de reimplementar a classe Tailwind na mão. **Não
+  migrado** (fora de escopo desta rodada, mesma classe de duplicação existe lá também):
+  botões ad-hoc dentro do painel admin (`GenericCrudPage.tsx`, `InstitucionalCrudPage.tsx`,
+  páginas em `src/app/admin/(painel)/**` — Salvar/Cancelar de formulário) e o `<select>`
+  de campos de formulário fora do padrão "Ordenar"/filtro.
+- `text-[11px]` (fora da escala do Tailwind) → `text-xs` em ~40 arquivos (labels de
+  campo de filtro + metadados de card/tabela). Sobrou intocado de propósito um
+  `text-[10px]` isolado (etiqueta "Nova" em thumbnail de upload de notícia) — valor
+  diferente, não fazia parte do achado.
+- Área de toque mobile: paginação (`Pagination.tsx`) agora mede exatamente 44×44px
+  (medido via `getBoundingClientRect`, não só CSS lido); itens do menu mobile
+  (`Header.tsx`/`DropdownMenuItem.tsx`) ganharam `py-3 lg:py-2` — maior só abaixo do
+  breakpoint `lg`, desktop continua compacto.
+- Ajuste de contraste no mapeamento de cor por seção do hub `/transparencia`
+  (`SecaoAcesso.tsx`, feature em andamento na mesma sessão): hover do ícone
+  `accent-light` com texto branco dava só ~2,9:1 (abaixo do mínimo 3:1 do WCAG pra
+  ícone/objeto gráfico) — hover passou a usar `accent-dark` como fundo (~6,7:1),
+  mantendo a família de cor.
+- `tsc --noEmit`, `next lint` (com a nova regra `jsx-a11y/recommended`) e `next build`
+  completo limpos em toda a rodada. Verificação visual real via Playwright
+  (`playwright-core`, não `chromium-cli` — ver seção 4) em telas simples e na mais
+  complexa (Licitações, 12 campos), incluindo medição de bounding box e
+  `getComputedStyle` do estado de foco — não só leitura de código.
+- **Pendências conscientes, fora de escopo desta rodada** (mencionar se o usuário pedir
+  para continuar): migrar os botões do painel admin pros novos componentes; considerar
+  `tailwind-merge`/`clsx` se `Input`/`Select`/`Button` precisarem de mais overrides de
+  `className` que colisão de utility (hoje resolvido caso a caso com props como
+  `fullWidth` em vez de merge de classe).
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash
@@ -1270,6 +1345,14 @@ perfis).
 Playwright está disponível no ambiente (`node_modules/.bin/playwright`) — rodar um script de
 teste precisa de `NODE_PATH=<repo>/node_modules node script.js` se o script morar fora do
 projeto (ex: no scratchpad da sessão), senão a resolução de módulo não encontra o pacote.
+**Numa sessão diferente (2026-08-09, ver seção 2.22)** isso não estava verdade — nem
+`playwright` nem `chromium-cli` existiam no ambiente/projeto. O que funcionou: `npm install
+playwright-core` **dentro do diretório do scratchpad** (não no projeto — evita mexer no
+`package.json` só pra QA visual pontual) + `npx playwright install chromium` **sem**
+`--with-deps` (a flag tenta `sudo apt-get`, que trava pedindo senha neste ambiente sem root;
+sem ela, o binário do Chromium baixa normalmente em `~/.cache/ms-playwright` e roda headless
+com `chromium.launch({ args: ['--no-sandbox'] })`). Ambiente pode variar por sessão/máquina —
+confira o que está disponível antes de assumir qualquer um dos dois caminhos.
 
 ### Pegadinhas específicas deste sandbox (2026-07)
 
@@ -1293,6 +1376,15 @@ projeto (ex: no scratchpad da sessão), senão a resolução de módulo não enc
   travadas há mais de ~15min — pode mexer em dados de teste/fixture sem você ter feito nada (já
   vimos isso mudar o status de uma licitação de teste no meio de uma sessão). Não é bug seu, mas
   pode confundir se você não souber que existe.
+- **Dois `next dev` rodando ao mesmo tempo corrompem o `.next/`** — cada processo escreve
+  manifests no mesmo diretório, e a página passa a dar `500` com `ENOENT` em
+  `app-build-manifest.json`/`build-manifest.json` mesmo depois de matar um dos dois (o cache
+  já ficou inconsistente). Antes de subir `npm run dev`, confirme que não sobrou processo de
+  sessão anterior: `ps aux | grep "next dev"` (não só `lsof -ti:3000` — se a porta já estava
+  ocupada, o Next sobe sozinho numa porta seguinte tipo `3001`, e o processo antigo continua
+  vivo escrevendo no mesmo `.next/` sem estar na porta que você está checando). Se acontecer,
+  mate todos os processos `next dev`/`next-server` encontrados e rode `rm -rf .next` antes de
+  subir de novo.
 - **Páginas públicas que usam `<Suspense>` envolvendo um client component com
   `usePageableResource`/`useAsyncData`** (ex.: `/obras`, `/licitacoes`, `/avisos`) **travam pra
   sempre no fallback do Suspense** quando abertas pela ferramenta de preview (Claude Browser) —
