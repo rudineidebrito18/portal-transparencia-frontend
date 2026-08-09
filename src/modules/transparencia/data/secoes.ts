@@ -70,9 +70,15 @@ export interface ItemAcesso {
   href?: string
 }
 
+// Cores já existentes em globals.css (@theme) — nada de tom novo, só reaproveita a
+// paleta da marca pra dar identidade visual a cada seção (ajuda a escanear as 14
+// seções da página). Ver mapeamento em CORES_SECAO (SecaoAcesso.tsx).
+export type CorSecao = 'primary' | 'accent' | 'secondary' | 'primary-light' | 'accent-dark' | 'accent-light' | 'primary-dark'
+
 export interface SecaoAcesso {
   titulo: string
   icon: IconType
+  cor: CorSecao
   itens: ItemAcesso[]
 }
 
@@ -86,6 +92,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Informações Institucionais',
     icon: MdAccountBalance,
+    cor: 'primary',
     itens: [
       { label: 'Diário Oficial', icon: MdNewspaper, href: '/diario-oficial' },
       { label: 'Leis', icon: MdArticle, href: '/legislacao' },
@@ -96,6 +103,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Execução Orçamentária e Financeira',
     icon: MdAttachMoney,
+    cor: 'accent',
     itens: [
       { label: 'Execução Orçamentária 2018 a 2024', icon: MdTrendingUp, href: '/gestao-fiscal?categoria=execucao-orcamentaria' },
       { label: 'Execução Orçamentária (2025-2026)', icon: MdTrendingDown, href: '/gestao-fiscal?categoria=execucao-orcamentaria' },
@@ -105,6 +113,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Convênios e Transferências',
     icon: MdSwapHoriz,
+    cor: 'secondary',
     itens: [
       { label: 'Convênios e Transferências Recebidas', icon: MdCallReceived, href: '/convenios?categoria=transferencias-recebidas' },
       { label: 'Convênios e Transferências Realizadas', icon: MdCallMade, href: '/convenios?categoria=transferencias-realizadas' },
@@ -114,6 +123,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Recursos Humanos',
     icon: MdGroups,
+    cor: 'primary-light',
     itens: [
       { label: 'Folha de Pagamento', icon: MdPayments, href: '/folha-pagamento' },
       { label: 'Servidores', icon: MdBadge, href: '/servidores' },
@@ -126,6 +136,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Diárias',
     icon: MdFlightTakeoff,
+    cor: 'accent-dark',
     itens: [
       { label: 'Diárias', icon: MdFlightTakeoff, href: '/diarias' },
       { label: 'Tabelas de Valores da Diária', icon: MdListAlt, href: '/tabela-valores' },
@@ -134,6 +145,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Licitações e Contratos',
     icon: MdGavel,
+    cor: 'accent-light',
     itens: [
       { label: 'Licitações', icon: MdGavel, href: '/licitacoes' },
       { label: 'Contratos', icon: MdDescription, href: '/contratos' },
@@ -149,6 +161,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Obras Públicas',
     icon: MdConstruction,
+    cor: 'primary-dark',
     itens: [
       { label: 'Obras Públicas', icon: MdConstruction, href: '/obras' },
       { label: 'Obras Paralisadas', icon: MdPauseCircleOutline, href: '/obras?status=paralisadas' },
@@ -157,6 +170,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Planejamento e Prestação de Contas',
     icon: MdAssessment,
+    cor: 'primary',
     itens: [
       { label: 'Prestação de Contas Anos Anteriores (Balanço Geral)', icon: MdAccountBalanceWallet, href: '/prestacao-contas?categoria=balanco-geral' },
       { label: 'Relatório de Gestão ou Atividade', icon: MdInsertChart, href: '/planejamento?categoria=rga' },
@@ -173,6 +187,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Ouvidoria e E-SIC',
     icon: MdRecordVoiceOver,
+    cor: 'accent',
     itens: [
       { label: 'E-SIC', icon: MdMailOutline, href: '/esic' },
       { label: 'Ouvidoria', icon: MdSupportAgent, href: '/ouvidoria' },
@@ -182,6 +197,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Lei Geral de Proteção de Dados e Governo Digital',
     icon: MdSecurity,
+    cor: 'secondary',
     itens: [
       { label: 'Perguntas Frequentes - FAQ', icon: MdHelpOutline, href: '/faq' },
       { label: 'Dados Abertos', icon: MdPublic, href: '/lgpd' },
@@ -190,6 +206,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Renúncia de Receita e Emendas Parlamentares',
     icon: MdReceiptLong,
+    cor: 'primary-light',
     itens: [
       { label: 'Execução Orçamentária (Emendas Parlamentares)', icon: MdEditNote, href: '/emendas-parlamentares' },
       { label: 'Renúncias Fiscais', icon: MdPercent, href: '/gestao-fiscal?categoria=renuncia-fiscal' },
@@ -198,6 +215,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Saúde Pública',
     icon: MdLocalHospital,
+    cor: 'accent-dark',
     itens: [
       { label: 'Conselho Municipal de Saúde', icon: MdGroup },
       { label: 'Unidades Saúde', icon: MdLocationOn, href: '/saude?categoria=unidade' },
@@ -208,6 +226,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Educação e Assistência Social',
     icon: MdSchool,
+    cor: 'accent-light',
     itens: [
       { label: 'Conselho Municipal (Educação e Assistência Social)', icon: MdVolunteerActivism },
       { label: 'Plano Educação', icon: MdMenuBook, href: '/educacao?categoria=planos' },
@@ -218,6 +237,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Emendas Parlamentares',
     icon: MdPolicy,
+    cor: 'primary-dark',
     itens: [
       { label: 'Emendas Federais', icon: MdPublic, href: '/emendas-parlamentares' },
       { label: 'Emendas Estaduais', icon: MdLocationOn, href: '/emendas-parlamentares' },

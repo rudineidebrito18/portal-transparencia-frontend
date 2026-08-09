@@ -2,9 +2,12 @@ import Link from 'next/link'
 import { MdArrowForward, MdOpenInNew, MdOutlineHourglassEmpty } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
-import { ItemAcesso } from '../data/secoes'
+import { ItemAcesso, CorSecao } from '../data/secoes'
+import { CORES_SECAO } from './SecaoAcesso'
 
-export default function ItemAcessoCard({ label, href, icon: Icon }: ItemAcesso) {
+export default function ItemAcessoCard({ label, href, icon: Icon, cor }: ItemAcesso & { cor: CorSecao }) {
+  const cores = CORES_SECAO[cor]
+
   if (!href) {
     return (
       <Card
@@ -26,22 +29,22 @@ export default function ItemAcessoCard({ label, href, icon: Icon }: ItemAcesso) 
   const externo = href.startsWith('http')
 
   const conteudo = (
-    <Card className="p-4 h-full flex items-center gap-3 border-l-4 border-l-primary group">
-      <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+    <Card className={`p-4 h-full flex items-center gap-3 border-l-4 group ${cores.borda}`}>
+      <span className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 transition-colors group-hover:text-white ${cores.badge} ${cores.hoverBg}`}>
         <Icon size={18} />
       </span>
-      <span className="text-sm font-medium text-text-secondary flex-1 group-hover:text-primary transition-colors">
+      <span className={`text-sm font-medium text-text-secondary flex-1 transition-colors ${cores.hoverTexto}`}>
         {label}
       </span>
       {externo ? (
         <MdOpenInNew
           size={16}
-          className="text-primary shrink-0"
+          className={`shrink-0 ${cores.texto}`}
         />
       ) : (
         <MdArrowForward
           size={16}
-          className="text-primary shrink-0 group-hover:translate-x-0.5 transition-transform"
+          className={`shrink-0 group-hover:translate-x-0.5 transition-transform ${cores.texto}`}
         />
       )}
     </Card>
