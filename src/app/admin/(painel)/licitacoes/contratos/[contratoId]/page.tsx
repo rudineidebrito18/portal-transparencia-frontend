@@ -3,11 +3,11 @@
 import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
+import { MdDeleteOutline, MdEdit, MdVisibility } from 'react-icons/md'
 
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import ConfirmDialog from '@/modules/admin/shared/ConfirmDialog'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { fornecedoresService } from '@/modules/admin/geral/geral.service'
@@ -17,6 +17,12 @@ import { contratoService } from '@/modules/admin/licitacoes/contrato.service'
 import { aditivoService } from '@/modules/admin/licitacoes/aditivo.service'
 import { AditivoRequest, Documento, DocumentoUploadRequest } from '@/modules/admin/licitacoes/types'
 import { hrefDocumento } from '@/utils/documento'
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
+const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
+const classeArquivo =
+  'block w-full text-sm text-admin-text-muted file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:text-white file:bg-admin-accent file:cursor-pointer file:transition-colors hover:file:bg-admin-accent-dark'
 
 function formatarData(data?: string) {
   if (!data) return '—'
@@ -54,63 +60,65 @@ export default function ContratoDetalheAdminPage() {
 
   const [aba, setAba] = useState<Aba>('documento')
 
-  if (loading) return <Skeleton className="h-64" />
-  if (erro) return <ErrorState message={erro} />
+  if (loading) {
+    return <div className="rounded-2xl border border-admin-border bg-admin-surface h-64 animate-pulse" aria-hidden="true" />
+  }
+  if (erro) return <AdminErrorState message={erro} />
   if (!contrato) return null
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
         <Link
           href={licitacaoId ? `/admin/licitacoes/${licitacaoId}` : '/admin/licitacoes'}
-          className="text-sm text-primary hover:underline"
+          className="text-sm text-admin-accent hover:underline"
         >
           &larr; Voltar para {licitacaoId ? 'a licitação' : 'Licitações'}
         </Link>
         <div>
-          <h1 className="text-lg font-bold text-primary">
+          <h1 className="text-lg font-bold text-admin-text">
             Contrato nº {contrato.numeroContrato}/{contrato.exercicio}
           </h1>
-          <p className="text-sm text-text-secondary/70">{contrato.objeto}</p>
+          <p className="text-sm text-admin-text-muted">{contrato.objeto}</p>
         </div>
       </div>
 
-      <Card className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div>
-          <p className="text-text-secondary/60 text-xs">Fornecedor</p>
-          <p className="font-semibold">{contrato.fornecedor}</p>
+          <p className="text-admin-text-faint text-xs">Fornecedor</p>
+          <p className="font-semibold text-admin-text">{contrato.fornecedor}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Status</p>
-          <p className="font-semibold">{contrato.status}</p>
+          <p className="text-admin-text-faint text-xs">Status</p>
+          <p className="font-semibold text-admin-text">{contrato.status}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Unidade</p>
-          <p className="font-semibold">{contrato.unidade}</p>
+          <p className="text-admin-text-faint text-xs">Unidade</p>
+          <p className="font-semibold text-admin-text">{contrato.unidade}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Gestor do contrato</p>
-          <p className="font-semibold">{contrato.gestorContrato}</p>
+          <p className="text-admin-text-faint text-xs">Gestor do contrato</p>
+          <p className="font-semibold text-admin-text">{contrato.gestorContrato}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Assinatura</p>
-          <p className="font-semibold">{formatarData(contrato.dataAssinatura)}</p>
+          <p className="text-admin-text-faint text-xs">Assinatura</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarData(contrato.dataAssinatura)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Publicação</p>
-          <p className="font-semibold">{formatarData(contrato.dataPublicacao)} ({contrato.meioPublicacao})</p>
+          <p className="text-admin-text-faint text-xs">Publicação</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarData(contrato.dataPublicacao)} ({contrato.meioPublicacao})</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Vigência</p>
-          <p className="font-semibold">{formatarData(contrato.dataInicio)} — {formatarData(contrato.dataTermino)}</p>
+          <p className="text-admin-text-faint text-xs">Vigência</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarData(contrato.dataInicio)} — {formatarData(contrato.dataTermino)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Valor</p>
-          <p className="font-semibold">{formatarMoeda(contrato.valorContrato)}</p>
+          <p className="text-admin-text-faint text-xs">Valor</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarMoeda(contrato.valorContrato)}</p>
         </div>
-      </Card>
+      </div>
 
-      <div className="flex gap-1 border-b border-border/30">
+      <div className="flex gap-1 border-b border-admin-border">
         {([
           ['documento', 'Documento'],
           ['aditivos', 'Aditivos']
@@ -119,7 +127,7 @@ export default function ContratoDetalheAdminPage() {
             key={valor}
             onClick={() => setAba(valor)}
             className={`px-4 py-2 text-sm font-semibold border-b-2 transition-all ${
-              aba === valor ? 'border-primary text-primary' : 'border-transparent text-text-secondary/60 hover:text-primary'
+              aba === valor ? 'border-admin-accent text-admin-accent' : 'border-transparent text-admin-text-muted hover:text-admin-text'
             }`}
           >
             {label}
@@ -156,14 +164,21 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
   const [arquivo, setArquivo] = useState<File | null>(null)
   const [enviando, setEnviando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [documentoParaExcluir, setDocumentoParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir este documento? Essa ação não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (documentoParaExcluir === null) return
+
+    setExcluindo(true)
     try {
-      await contratoService.excluirDocumento(contratoId, id)
+      await contratoService.excluirDocumento(contratoId, documentoParaExcluir)
+      setDocumentoParaExcluir(null)
       carregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -189,109 +204,133 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
   return (
     <div className="space-y-4">
       {podeCriar(usuario, 'licitacoes') && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">Novo documento</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">Novo documento</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="assunto">Assunto</label>
+                <label className={classeLabel} htmlFor="assunto">Assunto</label>
                 <input
                   id="assunto"
                   required
                   value={dados.assunto}
                   onChange={e => setDados({ ...dados, assunto: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="tipoDocumento">Tipo de documento</label>
+                <label className={classeLabel} htmlFor="tipoDocumento">Tipo de documento</label>
                 <input
                   id="tipoDocumento"
                   required
                   value={dados.tipoDocumento}
                   onChange={e => setDados({ ...dados, tipoDocumento: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataEnvio">Data de envio</label>
+                <label className={classeLabel} htmlFor="dataEnvio">Data de envio</label>
                 <input
                   id="dataEnvio"
                   type="date"
                   required
                   value={dados.dataEnvio}
                   onChange={e => setDados({ ...dados, dataEnvio: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">Arquivo (PDF)</label>
+              <label className={classeLabel} htmlFor="arquivo">Arquivo (PDF)</label>
               <input
                 id="arquivo"
                 type="file"
                 accept="application/pdf"
                 required
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold"
+                className={classeArquivo}
               />
             </div>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <button
               type="submit"
               disabled={enviando}
-              className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+              className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
             >
               {enviando ? 'Enviando...' : 'Enviar documento'}
             </button>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum documento cadastrado." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && lista.length === 0 && <AdminEmptyState message="Nenhum documento cadastrado." />}
 
       {!loading && !erro && lista.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Assunto</th>
-                <th className="p-3">Tipo</th>
-                <th className="p-3">Envio</th>
-                <th className="p-3">Arquivo</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map(d => (
-                <tr key={d.id} className="border-t border-border/20">
-                  <td className="p-3">{d.assunto}</td>
-                  <td className="p-3">{d.tipoDocumento}</td>
-                  <td className="p-3">{formatarData(d.dataEnvio)}</td>
-                  <td className="p-3">
-                    <Link href={hrefDocumento(d.caminhoPdf, d.assunto, { admin: true })} className="text-primary hover:underline">
-                      Ver documento
-                    </Link>
-                  </td>
-                  <td className="p-3 text-right">
-                    {podeExcluir(usuario, 'licitacoes') && (
-                      <button onClick={() => excluir(d.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Assunto</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Tipo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Envio</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Arquivo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {lista.map(d => (
+                  <tr key={d.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 text-admin-text">{d.assunto}</td>
+                    <td className="p-3.5 text-admin-text-muted">{d.tipoDocumento}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarData(d.dataEnvio)}</td>
+                    <td className="p-3.5">
+                      <Link
+                        href={hrefDocumento(d.caminhoPdf, d.assunto, { admin: true })}
+                        className="inline-flex items-center gap-1 text-admin-accent hover:underline"
+                      >
+                        <MdVisibility size={15} /> Ver documento
+                      </Link>
+                    </td>
+                    <td className="p-3.5 text-right">
+                      {podeExcluir(usuario, 'licitacoes') && (
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => setDocumentoParaExcluir(d.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
+
+      <ConfirmDialog
+        aberto={documentoParaExcluir !== null}
+        titulo="Excluir documento?"
+        mensagem="Essa ação não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setDocumentoParaExcluir(null)}
+      />
     </div>
   )
 }
@@ -327,6 +366,8 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
   const [arquivo, setArquivo] = useState<File | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [aditivoParaExcluir, setAditivoParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
 
   function abrirCriacao() {
     setErroForm(null)
@@ -340,13 +381,18 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
     setForm({ id: a.id, dataAssinatura: a.dataAssinatura, objeto: a.objeto, fornecedorId: a.fornecedorId ?? 0 })
   }
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir este aditivo? Essa ação não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (aditivoParaExcluir === null) return
+
+    setExcluindo(true)
     try {
-      await aditivoService.excluir(id)
+      await aditivoService.excluir(aditivoParaExcluir)
+      setAditivoParaExcluir(null)
       carregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -385,37 +431,37 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
       {podeCriar(usuario, 'licitacoes') && !form && (
         <button
           onClick={abrirCriacao}
-          className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+          className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all"
         >
           + Novo aditivo
         </button>
       )}
 
       {form && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">{form.id ? 'Editar aditivo' : 'Novo aditivo'}</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">{form.id ? 'Editar aditivo' : 'Novo aditivo'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataAssinatura">Data de assinatura</label>
+                <label className={classeLabel} htmlFor="dataAssinatura">Data de assinatura</label>
                 <input
                   id="dataAssinatura"
                   type="date"
                   required
                   value={form.dataAssinatura}
                   onChange={e => setForm({ ...form, dataAssinatura: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="fornecedorId">Fornecedor</label>
+                <label className={classeLabel} htmlFor="fornecedorId">Fornecedor</label>
                 <select
                   id="fornecedorId"
                   required
                   value={form.fornecedorId || ''}
                   onChange={e => setForm({ ...form, fornecedorId: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 >
                   <option value="" disabled>Selecione...</option>
                   {fornecedores.map(f => (
@@ -426,99 +472,129 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="objeto">Objeto</label>
+              <label className={classeLabel} htmlFor="objeto">Objeto</label>
               <textarea
                 id="objeto"
                 required
                 rows={2}
                 value={form.objeto}
                 onChange={e => setForm({ ...form, objeto: e.target.value })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">
-                Arquivo (PDF) {form.id && <span className="font-normal text-text-secondary/60">— opcional, mantém o atual se não enviar um novo</span>}
+              <label className={classeLabel} htmlFor="arquivo">
+                Arquivo (PDF) {form.id && <span className="font-normal normal-case text-admin-text-faint">— opcional, mantém o atual se não enviar um novo</span>}
               </label>
               <input
                 id="arquivo"
                 type="file"
                 accept="application/pdf"
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold"
+                className={classeArquivo}
               />
             </div>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+                className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 type="button"
                 onClick={() => setForm(null)}
-                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+                className="px-4 py-2 rounded-lg border border-admin-border text-sm font-semibold text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-text transition-all"
               >
                 Cancelar
               </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum aditivo cadastrado." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && lista.length === 0 && <AdminEmptyState message="Nenhum aditivo cadastrado." />}
 
       {!loading && !erro && lista.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Assinatura</th>
-                <th className="p-3">Objeto</th>
-                <th className="p-3">Fornecedor</th>
-                <th className="p-3">Documento</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map(a => (
-                <tr key={a.id} className="border-t border-border/20">
-                  <td className="p-3">{formatarData(a.dataAssinatura)}</td>
-                  <td className="p-3">{a.objeto}</td>
-                  <td className="p-3">{a.fornecedorNome}</td>
-                  <td className="p-3">
-                    {a.caminhoPdf ? (
-                      <Link href={hrefDocumento(a.caminhoPdf, a.objeto, { admin: true })} className="text-primary hover:underline">
-                        Ver documento
-                      </Link>
-                    ) : '—'}
-                  </td>
-                  <td className="p-3 text-right space-x-2">
-                    {podeEditar(usuario, 'licitacoes') && (
-                      <button onClick={() => abrirEdicao(a)} className="text-primary hover:underline">
-                        Editar
-                      </button>
-                    )}
-                    {podeExcluir(usuario, 'licitacoes') && (
-                      <button onClick={() => excluir(a.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Assinatura</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Objeto</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Fornecedor</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Documento</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {lista.map(a => (
+                  <tr key={a.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarData(a.dataAssinatura)}</td>
+                    <td className="p-3.5 text-admin-text">{a.objeto}</td>
+                    <td className="p-3.5 text-admin-text-muted">{a.fornecedorNome}</td>
+                    <td className="p-3.5">
+                      {a.caminhoPdf ? (
+                        <Link
+                          href={hrefDocumento(a.caminhoPdf, a.objeto, { admin: true })}
+                          className="inline-flex items-center gap-1 text-admin-accent hover:underline"
+                        >
+                          <MdVisibility size={15} /> Ver documento
+                        </Link>
+                      ) : (
+                        <span className="text-admin-text-faint">—</span>
+                      )}
+                    </td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {podeEditar(usuario, 'licitacoes') && (
+                          <button
+                            onClick={() => abrirEdicao(a)}
+                            aria-label="Editar"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                        )}
+                        {podeExcluir(usuario, 'licitacoes') && (
+                          <button
+                            onClick={() => setAditivoParaExcluir(a.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
+
+      <ConfirmDialog
+        aberto={aditivoParaExcluir !== null}
+        titulo="Excluir aditivo?"
+        mensagem="Essa ação não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setAditivoParaExcluir(null)}
+      />
     </div>
   )
 }

@@ -1512,6 +1512,164 @@ no site público (as poucas ocorrências restantes checadas uma a uma: `TipoEdic
 `AcessibilidadeMenu.tsx` é o próprio amarelo do alto contraste, intencional). `tsc`/
 `next lint` limpos, amostra de rotas confirmada via `curl`.
 
+## 2.27 Redesign ousado do painel admin — rodada 1 (2026-08-09) — concluído, painel bespoke fora de escopo
+
+Pedido do usuário: painel administrativo com cara de produto SaaS premium (Linear/
+Vercel/Stripe/Raycast/Notion/Arc/fintechs como inspiração conceitual), "muito mais
+liberdade criativa" que o site público, priorizando nesta ordem: Sidebar > Dashboard >
+Topbar > Cards/KPIs > Gráficos > Tabelas > Formulários > Upload > Modais > Estados.
+
+**Decisão de design não trivial, registrada aqui pra não ser revertida por engano**: o
+painel virou um ambiente **permanentemente escuro** (não claro/escuro com toggle). O
+pedido tinha uma seção explícita de "Dark Mode" pedindo pra avaliar se compensa
+adicionar uma experiência própria (não simplesmente inverter cores) — decidido que sim
+compensa ter uma experiência escura de verdade (é literalmente a estética padrão de
+todas as referências citadas: Linear, Vercel, Raycast e Arc são escuros por padrão), mas
+que um toggle claro/escuro completo com persistência é um projeto à parte, não incluído
+aqui. Namespace de tokens `admin-*` inteiramente separado da paleta do site público em
+`globals.css` (`--color-admin-bg/surface/surface-2/surface-3/border/text/accent/...` +
+`.admin-gradient-accent`/`.admin-gradient-mesh`/`.admin-glass`) — zero risco de vazar
+pro tema público, zero mudança de token existente.
+
+- **`AdminSidebar.tsx`**: reescrita completa. Ícone por categoria (não por link
+  individual — ~50 links, ícone genérico repetido não ajudaria), indicador de item
+  ativo em barra de gradiente lateral (não preenchimento sólido), collapse/expand
+  (72px↔288px, preferência persistida em `localStorage`), tooltip via CSS puro
+  (`group-hover`, sem JS de posicionamento) quando colapsada, avatar de iniciais
+  (derivadas do e-mail — `Usuario` não tem campo de nome/foto, não inventei um).
+- **`AdminTopbar.tsx`** (novo): breadcrumb derivado da rota atual contra a lista real de
+  navegação (mesma fonte que a sidebar usa), busca client-side sobre módulos/páginas
+  reais (nenhum endpoint novo), indicador de ambiente lendo `NEXT_PUBLIC_USE_MOCK` (já
+  existia, usado em ~15 services — não inventei essa variável), botão de colapsar a
+  sidebar. **Sem notificações**: não existe fonte de dado real pra isso no backend hoje
+  — um sino com contador fake seria exatamente o "não invente dados" que o próprio
+  pedido probe para o Dashboard; melhor omitir que fingir.
+- **Dashboard** (`src/app/admin/(painel)/page.tsx`): reescrito com KPIs reais —
+  Licitações/Contratos/Servidores (total via `listar({size:1}).totalElements`, mesmo
+  truque já usado em `DiarioOficialDestaque.tsx` do site público) e Obras em andamento
+  (filtro real `StatusObra.EM_ANDAMENTO`). Cada KPI busca e falha independente
+  (`Promise` isolada por card — um endpoint fora do ar não derruba os outros). Atividade
+  recente puxa `auditoriaService.listar` de verdade (admin-only, mesma regra que já
+  protegia a página de Auditoria). Nenhum gráfico foi adicionado: não existe lib de
+  chart no projeto (`package.json` conferido) e nenhuma fonte de dado em série temporal
+  óbvia sem desenho de API novo — instrução explícita do pedido era não inventar dado,
+  então fica de fora até existir algo real pra mostrar.
+- **`GenericCrudPage.tsx`** (maior alavanca real: ~29 dos módulos do registry passam por
+  esse único arquivo) e **`InstitucionalCrudPage.tsx`** (Avisos/Notícias) e
+  **`AutoridadeConfigPage.tsx`** (Prefeito/Vice-Prefeito) reescritos: tabela/formulário/
+  upload no novo visual, `confirm()` nativo do navegador trocado por
+  `ConfirmDialog.tsx` (novo, acessível — foco no cancelar ao abrir, Escape fecha,
+  `role="alertdialog"`) nos três. Upload em `GenericCrudPage` ganhou dropzone de
+  verdade (`onDragOver`/`onDrop`, não só decoração) além do clique.
+- **Achado real, corrigido antes de virar bug visível**: `Pagination.tsx`/
+  `EmptyState.tsx` do site público têm `bg-white`/`bg-primary` fixos — reaproveitá-los
+  sem alteração dentro do novo shell escuro teria deixado uma barra branca sólida em
+  toda tabela do admin (não "menos bonito", quebrado de verdade). Criados
+  `AdminPagination.tsx`/`AdminEmptyState.tsx`/`AdminErrorState.tsx` (mesma lógica,
+  tokens `admin-*`) em vez de tentar tornar os componentes públicos "cientes de tema" —
+  mais simples e sem risco de regressão nas ~85 rotas públicas que os usam como estão.
+- **Outro achado real**: primeira versão do upload de foto em `AutoridadeConfigPage.tsx`
+  usava `file:admin-gradient-accent` — variante do Tailwind (`file:`) só combina com
+  utility reconhecida, não com classe CSS escrita à mão; não teria gerado CSS nenhum.
+  Trocado por `file:bg-admin-accent hover:file:bg-admin-accent-dark` (tokens reais).
+- **`/admin/login`**: fora do layout `(painel)` (rota própria, sem sidebar/topbar) —
+  também migrado pro visual escuro, senão seria a primeira tela que o admin vê antes de
+  um dashboard completamente diferente. Confirmado que o `autoFocus` removido do campo
+  de e-mail na auditoria de a11y (seção 2.22) **não** foi reintroduzido sem querer.
+- **Validação**: `tsc --noEmit`, `next lint` e `next build` completo (78 rotas) limpos;
+  dev server reiniciado do zero, `/admin/login`, `/admin`, uma rota de
+  `GenericCrudPage`, `InstitucionalCrudPage` e `AutoridadeConfigPage` retornando 200
+  sem erro no log; confirmado no CSS compilado que os tokens/classes `admin-*` novos
+  foram realmente emitidos (mesma poda do Tailwind v4 documentada na seção 2.24 — sem
+  uso real em JSX, não aparecem). Site público re-verificado (`/`, `/licitacoes`) pra
+  confirmar que nada vazou entre os dois sistemas de tokens. **Não foi possível**
+  testar o fluxo autenticado de verdade (login → dashboard → criar/editar/excluir)
+  nesta sessão — sem backend rodando nem credenciais disponíveis no sandbox; validação
+  ficou em build+tsc+lint+leitura de código, não em clique real na tela.
+- **Fora de escopo desta rodada, de propósito — é a maior pendência real**: as páginas
+  *bespoke* do admin que não passam por `GenericCrudPage`/`InstitucionalCrudPage`/
+  `AutoridadeConfigPage` continuam com o visual antigo (claro) por dentro, agora
+  encaixadas dentro do shell escuro novo — inconsistente, não quebrado. Lista completa:
+  `admin/licitacoes/**`, `admin/obras/**`, `admin/rh/**` (servidores/cargos/diárias/
+  folha/concursos), `admin/geral/unidades/**`, `admin/geral/fornecedores`,
+  `admin/geral/tabela-valores`, `admin/esic/**`, `admin/ouvidoria/**`,
+  `admin/diario-oficial/**`, `admin/anticorrupcao/**`, `admin/convenios`,
+  `admin/emendas-parlamentares`, `admin/usuarios`, `admin/auditoria`, `admin/documento`.
+  Mencionar se o usuário pedir pra continuar — é uma lista grande, mesmo padrão de
+  fase piloto → aprovação → extensão que funcionou bem nas seções 2.23-2.26.
+
+## 2.28 Admin bespoke: resto do painel migrado pro tema escuro (2026-08-09) — concluído
+
+Usuário mandou print de 3 telas reais (Notícias, Usuários, Empresas Inidôneas) mostrando
+fundo branco quebrado dentro do shell escuro novo, e apontou que a sidebar colapsada
+"tá estranho". Os dois problemas eram reais, não só percepção:
+
+- **Bug real na sidebar colapsada**: `AdminSidebar.tsx` só passava `icone` pros 3 itens
+  de topo (Início/Usuários/Auditoria) — todo link individual dentro de categoria
+  renderizava sem ícone nenhum, só invisível ocupando espaço quando colapsada (o texto
+  já sumia via `{!colapsada && <span>}`, mas a linha continuava lá vazia). Corrigido:
+  colapsada agora mostra só cabeçalho de categoria (virou `<button>` clicável com
+  tooltip que expande a sidebar de novo) + os 3 itens de topo; links individuais somem
+  de vez quando colapsada em vez de aparecer como buraco.
+- **As 3 páginas dos prints eram reais exemplos de um problema maior**: das 28 páginas
+  *bespoke* do admin fora do escopo da seção 2.27 (registradas lá explicitamente como
+  pendência), nenhuma tinha sido migrada ainda — cada uma reaproveitava `Card`/`Badge`/
+  `Pagination`/`EmptyState`/`ErrorState`/`Skeleton` do site público (`bg-white` fixo),
+  que ficam quebrados dentro do `<main>` escuro do admin.
+
+**Como foi feito**: migrei 3 arquivos à mão primeiro (Notícias — upload de múltiplas
+imagens com marcação de principal, 2 `ConfirmDialog`; Usuários — ações de promover/
+rebaixar/desativar/reativar; Empresas Inidôneas) pra confirmar a receita de conversão
+com exemplos reais. Depois paralelizei as 22 páginas restantes em 5 agentes de
+background, cada um com um recorte de arquivos disjunto e a receita completa (mapeamento
+de classe por classe: containers, inputs, botões, tabela, badge→pill com dot, ações→
+ícone, `confirm()` nativo→`ConfirmDialog`) — mesma estratégia que já tinha funcionado
+pro rollout do site público (seção 2.22 menciona "3 agentes em paralelo" pro mesmo tipo
+de tarefa).
+
+- **4 dos 5 agentes terminaram limpo** (`tsc --noEmit` sem erro cada um): Anticorrupção+
+  Geral (5 arquivos), ESIC+Ouvidoria+Convênios+Emendas (6), Diário Oficial+Documento+
+  Auditoria (6), RH (6).
+- **O 5º agente (Licitações+Obras) caiu no meio** por erro de conexão da API, bem na
+  hora de começar o último arquivo (`obras/[id]/page.tsx`, avisado como "o mais
+  complexo"). Os outros 4 arquivos dele (`licitacoes/page.tsx`, `licitacoes/[id]`,
+  `licitacoes/contratos/[contratoId]`, `obras/page.tsx`) já estavam corretamente
+  migrados — confirmado por grep (zero import de `@/components/ui/*`, dezenas de
+  referências a `admin-*`). Migrei `obras/[id]/page.tsx` (829 linhas, 3 abas — Medições/
+  Anexos/ART, cada uma com form+tabela+exclusão própria) manualmente. Reexportei
+  `StatusObraDot` em `modules/admin/obras/types.ts` (re-export de 1 linha do que já
+  existia em `modules/obras/types.ts` desde a seção 2.26) mas decidi **não usá-lo**
+  nessa página — os valores de `StatusObraStyle`/`StatusObraDot` do site público são
+  pílulas claras (`bg-yellow-100` etc.), ficariam sem vida no escuro; mapeei
+  `StatusObra` pra `admin-info`/`admin-success`/`admin-error` direto, mesma lógica que
+  pedi nos prompts dos agentes.
+- **Confirmado por grep**: zero arquivo em `src/app/admin/**`/`src/modules/admin/**`
+  ainda importando `@/components/ui/*` ou `@/components/Breadcrumbs`, exceto
+  `admin/documento/page.tsx` — que usa `PdfViewer` (visualizador de PDF em si, não um
+  container estilizado; legítimo manter).
+- **Validação real**: `tsc --noEmit`, `next lint` e `next build` completo (78 rotas)
+  limpos depois de tudo consolidado; dev server reiniciado do zero; amostra de 13 rotas
+  de todos os clusters (licitações, obras incl. `/obras/1`, RH, diário oficial,
+  auditoria, documento, unidades, convênios, esic, ouvidoria) confirmada via `curl` —
+  200 em todas, sem erro no log. Site público reconferido (`/`, `/obras`) pra garantir
+  que nada vazou entre os dois sistemas de tokens.
+- **Decisões de design que os agentes tomaram sozinhos** (revisão rápida dos relatórios,
+  todas consistentes com a receita): badges de categoria/tipo sem semântica boa/ruim
+  (tipo de solicitação E-SIC, finalidade de ouvidoria, tipo de emenda, tipo de edição do
+  Diário Oficial) viraram pill neutro sem dot; "Vigente" (unidades/gestores) usou
+  `admin-info` em vez de `admin-success` pra não confundir com "Verificado"; status de
+  publicação do Diário Oficial (`RECEBIDO`/`VALIDANDO`/`AGUARDANDO_APROVACAO`/
+  `PUBLICADO`/`FALHOU`) ganhou mapa próprio pras 5 cores semânticas; ação extra "Anexos"
+  em `rh/concursos` (que a receita não previa, só Editar/Excluir) virou 3º botão de
+  ícone em vez de sobrar como link de texto solto.
+
+**Painel admin está, com isso, 100% migrado pro tema escuro** — não sobra mais nenhuma
+superfície `bg-white` fora de lugar. Segue de fora do escopo (não pedido): dark mode
+como toggle (é ambiente único, decisão da seção 2.27), gráficos no Dashboard (sem lib
+de chart no projeto, sem dado real óbvio pra mostrar), migração equivalente do
+site público pro escuro (não faz sentido — é o site público, identidade institucional
+clara é o objetivo ali, não um "modo escuro").
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

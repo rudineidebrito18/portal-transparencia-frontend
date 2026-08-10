@@ -3,14 +3,12 @@
 import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
+import { MdChevronRight, MdDeleteOutline, MdEdit, MdVisibility, MdVisibilityOff } from 'react-icons/md'
 
-import Badge from '@/components/ui/Badge'
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Pagination from '@/components/ui/Pagination'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import AdminPagination from '@/modules/admin/shared/AdminPagination'
+import ConfirmDialog from '@/modules/admin/shared/ConfirmDialog'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { LicitacaoDetalhe } from '@/modules/licitacoes/types'
@@ -27,7 +25,6 @@ import {
   LicitacaoOrgaoRequest,
   StatusLicitacao,
   StatusLicitacaoDescricao,
-  StatusLicitacaoStyle,
   TipoOrgao,
   TipoOrgaoDescricao,
   TipoProcedimentoDescricao,
@@ -35,6 +32,51 @@ import {
   normalizarStatus
 } from '@/modules/admin/licitacoes/types'
 import { hrefDocumento } from '@/utils/documento'
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
+const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
+const classeArquivo =
+  'block w-full text-sm text-admin-text-muted file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:text-white file:bg-admin-accent file:cursor-pointer file:transition-colors hover:file:bg-admin-accent-dark'
+
+type TomStatus = 'info' | 'success' | 'error' | 'neutro'
+
+// "Em aberto"/"em andamento" (e as variantes SINC-Contrata) tratados como
+// informativo (processo em curso), concluído como sucesso, deserta/fracassada/anulada
+// como erro (não resultou em contratação), e os demais (suspenso, incluído pelo
+// sistema) como neutro.
+const TOM_STATUS_LICITACAO: Record<StatusLicitacao, TomStatus> = {
+  [StatusLicitacao.EM_ABERTO]: 'info',
+  [StatusLicitacao.SINC_ABERTO]: 'info',
+  [StatusLicitacao.EM_ANDAMENTO]: 'info',
+  [StatusLicitacao.SINC_ANDAMENTO]: 'info',
+  [StatusLicitacao.FINALIZADO]: 'success',
+  [StatusLicitacao.SUSPENSO]: 'neutro',
+  [StatusLicitacao.DESERTA]: 'error',
+  [StatusLicitacao.FRACASSADA]: 'error',
+  [StatusLicitacao.ANULADA]: 'error',
+  [StatusLicitacao.INCLUIDO_SISTEMA]: 'neutro'
+}
+
+const CLASSES_TOM: Record<TomStatus, { pill: string; dot: string }> = {
+  info: { pill: 'bg-admin-info-light text-admin-info', dot: 'bg-admin-info' },
+  success: { pill: 'bg-admin-success-light text-admin-success', dot: 'bg-admin-success' },
+  error: { pill: 'bg-admin-error-light text-admin-error', dot: 'bg-admin-error' },
+  neutro: { pill: 'bg-admin-surface-3 text-admin-text-muted', dot: 'bg-admin-text-faint' }
+}
+
+function BadgeStatusLicitacao({ statusDescricao }: { statusDescricao: string }) {
+  const statusKey = normalizarStatus(statusDescricao)
+  const tom = statusKey ? TOM_STATUS_LICITACAO[statusKey] : 'neutro'
+  const label = statusKey ? StatusLicitacaoDescricao[statusKey] : statusDescricao
+  const { pill, dot } = CLASSES_TOM[tom]
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${pill}`}>
+      <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+      {label}
+    </span>
+  )
+}
 
 function formatarData(data?: string) {
   if (!data) return '—'
@@ -87,19 +129,17 @@ export default function LicitacaoDetalheAdminPage() {
   useEffect(carregar, [licitacaoId])
 
   const [aba, setAba] = useState<Aba>('documentos')
+  const [confirmandoVisibilidade, setConfirmandoVisibilidade] = useState(false)
   const [alterandoVisibilidade, setAlterandoVisibilidade] = useState(false)
 
-  async function alternarVisibilidade() {
+  async function confirmarAlternarVisibilidade() {
     if (!licitacao) return
-    const tornarVisivel = !licitacao.visivel
-    const mensagem = tornarVisivel
-      ? 'Tornar esta licitação visível de novo na consulta pública?'
-      : 'Ocultar esta licitação da consulta pública? Ela deixa de aparecer pra quem não é admin (não é exclusão — dá pra reverter depois).'
-    if (!confirm(mensagem)) return
 
+    const tornarVisivel = !licitacao.visivel
     setAlterandoVisibilidade(true)
     try {
       await licitacaoService.alterarVisibilidade(licitacaoId, tornarVisivel)
+      setConfirmandoVisibilidade(false)
       carregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao alterar visibilidade')
@@ -108,99 +148,101 @@ export default function LicitacaoDetalheAdminPage() {
     }
   }
 
-  if (loading) return <Skeleton className="h-64" />
-  if (erro) return <ErrorState message={erro} />
+  if (loading) {
+    return <div className="rounded-2xl border border-admin-border bg-admin-surface h-64 animate-pulse" aria-hidden="true" />
+  }
+  if (erro) return <AdminErrorState message={erro} />
   if (!licitacao) return null
 
-  const statusKey = normalizarStatus(licitacao.status)
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
-        <Link href="/admin/licitacoes" className="text-sm text-primary hover:underline">
+        <Link href="/admin/licitacoes" className="text-sm text-admin-accent hover:underline">
           &larr; Voltar para Licitações
         </Link>
         <div className="flex items-center justify-between mt-1">
           <div>
-            <h1 className="text-lg font-bold text-primary">
+            <h1 className="text-lg font-bold text-admin-text">
               Licitação nº {licitacao.numeroInstrumento}/{licitacao.ano}
-              <span className="text-sm font-normal text-text-secondary/60 ml-2">Nº TCE {licitacao.numeroSequencial}</span>
+              <span className="text-sm font-normal text-admin-text-faint ml-2">Nº TCE {licitacao.numeroSequencial}</span>
             </h1>
-            <p className="text-sm text-text-secondary/70">{licitacao.objeto}</p>
+            <p className="text-sm text-admin-text-muted">{licitacao.objeto}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className={statusKey ? StatusLicitacaoStyle[statusKey] : 'bg-gray-100 text-gray-600'}>
-              {statusKey ? StatusLicitacaoDescricao[statusKey] : licitacao.status}
-            </Badge>
-            {!licitacao.visivel && <Badge className="bg-gray-100 text-gray-500">Oculta</Badge>}
+            <BadgeStatusLicitacao statusDescricao={licitacao.status} />
+            {!licitacao.visivel && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-admin-surface-3 text-admin-text-faint">
+                <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-admin-text-faint" />
+                Oculta
+              </span>
+            )}
             {podeExcluir(usuario, 'licitacoes') && (
               <button
-                onClick={alternarVisibilidade}
-                disabled={alterandoVisibilidade}
-                className="px-3 py-1.5 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all disabled:opacity-60 inline-flex items-center gap-1"
+                onClick={() => setConfirmandoVisibilidade(true)}
+                className="px-3 py-1.5 rounded-lg border border-admin-border text-sm font-semibold text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-text transition-all inline-flex items-center gap-1"
               >
                 {licitacao.visivel ? <MdVisibilityOff /> : <MdVisibility />}
-                {alterandoVisibilidade ? 'Aguarde...' : licitacao.visivel ? 'Ocultar' : 'Mostrar'}
+                {licitacao.visivel ? 'Ocultar' : 'Mostrar'}
               </button>
             )}
           </div>
         </div>
       </div>
 
-      <Card className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div>
-          <p className="text-text-secondary/60 text-xs">Nº do processo</p>
-          <p className="font-semibold">{licitacao.numeroProcesso}</p>
+          <p className="text-admin-text-faint text-xs">Nº do processo</p>
+          <p className="font-semibold text-admin-text">{licitacao.numeroProcesso}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Tipo de procedimento</p>
-          <p className="font-semibold">
+          <p className="text-admin-text-faint text-xs">Tipo de procedimento</p>
+          <p className="font-semibold text-admin-text">
             {TipoProcedimentoDescricao[licitacao.tipoProcedimentoLicitacao as TipoProcedimentoLicitacao] ?? licitacao.tipoProcedimentoLicitacao}
           </p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Unidade</p>
-          <p className="font-semibold">{licitacao.unidade ?? '—'}</p>
+          <p className="text-admin-text-faint text-xs">Unidade</p>
+          <p className="font-semibold text-admin-text">{licitacao.unidade ?? '—'}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Autoridade</p>
-          <p className="font-semibold">{licitacao.nomeAutoridade ?? '—'}</p>
+          <p className="text-admin-text-faint text-xs">Autoridade</p>
+          <p className="font-semibold text-admin-text">{licitacao.nomeAutoridade ?? '—'}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Publicação</p>
-          <p className="font-semibold">{formatarData(licitacao.dataPublicacao)}</p>
+          <p className="text-admin-text-faint text-xs">Publicação</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarData(licitacao.dataPublicacao)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Sessão</p>
-          <p className="font-semibold">{formatarData(licitacao.dataSessao)}</p>
+          <p className="text-admin-text-faint text-xs">Sessão</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarData(licitacao.dataSessao)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Abertura</p>
-          <p className="font-semibold">{formatarData(licitacao.dataAbertura)}</p>
+          <p className="text-admin-text-faint text-xs">Abertura</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarData(licitacao.dataAbertura)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Homologação</p>
-          <p className="font-semibold">{formatarData(licitacao.dataHomologacao)}</p>
+          <p className="text-admin-text-faint text-xs">Homologação</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarData(licitacao.dataHomologacao)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Valor estimado</p>
-          <p className="font-semibold">{formatarMoeda(licitacao.valorEstimado)}</p>
+          <p className="text-admin-text-faint text-xs">Valor estimado</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarMoeda(licitacao.valorEstimado)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Valor adjudicado</p>
-          <p className="font-semibold">{formatarMoeda(licitacao.valorAdjudicado)}</p>
+          <p className="text-admin-text-faint text-xs">Valor adjudicado</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarMoeda(licitacao.valorAdjudicado)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">Valor da dotação</p>
-          <p className="font-semibold">{formatarMoeda(licitacao.valorDotacao)}</p>
+          <p className="text-admin-text-faint text-xs">Valor da dotação</p>
+          <p className="font-semibold text-admin-text tabular-nums">{formatarMoeda(licitacao.valorDotacao)}</p>
         </div>
         <div>
-          <p className="text-text-secondary/60 text-xs">COVID-19</p>
-          <p className="font-semibold">{licitacao.covid ? 'Sim' : 'Não'}</p>
+          <p className="text-admin-text-faint text-xs">COVID-19</p>
+          <p className="font-semibold text-admin-text">{licitacao.covid ? 'Sim' : 'Não'}</p>
         </div>
-      </Card>
+      </div>
 
-      <div className="flex gap-1 border-b border-border/30">
+      <div className="flex gap-1 border-b border-admin-border">
         {([
           ['documentos', 'Documentos'],
           ['contratos', 'Contratos'],
@@ -210,7 +252,7 @@ export default function LicitacaoDetalheAdminPage() {
             key={valor}
             onClick={() => setAba(valor)}
             className={`px-4 py-2 text-sm font-semibold border-b-2 transition-all ${
-              aba === valor ? 'border-primary text-primary' : 'border-transparent text-text-secondary/60 hover:text-primary'
+              aba === valor ? 'border-admin-accent text-admin-accent' : 'border-transparent text-admin-text-muted hover:text-admin-text'
             }`}
           >
             {label}
@@ -221,6 +263,21 @@ export default function LicitacaoDetalheAdminPage() {
       {aba === 'documentos' && <AbaDocumentos licitacaoId={licitacaoId} />}
       {aba === 'contratos' && <AbaContratos licitacaoId={licitacaoId} />}
       {aba === 'orgaos' && <AbaOrgaos licitacaoId={licitacaoId} />}
+
+      <ConfirmDialog
+        aberto={confirmandoVisibilidade}
+        titulo={licitacao.visivel ? 'Ocultar licitação?' : 'Tornar licitação visível?'}
+        mensagem={
+          licitacao.visivel
+            ? 'Ela deixa de aparecer na consulta pública para quem não é admin. Não é exclusão — dá pra reverter depois.'
+            : 'Ela volta a aparecer normalmente na consulta pública.'
+        }
+        confirmarLabel={licitacao.visivel ? 'Ocultar' : 'Tornar visível'}
+        perigoso={licitacao.visivel}
+        carregando={alterandoVisibilidade}
+        onConfirmar={confirmarAlternarVisibilidade}
+        onCancelar={() => setConfirmandoVisibilidade(false)}
+      />
     </div>
   )
 }
@@ -248,14 +305,21 @@ function AbaDocumentos({ licitacaoId }: { licitacaoId: number }) {
   const [arquivo, setArquivo] = useState<File | null>(null)
   const [enviando, setEnviando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [documentoParaExcluir, setDocumentoParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir este documento? Essa ação não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (documentoParaExcluir === null) return
+
+    setExcluindo(true)
     try {
-      await licitacaoService.excluirDocumento(licitacaoId, id)
+      await licitacaoService.excluirDocumento(licitacaoId, documentoParaExcluir)
+      setDocumentoParaExcluir(null)
       carregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -281,109 +345,133 @@ function AbaDocumentos({ licitacaoId }: { licitacaoId: number }) {
   return (
     <div className="space-y-4">
       {podeCriar(usuario, 'licitacoes') && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">Novo documento</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">Novo documento</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="assunto">Assunto</label>
+                <label className={classeLabel} htmlFor="assunto">Assunto</label>
                 <input
                   id="assunto"
                   required
                   value={dados.assunto}
                   onChange={e => setDados({ ...dados, assunto: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="tipoDocumento">Tipo de documento</label>
+                <label className={classeLabel} htmlFor="tipoDocumento">Tipo de documento</label>
                 <input
                   id="tipoDocumento"
                   required
                   value={dados.tipoDocumento}
                   onChange={e => setDados({ ...dados, tipoDocumento: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataEnvio">Data de envio</label>
+                <label className={classeLabel} htmlFor="dataEnvio">Data de envio</label>
                 <input
                   id="dataEnvio"
                   type="date"
                   required
                   value={dados.dataEnvio}
                   onChange={e => setDados({ ...dados, dataEnvio: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="arquivo">Arquivo (PDF)</label>
+              <label className={classeLabel} htmlFor="arquivo">Arquivo (PDF)</label>
               <input
                 id="arquivo"
                 type="file"
                 accept="application/pdf"
                 required
                 onChange={e => setArquivo(e.target.files?.[0] ?? null)}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold"
+                className={classeArquivo}
               />
             </div>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <button
               type="submit"
               disabled={enviando}
-              className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+              className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
             >
               {enviando ? 'Enviando...' : 'Enviar documento'}
             </button>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum documento cadastrado." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && lista.length === 0 && <AdminEmptyState message="Nenhum documento cadastrado." />}
 
       {!loading && !erro && lista.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Assunto</th>
-                <th className="p-3">Tipo</th>
-                <th className="p-3">Envio</th>
-                <th className="p-3">Arquivo</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map(d => (
-                <tr key={d.id} className="border-t border-border/20">
-                  <td className="p-3">{d.assunto}</td>
-                  <td className="p-3">{d.tipoDocumento}</td>
-                  <td className="p-3">{formatarData(d.dataEnvio)}</td>
-                  <td className="p-3">
-                    <Link href={hrefDocumento(d.caminhoPdf, d.assunto, { admin: true })} className="text-primary hover:underline">
-                      Ver documento
-                    </Link>
-                  </td>
-                  <td className="p-3 text-right">
-                    {podeExcluir(usuario, 'licitacoes') && (
-                      <button onClick={() => excluir(d.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Assunto</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Tipo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Envio</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Arquivo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {lista.map(d => (
+                  <tr key={d.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 text-admin-text">{d.assunto}</td>
+                    <td className="p-3.5 text-admin-text-muted">{d.tipoDocumento}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarData(d.dataEnvio)}</td>
+                    <td className="p-3.5">
+                      <Link
+                        href={hrefDocumento(d.caminhoPdf, d.assunto, { admin: true })}
+                        className="inline-flex items-center gap-1 text-admin-accent hover:underline"
+                      >
+                        <MdVisibility size={15} /> Ver documento
+                      </Link>
+                    </td>
+                    <td className="p-3.5 text-right">
+                      {podeExcluir(usuario, 'licitacoes') && (
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => setDocumentoParaExcluir(d.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
+
+      <ConfirmDialog
+        aberto={documentoParaExcluir !== null}
+        titulo="Excluir documento?"
+        mensagem="Essa ação não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setDocumentoParaExcluir(null)}
+      />
     </div>
   )
 }
@@ -415,6 +503,8 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
   const [form, setForm] = useState<ContratoFormState | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [contratoParaExcluir, setContratoParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
 
   function abrirCriacao() {
     setErroForm(null)
@@ -441,13 +531,18 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
     })
   }
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir este contrato? Essa ação também remove documentos e aditivos vinculados, e não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (contratoParaExcluir === null) return
+
+    setExcluindo(true)
     try {
-      await contratoService.excluir(id)
+      await contratoService.excluir(contratoParaExcluir)
+      setContratoParaExcluir(null)
       carregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -480,112 +575,112 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
       {podeCriar(usuario, 'licitacoes') && !form && (
         <button
           onClick={abrirCriacao}
-          className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+          className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all"
         >
           + Novo contrato
         </button>
       )}
 
       {form && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">{form.id ? 'Editar contrato' : 'Novo contrato'}</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">{form.id ? 'Editar contrato' : 'Novo contrato'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="numeroContrato">Nº do contrato</label>
+                <label className={classeLabel} htmlFor="numeroContrato">Nº do contrato</label>
                 <input
                   id="numeroContrato"
                   type="number"
                   required
                   value={form.numeroContrato}
                   onChange={e => setForm({ ...form, numeroContrato: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="exercicio">Exercício</label>
+                <label className={classeLabel} htmlFor="exercicio">Exercício</label>
                 <input
                   id="exercicio"
                   type="number"
                   required
                   value={form.exercicio}
                   onChange={e => setForm({ ...form, exercicio: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="fornecedor">Fornecedor</label>
+                <label className={classeLabel} htmlFor="fornecedor">Fornecedor</label>
                 <input
                   id="fornecedor"
                   required
                   value={form.fornecedor}
                   onChange={e => setForm({ ...form, fornecedor: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataAssinatura">Data de assinatura</label>
+                <label className={classeLabel} htmlFor="dataAssinatura">Data de assinatura</label>
                 <input
                   id="dataAssinatura"
                   type="date"
                   required
                   value={form.dataAssinatura}
                   onChange={e => setForm({ ...form, dataAssinatura: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataPublicacao">Data de publicação</label>
+                <label className={classeLabel} htmlFor="dataPublicacao">Data de publicação</label>
                 <input
                   id="dataPublicacao"
                   type="date"
                   required
                   value={form.dataPublicacao}
                   onChange={e => setForm({ ...form, dataPublicacao: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="meioPublicacao">Meio de publicação</label>
+                <label className={classeLabel} htmlFor="meioPublicacao">Meio de publicação</label>
                 <input
                   id="meioPublicacao"
                   required
                   value={form.meioPublicacao}
                   onChange={e => setForm({ ...form, meioPublicacao: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Data de início</label>
+                <label className={classeLabel} htmlFor="dataInicio">Data de início</label>
                 <input
                   id="dataInicio"
                   type="date"
                   required
                   value={form.dataInicio}
                   onChange={e => setForm({ ...form, dataInicio: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataTermino">Data de término</label>
+                <label className={classeLabel} htmlFor="dataTermino">Data de término</label>
                 <input
                   id="dataTermino"
                   type="date"
                   required
                   value={form.dataTermino}
                   onChange={e => setForm({ ...form, dataTermino: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="valorContrato">Valor do contrato</label>
+                <label className={classeLabel} htmlFor="valorContrato">Valor do contrato</label>
                 <input
                   id="valorContrato"
                   type="number"
@@ -593,40 +688,40 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
                   required
                   value={form.valorContrato}
                   onChange={e => setForm({ ...form, valorContrato: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="unidade">Unidade</label>
+                <label className={classeLabel} htmlFor="unidade">Unidade</label>
                 <input
                   id="unidade"
                   required
                   value={form.unidade}
                   onChange={e => setForm({ ...form, unidade: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="gestorContrato">Gestor do contrato</label>
+                <label className={classeLabel} htmlFor="gestorContrato">Gestor do contrato</label>
                 <input
                   id="gestorContrato"
                   required
                   value={form.gestorContrato}
                   onChange={e => setForm({ ...form, gestorContrato: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="status">Status</label>
+                <label className={classeLabel} htmlFor="status">Status</label>
                 <select
                   id="status"
                   required
                   value={form.status}
                   onChange={e => setForm({ ...form, status: e.target.value as StatusLicitacao })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 >
                   {Object.values(StatusLicitacao).map(s => (
                     <option key={s} value={s}>{StatusLicitacaoDescricao[s]}</option>
@@ -636,89 +731,118 @@ function AbaContratos({ licitacaoId }: { licitacaoId: number }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="objeto">Objeto</label>
+              <label className={classeLabel} htmlFor="objeto">Objeto</label>
               <textarea
                 id="objeto"
                 required
                 rows={2}
                 value={form.objeto}
                 onChange={e => setForm({ ...form, objeto: e.target.value })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+                className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 type="button"
                 onClick={() => setForm(null)}
-                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+                className="px-4 py-2 rounded-lg border border-admin-border text-sm font-semibold text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-text transition-all"
               >
                 Cancelar
               </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum contrato cadastrado." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && lista.length === 0 && <AdminEmptyState message="Nenhum contrato cadastrado." />}
 
       {!loading && !erro && lista.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Nº contrato</th>
-                <th className="p-3">Fornecedor</th>
-                <th className="p-3">Assinatura</th>
-                <th className="p-3">Vigência</th>
-                <th className="p-3">Valor</th>
-                <th className="p-3">Status</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map(c => (
-                <tr key={c.id} className="border-t border-border/20">
-                  <td className="p-3 font-semibold">{c.numeroContrato}/{c.exercicio}</td>
-                  <td className="p-3">{c.fornecedor}</td>
-                  <td className="p-3">{formatarData(c.dataAssinatura)}</td>
-                  <td className="p-3">{formatarData(c.dataInicio)} — {formatarData(c.dataTermino)}</td>
-                  <td className="p-3">{formatarMoeda(c.valorContrato)}</td>
-                  <td className="p-3">{c.status}</td>
-                  <td className="p-3 text-right space-x-2">
-                    <Link href={`/admin/licitacoes/contratos/${c.id}?licitacaoId=${licitacaoId}`} className="text-primary hover:underline">
-                      Ver
-                    </Link>
-                    {podeEditar(usuario, 'licitacoes') && (
-                      <button onClick={() => abrirEdicao(c)} className="text-primary hover:underline">
-                        Editar
-                      </button>
-                    )}
-                    {podeExcluir(usuario, 'licitacoes') && (
-                      <button onClick={() => excluir(c.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Nº contrato</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Fornecedor</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Assinatura</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Vigência</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Valor</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Status</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {lista.map(c => (
+                  <tr key={c.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 font-semibold text-admin-text tabular-nums">{c.numeroContrato}/{c.exercicio}</td>
+                    <td className="p-3.5 text-admin-text">{c.fornecedor}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarData(c.dataAssinatura)}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarData(c.dataInicio)} — {formatarData(c.dataTermino)}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarMoeda(c.valorContrato)}</td>
+                    <td className="p-3.5"><BadgeStatusLicitacao statusDescricao={c.status} /></td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Link
+                          href={`/admin/licitacoes/contratos/${c.id}?licitacaoId=${licitacaoId}`}
+                          aria-label="Ver detalhes"
+                          className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                        >
+                          <MdChevronRight size={16} />
+                        </Link>
+                        {podeEditar(usuario, 'licitacoes') && (
+                          <button
+                            onClick={() => abrirEdicao(c)}
+                            aria-label="Editar"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                        )}
+                        {podeExcluir(usuario, 'licitacoes') && (
+                          <button
+                            onClick={() => setContratoParaExcluir(c.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+      <AdminPagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+
+      <ConfirmDialog
+        aberto={contratoParaExcluir !== null}
+        titulo="Excluir contrato?"
+        mensagem="Essa ação também remove documentos e aditivos vinculados, e não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setContratoParaExcluir(null)}
+      />
     </div>
   )
 }
@@ -753,6 +877,8 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
   const [form, setForm] = useState<OrgaoFormState | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [orgaoParaExcluir, setOrgaoParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
 
   function abrirCriacao() {
     setErroForm(null)
@@ -764,13 +890,18 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
     setForm({ id: o.id, unidadeId: o.unidadeId, ordenador: o.ordenador, tipo: o.tipo })
   }
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir este vínculo de órgão? Essa ação não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (orgaoParaExcluir === null) return
+
+    setExcluindo(true)
     try {
-      await licitacaoService.excluirOrgao(licitacaoId, id)
+      await licitacaoService.excluirOrgao(licitacaoId, orgaoParaExcluir)
+      setOrgaoParaExcluir(null)
       carregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -800,7 +931,7 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-text-secondary/70">
+      <p className="text-sm text-admin-text-muted">
         Órgãos vinculados a esta licitação (padrão PNCP de compra compartilhada) — só um pode
         ser o gerenciador; os demais entram como participantes.
       </p>
@@ -808,26 +939,26 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
       {podeCriar(usuario, 'licitacoes') && !form && (
         <button
           onClick={abrirCriacao}
-          className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+          className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all"
         >
           + Vincular órgão
         </button>
       )}
 
       {form && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">{form.id ? 'Editar vínculo' : 'Novo vínculo'}</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">{form.id ? 'Editar vínculo' : 'Novo vínculo'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Unidade</label>
+                <label className={classeLabel} htmlFor="unidadeId">Unidade</label>
                 <select
                   id="unidadeId"
                   required
                   value={form.unidadeId || ''}
                   onChange={e => setForm({ ...form, unidadeId: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 >
                   <option value="" disabled>Selecione...</option>
                   {unidades.map(u => (
@@ -836,24 +967,24 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="ordenador">Ordenador</label>
+                <label className={classeLabel} htmlFor="ordenador">Ordenador</label>
                 <input
                   id="ordenador"
                   required
                   value={form.ordenador}
                   onChange={e => setForm({ ...form, ordenador: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                   placeholder="Nome de quem ordenava a despesa nesse órgão"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="tipo">Tipo</label>
+                <label className={classeLabel} htmlFor="tipo">Tipo</label>
                 <select
                   id="tipo"
                   required
                   value={form.tipo}
                   onChange={e => setForm({ ...form, tipo: e.target.value as TipoOrgao })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 >
                   {Object.values(TipoOrgao).map(t => (
                     <option key={t} value={t}>{TipoOrgaoDescricao[t]}</option>
@@ -862,71 +993,104 @@ function AbaOrgaos({ licitacaoId }: { licitacaoId: number }) {
               </div>
             </div>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+                className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 type="button"
                 onClick={() => setForm(null)}
-                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+                className="px-4 py-2 rounded-lg border border-admin-border text-sm font-semibold text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-text transition-all"
               >
                 Cancelar
               </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && lista.length === 0 && <EmptyState message="Nenhum órgão vinculado a esta licitação." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && lista.length === 0 && <AdminEmptyState message="Nenhum órgão vinculado a esta licitação." />}
 
       {!loading && !erro && lista.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Unidade</th>
-                <th className="p-3">Ordenador</th>
-                <th className="p-3">Tipo</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map(o => (
-                <tr key={o.id} className="border-t border-border/20">
-                  <td className="p-3 font-semibold">{o.unidadeNome}</td>
-                  <td className="p-3">{o.ordenador}</td>
-                  <td className="p-3">
-                    <Badge className={o.tipo === TipoOrgao.GERENCIADOR ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-600'}>
-                      {TipoOrgaoDescricao[o.tipo]}
-                    </Badge>
-                  </td>
-                  <td className="p-3 text-right space-x-2">
-                    {podeEditar(usuario, 'licitacoes') && (
-                      <button onClick={() => abrirEdicao(o)} className="text-primary hover:underline">
-                        Editar
-                      </button>
-                    )}
-                    {podeExcluir(usuario, 'licitacoes') && (
-                      <button onClick={() => excluir(o.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Unidade</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Ordenador</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Tipo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {lista.map(o => (
+                  <tr key={o.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 font-semibold text-admin-text">{o.unidadeNome}</td>
+                    <td className="p-3.5 text-admin-text-muted">{o.ordenador}</td>
+                    <td className="p-3.5">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          o.tipo === TipoOrgao.GERENCIADOR ? 'bg-admin-info-light text-admin-info' : 'bg-admin-surface-3 text-admin-text-muted'
+                        }`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`w-1.5 h-1.5 rounded-full ${o.tipo === TipoOrgao.GERENCIADOR ? 'bg-admin-info' : 'bg-admin-text-faint'}`}
+                        />
+                        {TipoOrgaoDescricao[o.tipo]}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {podeEditar(usuario, 'licitacoes') && (
+                          <button
+                            onClick={() => abrirEdicao(o)}
+                            aria-label="Editar"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                        )}
+                        {podeExcluir(usuario, 'licitacoes') && (
+                          <button
+                            onClick={() => setOrgaoParaExcluir(o.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
+
+      <ConfirmDialog
+        aberto={orgaoParaExcluir !== null}
+        titulo="Excluir vínculo de órgão?"
+        mensagem="Essa ação não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setOrgaoParaExcluir(null)}
+      />
     </div>
   )
 }

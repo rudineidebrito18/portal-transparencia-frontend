@@ -2,10 +2,32 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ComponentType } from 'react'
+import {
+  MdAccountBalance,
+  MdApartment,
+  MdBadge,
+  MdFactCheck,
+  MdGavel,
+  MdHandshake,
+  MdHistory,
+  MdLocalHospital,
+  MdLogout,
+  MdMenuBook,
+  MdNewspaper,
+  MdSchool,
+  MdSpaceDashboard,
+  MdSupportAgent
+} from 'react-icons/md'
 
 import { useAuth } from '@/modules/auth/AuthContext'
 import { isAdministrador } from '@/modules/auth/permissoes'
 import { REGISTRY_MODULOS_GENERICOS } from '@/modules/admin/genericos/registry'
+
+interface Props {
+  colapsada: boolean
+  onExpandir: () => void
+}
 
 // RH bespoke (servidor/cargos/diárias/folha/concursos) — mescla com a
 // categoria "Recursos Humanos" do registry genérico (que só tem
@@ -67,6 +89,65 @@ const LINKS_DIARIO_OFICIAL_BESPOKE = [
   { href: '/admin/diario-oficial/edicoes-nao-eletronicas', label: 'Diário Oficial — Edições Não Eletrônicas' }
 ]
 
+// Ícone por categoria — só nos cabeçalhos (não em cada link individual, seriam ~50
+// ícones sem significado real distinto). `Institucional`/`Geral` reaproveitam o mesmo
+// bloco visual já que a sidebar não os separa hoje.
+const ICONE_CATEGORIA: Record<string, ComponentType<{ size?: number; className?: string }>> = {
+  'Institucional e Geral': MdApartment,
+  'ESIC e Ouvidoria': MdSupportAgent,
+  'Recursos Humanos': MdBadge,
+  Licitações: MdGavel,
+  'Convênios e Repasses': MdHandshake,
+  'Fiscal e Orçamentário': MdAccountBalance,
+  'Diário Oficial': MdNewspaper,
+  Planejamento: MdHistory,
+  'Prestação de Contas': MdFactCheck,
+  Legislação: MdMenuBook,
+  Saúde: MdLocalHospital,
+  Educação: MdSchool
+}
+
+// Cabeçalho de categoria. Expandida: só um rótulo, não navega. Colapsada: vira botão
+// clicável (expande a sidebar de novo) com tooltip — sem isso, os links individuais
+// abaixo dele (que não têm ícone próprio, ver ItemNav) ficariam invisíveis mas ainda
+// ocupando espaço quando colapsada, e é exatamente esse buraco que parecia "estranho".
+function CabecalhoCategoria({
+  categoria,
+  icone: Icone,
+  colapsada,
+  onExpandir
+}: {
+  categoria: string
+  icone?: ComponentType<{ size?: number; className?: string }>
+  colapsada: boolean
+  onExpandir: () => void
+}) {
+  if (colapsada) {
+    return (
+      <button
+        onClick={onExpandir}
+        aria-label={`Expandir menu — ${categoria}`}
+        className="group relative w-full flex items-center justify-center rounded-lg py-2 text-admin-text-faint hover:bg-admin-surface-2 hover:text-admin-text transition-colors"
+      >
+        {Icone && <Icone size={16} className="shrink-0" />}
+        <span
+          role="tooltip"
+          className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-md bg-admin-surface-3 border border-admin-border-strong px-2.5 py-1.5 text-xs font-medium text-admin-text opacity-0 shadow-admin-md transition-opacity duration-150 group-hover:opacity-100 z-50"
+        >
+          {categoria}
+        </span>
+      </button>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-2 px-3 mb-1">
+      {Icone && <Icone size={14} className="text-admin-text-faint shrink-0" />}
+      <p className="text-xs font-semibold uppercase tracking-wide text-admin-text-faint truncate">{categoria}</p>
+    </div>
+  )
+}
+
 function agruparPorCategoria() {
   const grupos = new Map<string, typeof REGISTRY_MODULOS_GENERICOS>()
 
@@ -79,150 +160,198 @@ function agruparPorCategoria() {
   return grupos
 }
 
-export default function AdminSidebar() {
+function iniciais(email: string): string {
+  const nomeParte = email.split('@')[0] ?? email
+  const pedacos = nomeParte.split(/[._-]/).filter(Boolean)
+  const letras = pedacos.length >= 2 ? pedacos[0][0] + pedacos[1][0] : nomeParte.slice(0, 2)
+  return letras.toUpperCase()
+}
+
+// Item de nav com indicador de ativo em barra de gradiente (não preenchimento sólido —
+// mais discreto, "premium" sem competir com o ícone/texto) + tooltip via CSS puro
+// (group-hover) quando a sidebar está colapsada, sem precisar de posicionamento via JS.
+function ItemNav({
+  href,
+  label,
+  ativo,
+  colapsada,
+  icone: Icone,
+  onNavigate
+}: {
+  href: string
+  label: string
+  ativo: boolean
+  colapsada: boolean
+  icone?: ComponentType<{ size?: number; className?: string }>
+  onNavigate?: () => void
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      className={`group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+        colapsada ? 'justify-center px-0' : ''
+      } ${
+        ativo
+          ? 'bg-admin-surface-3 text-admin-text font-semibold'
+          : 'text-admin-text-muted hover:bg-admin-surface-2 hover:text-admin-text'
+      }`}
+    >
+      {ativo && (
+        <span
+          aria-hidden="true"
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full admin-gradient-accent"
+        />
+      )}
+      {Icone && <Icone size={16} className="shrink-0" />}
+      {!colapsada && <span className="truncate">{label}</span>}
+
+      {colapsada && (
+        <span
+          role="tooltip"
+          className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-md bg-admin-surface-3 border border-admin-border-strong px-2.5 py-1.5 text-xs font-medium text-admin-text opacity-0 shadow-admin-md transition-opacity duration-150 group-hover:opacity-100 z-50"
+        >
+          {label}
+        </span>
+      )}
+    </Link>
+  )
+}
+
+export default function AdminSidebar({ colapsada, onExpandir }: Props) {
   const { usuario, logout } = useAuth()
   const pathname = usePathname()
   const grupos = agruparPorCategoria()
 
+  function irPara(href: string) {
+    return pathname === href
+  }
+
+  // No colapsado, clicar em qualquer item real expande a sidebar de novo (categoria
+  // inteira só aparece expandida — ver decisão em STATUS.md 2.27).
+  const handleNavigate = colapsada ? onExpandir : undefined
+
   return (
-    <aside className="w-72 shrink-0 bg-primary-dark text-white h-screen flex flex-col">
-      <div className="p-5 border-b border-white/10">
-        <p className="font-bold text-sm">Painel Administrativo</p>
-        <p className="text-xs text-white/60">Portal da Transparência</p>
+    <aside
+      className={`shrink-0 h-screen flex flex-col bg-admin-surface border-r border-admin-border transition-[width] duration-200 ${
+        colapsada ? 'w-[76px]' : 'w-72'
+      }`}
+    >
+      <div className={`flex items-center gap-2.5 p-4 border-b border-admin-border ${colapsada ? 'justify-center px-0' : ''}`}>
+        <span className="shrink-0 w-8 h-8 rounded-lg admin-gradient-accent flex items-center justify-center font-bold text-white text-sm shadow-admin-glow">
+          PT
+        </span>
+        {!colapsada && (
+          <div className="min-w-0">
+            <p className="font-semibold text-sm text-admin-text truncate">Painel Administrativo</p>
+            <p className="text-xs text-admin-text-faint truncate">Portal da Transparência</p>
+          </div>
+        )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto p-3 space-y-4 text-sm">
-        <Link
-          href="/admin"
-          className={`block px-3 py-2 rounded-lg font-semibold transition ${pathname === '/admin' ? 'bg-white/15' : 'hover:bg-white/10'}`}
-        >
-          Início
-        </Link>
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-5 text-sm">
+        <div className="space-y-0.5">
+          <ItemNav href="/admin" label="Início" ativo={irPara('/admin')} colapsada={colapsada} icone={MdSpaceDashboard} onNavigate={handleNavigate} />
 
-        {isAdministrador(usuario) && (
-          <Link
-            href="/admin/usuarios"
-            className={`block px-3 py-2 rounded-lg font-semibold transition ${pathname === '/admin/usuarios' ? 'bg-white/15' : 'hover:bg-white/10'}`}
-          >
-            Gestão de Usuários
-          </Link>
-        )}
+          {isAdministrador(usuario) && (
+            <ItemNav
+              href="/admin/usuarios"
+              label="Gestão de Usuários"
+              ativo={irPara('/admin/usuarios')}
+              colapsada={colapsada}
+              icone={MdBadge}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {isAdministrador(usuario) && (
-          <Link
-            href="/admin/auditoria"
-            className={`block px-3 py-2 rounded-lg font-semibold transition ${pathname === '/admin/auditoria' ? 'bg-white/15' : 'hover:bg-white/10'}`}
-          >
-            Auditoria
-          </Link>
-        )}
-
-        <div>
-          <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wide text-white/50">
-            Institucional e Geral
-          </p>
-          {LINKS_INSTITUCIONAL_GERAL.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {isAdministrador(usuario) && (
+            <ItemNav
+              href="/admin/auditoria"
+              label="Auditoria"
+              ativo={irPara('/admin/auditoria')}
+              colapsada={colapsada}
+              icone={MdHistory}
+              onNavigate={handleNavigate}
+            />
+          )}
         </div>
 
-        <div>
-          <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wide text-white/50">
-            ESIC e Ouvidoria
-          </p>
-          {LINKS_ESIC_OUVIDORIA.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
+        {[
+          { categoria: 'Institucional e Geral', links: LINKS_INSTITUCIONAL_GERAL },
+          { categoria: 'ESIC e Ouvidoria', links: LINKS_ESIC_OUVIDORIA }
+        ].map(({ categoria, links }) => {
+          const Icone = ICONE_CATEGORIA[categoria]
+          return (
+            <div key={categoria} className="space-y-0.5">
+              <CabecalhoCategoria categoria={categoria} icone={Icone} colapsada={colapsada} onExpandir={onExpandir} />
+              {!colapsada && links.map(link => (
+                <ItemNav key={link.href} href={link.href} label={link.label} ativo={irPara(link.href)} colapsada={colapsada} onNavigate={handleNavigate} />
+              ))}
+            </div>
+          )
+        })}
 
-        {[...grupos.entries()].map(([categoria, modulos]) => (
-          <div key={categoria}>
-            <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {categoria}
-            </p>
-            {modulos.map(modulo => {
-              const href = `/admin/modulos/${modulo.slug}`
-              return (
-                <Link
-                  key={modulo.slug}
-                  href={href}
-                  className={`block px-3 py-1.5 rounded-lg transition ${pathname === href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-                >
-                  {modulo.label}
-                </Link>
-              )
-            })}
-            {categoria === 'Recursos Humanos' && LINKS_RH_BESPOKE.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {categoria === 'Licitações' && LINKS_LICITACOES_BESPOKE.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {categoria === 'Convênios e Repasses' && LINKS_CONVENIOS_BESPOKE.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {categoria === 'Fiscal e Orçamentário' && LINKS_ANTICORRUPCAO_BESPOKE.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {categoria === 'Diário Oficial' && LINKS_DIARIO_OFICIAL_BESPOKE.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`block px-3 py-1.5 rounded-lg transition ${pathname === link.href ? 'bg-white/15' : 'hover:bg-white/10 text-white/85'}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        ))}
+        {[...grupos.entries()].map(([categoria, modulos]) => {
+          const Icone = ICONE_CATEGORIA[categoria]
+          const extras =
+            (categoria === 'Recursos Humanos' && LINKS_RH_BESPOKE) ||
+            (categoria === 'Licitações' && LINKS_LICITACOES_BESPOKE) ||
+            (categoria === 'Convênios e Repasses' && LINKS_CONVENIOS_BESPOKE) ||
+            (categoria === 'Fiscal e Orçamentário' && LINKS_ANTICORRUPCAO_BESPOKE) ||
+            (categoria === 'Diário Oficial' && LINKS_DIARIO_OFICIAL_BESPOKE) ||
+            []
+
+          return (
+            <div key={categoria} className="space-y-0.5">
+              <CabecalhoCategoria categoria={categoria} icone={Icone} colapsada={colapsada} onExpandir={onExpandir} />
+
+              {!colapsada && extras.map(link => (
+                <ItemNav key={link.href} href={link.href} label={link.label} ativo={irPara(link.href)} colapsada={colapsada} onNavigate={handleNavigate} />
+              ))}
+
+              {!colapsada && modulos.map(modulo => {
+                const href = `/admin/modulos/${modulo.slug}`
+                return (
+                  <ItemNav key={modulo.slug} href={href} label={modulo.label} ativo={irPara(href)} colapsada={colapsada} onNavigate={handleNavigate} />
+                )
+              })}
+            </div>
+          )
+        })}
       </nav>
 
-      <div className="p-4 border-t border-white/10 text-xs">
-        <p className="font-semibold truncate">{usuario?.email}</p>
-        <p className="text-white/50 mb-2">
-          {isAdministrador(usuario) ? 'Administrador' : 'Gerente'}
-        </p>
+      <div className={`p-3 border-t border-admin-border ${colapsada ? 'flex flex-col items-center gap-2' : ''}`}>
+        <div className={`flex items-center gap-2.5 rounded-lg p-2 ${colapsada ? '' : 'bg-admin-surface-2'}`}>
+          <span className="shrink-0 w-8 h-8 rounded-full admin-gradient-accent flex items-center justify-center text-xs font-bold text-white">
+            {usuario ? iniciais(usuario.email) : '?'}
+          </span>
+          {!colapsada && (
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-admin-text truncate">{usuario?.email}</p>
+              <p className="text-[11px] text-admin-text-faint">
+                {isAdministrador(usuario) ? 'Administrador' : 'Gerente'}
+              </p>
+            </div>
+          )}
+        </div>
+
         <button
           onClick={logout}
-          className="w-full py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition font-semibold"
+          aria-label="Sair"
+          className={`group relative flex items-center gap-2 rounded-lg text-xs font-semibold text-admin-text-muted hover:bg-admin-surface-2 hover:text-admin-error transition-colors ${
+            colapsada ? 'w-9 h-9 justify-center' : 'w-full mt-1.5 px-3 py-2'
+          }`}
         >
-          Sair
+          <MdLogout size={16} />
+          {!colapsada && 'Sair'}
+          {colapsada && (
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-md bg-admin-surface-3 border border-admin-border-strong px-2.5 py-1.5 text-xs font-medium text-admin-text opacity-0 shadow-admin-md transition-opacity duration-150 group-hover:opacity-100 z-50"
+            >
+              Sair
+            </span>
+          )}
         </button>
       </div>
     </aside>

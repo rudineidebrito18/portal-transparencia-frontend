@@ -1,18 +1,17 @@
 'use client'
 
 import { FormEvent, useCallback, useState } from 'react'
+import { MdEdit, MdDeleteOutline, MdStar, MdStarBorder, MdClose } from 'react-icons/md'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
-import Badge from '@/components/ui/Badge'
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Pagination from '@/components/ui/Pagination'
-import Skeleton from '@/components/ui/Skeleton'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { ConteudoInstitucional, ImagemNoticia } from '@/modules/institucional/types'
 import { imagemPrincipal } from '@/modules/institucional/utils'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import AdminPagination from '@/modules/admin/shared/AdminPagination'
+import ConfirmDialog from '@/modules/admin/shared/ConfirmDialog'
 import { noticiaAdminService } from '@/modules/admin/institucional/institucional.service'
 import { ConteudoInstitucionalRequest } from '@/modules/admin/institucional/institucional.service'
 
@@ -31,6 +30,10 @@ interface NovaImagem {
 }
 
 const FORM_VAZIO: FormState = { id: null, titulo: '', texto: '', data: '', ativo: true, imagensExistentes: [] }
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
+const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
 
 export default function NoticiasAdminPage() {
   const { usuario } = useAuth()
@@ -53,6 +56,9 @@ export default function NoticiasAdminPage() {
   const [principalNovaIndex, setPrincipalNovaIndex] = useState<number | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
+  const [imagemParaRemover, setImagemParaRemover] = useState<number | null>(null)
 
   function limparNovasImagens() {
     novasImagens.forEach(img => URL.revokeObjectURL(img.preview))
@@ -89,13 +95,13 @@ export default function NoticiasAdminPage() {
     }
   }
 
-  async function removerExistente(imagemId: number) {
-    if (!form?.id) return
-    if (!confirm('Remover esta imagem?')) return
+  async function confirmarRemocaoImagem() {
+    if (!form?.id || imagemParaRemover === null) return
 
     try {
-      await noticiaAdminService.removerImagem(form.id, imagemId)
-      setForm({ ...form, imagensExistentes: form.imagensExistentes.filter(img => img.id !== imagemId) })
+      await noticiaAdminService.removerImagem(form.id, imagemParaRemover)
+      setForm({ ...form, imagensExistentes: form.imagensExistentes.filter(img => img.id !== imagemParaRemover) })
+      setImagemParaRemover(null)
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao remover imagem')
     }
@@ -120,14 +126,18 @@ export default function NoticiasAdminPage() {
     })
   }
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir esta notícia? Essa ação não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (idParaExcluir === null) return
 
+    setExcluindo(true)
     try {
-      await noticiaAdminService.excluir(id)
+      await noticiaAdminService.excluir(idParaExcluir)
+      setIdParaExcluir(null)
       recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -165,89 +175,90 @@ export default function NoticiasAdminPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold text-primary">Notícias</h1>
+        <h1 className="text-lg font-bold text-admin-text">Notícias</h1>
 
         {podeCriar(usuario, 'institucional') && (
           <button
             onClick={abrirCriacao}
-            className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+            className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all"
           >
             + Nova notícia
           </button>
         )}
       </div>
 
-      <Card className="p-4 flex flex-wrap gap-3 items-center" hoverable={false}>
-        <label className="text-sm font-medium" htmlFor="filtro-status">Status:</label>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-4 flex flex-wrap gap-3 items-center">
+        <label className="text-sm font-medium text-admin-text-muted" htmlFor="filtro-status">Status:</label>
         <select
           id="filtro-status"
           value={filtros.ativo === undefined ? '' : String(filtros.ativo)}
           onChange={e =>
             setFiltros({ ativo: e.target.value === '' ? undefined : e.target.value === 'true' })
           }
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         >
           <option value="">Todos</option>
           <option value="true">Ativos</option>
           <option value="false">Inativos</option>
         </select>
-      </Card>
+      </div>
 
       {form && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">{form.id ? 'Editar notícia' : 'Nova notícia'}</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">{form.id ? 'Editar notícia' : 'Nova notícia'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="titulo">Título</label>
+              <label className={classeLabel} htmlFor="titulo">Título</label>
               <input
                 id="titulo"
                 required
                 value={form.titulo}
                 onChange={e => setForm({ ...form, titulo: e.target.value })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="texto">Texto</label>
+              <label className={classeLabel} htmlFor="texto">Texto</label>
               <textarea
                 id="texto"
                 required
                 rows={4}
                 value={form.texto}
                 onChange={e => setForm({ ...form, texto: e.target.value })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div className="flex gap-3 flex-wrap items-end">
-              <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="data">Data</label>
+              <div className="w-40">
+                <label className={classeLabel} htmlFor="data">Data</label>
                 <input
                   id="data"
                   type="date"
                   required
                   value={form.data}
                   onChange={e => setForm({ ...form, data: e.target.value })}
-                  className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
 
-              <label className="flex items-center gap-2 text-sm font-medium pb-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-admin-text-muted pb-2">
                 <input
                   type="checkbox"
                   checked={form.ativo}
                   onChange={e => setForm({ ...form, ativo: e.target.checked })}
+                  className="rounded border-admin-border accent-admin-accent"
                 />
                 Ativo (visível no portal)
               </label>
             </div>
 
             <fieldset className="border-0 p-0 m-0 min-w-0">
-              <legend className="block text-sm font-medium mb-1 p-0">Imagens</legend>
+              <legend className={classeLabel}>Imagens</legend>
 
               {form.imagensExistentes.length > 0 && (
                 <div className="flex flex-wrap gap-3 mb-3">
@@ -257,28 +268,30 @@ export default function NoticiasAdminPage() {
                       <img
                         src={imagem.url}
                         alt={`Imagem da notícia${form.titulo ? `: ${form.titulo}` : ''}`}
-                        className={`h-20 w-20 rounded-lg object-cover border-2 ${imagem.principal ? 'border-primary' : 'border-transparent'}`}
+                        className={`h-20 w-20 rounded-lg object-cover border-2 ${imagem.principal ? 'border-admin-accent' : 'border-transparent'}`}
                       />
                       <div className="absolute -top-2 -right-2 flex gap-1">
                         <button
                           type="button"
                           onClick={() => marcarExistentePrincipal(imagem.id)}
                           title={imagem.principal ? 'Imagem principal' : 'Tornar principal'}
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all ${
+                          aria-label={imagem.principal ? 'Imagem principal' : 'Tornar principal'}
+                          className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                             imagem.principal
-                              ? 'bg-primary text-white'
-                              : 'bg-white border border-border/30 text-text-secondary/60 hover:text-primary'
+                              ? 'admin-gradient-accent text-white'
+                              : 'bg-admin-surface-3 border border-admin-border-strong text-admin-text-faint hover:text-admin-accent'
                           }`}
                         >
-                          ★
+                          {imagem.principal ? <MdStar size={13} /> : <MdStarBorder size={13} />}
                         </button>
                         <button
                           type="button"
-                          onClick={() => removerExistente(imagem.id)}
+                          onClick={() => setImagemParaRemover(imagem.id)}
                           title="Remover"
-                          className="w-6 h-6 rounded-full bg-white border border-border/30 text-error flex items-center justify-center text-xs hover:bg-error/10 transition-all"
+                          aria-label="Remover imagem"
+                          className="w-6 h-6 rounded-full bg-admin-surface-3 border border-admin-border-strong text-admin-error flex items-center justify-center hover:bg-admin-error-light transition-all"
                         >
-                          ×
+                          <MdClose size={13} />
                         </button>
                       </div>
                     </div>
@@ -294,31 +307,33 @@ export default function NoticiasAdminPage() {
                       <img
                         src={imagem.preview}
                         alt={`Nova imagem: ${imagem.file.name}`}
-                        className={`h-20 w-20 rounded-lg object-cover border-2 ${index === principalNovaIndex ? 'border-primary' : 'border-transparent'}`}
+                        className={`h-20 w-20 rounded-lg object-cover border-2 ${index === principalNovaIndex ? 'border-admin-accent' : 'border-transparent'}`}
                       />
                       <div className="absolute -top-2 -right-2 flex gap-1">
                         <button
                           type="button"
                           onClick={() => setPrincipalNovaIndex(index)}
                           title={index === principalNovaIndex ? 'Imagem principal' : 'Tornar principal'}
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all ${
+                          aria-label={index === principalNovaIndex ? 'Imagem principal' : 'Tornar principal'}
+                          className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                             index === principalNovaIndex
-                              ? 'bg-primary text-white'
-                              : 'bg-white border border-border/30 text-text-secondary/60 hover:text-primary'
+                              ? 'admin-gradient-accent text-white'
+                              : 'bg-admin-surface-3 border border-admin-border-strong text-admin-text-faint hover:text-admin-accent'
                           }`}
                         >
-                          ★
+                          {index === principalNovaIndex ? <MdStar size={13} /> : <MdStarBorder size={13} />}
                         </button>
                         <button
                           type="button"
                           onClick={() => removerNovaImagem(index)}
                           title="Remover"
-                          className="w-6 h-6 rounded-full bg-white border border-border/30 text-error flex items-center justify-center text-xs hover:bg-error/10 transition-all"
+                          aria-label="Remover imagem"
+                          className="w-6 h-6 rounded-full bg-admin-surface-3 border border-admin-border-strong text-admin-error flex items-center justify-center hover:bg-admin-error-light transition-all"
                         >
-                          ×
+                          <MdClose size={13} />
                         </button>
                       </div>
-                      <p className="text-[10px] text-text-secondary/60 mt-1 w-20 truncate">Nova</p>
+                      <p className="text-[10px] text-admin-text-faint mt-1 w-20 truncate">Nova</p>
                     </div>
                   ))}
                 </div>
@@ -329,99 +344,139 @@ export default function NoticiasAdminPage() {
                 accept="image/png,image/jpeg"
                 multiple
                 onChange={e => { adicionarNovosArquivos(e.target.files); e.target.value = '' }}
-                className="block w-full text-sm text-text-secondary/70
+                className="block w-full text-sm text-admin-text-muted
                   file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0
-                  file:text-sm file:font-semibold file:bg-primary file:text-white
-                  hover:file:bg-primary-dark file:cursor-pointer file:transition-all"
+                  file:text-sm file:font-semibold file:text-white
+                  file:bg-admin-accent file:cursor-pointer file:transition-colors hover:file:bg-admin-accent-dark"
               />
-              <p className="text-xs text-text-secondary/50 mt-1">
+              <p className="text-xs text-admin-text-faint mt-1">
                 Clique na estrela pra marcar a imagem principal — é a que aparece nas listagens do site.
               </p>
             </fieldset>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+                className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 type="button"
                 onClick={() => { limparNovasImagens(); setForm(null) }}
-                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+                className="px-4 py-2 rounded-lg border border-admin-border text-sm font-semibold text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-text transition-all"
               >
                 Cancelar
               </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhuma notícia encontrada." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && data.length === 0 && <AdminEmptyState message="Nenhuma notícia encontrada." />}
 
       {!loading && !erro && data.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Imagem</th>
-                <th className="p-3">Título</th>
-                <th className="p-3">Data</th>
-                <th className="p-3">Status</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(item => (
-                <tr key={item.id} className="border-t border-border/20">
-                  <td className="p-3">
-                    {imagemPrincipal(item) ? (
-                      <div className="relative inline-block">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={imagemPrincipal(item)!} alt={`Imagem da notícia: ${item.titulo}`} className="h-10 w-10 rounded-lg object-cover" />
-                        {(item.imagens?.length ?? 0) > 1 && (
-                          <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] leading-none rounded-full w-4 h-4 flex items-center justify-center">
-                            {item.imagens!.length}
-                          </span>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Imagem</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Título</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Data</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Status</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map(item => (
+                  <tr key={item.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5">
+                      {imagemPrincipal(item) ? (
+                        <div className="relative inline-block">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={imagemPrincipal(item)!} alt={`Imagem da notícia: ${item.titulo}`} className="h-10 w-10 rounded-lg object-cover" />
+                          {(item.imagens?.length ?? 0) > 1 && (
+                            <span className="absolute -top-1 -right-1 admin-gradient-accent text-white text-[10px] leading-none rounded-full w-4 h-4 flex items-center justify-center">
+                              {item.imagens!.length}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-admin-text-faint">-</span>
+                      )}
+                    </td>
+                    <td className="p-3.5 text-admin-text">{item.titulo}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{item.data}</td>
+                    <td className="p-3.5">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          item.ativo ? 'bg-admin-success-light text-admin-success' : 'bg-admin-surface-3 text-admin-text-faint'
+                        }`}
+                      >
+                        <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full ${item.ativo ? 'bg-admin-success' : 'bg-admin-text-faint'}`} />
+                        {item.ativo ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {podeEditar(usuario, 'institucional') && (
+                          <button
+                            onClick={() => abrirEdicao(item)}
+                            aria-label="Editar"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                        )}
+                        {podeExcluir(usuario, 'institucional') && (
+                          <button
+                            onClick={() => setIdParaExcluir(item.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
                         )}
                       </div>
-                    ) : (
-                      <span className="text-text-secondary/40">-</span>
-                    )}
-                  </td>
-                  <td className="p-3">{item.titulo}</td>
-                  <td className="p-3">{item.data}</td>
-                  <td className="p-3">
-                    <Badge className={item.ativo ? 'bg-success/10 text-success' : 'bg-text-secondary/10 text-text-secondary'}>
-                      {item.ativo ? 'Ativo' : 'Inativo'}
-                    </Badge>
-                  </td>
-                  <td className="p-3 text-right space-x-2">
-                    {podeEditar(usuario, 'institucional') && (
-                      <button onClick={() => abrirEdicao(item)} className="text-primary hover:underline">
-                        Editar
-                      </button>
-                    )}
-                    {podeExcluir(usuario, 'institucional') && (
-                      <button onClick={() => excluir(item.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+      <AdminPagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+
+      <ConfirmDialog
+        aberto={idParaExcluir !== null}
+        titulo="Excluir notícia?"
+        mensagem="Essa ação não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setIdParaExcluir(null)}
+      />
+
+      <ConfirmDialog
+        aberto={imagemParaRemover !== null}
+        titulo="Remover imagem?"
+        mensagem="A imagem será removida da notícia."
+        confirmarLabel="Remover"
+        perigoso
+        onConfirmar={confirmarRemocaoImagem}
+        onCancelar={() => setImagemParaRemover(null)}
+      />
     </div>
   )
 }

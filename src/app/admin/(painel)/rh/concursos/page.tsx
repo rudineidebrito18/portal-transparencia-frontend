@@ -2,13 +2,13 @@
 
 import { FormEvent, useCallback, useState } from 'react'
 import Link from 'next/link'
+import { MdAttachFile, MdEdit, MdDeleteOutline } from 'react-icons/md'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Pagination from '@/components/ui/Pagination'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import AdminPagination from '@/modules/admin/shared/AdminPagination'
+import ConfirmDialog from '@/modules/admin/shared/ConfirmDialog'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { concursoService } from '@/modules/admin/rh/concurso.service'
@@ -39,6 +39,10 @@ const FORM_VAZIO: FormState = {
   resumo: ''
 }
 
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
+const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
+
 export default function ConcursosAdminPage() {
   const { usuario } = useAuth()
 
@@ -58,6 +62,8 @@ export default function ConcursosAdminPage() {
   const [form, setForm] = useState<FormState | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
 
   function abrirCriacao() {
     setErroForm(null)
@@ -69,14 +75,18 @@ export default function ConcursosAdminPage() {
     setForm({ ...c })
   }
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir este concurso? Essa ação não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (idParaExcluir === null) return
 
+    setExcluindo(true)
     try {
-      await concursoService.excluir(id)
+      await concursoService.excluir(idParaExcluir)
+      setIdParaExcluir(null)
       recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -107,80 +117,80 @@ export default function ConcursosAdminPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold text-primary">Concursos e Seleções Públicas</h1>
+        <h1 className="text-lg font-bold text-admin-text">Concursos e Seleções Públicas</h1>
 
         {podeCriar(usuario, 'padrao') && (
           <button
             onClick={abrirCriacao}
-            className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+            className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all"
           >
             + Novo concurso
           </button>
         )}
       </div>
 
-      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-4 flex flex-wrap gap-3">
         <input
           type="number"
           placeholder="Número..."
           defaultValue={filtros.numero ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, numero: Number((e.target as HTMLInputElement).value) || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm w-32"
+          className={`${classeInput} w-32`}
         />
         <input
           type="number"
           placeholder="Ano..."
           defaultValue={filtros.ano ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, ano: Number((e.target as HTMLInputElement).value) || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm w-32"
+          className={`${classeInput} w-32`}
         />
         <input
           placeholder="Descrição..."
           defaultValue={filtros.descricao ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, descricao: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">Abertura de:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>Abertura de:</span>
           <input
             type="date"
             value={filtros.dataAberturaInicial ?? ''}
             onChange={e => setFiltros({ ...filtros, dataAberturaInicial: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">até:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>até:</span>
           <input
             type="date"
             value={filtros.dataAberturaFinal ?? ''}
             onChange={e => setFiltros({ ...filtros, dataAberturaFinal: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
-      </Card>
+      </div>
 
       {form && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">{form.id ? 'Editar concurso' : 'Novo concurso'}</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">{form.id ? 'Editar concurso' : 'Novo concurso'}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="descricao">Descrição</label>
+              <label className={classeLabel} htmlFor="descricao">Descrição</label>
               <input
                 id="descricao"
                 required
                 value={form.descricao}
                 onChange={e => setForm({ ...form, descricao: e.target.value })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="numero">Número</label>
+                <label className={classeLabel} htmlFor="numero">Número</label>
                 <input
                   id="numero"
                   type="number"
@@ -188,152 +198,181 @@ export default function ConcursosAdminPage() {
                   required
                   value={form.numero}
                   onChange={e => setForm({ ...form, numero: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="ano">Ano</label>
+                <label className={classeLabel} htmlFor="ano">Ano</label>
                 <input
                   id="ano"
                   type="number"
                   required
                   value={form.ano}
                   onChange={e => setForm({ ...form, ano: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataAbertura">Data de abertura</label>
+                <label className={classeLabel} htmlFor="dataAbertura">Data de abertura</label>
                 <input
                   id="dataAbertura"
                   type="date"
                   required
                   value={form.dataAbertura}
                   onChange={e => setForm({ ...form, dataAbertura: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="validate">Validade</label>
+                <label className={classeLabel} htmlFor="validate">Validade</label>
                 <input
                   id="validate"
                   type="date"
                   required
                   value={form.validate}
                   onChange={e => setForm({ ...form, validate: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataInscricoes">Início das inscrições</label>
+                <label className={classeLabel} htmlFor="dataInscricoes">Início das inscrições</label>
                 <input
                   id="dataInscricoes"
                   type="date"
                   required
                   value={form.dataInscricoes}
                   onChange={e => setForm({ ...form, dataInscricoes: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataTerminoInscricoes">Término das inscrições</label>
+                <label className={classeLabel} htmlFor="dataTerminoInscricoes">Término das inscrições</label>
                 <input
                   id="dataTerminoInscricoes"
                   type="date"
                   required
                   value={form.dataTerminoInscricoes}
                   onChange={e => setForm({ ...form, dataTerminoInscricoes: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="resumo">Resumo</label>
+              <label className={classeLabel} htmlFor="resumo">Resumo</label>
               <textarea
                 id="resumo"
                 required
                 value={form.resumo}
                 onChange={e => setForm({ ...form, resumo: e.target.value })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
                 rows={3}
               />
             </div>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+                className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 type="button"
                 onClick={() => setForm(null)}
-                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+                className="px-4 py-2 rounded-lg border border-admin-border text-sm font-semibold text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-text transition-all"
               >
                 Cancelar
               </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhum concurso encontrado." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && data.length === 0 && <AdminEmptyState message="Nenhum concurso encontrado." />}
 
       {!loading && !erro && data.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Descrição</th>
-                <th className="p-3">Nº/Ano</th>
-                <th className="p-3">Inscrições</th>
-                <th className="p-3">Validade</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(c => (
-                <tr key={c.id} className="border-t border-border/20">
-                  <td className="p-3 font-semibold">{c.descricao}</td>
-                  <td className="p-3">{c.numero}/{c.ano}</td>
-                  <td className="p-3">{c.dataInscricoes} a {c.dataTerminoInscricoes}</td>
-                  <td className="p-3">{c.validate}</td>
-                  <td className="p-3 text-right space-x-2">
-                    <Link href={`/admin/rh/concursos/${c.id}`} className="text-primary hover:underline">
-                      Anexos
-                    </Link>
-                    {podeEditar(usuario, 'padrao') && (
-                      <button onClick={() => abrirEdicao(c)} className="text-primary hover:underline">
-                        Editar
-                      </button>
-                    )}
-                    {podeExcluir(usuario, 'padrao') && (
-                      <button onClick={() => excluir(c.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Descrição</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Nº/Ano</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Inscrições</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Validade</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {data.map(c => (
+                  <tr key={c.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 font-semibold text-admin-text">{c.descricao}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{c.numero}/{c.ano}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{c.dataInscricoes} a {c.dataTerminoInscricoes}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{c.validate}</td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Link
+                          href={`/admin/rh/concursos/${c.id}`}
+                          aria-label="Anexos"
+                          className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                        >
+                          <MdAttachFile size={16} />
+                        </Link>
+                        {podeEditar(usuario, 'padrao') && (
+                          <button
+                            onClick={() => abrirEdicao(c)}
+                            aria-label="Editar"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                        )}
+                        {podeExcluir(usuario, 'padrao') && (
+                          <button
+                            onClick={() => setIdParaExcluir(c.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+      <AdminPagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+
+      <ConfirmDialog
+        aberto={idParaExcluir !== null}
+        titulo="Excluir concurso?"
+        mensagem="Essa ação não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setIdParaExcluir(null)}
+      />
     </div>
   )
 }

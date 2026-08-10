@@ -2,9 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react'
 
-import Card from '@/components/ui/Card'
-import ErrorState from '@/components/ui/ErrorState'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeEditar } from '@/modules/auth/permissoes'
 import { diarioOficialInfoService } from '@/modules/admin/diario-oficial/diarioOficial.service'
@@ -21,6 +19,12 @@ const FORM_VAZIO: DiarioOficialInfoRequest = {
   periodicidade: '',
   quemSomos: ''
 }
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
+const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
+const classeInputArquivo =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text-muted file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-admin-accent file:text-white file:text-sm file:font-semibold file:cursor-pointer file:transition-colors hover:file:bg-admin-accent-dark'
 
 export default function DiarioOficialConfigAdminPage() {
   const { usuario } = useAuth()
@@ -89,116 +93,116 @@ export default function DiarioOficialConfigAdminPage() {
     return (
       <div className="space-y-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-16" />
+          <div key={i} className="rounded-2xl border border-admin-border bg-admin-surface h-16 animate-pulse" aria-hidden="true" />
         ))}
       </div>
     )
   }
 
-  if (erro) return <ErrorState message={erro} />
+  if (erro) return <AdminErrorState message={erro} />
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-bold text-primary">Diário Oficial — Configuração</h1>
+      <h1 className="text-lg font-bold text-admin-text">Diário Oficial — Configuração</h1>
 
-      <Card className="p-6" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <fieldset disabled={!podeSalvar} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="name">Nome</label>
+                <label className={classeLabel} htmlFor="name">Nome</label>
                 <input
                   id="name"
                   required
                   value={form.name}
                   onChange={e => atualizarCampo('name', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="issn">ISSN</label>
+                <label className={classeLabel} htmlFor="issn">ISSN</label>
                 <input
                   id="issn"
                   required
                   value={form.issn}
                   onChange={e => atualizarCampo('issn', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
+                <label className={classeLabel} htmlFor="email">E-mail</label>
                 <input
                   id="email"
                   type="email"
                   required
                   value={form.email}
                   onChange={e => atualizarCampo('email', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="telefone">Telefone</label>
+                <label className={classeLabel} htmlFor="telefone">Telefone</label>
                 <input
                   id="telefone"
                   required
                   value={form.telefone}
                   onChange={e => atualizarCampo('telefone', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="editorChefe">Editor-chefe</label>
+                <label className={classeLabel} htmlFor="editorChefe">Editor-chefe</label>
                 <input
                   id="editorChefe"
                   required
                   value={form.editorChefe}
                   onChange={e => atualizarCampo('editorChefe', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="redacao">Redação</label>
+                <label className={classeLabel} htmlFor="redacao">Redação</label>
                 <input
                   id="redacao"
                   required
                   value={form.redacao}
                   onChange={e => atualizarCampo('redacao', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="endereco">Endereço</label>
+              <label className={classeLabel} htmlFor="endereco">Endereço</label>
               <input
                 id="endereco"
                 required
                 value={form.endereco}
                 onChange={e => atualizarCampo('endereco', e.target.value)}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="periodicidade">Periodicidade</label>
+              <label className={classeLabel} htmlFor="periodicidade">Periodicidade</label>
               <input
                 id="periodicidade"
                 required
                 placeholder="Ex: Diariamente, exceto sábados, domingos e feriados"
                 value={form.periodicidade}
                 onChange={e => atualizarCampo('periodicidade', e.target.value)}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="quemSomos">Quem Somos</label>
+              <label className={classeLabel} htmlFor="quemSomos">Quem Somos</label>
               <textarea
                 id="quemSomos"
                 required
@@ -206,13 +210,13 @@ export default function DiarioOficialConfigAdminPage() {
                 placeholder="Texto de apresentação exibido na aba &quot;Quem Somos&quot; do Diário Oficial público"
                 value={form.quemSomos}
                 onChange={e => atualizarCampo('quemSomos', e.target.value)}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="brasao">Brasão</label>
+                <label className={classeLabel} htmlFor="brasao">Brasão</label>
                 {atual && (
                   <img src={atual.pathBrasao} alt="Brasão atual" className="h-16 mb-2 object-contain" />
                 )}
@@ -222,11 +226,11 @@ export default function DiarioOficialConfigAdminPage() {
                   accept="image/*"
                   required
                   onChange={e => setBrasao(e.target.files?.[0] ?? null)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold"
+                  className={classeInputArquivo}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="logo">Logomarca</label>
+                <label className={classeLabel} htmlFor="logo">Logomarca</label>
                 {atual && (
                   <img src={atual.pathLogo} alt="Logomarca atual" className="h-16 mb-2 object-contain" />
                 )}
@@ -236,35 +240,35 @@ export default function DiarioOficialConfigAdminPage() {
                   accept="image/*"
                   required
                   onChange={e => setLogo(e.target.files?.[0] ?? null)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold"
+                  className={classeInputArquivo}
                 />
               </div>
             </div>
-            <p className="text-xs text-text-secondary/60">
+            <p className="text-xs text-admin-text-faint">
               O backend exige reenviar os dois arquivos em toda atualização, mesmo pra mudar só um campo de texto.
             </p>
           </fieldset>
 
           {!podeSalvar && (
-            <p className="text-xs text-text-secondary/60">
+            <p className="text-xs text-admin-text-faint">
               Seu papel não permite editar essas informações.
             </p>
           )}
 
-          {erroForm && <ErrorState message={erroForm} />}
-          {salvo && <p className="text-sm text-success font-semibold">Alterações salvas.</p>}
+          {erroForm && <AdminErrorState message={erroForm} />}
+          {salvo && <p className="text-sm text-admin-success font-semibold">Alterações salvas.</p>}
 
           {podeSalvar && (
             <button
               type="submit"
               disabled={salvando}
-              className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+              className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
             >
               {salvando ? 'Salvando...' : 'Salvar alterações'}
             </button>
           )}
         </form>
-      </Card>
+      </div>
     </div>
   )
 }

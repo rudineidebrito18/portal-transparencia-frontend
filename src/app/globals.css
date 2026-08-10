@@ -97,6 +97,79 @@ html, body {
   --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
+/* Design system próprio do painel administrativo (2026-08-09 — ver STATUS.md §2.27).
+   Namespace `admin-*` deliberado e totalmente separado da paleta pública acima — nada
+   aqui sobrescreve `--color-primary`/`--color-secondary`/etc., zero risco pro site
+   público. Não é "site público com fundo escuro": é uma superfície escura desenhada do
+   zero (camadas de elevação, acentos mais claros/saturados que a versão do site público
+   porque precisam "brilhar" sobre fundo quase preto em vez de ler sobre branco).
+   Escopo é por convenção de uso (só componentes em `src/modules/admin/**` e
+   `src/app/admin/**` usam essas classes), não por seletor CSS — igual ao resto do
+   sistema de tokens do projeto. */
+@theme {
+  /* Camadas de elevação — do fundo da página até o elemento mais "no topo" (popover,
+     item ativo). Tom com leve viés azul (não cinza puro) pra manter a identidade de
+     marca mesmo no escuro. */
+  --color-admin-bg: #0a0e17;
+  --color-admin-surface: #131a27;
+  --color-admin-surface-2: #1a2233;
+  --color-admin-surface-3: #222c42;
+
+  --color-admin-border: #263049;
+  --color-admin-border-strong: #34415f;
+
+  --color-admin-text: #f1f5f9;
+  --color-admin-text-muted: #8b96ab;
+  --color-admin-text-faint: #5b6478;
+
+  /* Acentos — mesmo hue de marca do site público (azul/vermelho/verde), mas mais claros
+     e saturados: em fundo quase preto, a versão "institucional" (`#1e4d8c` etc.) fica
+     opaca/sem vida. Aqui viram os únicos elementos realmente vívidos da tela — o resto
+     da interface é deliberadamente contido, é isso que cria a sofisticação (contraste
+     entre área quieta e área marcante), não gradiente em tudo. */
+  --color-admin-accent: #4c8dff;
+  --color-admin-accent-dark: #2e6bdb;
+  --color-admin-accent-secondary: #ff5d72;
+  --color-admin-accent-tertiary: #34d399;
+
+  --color-admin-success: #34d399;
+  --color-admin-success-light: #0f2e26;
+  --color-admin-warning: #fbbf24;
+  --color-admin-warning-light: #332708;
+  --color-admin-error: #ff5d72;
+  --color-admin-error-light: #34131a;
+  --color-admin-info: #4c8dff;
+  --color-admin-info-light: #0f2038;
+
+  /* Sombra "normal" some contra fundo quase preto — o que dá profundidade aqui é
+     glow de cor + borda, não drop shadow. `--shadow-admin-*` ainda existe pros poucos
+     casos de elemento realmente flutuando sobre outros (modal, popover). */
+  --shadow-admin-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-admin-md: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
+  --shadow-admin-lg: 0 24px 48px -16px rgba(0, 0, 0, 0.65);
+  --shadow-admin-glow: 0 0 0 1px rgba(76, 141, 255, 0.16), 0 8px 28px -6px rgba(76, 141, 255, 0.35);
+}
+
+.admin-gradient-accent {
+  background-image: linear-gradient(135deg, var(--color-admin-accent), #6366f1);
+}
+.admin-gradient-mesh {
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(76, 141, 255, 0.16), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(52, 211, 153, 0.10), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(255, 93, 114, 0.08), transparent 45%);
+}
+.admin-glass {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .admin-glass {
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+}
+
 /* Alto contraste (menu de acessibilidade, src/components/AcessibilidadeMenu.tsx) — fundo
    escuro, texto branco, links/títulos/nav em amarelo (esquema clássico de alto contraste
    preto+amarelo, conferido contra referência real de outra prefeitura — bomlugar.ma.gov.br

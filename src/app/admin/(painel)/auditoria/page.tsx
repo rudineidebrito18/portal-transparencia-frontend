@@ -1,12 +1,9 @@
 'use client'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
-import Badge from '@/components/ui/Badge'
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Pagination from '@/components/ui/Pagination'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import AdminPagination from '@/modules/admin/shared/AdminPagination'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { isAdministrador } from '@/modules/auth/permissoes'
 import { auditoriaService } from '@/modules/admin/auditoria/auditoria.service'
@@ -18,11 +15,14 @@ const ACAO_LABEL: Record<AcaoAuditoria, string> = {
   EXCLUSAO: 'Exclusão'
 }
 
-const ACAO_COR: Record<AcaoAuditoria, string> = {
-  CRIACAO: 'bg-success/10 text-success',
-  EDICAO: 'bg-accent/10 text-accent',
-  EXCLUSAO: 'bg-error/10 text-error'
+const ACAO_ESTILO: Record<AcaoAuditoria, { pill: string; dot: string }> = {
+  CRIACAO: { pill: 'bg-admin-success-light text-admin-success', dot: 'bg-admin-success' },
+  EDICAO: { pill: 'bg-admin-info-light text-admin-info', dot: 'bg-admin-info' },
+  EXCLUSAO: { pill: 'bg-admin-error-light text-admin-error', dot: 'bg-admin-error' }
 }
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
 
 export default function AuditoriaPage() {
   const { usuario } = useAuth()
@@ -33,20 +33,20 @@ export default function AuditoriaPage() {
   >({ fetchFunction: auditoriaService.listar, initialSort: 'dataHora,desc' })
 
   if (!isAdministrador(usuario)) {
-    return <ErrorState title="Acesso restrito" message="Apenas administradores podem ver o log de auditoria." />
+    return <AdminErrorState title="Acesso restrito" message="Apenas administradores podem ver o log de auditoria." />
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-lg font-bold text-primary">Auditoria</h1>
-        <p className="text-sm text-text-secondary/70">
+        <h1 className="text-lg font-bold text-admin-text">Auditoria</h1>
+        <p className="text-sm text-admin-text-muted">
           Registro de quem criou/editou/excluiu o quê — cobre todos os módulos do sistema,
           incluindo licitações, obras, RH específico e diário oficial.
         </p>
       </div>
 
-      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-4 flex flex-wrap gap-3">
         <input
           type="number"
           placeholder="ID do usuário"
@@ -57,7 +57,7 @@ export default function AuditoriaPage() {
               setFiltros({ ...filtros, usuarioId: valor ? Number(valor) : undefined })
             }
           }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm w-36"
+          className={`${classeInput} w-36`}
         />
         <input
           placeholder="Módulo (ex: Fornecedor, Cargo, Notícia)"
@@ -65,56 +65,63 @@ export default function AuditoriaPage() {
           onKeyDown={e => {
             if (e.key === 'Enter') setFiltros({ ...filtros, modulo: (e.target as HTMLInputElement).value })
           }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm flex-1 min-w-[240px]"
+          className={`${classeInput} flex-1 min-w-[240px]`}
         />
         <input
           type="datetime-local"
           value={filtros.dataInicial ?? ''}
           onChange={e => setFiltros({ ...filtros, dataInicial: e.target.value })}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
         <input
           type="datetime-local"
           value={filtros.dataFinal ?? ''}
           onChange={e => setFiltros({ ...filtros, dataFinal: e.target.value })}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
-      </Card>
+      </div>
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhum registro de auditoria encontrado." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && data.length === 0 && <AdminEmptyState message="Nenhum registro de auditoria encontrado." />}
 
       {!loading && !erro && data.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Quando</th>
-                <th className="p-3">Usuário</th>
-                <th className="p-3">Ação</th>
-                <th className="p-3">Módulo</th>
-                <th className="p-3">Registro</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(log => (
-                <tr key={log.id} className="border-t border-border/20">
-                  <td className="p-3 whitespace-nowrap">{new Date(log.dataHora).toLocaleString('pt-BR')}</td>
-                  <td className="p-3">{log.usuarioEmail}</td>
-                  <td className="p-3">
-                    <Badge className={ACAO_COR[log.acao]}>{ACAO_LABEL[log.acao]}</Badge>
-                  </td>
-                  <td className="p-3">{log.modulo}</td>
-                  <td className="p-3">#{log.entidadeId}</td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Quando</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Usuário</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Ação</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Módulo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Registro</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {data.map(log => (
+                  <tr key={log.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{new Date(log.dataHora).toLocaleString('pt-BR')}</td>
+                    <td className="p-3.5 text-admin-text">{log.usuarioEmail}</td>
+                    <td className="p-3.5">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${ACAO_ESTILO[log.acao].pill}`}>
+                        <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full ${ACAO_ESTILO[log.acao].dot}`} />
+                        {ACAO_LABEL[log.acao]}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-admin-text-muted">{log.modulo}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">#{log.entidadeId}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+      <AdminPagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

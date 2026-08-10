@@ -3,14 +3,14 @@
 import { useCallback } from 'react'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
-import Badge from '@/components/ui/Badge'
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Pagination from '@/components/ui/Pagination'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import AdminPagination from '@/modules/admin/shared/AdminPagination'
 import { esicFormularioService } from '@/modules/admin/esic-ouvidoria/esic-ouvidoria.service'
 import { FiltroFormularioEsic, FormularioEsic, LABELS_TIPO_SOLICITACAO_ESIC, TipoSolicitacaoEsic } from '@/modules/admin/esic-ouvidoria/types'
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
 
 function formatarData(data?: string) {
   if (!data) return '—'
@@ -29,17 +29,17 @@ export default function EsicFormulariosAdminPage() {
   >({ fetchFunction, initialSort: 'criadoEm,desc' })
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-bold text-primary">E-SIC — Formulários Recebidos</h1>
-      <p className="text-sm text-text-secondary/70">
+    <div className="space-y-5">
+      <h1 className="text-lg font-bold text-admin-text">E-SIC — Formulários Recebidos</h1>
+      <p className="text-sm text-admin-text-muted">
         Somente leitura — o backend ainda não expõe edição/exclusão de solicitações do E-SIC.
       </p>
 
-      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-4 flex flex-wrap gap-3">
         <select
           value={filtros.tipoSolicitacao ?? ''}
           onChange={e => setFiltros({ ...filtros, tipoSolicitacao: (e.target.value as TipoSolicitacaoEsic) || undefined })}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         >
           <option value="">Todos os tipos</option>
           {(Object.keys(LABELS_TIPO_SOLICITACAO_ESIC) as TipoSolicitacaoEsic[]).map(t => (
@@ -50,75 +50,81 @@ export default function EsicFormulariosAdminPage() {
           placeholder="Nome..."
           defaultValue={filtros.nome ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, nome: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
         <input
           placeholder="E-mail..."
           defaultValue={filtros.email ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, email: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">De:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>De:</span>
           <input
             type="date"
             value={filtros.dataInicial ?? ''}
             onChange={e => setFiltros({ ...filtros, dataInicial: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">Até:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>Até:</span>
           <input
             type="date"
             value={filtros.dataFinal ?? ''}
             onChange={e => setFiltros({ ...filtros, dataFinal: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
-      </Card>
+      </div>
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhum formulário encontrado." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && data.length === 0 && <AdminEmptyState message="Nenhum formulário encontrado." />}
 
       {!loading && !erro && data.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Tipo</th>
-                <th className="p-3">Solicitante</th>
-                <th className="p-3">Solicitação</th>
-                <th className="p-3">Recebido em</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(item => (
-                <tr key={item.id} className="border-t border-border/20 align-top">
-                  <td className="p-3 whitespace-nowrap">
-                    <Badge className="bg-primary/10 text-primary">{LABELS_TIPO_SOLICITACAO_ESIC[item.tipoSolicitacao]}</Badge>
-                  </td>
-                  <td className="p-3 whitespace-nowrap">
-                    {item.anonima ? (
-                      <span className="text-text-secondary/60 italic">Anônimo</span>
-                    ) : (
-                      <>
-                        <p className="font-semibold">{item.nome}</p>
-                        <p className="text-xs text-text-secondary/60">{item.email}</p>
-                      </>
-                    )}
-                  </td>
-                  <td className="p-3 max-w-lg">{item.solicitacao}</td>
-                  <td className="p-3 whitespace-nowrap">{formatarData(item.criadoEm)}</td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Tipo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Solicitante</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Solicitação</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Recebido em</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {data.map(item => (
+                  <tr key={item.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors align-top">
+                    <td className="p-3.5 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-admin-surface-3 text-admin-text-muted">
+                        {LABELS_TIPO_SOLICITACAO_ESIC[item.tipoSolicitacao]}
+                      </span>
+                    </td>
+                    <td className="p-3.5 whitespace-nowrap">
+                      {item.anonima ? (
+                        <span className="text-admin-text-faint italic">Anônimo</span>
+                      ) : (
+                        <>
+                          <p className="font-semibold text-admin-text">{item.nome}</p>
+                          <p className="text-xs text-admin-text-faint">{item.email}</p>
+                        </>
+                      )}
+                    </td>
+                    <td className="p-3.5 max-w-lg text-admin-text-muted">{item.solicitacao}</td>
+                    <td className="p-3.5 whitespace-nowrap text-admin-text-muted tabular-nums">{formatarData(item.criadoEm)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+      <AdminPagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

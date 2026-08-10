@@ -3,9 +3,7 @@
 import Image from 'next/image'
 import { FormEvent, useEffect, useState } from 'react'
 
-import Card from '@/components/ui/Card'
-import ErrorState from '@/components/ui/ErrorState'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeEditar } from '@/modules/auth/permissoes'
 import { Autoridade, AutoridadeRequest } from '@/modules/admin/geral/types'
@@ -31,6 +29,10 @@ function formVazio(cargoPadrao: string): AutoridadeRequest {
     dataFimMandato: ''
   }
 }
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all disabled:opacity-50'
+const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
 
 // Compartilhado entre /admin/geral/prefeito e /admin/geral/vice-prefeito — os dois são
 // singletons independentes (sem vínculo/FK entre si nem com Unidade), formato idêntico,
@@ -113,94 +115,94 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-16" />
+          <div key={i} className="h-16 rounded-xl bg-admin-surface animate-pulse" aria-hidden="true" />
         ))}
       </div>
     )
   }
 
-  if (erro) return <ErrorState message={erro} />
+  if (erro) return <AdminErrorState message={erro} />
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-bold text-primary">{titulo}</h1>
+    <div className="space-y-5">
+      <h1 className="text-lg font-bold text-admin-text">{titulo}</h1>
 
       {aindaNaoConfigurado && (
-        <p className="text-sm text-text-secondary/70">
+        <p className="text-sm text-admin-text-muted">
           Ainda não há perfil cadastrado — preencha e salve para criar.
         </p>
       )}
 
-      <Card className="p-6" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <fieldset disabled={!podeSalvar} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="nome">Nome completo</label>
+                <label className={classeLabel} htmlFor="nome">Nome completo</label>
                 <input
                   id="nome"
                   required
                   value={form.nome}
                   onChange={e => atualizarCampo('nome', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="nomePopular">Nome popular (opcional)</label>
+                <label className={classeLabel} htmlFor="nomePopular">Nome popular (opcional)</label>
                 <input
                   id="nomePopular"
                   value={form.nomePopular ?? ''}
                   onChange={e => atualizarCampo('nomePopular', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                   placeholder="Como é conhecido publicamente"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
+              <label className={classeLabel} htmlFor="cargo">Cargo</label>
               <input
                 id="cargo"
                 required
                 value={form.cargo}
                 onChange={e => atualizarCampo('cargo', e.target.value)}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="atribuicoes">Atribuições</label>
+              <label className={classeLabel} htmlFor="atribuicoes">Atribuições</label>
               <textarea
                 id="atribuicoes"
                 required
                 rows={4}
                 value={form.atribuicoes}
                 onChange={e => atualizarCampo('atribuicoes', e.target.value)}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
+                <label className={classeLabel} htmlFor="email">E-mail</label>
                 <input
                   type="email"
                   id="email"
                   required
                   value={form.email}
                   onChange={e => atualizarCampo('email', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="telefone">Telefone (opcional)</label>
+                <label className={classeLabel} htmlFor="telefone">Telefone (opcional)</label>
                 <input
                   id="telefone"
                   value={form.telefone ?? ''}
                   onChange={e => atualizarCampo('telefone', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                   placeholder="Se vazio, o site público usa o telefone do Gabinete do Prefeito"
                 />
               </div>
@@ -208,30 +210,30 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataInicioMandato">Início do mandato (opcional)</label>
+                <label className={classeLabel} htmlFor="dataInicioMandato">Início do mandato (opcional)</label>
                 <input
                   type="date"
                   id="dataInicioMandato"
                   value={form.dataInicioMandato ?? ''}
                   onChange={e => atualizarCampo('dataInicioMandato', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataFimMandato">Fim do mandato (opcional)</label>
+                <label className={classeLabel} htmlFor="dataFimMandato">Fim do mandato (opcional)</label>
                 <input
                   type="date"
                   id="dataFimMandato"
                   min={form.dataInicioMandato || undefined}
                   value={form.dataFimMandato ?? ''}
                   onChange={e => atualizarCampo('dataFimMandato', e.target.value)}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="foto">
+              <label className={classeLabel} htmlFor="foto">
                 Foto {fotoAtualUrl && '(opcional — mantém a atual se vazio)'}
               </label>
               {fotoAtualUrl && (
@@ -240,7 +242,7 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
                   alt="Foto atual"
                   width={64}
                   height={64}
-                  className="w-16 h-16 rounded-lg object-cover mb-2"
+                  className="w-16 h-16 rounded-lg object-cover mb-2 border border-admin-border"
                 />
               )}
               <input
@@ -248,35 +250,35 @@ export default function AutoridadeConfigPage({ titulo, cargoPadrao, service }: P
                 type="file"
                 accept="image/*"
                 onChange={e => setFoto(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-text-secondary/70
+                className="block w-full text-sm text-admin-text-muted
                   file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0
-                  file:text-sm file:font-semibold file:bg-primary file:text-white
-                  hover:file:bg-primary-dark file:cursor-pointer file:transition-all"
+                  file:text-sm file:font-semibold file:text-white
+                  file:bg-admin-accent file:cursor-pointer file:transition-colors hover:file:bg-admin-accent-dark"
               />
-              {foto && <p className="text-xs text-text-secondary/70 mt-1">Selecionada: {foto.name}</p>}
+              {foto && <p className="text-xs text-admin-text-faint mt-1">Selecionada: {foto.name}</p>}
             </div>
           </fieldset>
 
           {!podeSalvar && (
-            <p className="text-xs text-text-secondary/60">
+            <p className="text-xs text-admin-text-faint">
               Seu papel não permite editar essas informações.
             </p>
           )}
 
-          {erroForm && <ErrorState message={erroForm} />}
-          {salvo && <p className="text-sm text-success font-semibold">Alterações salvas.</p>}
+          {erroForm && <AdminErrorState message={erroForm} />}
+          {salvo && <p className="text-sm text-admin-success font-semibold">Alterações salvas.</p>}
 
           {podeSalvar && (
             <button
               type="submit"
               disabled={salvando}
-              className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+              className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
             >
               {salvando ? 'Salvando...' : 'Salvar alterações'}
             </button>
           )}
         </form>
-      </Card>
+      </div>
     </div>
   )
 }

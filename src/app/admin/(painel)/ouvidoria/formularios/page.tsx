@@ -3,17 +3,18 @@
 import { useCallback } from 'react'
 
 import Link from 'next/link'
+import { MdVisibility } from 'react-icons/md'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
-import Badge from '@/components/ui/Badge'
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Pagination from '@/components/ui/Pagination'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import AdminPagination from '@/modules/admin/shared/AdminPagination'
 import { ouvidoriaFormularioService } from '@/modules/admin/esic-ouvidoria/esic-ouvidoria.service'
 import { FiltroFormularioOuvidoria, FinalidadeOuvidoria, FormularioOuvidoria, LABELS_FINALIDADE_OUVIDORIA } from '@/modules/admin/esic-ouvidoria/types'
 import { hrefDocumento } from '@/utils/documento'
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
 
 function formatarData(data?: string) {
   if (!data) return '—'
@@ -32,17 +33,17 @@ export default function OuvidoriaFormulariosAdminPage() {
   >({ fetchFunction, initialSort: 'criadoEm,desc' })
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-bold text-primary">Ouvidoria — Formulários Recebidos</h1>
-      <p className="text-sm text-text-secondary/70">
+    <div className="space-y-5">
+      <h1 className="text-lg font-bold text-admin-text">Ouvidoria — Formulários Recebidos</h1>
+      <p className="text-sm text-admin-text-muted">
         Somente leitura — o backend ainda não expõe edição/exclusão de manifestações da Ouvidoria.
       </p>
 
-      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-4 flex flex-wrap gap-3">
         <select
           value={filtros.finalidade ?? ''}
           onChange={e => setFiltros({ ...filtros, finalidade: (e.target.value as FinalidadeOuvidoria) || undefined })}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         >
           <option value="">Todas as finalidades</option>
           {(Object.keys(LABELS_FINALIDADE_OUVIDORIA) as FinalidadeOuvidoria[]).map(f => (
@@ -53,87 +54,96 @@ export default function OuvidoriaFormulariosAdminPage() {
           placeholder="Nome..."
           defaultValue={filtros.nome ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, nome: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
         <input
           placeholder="E-mail..."
           defaultValue={filtros.email ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, email: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">De:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>De:</span>
           <input
             type="date"
             value={filtros.dataInicial ?? ''}
             onChange={e => setFiltros({ ...filtros, dataInicial: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">Até:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>Até:</span>
           <input
             type="date"
             value={filtros.dataFinal ?? ''}
             onChange={e => setFiltros({ ...filtros, dataFinal: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
-      </Card>
+      </div>
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhuma manifestação encontrada." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && data.length === 0 && <AdminEmptyState message="Nenhuma manifestação encontrada." />}
 
       {!loading && !erro && data.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Finalidade</th>
-                <th className="p-3">Solicitante</th>
-                <th className="p-3">Unidade</th>
-                <th className="p-3">Comentário</th>
-                <th className="p-3">Anexo</th>
-                <th className="p-3">Recebido em</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(item => (
-                <tr key={item.id} className="border-t border-border/20 align-top">
-                  <td className="p-3 whitespace-nowrap">
-                    <Badge className="bg-primary/10 text-primary">{LABELS_FINALIDADE_OUVIDORIA[item.finalidade]}</Badge>
-                  </td>
-                  <td className="p-3 whitespace-nowrap">
-                    {item.anonima ? (
-                      <span className="text-text-secondary/60 italic">Anônimo</span>
-                    ) : (
-                      <>
-                        <p className="font-semibold">{item.nome}</p>
-                        <p className="text-xs text-text-secondary/60">{item.email}</p>
-                      </>
-                    )}
-                  </td>
-                  <td className="p-3 whitespace-nowrap">{item.unidadeNome ?? '—'}</td>
-                  <td className="p-3 max-w-lg">{item.comentario}</td>
-                  <td className="p-3 whitespace-nowrap">
-                    {item.caminhoArquivo ? (
-                      <Link href={hrefDocumento(item.caminhoArquivo, `Manifestação de ${item.nome ?? 'anônimo'}`, { admin: true })} className="text-primary hover:underline">
-                        Ver anexo
-                      </Link>
-                    ) : (
-                      <span className="text-text-secondary/40">—</span>
-                    )}
-                  </td>
-                  <td className="p-3 whitespace-nowrap">{formatarData(item.criadoEm)}</td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Finalidade</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Solicitante</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Unidade</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Comentário</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Anexo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Recebido em</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {data.map(item => (
+                  <tr key={item.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors align-top">
+                    <td className="p-3.5 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-admin-surface-3 text-admin-text-muted">
+                        {LABELS_FINALIDADE_OUVIDORIA[item.finalidade]}
+                      </span>
+                    </td>
+                    <td className="p-3.5 whitespace-nowrap">
+                      {item.anonima ? (
+                        <span className="text-admin-text-faint italic">Anônimo</span>
+                      ) : (
+                        <>
+                          <p className="font-semibold text-admin-text">{item.nome}</p>
+                          <p className="text-xs text-admin-text-faint">{item.email}</p>
+                        </>
+                      )}
+                    </td>
+                    <td className="p-3.5 whitespace-nowrap text-admin-text-muted">{item.unidadeNome ?? '—'}</td>
+                    <td className="p-3.5 max-w-lg text-admin-text-muted">{item.comentario}</td>
+                    <td className="p-3.5 whitespace-nowrap">
+                      {item.caminhoArquivo ? (
+                        <Link
+                          href={hrefDocumento(item.caminhoArquivo, `Manifestação de ${item.nome ?? 'anônimo'}`, { admin: true })}
+                          className="inline-flex items-center gap-1 text-admin-accent hover:underline"
+                        >
+                          <MdVisibility size={15} /> Ver anexo
+                        </Link>
+                      ) : (
+                        <span className="text-admin-text-faint">—</span>
+                      )}
+                    </td>
+                    <td className="p-3.5 whitespace-nowrap text-admin-text-muted tabular-nums">{formatarData(item.criadoEm)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+      <AdminPagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
     </div>
   )
 }

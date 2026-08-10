@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { MdArrowBack } from 'react-icons/md'
 
 import PdfViewer from '@/components/ui/PdfViewer'
-import Skeleton from '@/components/ui/Skeleton'
 
 function Conteudo() {
   const params = useSearchParams()
@@ -18,18 +17,18 @@ function Conteudo() {
       <button
         type="button"
         onClick={() => router.back()}
-        className="flex items-center gap-1 text-sm text-primary hover:underline"
+        className="flex items-center gap-1 text-sm text-admin-accent hover:underline"
       >
         <MdArrowBack size={16} />
         Voltar
       </button>
 
-      <h1 className="text-lg font-bold text-primary">{titulo}</h1>
+      <h1 className="text-lg font-bold text-admin-text">{titulo}</h1>
 
       {src ? (
         <PdfViewer src={src} titulo={titulo} />
       ) : (
-        <p className="text-sm text-text-secondary/70">Nenhum documento informado.</p>
+        <p className="text-sm text-admin-text-faint">Nenhum documento informado.</p>
       )}
     </div>
   )
@@ -37,7 +36,7 @@ function Conteudo() {
 
 export default function DocumentoAdminPage() {
   return (
-    <Suspense fallback={<Skeleton className="h-[80vh]" />}>
+    <Suspense fallback={<div className="rounded-2xl border border-admin-border bg-admin-surface h-[80vh] animate-pulse" aria-hidden="true" />}>
       <Conteudo />
     </Suspense>
   )

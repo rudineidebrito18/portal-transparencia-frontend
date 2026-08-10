@@ -1,13 +1,13 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
+import { MdEdit, MdDeleteOutline } from 'react-icons/md'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Pagination from '@/components/ui/Pagination'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import AdminPagination from '@/modules/admin/shared/AdminPagination'
+import ConfirmDialog from '@/modules/admin/shared/ConfirmDialog'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { unidadesService } from '@/modules/admin/geral/geral.service'
@@ -41,6 +41,10 @@ const FORM_VAZIO: FormState = {
   unidadeId: undefined
 }
 
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
+const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
+
 export default function DiariasAdminPage() {
   const { usuario } = useAuth()
 
@@ -65,6 +69,8 @@ export default function DiariasAdminPage() {
   const [form, setForm] = useState<FormState | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
 
   function abrirCriacao() {
     setErroForm(null)
@@ -76,14 +82,18 @@ export default function DiariasAdminPage() {
     setForm({ ...d })
   }
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir esta diária? Essa ação não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (idParaExcluir === null) return
 
+    setExcluindo(true)
     try {
-      await diariaService.excluir(id)
+      await diariaService.excluir(idParaExcluir)
+      setIdParaExcluir(null)
       recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -114,140 +124,140 @@ export default function DiariasAdminPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold text-primary">Diárias</h1>
+        <h1 className="text-lg font-bold text-admin-text">Diárias</h1>
 
         {podeCriar(usuario, 'rh') && (
           <button
             onClick={abrirCriacao}
-            className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+            className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all"
           >
             + Nova diária
           </button>
         )}
       </div>
 
-      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-4 flex flex-wrap gap-3">
         <input
           placeholder="Beneficiário..."
           defaultValue={filtros.beneficiario ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, beneficiario: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
         <input
           placeholder="Cargo..."
           defaultValue={filtros.cargo ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, cargo: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
         <input
           placeholder="Destino..."
           defaultValue={filtros.destino ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, destino: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">Início:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>Início:</span>
           <input
             type="date"
             value={filtros.dataInicio ?? ''}
             onChange={e => setFiltros({ ...filtros, dataInicio: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">Término:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>Término:</span>
           <input
             type="date"
             value={filtros.dataTermino ?? ''}
             onChange={e => setFiltros({ ...filtros, dataTermino: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
         <select
           value={filtros.unidadeId ?? ''}
           onChange={e => setFiltros({ ...filtros, unidadeId: e.target.value ? Number(e.target.value) : undefined })}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         >
           <option value="">Todas as unidades</option>
           {unidades.map(u => (
             <option key={u.id} value={u.id}>{u.nome}</option>
           ))}
         </select>
-      </Card>
+      </div>
 
       {form && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">{form.id ? 'Editar diária' : 'Nova diária'}</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">{form.id ? 'Editar diária' : 'Nova diária'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="beneficiario">Beneficiário</label>
+                <label className={classeLabel} htmlFor="beneficiario">Beneficiário</label>
                 <input
                   id="beneficiario"
                   required
                   value={form.beneficiario}
                   onChange={e => setForm({ ...form, beneficiario: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
+                <label className={classeLabel} htmlFor="cargo">Cargo</label>
                 <input
                   id="cargo"
                   required
                   value={form.cargo}
                   onChange={e => setForm({ ...form, cargo: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataInicio">Data de início</label>
+                <label className={classeLabel} htmlFor="dataInicio">Data de início</label>
                 <input
                   id="dataInicio"
                   type="date"
                   required
                   value={form.dataInicio}
                   onChange={e => setForm({ ...form, dataInicio: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataTermino">Data de término</label>
+                <label className={classeLabel} htmlFor="dataTermino">Data de término</label>
                 <input
                   id="dataTermino"
                   type="date"
                   required
                   value={form.dataTermino}
                   onChange={e => setForm({ ...form, dataTermino: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="destino">Destino</label>
+              <label className={classeLabel} htmlFor="destino">Destino</label>
               <input
                 id="destino"
                 required
                 value={form.destino}
                 onChange={e => setForm({ ...form, destino: e.target.value })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Unidade</label>
+              <label className={classeLabel} htmlFor="unidadeId">Unidade</label>
               <select
                 id="unidadeId"
                 value={form.unidadeId ?? ''}
                 onChange={e => setForm({ ...form, unidadeId: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
               >
                 <option value="">Não vinculada</option>
                 {unidades.map(u => (
@@ -257,20 +267,20 @@ export default function DiariasAdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="motivo">Motivo</label>
+              <label className={classeLabel} htmlFor="motivo">Motivo</label>
               <textarea
                 id="motivo"
                 required
                 value={form.motivo}
                 onChange={e => setForm({ ...form, motivo: e.target.value })}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                className={classeInput}
                 rows={2}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="quantDiarias">Quantidade de diárias</label>
+                <label className={classeLabel} htmlFor="quantDiarias">Quantidade de diárias</label>
                 <input
                   id="quantDiarias"
                   type="number"
@@ -278,11 +288,11 @@ export default function DiariasAdminPage() {
                   required
                   value={form.quantDiarias}
                   onChange={e => setForm({ ...form, quantDiarias: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="valorConcedido">Valor concedido</label>
+                <label className={classeLabel} htmlFor="valorConcedido">Valor concedido</label>
                 <input
                   id="valorConcedido"
                   type="number"
@@ -291,82 +301,107 @@ export default function DiariasAdminPage() {
                   required
                   value={form.valorConcedido}
                   onChange={e => setForm({ ...form, valorConcedido: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+                className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 type="button"
                 onClick={() => setForm(null)}
-                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+                className="px-4 py-2 rounded-lg border border-admin-border text-sm font-semibold text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-text transition-all"
               >
                 Cancelar
               </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhuma diária encontrada." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && data.length === 0 && <AdminEmptyState message="Nenhuma diária encontrada." />}
 
       {!loading && !erro && data.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Beneficiário</th>
-                <th className="p-3">Cargo</th>
-                <th className="p-3">Destino</th>
-                <th className="p-3">Unidade</th>
-                <th className="p-3">Período</th>
-                <th className="p-3">Qtd.</th>
-                <th className="p-3">Valor</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(d => (
-                <tr key={d.id} className="border-t border-border/20">
-                  <td className="p-3 font-semibold">{d.beneficiario}</td>
-                  <td className="p-3">{d.cargo}</td>
-                  <td className="p-3">{d.destino}</td>
-                  <td className="p-3 text-text-secondary/70">{d.unidadeNome ?? '—'}</td>
-                  <td className="p-3">{d.dataInicio} a {d.dataTermino}</td>
-                  <td className="p-3">{d.quantDiarias}</td>
-                  <td className="p-3">{d.valorConcedido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                  <td className="p-3 text-right space-x-2">
-                    {podeEditar(usuario, 'rh') && (
-                      <button onClick={() => abrirEdicao(d)} className="text-primary hover:underline">
-                        Editar
-                      </button>
-                    )}
-                    {podeExcluir(usuario, 'rh') && (
-                      <button onClick={() => excluir(d.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Beneficiário</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Cargo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Destino</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Unidade</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Período</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Qtd.</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Valor</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {data.map(d => (
+                  <tr key={d.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 font-semibold text-admin-text">{d.beneficiario}</td>
+                    <td className="p-3.5 text-admin-text-muted">{d.cargo}</td>
+                    <td className="p-3.5 text-admin-text-muted">{d.destino}</td>
+                    <td className="p-3.5 text-admin-text-faint">{d.unidadeNome ?? '—'}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{d.dataInicio} a {d.dataTermino}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{d.quantDiarias}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{d.valorConcedido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {podeEditar(usuario, 'rh') && (
+                          <button
+                            onClick={() => abrirEdicao(d)}
+                            aria-label="Editar"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                        )}
+                        {podeExcluir(usuario, 'rh') && (
+                          <button
+                            onClick={() => setIdParaExcluir(d.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+      <AdminPagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+
+      <ConfirmDialog
+        aberto={idParaExcluir !== null}
+        titulo="Excluir diária?"
+        mensagem="Essa ação não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setIdParaExcluir(null)}
+      />
     </div>
   )
 }

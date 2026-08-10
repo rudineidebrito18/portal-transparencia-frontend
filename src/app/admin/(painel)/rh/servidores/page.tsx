@@ -1,13 +1,13 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
+import { MdEdit, MdDeleteOutline } from 'react-icons/md'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
-import Card from '@/components/ui/Card'
-import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Pagination from '@/components/ui/Pagination'
-import Skeleton from '@/components/ui/Skeleton'
+import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
+import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
+import AdminPagination from '@/modules/admin/shared/AdminPagination'
+import ConfirmDialog from '@/modules/admin/shared/ConfirmDialog'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { unidadesService } from '@/modules/admin/geral/geral.service'
@@ -26,6 +26,10 @@ interface FormState {
 }
 
 const FORM_VAZIO: FormState = { id: null, cpf: '', name: '', cargo: '', unidadeId: 0, dataAdmissao: '', cargaHoraria: 40 }
+
+const classeInput =
+  'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
+const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
 
 export default function ServidoresAdminPage() {
   const { usuario } = useAuth()
@@ -51,6 +55,8 @@ export default function ServidoresAdminPage() {
   const [form, setForm] = useState<FormState | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null)
+  const [excluindo, setExcluindo] = useState(false)
 
   function abrirCriacao() {
     setErroForm(null)
@@ -70,14 +76,18 @@ export default function ServidoresAdminPage() {
     })
   }
 
-  async function excluir(id: number) {
-    if (!confirm('Excluir este servidor? Essa ação não pode ser desfeita.')) return
+  async function confirmarExclusao() {
+    if (idParaExcluir === null) return
 
+    setExcluindo(true)
     try {
-      await servidorService.excluir(id)
+      await servidorService.excluir(idParaExcluir)
+      setIdParaExcluir(null)
       recarregar()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erro ao excluir')
+    } finally {
+      setExcluindo(false)
     }
   }
 
@@ -114,114 +124,114 @@ export default function ServidoresAdminPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold text-primary">Servidores</h1>
+        <h1 className="text-lg font-bold text-admin-text">Servidores</h1>
 
         {podeCriar(usuario, 'rh') && (
           <button
             onClick={abrirCriacao}
-            className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all"
+            className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all"
           >
             + Novo servidor
           </button>
         )}
       </div>
 
-      <Card className="p-4 flex flex-wrap gap-3" hoverable={false}>
+      <div className="rounded-2xl border border-admin-border bg-admin-surface p-4 flex flex-wrap gap-3">
         <input
           placeholder="CPF..."
           defaultValue={filtros.cpf ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, cpf: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
         <input
           placeholder="Nome..."
           defaultValue={filtros.name ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, name: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
         <input
           placeholder="Cargo..."
           defaultValue={filtros.cargo ?? ''}
           onKeyDown={e => { if (e.key === 'Enter') setFiltros({ ...filtros, cargo: (e.target as HTMLInputElement).value || undefined }) }}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         />
         <select
           value={filtros.unidadeId ?? ''}
           onChange={e => setFiltros({ ...filtros, unidadeId: e.target.value ? Number(e.target.value) : undefined })}
-          className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+          className={`${classeInput} w-auto`}
         >
           <option value="">Todas as unidades</option>
           {unidades.map(u => (
             <option key={u.id} value={u.id}>{u.nome}</option>
           ))}
         </select>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-text-secondary/60">Admissão:</span>
+        <div className="flex items-center gap-2 text-sm text-admin-text-muted">
+          <span>Admissão:</span>
           <input
             type="date"
             value={filtros.dataAdmissaoInicio ?? ''}
             onChange={e => setFiltros({ ...filtros, dataAdmissaoInicio: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
           <span>até</span>
           <input
             type="date"
             value={filtros.dataAdmissaoFim ?? ''}
             onChange={e => setFiltros({ ...filtros, dataAdmissaoFim: e.target.value || undefined })}
-            className="border border-border/30 rounded-lg px-3 py-2 text-sm"
+            className={`${classeInput} w-auto`}
           />
         </div>
-      </Card>
+      </div>
 
       {form && (
-        <Card className="p-4" hoverable={false}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <h2 className="font-semibold text-sm">{form.id ? 'Editar servidor' : 'Novo servidor'}</h2>
+        <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="font-semibold text-sm text-admin-text">{form.id ? 'Editar servidor' : 'Novo servidor'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="cpf">CPF</label>
+                <label className={classeLabel} htmlFor="cpf">CPF</label>
                 <input
                   id="cpf"
                   required
                   value={form.cpf}
                   onChange={e => setForm({ ...form, cpf: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="name">Nome</label>
+                <label className={classeLabel} htmlFor="name">Nome</label>
                 <input
                   id="name"
                   required
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="cargo">Cargo</label>
+                <label className={classeLabel} htmlFor="cargo">Cargo</label>
                 <input
                   id="cargo"
                   required
                   value={form.cargo}
                   onChange={e => setForm({ ...form, cargo: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="unidadeId">Unidade</label>
+                <label className={classeLabel} htmlFor="unidadeId">Unidade</label>
                 <select
                   id="unidadeId"
                   required
                   value={form.unidadeId || ''}
                   onChange={e => setForm({ ...form, unidadeId: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 >
                   <option value="" disabled>Selecione...</option>
                   {unidades.map(u => (
@@ -233,18 +243,18 @@ export default function ServidoresAdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="dataAdmissao">Data de admissão</label>
+                <label className={classeLabel} htmlFor="dataAdmissao">Data de admissão</label>
                 <input
                   id="dataAdmissao"
                   type="date"
                   required
                   value={form.dataAdmissao}
                   onChange={e => setForm({ ...form, dataAdmissao: e.target.value })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="cargaHoraria">Carga horária semanal</label>
+                <label className={classeLabel} htmlFor="cargaHoraria">Carga horária semanal</label>
                 <input
                   id="cargaHoraria"
                   type="number"
@@ -252,80 +262,105 @@ export default function ServidoresAdminPage() {
                   required
                   value={form.cargaHoraria}
                   onChange={e => setForm({ ...form, cargaHoraria: Number(e.target.value) })}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm"
+                  className={classeInput}
                 />
               </div>
             </div>
 
-            {erroForm && <ErrorState message={erroForm} />}
+            {erroForm && <AdminErrorState message={erroForm} />}
 
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all disabled:opacity-60"
+                className="px-4 py-2 rounded-lg admin-gradient-accent text-white text-sm font-semibold shadow-admin-glow hover:brightness-110 transition-all disabled:opacity-60"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 type="button"
                 onClick={() => setForm(null)}
-                className="px-4 py-2 rounded-lg border border-border/30 text-sm font-semibold hover:bg-neutral-light transition-all"
+                className="px-4 py-2 rounded-lg border border-admin-border text-sm font-semibold text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-text transition-all"
               >
                 Cancelar
               </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
-      {loading && <Skeleton className="h-40" />}
-      {erro && <ErrorState message={erro} />}
-      {!loading && !erro && data.length === 0 && <EmptyState message="Nenhum servidor encontrado." />}
+      {loading && (
+        <div className="rounded-2xl border border-admin-border bg-admin-surface h-40 animate-pulse" aria-hidden="true" />
+      )}
+      {erro && <AdminErrorState message={erro} />}
+      {!loading && !erro && data.length === 0 && <AdminEmptyState message="Nenhum servidor encontrado." />}
 
       {!loading && !erro && data.length > 0 && (
-        <Card className="overflow-x-auto" hoverable={false}>
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-light text-left">
-              <tr>
-                <th className="p-3">Nome</th>
-                <th className="p-3">CPF</th>
-                <th className="p-3">Cargo</th>
-                <th className="p-3">Unidade</th>
-                <th className="p-3">Admissão</th>
-                <th className="p-3">Carga horária</th>
-                <th className="p-3 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(s => (
-                <tr key={s.id} className="border-t border-border/20">
-                  <td className="p-3 font-semibold">{s.name}</td>
-                  <td className="p-3">{s.cpf}</td>
-                  <td className="p-3">{s.cargo}</td>
-                  <td className="p-3">{s.unidade?.nome ?? '-'}</td>
-                  <td className="p-3">{s.dataAdmissao}</td>
-                  <td className="p-3">{s.cargaHoraria}h</td>
-                  <td className="p-3 text-right space-x-2">
-                    {podeEditar(usuario, 'rh') && (
-                      <button onClick={() => abrirEdicao(s)} className="text-primary hover:underline">
-                        Editar
-                      </button>
-                    )}
-                    {podeExcluir(usuario, 'rh') && (
-                      <button onClick={() => excluir(s.id)} className="text-error hover:underline">
-                        Excluir
-                      </button>
-                    )}
-                  </td>
+        <div className="rounded-2xl border border-admin-border bg-admin-surface overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-admin-border text-left">
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Nome</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">CPF</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Cargo</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Unidade</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Admissão</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Carga horária</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {data.map(s => (
+                  <tr key={s.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 font-semibold text-admin-text">{s.name}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{s.cpf}</td>
+                    <td className="p-3.5 text-admin-text-muted">{s.cargo}</td>
+                    <td className="p-3.5 text-admin-text-muted">{s.unidade?.nome ?? '-'}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{s.dataAdmissao}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{s.cargaHoraria}h</td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {podeEditar(usuario, 'rh') && (
+                          <button
+                            onClick={() => abrirEdicao(s)}
+                            aria-label="Editar"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                        )}
+                        {podeExcluir(usuario, 'rh') && (
+                          <button
+                            onClick={() => setIdParaExcluir(s.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+      <AdminPagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} />
+
+      <ConfirmDialog
+        aberto={idParaExcluir !== null}
+        titulo="Excluir servidor?"
+        mensagem="Essa ação não pode ser desfeita."
+        confirmarLabel="Excluir"
+        perigoso
+        carregando={excluindo}
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setIdParaExcluir(null)}
+      />
     </div>
   )
 }
