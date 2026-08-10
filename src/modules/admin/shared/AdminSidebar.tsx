@@ -1,8 +1,9 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ComponentType } from 'react'
+import { ComponentType, useEffect, useRef } from 'react'
 import {
   MdAccountBalance,
   MdApartment,
@@ -231,6 +232,28 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
   // inteira só aparece expandida — ver decisão em STATUS.md 2.27).
   const handleNavigate = colapsada ? onExpandir : undefined
 
+  // Clicar num ícone de categoria colapsada expandia a sidebar, mas o scroll ficava
+  // onde estava antes (em pixels) — como o conteúdo colapsado é muito mais compacto que
+  // o expandido, esse mesmo scroll em pixels não corresponde mais à mesma categoria
+  // depois de expandir, e na prática sempre parecia "voltar pro início da lista"
+  // (usuário reportou isso). `categoriaAlvoRef` guarda qual categoria foi clicada; o
+  // efeito abaixo rola até ela assim que `colapsada` vira `false`. Ref (não state) de
+  // propósito — só precisa ser lido uma vez dentro do efeito, não precisa re-renderizar.
+  const categoriaRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const categoriaAlvoRef = useRef<string | null>(null)
+
+  function expandirParaCategoria(categoria: string) {
+    categoriaAlvoRef.current = categoria
+    onExpandir()
+  }
+
+  useEffect(() => {
+    if (colapsada || !categoriaAlvoRef.current) return
+
+    categoriaRefs.current[categoriaAlvoRef.current]?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    categoriaAlvoRef.current = null
+  }, [colapsada])
+
   return (
     <aside
       className={`shrink-0 h-screen flex flex-col bg-admin-surface border-r border-admin-border transition-[width] duration-200 ${
@@ -238,14 +261,16 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
       }`}
     >
       <div className={`flex items-center gap-2.5 p-4 border-b border-admin-border ${colapsada ? 'justify-center px-0' : ''}`}>
-        <span className="shrink-0 w-8 h-8 rounded-lg admin-gradient-accent flex items-center justify-center font-bold text-white text-sm shadow-admin-glow">
-          PT
-        </span>
+        <Image
+          src="/logo_lago_r.png"
+          alt="Prefeitura Municipal de Lago dos Rodrigues"
+          width={1024}
+          height={275}
+          priority
+          className={colapsada ? 'w-11 h-auto shrink-0' : 'w-36 h-auto shrink-0'}
+        />
         {!colapsada && (
-          <div className="min-w-0">
-            <p className="font-semibold text-sm text-admin-text truncate">Painel Administrativo</p>
-            <p className="text-xs text-admin-text-faint truncate">Portal da Transparência</p>
-          </div>
+          <p className="text-xs text-admin-text-faint truncate">Painel Administrativo</p>
         )}
       </div>
 
@@ -282,8 +307,8 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
         ].map(({ categoria, links }) => {
           const Icone = ICONE_CATEGORIA[categoria]
           return (
-            <div key={categoria} className="space-y-0.5">
-              <CabecalhoCategoria categoria={categoria} icone={Icone} colapsada={colapsada} onExpandir={onExpandir} />
+            <div key={categoria} ref={el => { categoriaRefs.current[categoria] = el }} className="space-y-0.5">
+              <CabecalhoCategoria categoria={categoria} icone={Icone} colapsada={colapsada} onExpandir={() => expandirParaCategoria(categoria)} />
               {!colapsada && links.map(link => (
                 <ItemNav key={link.href} href={link.href} label={link.label} ativo={irPara(link.href)} colapsada={colapsada} onNavigate={handleNavigate} />
               ))}
@@ -302,8 +327,8 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
             []
 
           return (
-            <div key={categoria} className="space-y-0.5">
-              <CabecalhoCategoria categoria={categoria} icone={Icone} colapsada={colapsada} onExpandir={onExpandir} />
+            <div key={categoria} ref={el => { categoriaRefs.current[categoria] = el }} className="space-y-0.5">
+              <CabecalhoCategoria categoria={categoria} icone={Icone} colapsada={colapsada} onExpandir={() => expandirParaCategoria(categoria)} />
 
               {!colapsada && extras.map(link => (
                 <ItemNav key={link.href} href={link.href} label={link.label} ativo={irPara(link.href)} colapsada={colapsada} onNavigate={handleNavigate} />

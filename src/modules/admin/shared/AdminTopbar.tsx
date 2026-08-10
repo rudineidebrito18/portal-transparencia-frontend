@@ -1,12 +1,9 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { MdMenuOpen, MdOutlineCircle, MdSearch } from 'react-icons/md'
 
-import { useAuth } from '@/modules/auth/AuthContext'
-import { isAdministrador } from '@/modules/auth/permissoes'
 import { REGISTRY_MODULOS_GENERICOS } from '@/modules/admin/genericos/registry'
 
 interface Props {
@@ -80,7 +77,6 @@ function tituloDaRota(pathname: string, entradas: EntradaBusca[]): { categoria: 
 }
 
 export default function AdminTopbar({ colapsada, onToggleColapsada }: Props) {
-  const { usuario } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
   const entradas = useMemo(() => todasEntradas(), [])
@@ -172,15 +168,6 @@ export default function AdminTopbar({ colapsada, onToggleColapsada }: Props) {
         <MdOutlineCircle size={8} className="fill-current" />
         {ambienteMock ? 'Dados de demonstração' : 'Ambiente conectado'}
       </span>
-
-      <Link
-        href="/admin/usuarios"
-        className="shrink-0 w-9 h-9 rounded-full admin-gradient-accent flex items-center justify-center text-xs font-bold text-white shadow-admin-glow"
-        aria-label={isAdministrador(usuario) ? 'Administrador' : 'Gerente'}
-        title={usuario?.email}
-      >
-        {usuario ? usuario.email.slice(0, 2).toUpperCase() : '?'}
-      </Link>
     </header>
   )
 }

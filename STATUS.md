@@ -1670,6 +1670,42 @@ de chart no projeto, sem dado real óbvio pra mostrar), migração equivalente d
 site público pro escuro (não faz sentido — é o site público, identidade institucional
 clara é o objetivo ali, não um "modo escuro").
 
+**Complemento no mesmo dia**: usuário reportou que clicar num ícone de categoria
+colapsada sempre expandia "no começo da lista", nunca na categoria certa. Bug real: o
+clique só chamava `onExpandir()` (troca `colapsada` pra `false`), sem mexer no scroll —
+como o conteúdo colapsado é bem mais compacto que o expandido, o mesmo scroll em pixels
+não corresponde mais à mesma categoria depois de expandir, então sempre parecia
+"resetar". Corrigido em `AdminSidebar.tsx`: `categoriaAlvoRef` guarda qual categoria foi
+clicada (ref, não state — só precisa ser lido uma vez), e um `useEffect` que observa
+`colapsada` chama `scrollIntoView({block:'start', behavior:'smooth'})` no elemento da
+categoria assim que a sidebar termina de expandir. Cada `<div>` de categoria (nos 2
+blocos que renderizam categorias — a lista fixa Institucional/ESIC e a dinâmica do
+registry) ganhou o ref correspondente. `tsc`/`next lint` limpos, confirmado via `curl`
+que `/admin` continua servindo 200 sem erro no log.
+
+**Mais um complemento, mesmo dia**: usuário mandou print apontando 2 problemas de
+identidade visual — o avatar de iniciais aparecia duplicado (canto da Sidebar E da
+Topbar, mesma informação duas vezes) e o quadrado "PT" no lugar do logo real da
+Prefeitura. Corrigido:
+- **Logo real**: `public/logo_lago_r.png` (já usado no Header do site público) confirmado
+  como PNG RGBA (tem alpha, funciona sobre fundo escuro) via `python3 -c "from PIL...`.
+  Substituído o quadrado "PT" por `<Image>` de verdade em `AdminSidebar.tsx` (header,
+  `w-36` expandida / `w-11` colapsada, mesma imagem larga só reduzida — sem crop, criar
+  uma versão cortada só do ícone exigiria um asset novo que não existe) e em
+  `admin/login/page.tsx` (`w-44`).
+- **Avatar duplicado**: removido o círculo de iniciais da Topbar (`AdminTopbar.tsx`) —
+  a Sidebar já mostra e-mail completo + papel + botão de sair no rodapé, é a fonte
+  única de identidade agora. Import de `useAuth`/`isAdministrador`/`Link` removidos do
+  arquivo por terem ficado sem uso.
+- **Gotcha do processo, não um bug de código**: depois de editar `AdminSidebar.tsx`/
+  `AdminTopbar.tsx` com o dev server já rodando, apareceu `⚠ Fast Refresh had to perform
+  a full reload due to a runtime error` no log — sem stack trace (erro fica só no
+  console do navegador, que não é visível pra mim nesta sessão). Requests seguintes
+  continuaram 200 normalmente, e um restart limpo (`rm -rf .next` + `npm run dev` do
+  zero) não reproduziu nada — confirma que era só o Fast Refresh não conseguindo
+  aplicar a quente uma mudança estrutural nos hooks do componente (comum ao remover
+  `useAuth()` do meio do arquivo), não uma regressão real. `tsc`/`next lint` limpos.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

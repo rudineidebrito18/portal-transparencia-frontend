@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { FormEvent, Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -36,9 +37,14 @@ function LoginForm() {
         onSubmit={handleSubmit}
         className="relative bg-admin-surface border border-admin-border-strong rounded-2xl shadow-admin-lg p-8 w-full max-w-sm"
       >
-        <span className="inline-flex w-11 h-11 rounded-xl admin-gradient-accent items-center justify-center font-bold text-white shadow-admin-glow mb-4">
-          PT
-        </span>
+        <Image
+          src="/logo_lago_r.png"
+          alt="Prefeitura Municipal de Lago dos Rodrigues"
+          width={1024}
+          height={275}
+          priority
+          className="w-44 h-auto mb-5"
+        />
 
         <h1 className="text-lg font-bold text-admin-text mb-1">Painel Administrativo</h1>
         <p className="text-sm text-admin-text-muted mb-6">Portal da Transparência</p>
