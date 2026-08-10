@@ -175,7 +175,7 @@ export default async function OrganogramaDiagrama() {
         </p>
       )}
 
-      <p className="text-xs text-text-secondary/60 text-center mt-8 max-w-2xl mx-auto leading-relaxed">
+      <p className="text-xs text-text-muted text-center mt-8 max-w-2xl mx-auto leading-relaxed">
         <strong>Base legal:</strong> Lei Municipal nº 88/2009, de 17 de agosto de 2009,
         alterada pela Lei nº 164/2016 — dispõe sobre a estrutura administrativa do
         Município de Lago dos Rodrigues – MA e dá outras providências.

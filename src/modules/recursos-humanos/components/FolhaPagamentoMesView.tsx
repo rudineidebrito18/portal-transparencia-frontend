@@ -63,7 +63,7 @@ export default function FolhaPagamentoMesView() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
           <div>
-            <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="mes">
+            <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="mes">
               Mês
             </label>
             <Select
@@ -78,7 +78,7 @@ export default function FolhaPagamentoMesView() {
           </div>
 
           <div>
-            <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
+            <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="ano">
               Ano
             </label>
             <Select
@@ -126,7 +126,7 @@ export default function FolhaPagamentoMesView() {
                     <MdGroups size={22} />
                   </div>
                   <div>
-                    <p className="text-xs uppercase text-text-secondary/60">Servidores na Folha</p>
+                    <p className="text-xs uppercase text-text-muted">Servidores na Folha</p>
                     <p className="text-xl font-bold text-primary">{totalRegistros}</p>
                   </div>
                 </Card>
@@ -136,7 +136,7 @@ export default function FolhaPagamentoMesView() {
                     <MdPayments size={22} />
                   </div>
                   <div>
-                    <p className="text-xs uppercase text-text-secondary/60">Total Líquido no Mês</p>
+                    <p className="text-xs uppercase text-text-muted">Total Líquido no Mês</p>
                     <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolha)}</p>
                   </div>
                 </Card>
@@ -146,7 +146,7 @@ export default function FolhaPagamentoMesView() {
               <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
                 <table className="w-full text-sm bg-white">
                   <thead>
-                    <tr className="bg-neutral-light/60 text-text-secondary/60 text-xs uppercase">
+                    <tr className="bg-neutral-light/60 text-text-muted text-xs uppercase">
                       <th className="text-left px-4 py-3 font-semibold">Servidor</th>
                       <th className="text-left px-4 py-3 font-semibold">CPF</th>
                       <th className="text-right px-4 py-3 font-semibold">Salário Bruto</th>
@@ -162,7 +162,7 @@ export default function FolhaPagamentoMesView() {
                         <td className="px-4 py-3 text-right text-text-secondary">
                           {formatarMoeda(folha.salarioBruto)}
                         </td>
-                        <td className="px-4 py-3 text-right text-red-600">
+                        <td className="px-4 py-3 text-right text-error">
                           -{formatarMoeda(folha.descontos)}
                         </td>
                         <td className="px-4 py-3 text-right font-bold text-accent">

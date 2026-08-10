@@ -14,10 +14,10 @@ export default function PageHeader({ title, breadcrumbItems }: PageHeaderProps) 
   return (
     <header>
       <Breadcrumbs items={breadcrumbItems} />
-      <h1 className="text-3xl font-bold mb-4 text-primary uppercase">
+      <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wide leading-tight mb-3 text-primary uppercase">
         {title}
       </h1>
-      <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
+      <div className="h-1.5 w-14 sm:w-20 rounded-full bg-gradient-to-r from-secondary to-secondary-light mb-6" />
     </header>
   );
 }

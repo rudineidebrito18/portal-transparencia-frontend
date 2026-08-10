@@ -37,7 +37,7 @@ export default function SecretariaFiltro({ valoresIniciais, onFiltrar }: Props) 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="nome">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="nome">
             Nome
           </label>
           <Input
@@ -50,7 +50,7 @@ export default function SecretariaFiltro({ valoresIniciais, onFiltrar }: Props) 
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="vigencia">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="vigencia">
             Vigência
           </label>
           <Input

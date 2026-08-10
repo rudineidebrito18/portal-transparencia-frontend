@@ -9,6 +9,7 @@ import { formatarData } from "@/utils/date"
 import {
   StatusLicitacao,
   StatusLicitacaoDescricao,
+  StatusLicitacaoDot,
   StatusLicitacaoStyle,
   TipoProcedimentoDescricao,
   TipoProcedimentoLicitacao
@@ -28,6 +29,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
   const statusKey = normalizarStatus(licitacao.statusDescricao)
   const statusLabel = statusKey ? StatusLicitacaoDescricao[statusKey] : licitacao.statusDescricao
   const statusStyle = statusKey ? StatusLicitacaoStyle[statusKey] : "bg-gray-100 text-gray-600"
+  const statusDot = statusKey ? StatusLicitacaoDot[statusKey] : "bg-gray-400"
 
   const tipoLabel =
     TipoProcedimentoDescricao[licitacao.tipoProcedimentoLicitacao as TipoProcedimentoLicitacao] ||
@@ -42,7 +44,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
           {tipoLabel} {licitacao.numeroInstrumento}/{licitacao.ano}
         </h2>
 
-        <Badge className={statusStyle}>{statusLabel}</Badge>
+        <Badge className={statusStyle} dotClassName={statusDot}>{statusLabel}</Badge>
       </div>
 
       {/* OBJETO */}
@@ -53,14 +55,14 @@ export default function LicitacaoCard({ licitacao }: Props) {
       {/* GRID INFO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
         <div>
-          <p className="text-xs uppercase text-text-secondary/60">Abertura</p>
+          <p className="text-xs uppercase text-text-muted">Abertura</p>
           <p className="font-semibold text-text-secondary">
             {formatarData(licitacao.dataAbertura)}
           </p>
         </div>
 
         <div>
-          <p className="text-xs uppercase text-text-secondary/60">Valor</p>
+          <p className="text-xs uppercase text-text-muted">Valor</p>
           <p className="font-semibold text-accent">
             {licitacao.valorTotalDespesa
               ? formatarMoeda(licitacao.valorTotalDespesa)
@@ -69,7 +71,7 @@ export default function LicitacaoCard({ licitacao }: Props) {
         </div>
 
         <div className="col-span-2">
-          <p className="text-xs uppercase text-text-secondary/60">Unidade</p>
+          <p className="text-xs uppercase text-text-muted">Unidade</p>
           <p className="font-semibold text-text-secondary truncate">
             {licitacao.unidade || "Não informada"}
           </p>

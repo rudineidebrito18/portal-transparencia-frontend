@@ -58,7 +58,7 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="empresa">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="empresa">
             Empresa
           </label>
           <Input
@@ -72,7 +72,7 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cnpj">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="cnpj">
             CNPJ
           </label>
           <Input
@@ -86,7 +86,7 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="status">
             Status
           </label>
           <Input
@@ -100,7 +100,7 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataInicial">
             Data (início)
           </label>
           <Input
@@ -113,7 +113,7 @@ export default function EmpresaInidoneaFiltro({ valoresIniciais, onFiltrar }: Pr
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataFinal">
             Data (fim)
           </label>
           <Input

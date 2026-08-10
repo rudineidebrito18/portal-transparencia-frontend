@@ -34,7 +34,7 @@ export default function ConteudoInstitucionalCard({ item, variant }: Props) {
           <h2 className="text-base font-bold text-primary leading-tight">
             {item.titulo}
           </h2>
-          <p className="text-xs text-text-secondary/60 mt-1">
+          <p className="text-xs text-text-muted mt-1">
             {formatarData(item.data)}
           </p>
         </div>

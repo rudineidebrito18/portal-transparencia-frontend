@@ -61,7 +61,7 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cargo">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="cargo">
             Cargo
           </label>
           <Input
@@ -75,7 +75,7 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="valorBrutoMin">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="valorBrutoMin">
             Valor bruto (mínimo)
           </label>
           <Input
@@ -92,7 +92,7 @@ export default function CargoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="valorBrutoMax">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="valorBrutoMax">
             Valor bruto (máximo)
           </label>
           <Input

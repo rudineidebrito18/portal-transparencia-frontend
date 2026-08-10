@@ -56,7 +56,7 @@ export default function PdfViewer({ src, titulo }: Props) {
 
       {/* VISUALIZADOR */}
       {carregando && (
-        <div className="h-[80vh] flex items-center justify-center text-sm text-text-secondary/60">
+        <div className="h-[80vh] flex items-center justify-center text-sm text-text-muted">
           Carregando documento...
         </div>
       )}

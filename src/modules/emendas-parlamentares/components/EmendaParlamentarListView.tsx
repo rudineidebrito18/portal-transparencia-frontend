@@ -39,7 +39,7 @@ export default function EmendaParlamentarListView() {
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> resultados encontrados
           {atualizadoEm && (
-            <span className="text-text-secondary/60"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+            <span className="text-text-muted"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
           )}
         </span>
 

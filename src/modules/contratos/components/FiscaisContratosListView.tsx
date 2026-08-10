@@ -32,7 +32,7 @@ export default function FiscaisContratosListView() {
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> contratos encontrados
           {atualizadoEm && (
-            <span className="text-text-secondary/60"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+            <span className="text-text-muted"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
           )}
         </span>
       </div>

@@ -74,7 +74,7 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
             <div className="md:col-span-2">
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="beneficiario">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="beneficiario">
                 Beneficiário
               </label>
               <Input
@@ -88,7 +88,7 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cargo">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="cargo">
                 Cargo
               </label>
               <Input
@@ -102,7 +102,7 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="destino">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="destino">
                 Destino
               </label>
               <Input
@@ -116,7 +116,7 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="unidadeId">
                 Unidade
               </label>
               <Select
@@ -133,7 +133,7 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="motivo">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="motivo">
                 Motivo
               </label>
               <Input
@@ -147,7 +147,7 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicio">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataInicio">
                 Viagem (início)
               </label>
               <Input
@@ -160,7 +160,7 @@ export default function DiariaFiltro({ valoresIniciais, onFiltrar }: Props) {
             </div>
 
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataTermino">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataTermino">
                 Viagem (término)
               </label>
               <Input

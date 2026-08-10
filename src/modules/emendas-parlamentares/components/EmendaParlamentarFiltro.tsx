@@ -43,7 +43,7 @@ export default function EmendaParlamentarFiltro({ valoresIniciais, onFiltrar }: 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipo">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="tipo">
             Tipo
           </label>
           <Select
@@ -59,7 +59,7 @@ export default function EmendaParlamentarFiltro({ valoresIniciais, onFiltrar }: 
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="ano">
             Ano de Publicação
           </label>
           <Select

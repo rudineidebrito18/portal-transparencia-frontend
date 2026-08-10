@@ -5,24 +5,55 @@ html, body {
 }
 
 @theme {
-  --color-primary: #1f3e73;      /* Azul escuro */
-  --color-secondary: #e30613;    /* Vermelho vibrante */
+  /* Paleta "Fidelidade à marca" (2026-08-09, aprovada pelo usuário depois de comparar 3
+     direções — ver STATUS.md §2.24). Primary saía mais escuro/corporativo que o azul
+     real da logo oficial da Prefeitura; ajustado pro tom vívido que aparece no nome
+     "LAGO DOS RODRIGUES" da logo. Secondary é essencialmente o vermelho que já estava
+     (a logo usa praticamente o mesmo vermelho na figura) — mudança mínima. */
+  --color-primary: #1e4d8c;      /* Azul da logo (nome do município) */
+  --color-secondary: #e4262e;    /* Vermelho da figura da logo */
   --color-accent: #0074c8;       /* Azul claro */
   --color-neutral: #f1f5f9;      /* Cinza muito claro */
   --color-light: #ffffff;        /* Branco */
 
   /* Complementares */
-  --color-primary-light: #3a5ea8;     /* Azul primário mais claro */
-  --color-primary-dark: #162d54;      /* Azul primário mais escuro */
+  --color-primary-light: #3e72b8;     /* Azul primário mais claro */
+  --color-primary-dark: #163a69;      /* Azul primário mais escuro */
 
   --color-secondary-light: #ff4d4d;   /* Vermelho secundário mais claro */
-  --color-secondary-dark: #b0020e;    /* Vermelho secundário mais escuro */
+  --color-secondary-dark: #ac1e25;    /* Vermelho secundário mais escuro */
 
   --color-accent-light: #3399ff;      /* Azul acento mais claro */
   --color-accent-dark: #005ea2;       /* Azul acento mais escuro */
 
+  /* Verde dos coqueiros da logo — 4ª cor de marca, token próprio (`tertiary`) e não um
+     apelido de `--color-success`: um é identidade visual (logo/domínio), o outro é
+     estado semântico (deu certo/deu errado); mantê-los independentes evita que uma
+     mudança futura num deles reescreva o outro sem querer. `-dark` calculado pra
+     contraste de verdade — `tertiary` puro com texto branco em cima dá só ~3:1 (falha
+     WCAG AA de texto normal); `tertiary-dark` dá ~5,4:1. Regra prática: `tertiary` pra
+     texto/ícone/borda sobre fundo claro ou `bg-tertiary/10`; `tertiary-dark` sempre que
+     for fundo sólido com texto branco em cima. Ainda não usado em nenhum componente
+     nesta rodada — token disponível pra quando o rollout chegar em conteúdo de
+     natureza/sustentabilidade/obras (ideia igual à que já existe em
+     `SecaoAcesso.tsx`/`CORES_SECAO`). */
+  --color-tertiary: #2fa84f;
+  --color-tertiary-light: #4fc373;
+  --color-tertiary-dark: #1f7a38;
+
   --color-neutral-light: #f9fafb;     /* Fundo quase branco */
   --color-neutral-dark: #cbd5e1;      /* Cinza médio */
+
+  /* Aliases semânticos pro mesmo par claro/escuro acima — mesma cor, nome que deixa a
+     intenção explícita no lugar de uso (`hover:bg-primary-hover` em vez de
+     `hover:bg-primary-dark`) sem duplicar a fonte de verdade. */
+  --color-primary-hover: var(--color-primary-dark);
+  --color-secondary-hover: var(--color-secondary-dark);
+
+  /* Informativo — reaproveita o azul de marca (accent) em vez de introduzir mais um tom
+     de azul só pra esse estado; é o mesmo raciocínio já usado pra success/error/warning. */
+  --color-info: #0074c8;
+  --color-info-light: #e0f2fe;
 
   /* Texto — nomes contraintuitivos de propósito: "primary" é o texto usado sobre fundo
      escuro (header, footer, botões primary), "secondary" é o texto padrão do corpo da
@@ -30,6 +61,7 @@ html, body {
      fundo. Os comentários antigos aqui descreviam o oposto do valor real — corrigido. */
   --color-text-primary: #ffffff;      /* Branco — texto sobre fundo escuro */
   --color-text-secondary: #000000;    /* Preto — texto padrão sobre fundo claro */
+  --color-text-muted: #64748b;        /* Cinza médio — legendas, metadados, texto de apoio */
 
   /* Bordas */
   --color-border: #242424;            /* Cinza claro para bordas */
@@ -42,9 +74,27 @@ html, body {
   --color-warning: #facc15;           /* Amarelo */
   --color-warning-light: #fef3c7;
 
-  /* Sombreamento */
-  --color-shadow-light: rgba(31, 62, 115, 0.1);
-  --color-shadow-dark: rgba(31, 62, 115, 0.3);
+  /* Sombreamento — rgb equivalente ao novo --color-primary (#1e4d8c), não deixar
+     dessincronizar do tom de azul atual. */
+  --color-shadow-light: rgba(30, 77, 140, 0.1);
+  --color-shadow-dark: rgba(30, 77, 140, 0.3);
+
+  /* Sombras com tinta de marca (usam os tokens acima) em vez do preto puro padrão do
+     Tailwind — mesma API (`shadow-sm`/`shadow`/`shadow-md`/`shadow-lg`, já usadas em ~80
+     lugares no site), resultado mais discreto e coerente com a paleta, sem tocar em
+     nenhum componente. */
+  --shadow-sm: 0 1px 2px 0 var(--color-shadow-light);
+  --shadow: 0 1px 3px 0 var(--color-shadow-light), 0 1px 2px -1px var(--color-shadow-light);
+  --shadow-md: 0 4px 10px -2px var(--color-shadow-light), 0 2px 5px -2px var(--color-shadow-light);
+  --shadow-lg: 0 12px 20px -6px var(--color-shadow-dark), 0 4px 8px -4px var(--color-shadow-light);
+
+  /* Tipografia — Public Sans (carregada via next/font em layout.tsx, que define a
+     variável --font-public-sans) no lugar da stack de sistema padrão do Tailwind. Public
+     Sans é a fonte do design system do governo federal americano (USWDS), desenhada
+     especificamente pra interfaces institucionais/públicas — ajuda a fugir da cara de
+     "template de SaaS" sem abrir mão de legibilidade. Fallback de sistema mantido pra
+     não quebrar nada antes do primeiro load da fonte. */
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 /* Alto contraste (menu de acessibilidade, src/components/AcessibilidadeMenu.tsx) — fundo
@@ -75,6 +125,10 @@ html.alto-contraste {
   --color-neutral-light: #121212;
   --color-text-secondary: #ffffff;
   --color-border: #666666;
+  /* #64748b (valor normal do token) contra o fundo quase preto daqui fica perto demais
+     do mínimo de contraste (~4.7:1, sem margem de segurança) — clareado pra garantir
+     folga real acima do 4.5:1 exigido em texto normal. */
+  --color-text-muted: #cbd5e1;
 }
 
 html.alto-contraste body {
@@ -87,6 +141,108 @@ html.alto-contraste .bg-white {
 
 html.alto-contraste .bg-primary {
   background-color: #000000 !important;
+}
+
+/* Superfície de marca com leve profundidade (Hero, carrossel de notícias, banda de CTA
+   final da Home) — classe própria em vez de `bg-gradient-to-br from-primary
+   to-primary-dark` direto no componente de propósito: o override de alto contraste acima
+   casa por nome literal de classe (`.bg-primary`), não por cor computada, então um
+   gradiente escrito com as utilities do Tailwind vazaria azul no modo alto contraste sem
+   nenhum erro visível no código (motivo real por trás do Footer.tsx ter sido revertido
+   de gradiente pra `bg-primary` puro numa rodada anterior). Com uma classe própria, o
+   override abaixo cobre o caso. */
+.bg-primary-gradient {
+  background-image: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+}
+
+html.alto-contraste .bg-primary-gradient {
+  background-image: none !important;
+  background-color: #000000 !important;
+}
+
+/* Segunda passada visual (2026-08-09, ver STATUS.md §2.25) — elementos puramente
+   decorativos (blobs de gradiente do Hero, textura de pontos) somem no alto contraste
+   em vez de ganhar um override de cor: são só atmosfera, não carregam informação, e o
+   modo alto contraste pede fundo sólido e sem distração, não "a mesma decoração só que
+   preta". `display: none` aqui é mais simples e mais robusto que tentar recolorir cada
+   blob individualmente. */
+html.alto-contraste .hero-decor {
+  display: none !important;
+}
+
+@keyframes blob-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-18px, 14px) scale(1.05); }
+}
+@keyframes blob-drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(16px, -12px) scale(1.04); }
+}
+.animate-blob-drift-a {
+  animation: blob-drift-a 22s ease-in-out infinite;
+}
+.animate-blob-drift-b {
+  animation: blob-drift-b 26s ease-in-out infinite;
+}
+
+/* Crossfade do carrossel de notícias — o conteúdo troca de key a cada slide (ver
+   NoticiasCarousel.tsx), então isso roda de novo do zero em toda troca em vez de
+   precisar de uma lib de transição só pra esse fade. */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+/* Texto em gradiente — só pra uma palavra por vez, nunca o parágrafo inteiro (perde
+   legibilidade rápido em bloco de texto corrido). `@supports` garante fallback sólido
+   em vez de texto invisível em navegadores sem `background-clip: text`. */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .text-gradient-brand {
+    background: linear-gradient(90deg, #ffffff, var(--color-accent-light) 65%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Glassmorphism — só onde tem fundo colorido/com textura por baixo pra justificar
+   (cards do Hero flutuando sobre o gradiente de marca). Opacidade alta de propósito
+   (90%, não os 30-40% típicos de glassmorphism decorativo): o texto de dentro precisa
+   manter o mesmo contraste de um card sólido branco, só ganha o desfoque + borda clara
+   como acabamento. `@supports` com fallback sólido pra navegador sem suporte a
+   `backdrop-filter`. */
+.card-glass {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .card-glass {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+/* Mesma lógica do `.hero-decor`: no alto contraste vira superfície sólida escura igual
+   ao resto (`.bg-white`), sem vidro/gradiente — ver limitação já documentada acima
+   sobre `text-primary` em chip sobre fundo escuro, se aplica igual aqui. */
+html.alto-contraste .card-glass {
+  background-color: #121212 !important;
+  border-color: #666666 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Sem isso, só a palavra com `.text-gradient-brand` escaparia do amarelo que
+   `html.alto-contraste h1` força no resto do heading (ela define a própria `color`
+   inline via `background-clip: text`, que não herda do pai) — título ficaria com uma
+   palavra num gradiente azul e o resto amarelo. Força a mesma cor sólida do resto. */
+html.alto-contraste .text-gradient-brand {
+  background: none !important;
+  -webkit-text-fill-color: #ffd400 !important;
+  color: #ffd400 !important;
 }
 
 html.alto-contraste a,
@@ -127,6 +283,20 @@ button:focus-visible,
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* FASE 13 do redesign pede microinterações discretas (hover, transição, expansão de
+   menu) — essa regra garante que elas não rodem pra quem pediu menos movimento no SO,
+   sem precisar de tratamento manual em cada componente que ganhar uma transição nova. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* O CSS que o próprio plugin do VLibras injeta em runtime não estava aplicando

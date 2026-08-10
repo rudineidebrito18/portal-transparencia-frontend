@@ -66,7 +66,7 @@ export default function RelatorioGestaoFiscalFiltro({ valoresIniciais, onFiltrar
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="ano">
             Ano
           </label>
           <Input
@@ -80,7 +80,7 @@ export default function RelatorioGestaoFiscalFiltro({ valoresIniciais, onFiltrar
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="periodo">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="periodo">
             Período
           </label>
           <Input

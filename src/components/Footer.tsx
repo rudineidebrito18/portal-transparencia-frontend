@@ -41,11 +41,11 @@ const LINKS_ACESSIBILIDADE = [
 function ColunaLinks({ titulo, links }: { titulo: string; links: { label: string; href: string }[] }) {
   return (
     <div>
-      <h3 className="text-xs font-bold uppercase tracking-wide text-white/60 mb-3">{titulo}</h3>
-      <ul className="space-y-2 text-sm">
+      <h3 className="text-xs font-bold uppercase tracking-wide text-white/50 mb-4">{titulo}</h3>
+      <ul className="space-y-2.5 text-sm">
         {links.map(link => (
           <li key={link.href}>
-            <Link href={link.href} className="hover:underline text-white/90">
+            <Link href={link.href} className="text-white/85 hover:text-white transition-colors">
               {link.label}
             </Link>
           </li>
@@ -59,13 +59,19 @@ export default function Footer() {
   const { data: contato, loading, erro } = useInformacoesOuvidoria()
 
   return (
-    <footer className="bg-primary text-white mt-10">
-      <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="relative bg-primary-gradient text-white mt-10">
+      <div
+        aria-hidden="true"
+        className="h-1 w-full hero-decor"
+        style={{ backgroundImage: 'linear-gradient(90deg, var(--color-primary-light), var(--color-secondary), var(--color-tertiary))' }}
+      />
+
+      <div className="max-w-6xl mx-auto px-4 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wide text-white/60 mb-3">
+          <h3 className="text-xs font-bold uppercase tracking-wide text-white/50 mb-4">
             Prefeitura Municipal
           </h3>
-          <p className="text-sm text-white/90 leading-relaxed">
+          <p className="text-sm text-white/85 leading-relaxed">
             Prefeitura Municipal de Lago dos Rodrigues
           </p>
         </div>
@@ -75,10 +81,10 @@ export default function Footer() {
         <ColunaLinks titulo="Acessibilidade" links={LINKS_ACESSIBILIDADE} />
 
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wide text-white/60 mb-3">Contato</h3>
+          <h3 className="text-xs font-bold uppercase tracking-wide text-white/50 mb-4">Contato</h3>
 
           {loading && (
-            <div className="space-y-2">
+            <div className="space-y-2.5" aria-hidden="true">
               <div className="h-3 w-40 bg-white/20 rounded animate-pulse" />
               <div className="h-3 w-32 bg-white/20 rounded animate-pulse" />
               <div className="h-3 w-36 bg-white/20 rounded animate-pulse" />
@@ -90,22 +96,22 @@ export default function Footer() {
           )}
 
           {!loading && contato && (
-            <ul className="space-y-2 text-sm text-white/90">
+            <ul className="space-y-2.5 text-sm text-white/85">
               <li className="flex items-start gap-2">
-                <MdLocationOn className="shrink-0 mt-0.5" size={16} />
+                <MdLocationOn className="shrink-0 mt-0.5 text-accent-light" size={16} />
                 <span>{contato.endereco}</span>
               </li>
               <li className="flex items-start gap-2">
-                <MdSchedule className="shrink-0 mt-0.5" size={16} />
+                <MdSchedule className="shrink-0 mt-0.5 text-accent-light" size={16} />
                 <span>{contato.horarioAtendimento}</span>
               </li>
               <li className="flex items-center gap-2">
-                <MdPhone className="shrink-0" size={16} />
-                <a href={`tel:${contato.telefone}`} className="hover:underline">{contato.telefone}</a>
+                <MdPhone className="shrink-0 text-accent-light" size={16} />
+                <a href={`tel:${contato.telefone}`} className="hover:text-white hover:underline transition-colors">{contato.telefone}</a>
               </li>
               <li className="flex items-center gap-2">
-                <MdEmail className="shrink-0" size={16} />
-                <a href={`mailto:${contato.email}`} className="hover:underline">{contato.email}</a>
+                <MdEmail className="shrink-0 text-accent-light" size={16} />
+                <a href={`mailto:${contato.email}`} className="hover:text-white hover:underline transition-colors">{contato.email}</a>
               </li>
             </ul>
           )}

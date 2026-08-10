@@ -60,7 +60,7 @@ export default function AutoridadeView({ autoridade }: Props) {
           <p className="text-sm text-text-secondary/70 mt-1">{autoridade.cargo}</p>
 
           {(autoridade.dataInicioMandato || autoridade.dataFimMandato) && (
-            <p className="text-xs text-text-secondary/60 mt-2">
+            <p className="text-xs text-text-muted mt-2">
               Mandato de {formatarData(autoridade.dataInicioMandato ?? undefined)} a{' '}
               {autoridade.dataFimMandato ? formatarData(autoridade.dataFimMandato) : 'o momento'}
             </p>

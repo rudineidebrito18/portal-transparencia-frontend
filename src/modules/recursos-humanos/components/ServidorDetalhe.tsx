@@ -78,7 +78,7 @@ export default function ServidorDetalhe({ servidor }: Props) {
             <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
               <table className="w-full text-sm bg-white">
                 <thead>
-                  <tr className="bg-neutral-light/60 text-text-secondary/60 text-xs uppercase">
+                  <tr className="bg-neutral-light/60 text-text-muted text-xs uppercase">
                     <th className="text-left px-4 py-3 font-semibold">Referência</th>
                     <th className="text-right px-4 py-3 font-semibold">Salário Bruto</th>
                     <th className="text-right px-4 py-3 font-semibold">Descontos</th>
@@ -94,7 +94,7 @@ export default function ServidorDetalhe({ servidor }: Props) {
                       <td className="px-4 py-3 text-right text-text-secondary">
                         {formatarMoeda(folha.salarioBruto)}
                       </td>
-                      <td className="px-4 py-3 text-right text-red-600">
+                      <td className="px-4 py-3 text-right text-error">
                         -{formatarMoeda(folha.desconto)}
                       </td>
                       <td className="px-4 py-3 text-right font-bold text-accent">

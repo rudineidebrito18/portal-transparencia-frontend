@@ -44,7 +44,7 @@ export default function SecretariaCard({ unidade }: Props) {
         <div className="min-w-0">
           <h2 className="text-base font-bold text-primary leading-tight">{unidade.nome}</h2>
           {gestor?.nome && (
-            <p className="text-xs text-text-secondary/60 mt-1 flex items-center gap-1">
+            <p className="text-xs text-text-muted mt-1 flex items-center gap-1">
               <MdBadge size={14} />
               {gestor.nome}{gestor.cargo && ` — ${gestor.cargo}`}
             </p>

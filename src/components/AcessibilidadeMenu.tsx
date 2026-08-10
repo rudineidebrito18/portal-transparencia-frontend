@@ -77,7 +77,7 @@ export default function AcessibilidadeMenu({ altoContraste, onAumentarFonte, onD
         className={`absolute right-0 top-full w-56 bg-white rounded-xl shadow-lg border border-border/10 overflow-hidden z-50
           ${aberto ? 'visible' : 'invisible group-hover:visible group-focus-within:visible'}`}
       >
-        <p className="px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-text-secondary/60 bg-neutral-light">
+        <p className="px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-text-muted bg-neutral-light">
           Acessibilidade
         </p>
 

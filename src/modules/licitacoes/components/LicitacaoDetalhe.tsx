@@ -20,6 +20,7 @@ import { formatarData } from '@/utils/date'
 import {
   StatusLicitacao,
   StatusLicitacaoDescricao,
+  StatusLicitacaoDot,
   StatusLicitacaoStyle,
   TipoProcedimentoDescricao,
   TipoProcedimentoLicitacao
@@ -43,6 +44,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
   const statusKey = licitacao.status as StatusLicitacao
   const statusLabel = StatusLicitacaoDescricao[statusKey] ?? licitacao.status
   const statusStyle = StatusLicitacaoStyle[statusKey] ?? 'bg-gray-100 text-gray-600'
+  const statusDot = StatusLicitacaoDot[statusKey] ?? 'bg-gray-400'
 
   const tipoLabel =
     TipoProcedimentoDescricao[licitacao.tipoProcedimentoLicitacao as TipoProcedimentoLicitacao] ||
@@ -73,7 +75,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
             </h1>
           </div>
 
-          <Badge size="md" className={`self-start ${statusStyle}`}>
+          <Badge size="md" className={`self-start ${statusStyle}`} dotClassName={statusDot}>
             {statusLabel}
           </Badge>
         </div>
@@ -133,7 +135,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
             {/* UNIDADE / AUTORIDADE */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
               <div className="bg-white p-5 rounded-xl border border-border/30 shadow-sm">
-                <p className="text-xs uppercase text-text-secondary/60 mb-1 flex items-center gap-1">
+                <p className="text-xs uppercase text-text-muted mb-1 flex items-center gap-1">
                   <MdAccountBalance /> Unidade
                 </p>
                 <p className="font-bold text-primary uppercase">
@@ -142,7 +144,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
               </div>
 
               <div className="bg-white p-5 rounded-xl border border-border/30 shadow-sm">
-                <p className="text-xs uppercase text-text-secondary/60 mb-1">
+                <p className="text-xs uppercase text-text-muted mb-1">
                   Autoridade
                 </p>
                 <p className="font-bold text-text-secondary uppercase">

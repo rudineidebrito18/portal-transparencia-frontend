@@ -20,7 +20,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
           <Link
             href="/"
             aria-label="Início"
-            className="text-text-secondary/60 hover:text-primary transition-colors flex items-center gap-1 text-xs md:text-sm"
+            className="text-text-muted hover:text-primary transition-colors flex items-center gap-1 text-xs md:text-sm"
           >
             <MdHome size={18} />
             <span className="hidden md:inline">Início</span>
@@ -33,7 +33,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
             {item.href ? (
               <Link 
                 href={item.href}
-                className="ml-1 text-xs md:text-sm font-medium text-text-secondary/60 hover:text-primary transition-colors"
+                className="ml-1 text-xs md:text-sm font-medium text-text-muted hover:text-primary transition-colors"
               >
                 {item.label}
               </Link>

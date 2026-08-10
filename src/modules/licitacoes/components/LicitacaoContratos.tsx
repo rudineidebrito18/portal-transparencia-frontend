@@ -10,7 +10,7 @@ import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
 import Skeleton from '@/components/ui/Skeleton'
 import { useContratosDaLicitacao } from '@/modules/contratos/hooks/useContratosDaLicitacao'
-import { contratoStatusLabel, contratoStatusStyle } from '@/modules/contratos/status'
+import { contratoStatusDot, contratoStatusLabel, contratoStatusStyle } from '@/modules/contratos/status'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
 
@@ -59,7 +59,7 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
               Contrato {contrato.numeroContrato}/{contrato.exercicio}
             </h4>
 
-            <Badge className={contratoStatusStyle(contrato.status)}>
+            <Badge className={contratoStatusStyle(contrato.status)} dotClassName={contratoStatusDot(contrato.status)}>
               {contratoStatusLabel(contrato.status)}
             </Badge>
           </div>
@@ -74,7 +74,7 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
               </div>
 
               <div className="overflow-hidden">
-                <p className="text-xs uppercase font-semibold text-text-secondary/60 tracking-wide">
+                <p className="text-xs uppercase font-semibold text-text-muted tracking-wide">
                   Fornecedor
                 </p>
                 <p className="text-sm font-semibold text-text-secondary truncate">
@@ -90,7 +90,7 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
               </div>
 
               <div>
-                <p className="text-xs uppercase font-semibold text-text-secondary/60 tracking-wide">
+                <p className="text-xs uppercase font-semibold text-text-muted tracking-wide">
                   Vigência Final
                 </p>
                 <p className="text-sm font-semibold text-text-secondary">
@@ -102,7 +102,7 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
             {/* VALOR + AÇÃO */}
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase font-semibold text-text-secondary/60 tracking-wide">
+                <p className="text-xs uppercase font-semibold text-text-muted tracking-wide">
                   Valor Total
                 </p>
                 <p className="text-base font-bold text-accent">

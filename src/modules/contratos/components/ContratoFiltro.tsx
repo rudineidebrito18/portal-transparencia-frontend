@@ -81,7 +81,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroContrato">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="numeroContrato">
             Número do contrato
           </label>
           <Input
@@ -95,7 +95,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="exercicio">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="exercicio">
             Exercício
           </label>
           <Input
@@ -109,7 +109,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div className="md:col-span-2">
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="fornecedor">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="fornecedor">
             Fornecedor
           </label>
           <Input
@@ -123,7 +123,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="unidadeId">
             Unidade
           </label>
           <Select
@@ -140,7 +140,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="status">
             Status
           </label>
           <Input
@@ -154,7 +154,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="gestorContrato">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="gestorContrato">
             Gestor do contrato
           </label>
           <Input
@@ -168,7 +168,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="objeto">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="objeto">
             Objeto
           </label>
           <Input
@@ -182,7 +182,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataInicial">
             Assinatura (início)
           </label>
           <Input
@@ -195,7 +195,7 @@ export default function ContratoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataFinal">
             Assinatura (fim)
           </label>
           <Input

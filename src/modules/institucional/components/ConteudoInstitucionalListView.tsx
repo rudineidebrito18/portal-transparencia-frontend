@@ -70,7 +70,7 @@ export default function ConteudoInstitucionalListView({
               <strong className="text-primary">{totalElements}</strong>{' '}
               {variant === 'aviso' ? 'avisos encontrados' : 'notícias encontradas'}
               {atualizadoEm && (
-                <span className="text-text-secondary/60"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+                <span className="text-text-muted"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
               )}
             </span>
 

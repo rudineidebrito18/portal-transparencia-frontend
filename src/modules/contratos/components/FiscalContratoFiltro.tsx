@@ -46,7 +46,7 @@ export default function FiscalContratoFiltro({ valoresIniciais, onFiltrar }: Pro
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="gestorContrato">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="gestorContrato">
             Nome do Fiscal
           </label>
           <Input
@@ -59,7 +59,7 @@ export default function FiscalContratoFiltro({ valoresIniciais, onFiltrar }: Pro
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroContrato">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="numeroContrato">
             Nº do Contrato
           </label>
           <Input

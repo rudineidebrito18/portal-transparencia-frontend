@@ -1269,6 +1269,249 @@ seções 2.10/2.16) não foram mexidos. O que mudou:
   `className` que colisão de utility (hoje resolvido caso a caso com props como
   `fullWidth` em vez de merge de classe).
 
+## 2.23 Redesign visual — fase piloto (2026-08-09) — concluído, aguardando aprovação pra continuar
+
+Pedido do usuário: modernização visual completa do site (identidade institucional, não
+genérica). Dado o tamanho real (~55 rotas), acordado com o usuário fazer uma fase piloto
+primeiro — Design System + Header/Footer/Home/Hero + 2 páginas-vitrine — pra aprovar a
+direção antes de estender pro resto. Paleta base (azul-marinho `#1f3e73`/vermelho
+`#e30613`/azul `#0074c8`) mantida por decisão do usuário, com liberdade de refino.
+
+- **`globals.css`**: tokens novos sem renomear/remover nenhum existente (evita quebrar as
+  ~80 classes `bg-primary`/`text-accent`/etc. já espalhadas pelo site e o bloco
+  `html.alto-contraste`, que teria que ser auditado de novo se algo fosse renomeado):
+  `--color-primary-hover`/`--color-secondary-hover` (alias de `-dark`, só clareza
+  semântica), `--color-info`/`--color-info-light` (reaproveita `accent`), `--color-text-muted`
+  (`#64748b`, com override pra `#cbd5e1` em `alto-contraste` — o valor normal ficava
+  perto demais do mínimo de contraste em fundo quase preto). `--shadow-sm/md/lg` do
+  Tailwind sobrescritos pra usar `--color-shadow-light/dark` (já existiam, criados numa
+  rodada anterior, nunca referenciados em lugar nenhum — sombra de verdade tintada de
+  marca agora em ~80 usos de `shadow-*` no site, sem tocar em nenhum componente). Regra
+  global `prefers-reduced-motion: reduce` adicionada (FASE 13 do pedido do usuário).
+- **Tipografia**: `next/font/google` (Public Sans — fonte do design system do governo
+  federal americano/USWDS, feita pra interface institucional, foge da cara de "template
+  de SaaS" tipo Inter) carregada em `layout.tsx`, mapeada em `--font-sans`. Self-hosted
+  pelo Next (sem request externo em runtime). `PageHeader.tsx` (usado em ~60 páginas) e
+  `SectionHeader.tsx` ganharam escala responsiva (`text-2xl sm:text-3xl` em vez de
+  tamanho fixo) — melhoria propaga pra todo o site automaticamente.
+- **`Header.tsx`**: `logoSectionHeight` 120→92px (header mais enxuto, pedido explícito da
+  FASE 3 de não deixar alto), item de nav ativo agora destacado via `usePathname`
+  (`bg-white/15`), hover dos links de nav trocado de bloco sólido `bg-secondary` pra
+  `bg-white/10` arredondado (mais discreto). Bug real encontrado e corrigido: logo tinha
+  `md:w-68` — classe inválida (68 não existe na escala padrão do Tailwind), nunca
+  aplicava nada; virou `md:w-56`. Toda a lógica de scroll/resize/acessibilidade
+  (`ResizeObserver`, `alto-contraste`, `AcessibilidadeMenu` duplicado topbar+mobile)
+  intacta, só classes visuais mudaram.
+- **`Footer.tsx`**: borda superior de 4px `border-secondary` (assinatura visual), ícones
+  de contato em `accent-light`, espaçamento maior (`py-10`→`py-14`). **Cuidado real**:
+  primeira versão usava `bg-gradient-to-b from-primary to-primary-dark` no `<footer>` —
+  reveretido pra `bg-primary` puro porque o override de alto contraste
+  (`html.alto-contraste .bg-primary`) casa por nome literal de classe, não por cor
+  computada; um gradiente teria vazado azul no modo alto contraste sem nenhum erro
+  visível no código.
+- **`Hero.tsx`** (novo, `src/modules/home/components/Hero.tsx`): banda de identidade +
+  3 acessos rápidos (Transparência/Licitações/Ouvidoria) acima do carrossel de notícias
+  na Home. Motivo: o carrossel (`NoticiasCarousel.tsx`) já funcionava como hero de fato,
+  mas dependia de existir notícia publicada — sem isso, um visitante novo não tinha
+  nenhuma janela fixa de "onde estou". Fundo claro de propósito (carrossel já é
+  `bg-primary` cheio logo abaixo; dois blocos azuis emendados pesava a página).
+  Reaproveita `Card` em vez de estilizar do zero.
+- **Páginas-vitrine**: `/transparencia` (`page.tsx` trocado pro `PageHeader` compartilhado
+  em vez de repetir h1+barra na mão — duplicação que existia há tempo; `TransparenciaHub.tsx`
+  ganhou contagem de resultados da busca, `aria-live="polite"`); `/licitacoes`
+  (`LicitacaoFiltro.tsx`/`LicitacaoCard.tsx` migrados de `text-text-secondary/60` pro
+  token novo `text-text-muted`). Os dois módulos já estavam bem construídos (Card, Badge,
+  `FiltroCard` com contador de filtros ativos, cores por seção documentadas em
+  `SecaoAcesso.tsx`) — não foram reescritos, só os pontos reais de inconsistência.
+- **Validação**: `tsc --noEmit`, `next lint` (só os 2 warnings pré-existentes de
+  `<img>` em `admin/diario-oficial/config`, não relacionados) e `next build` completos
+  limpos, todas as ~85 rotas geradas sem erro. **Gotcha real desta sessão**: rodar
+  `next build` com o `next dev --turbopack` já ligado (mesmo `.next/`) corrompeu o dev
+  server (500 genérico em toda rota) — mesma classe de bug já documentada acima pra "dois
+  `next dev` simultâneos", só que com `build`+`dev` concorrentes. Resolvido matando os 3
+  processos (`next dev`, o `node` do binário, `next-server`) + `rm -rf .next` + `npm run
+  dev` de novo. Confirmado depois via `curl` (200 em `/`, `/transparencia`, `/licitacoes`,
+  `/servidores`, `/noticias`) e log do dev server sem erro/warning.
+- **Fora de escopo desta rodada, de propósito** (piloto aprovado com o usuário antes de
+  estender): as ~50 páginas restantes do site (todas as outras rotas de
+  `src/app/**`), Hero/cards das demais seções internas, botões do painel admin (mesma
+  pendência já registrada na seção 2.22), migração completa de `text-text-secondary/60`
+  → `text-text-muted` no resto do site (só aplicada nos 2 arquivos da vitrine).
+
+**Rodada 2, mesma sessão — "ousar mais"**: usuário achou o piloto conservador demais
+("tenta ousar um pouco mais, mais moderno, não exagera"). Em vez de espalhar mais
+efeitos, comprometi mais forte com um único gesto de assinatura no Hero: fundo
+`bg-primary-gradient` cortado em diagonal via `clip-path` (só a camada de fundo, nunca o
+wrapper de conteúdo — evita clipar texto/cards por engano), blob desfocado
+(`bg-accent/25 blur-3xl`) num canto, tipografia bem maior (`text-4xl md:text-5xl
+font-extrabold`), e os 3 cards de acesso rápido "flutuando" sobre o corte via margem
+negativa. Essa mesma superfície de marca (`.bg-primary-gradient`, nova classe em
+`globals.css`) foi reaproveitada em `NoticiasCarousel.tsx` e na banda de CTA final da
+Home — 3 "momentos azuis" da página agora consistentes, sem repetir a diagonal em nenhum
+outro lugar (ficaria com cara de template). Nav do Header trocou indicador de item ativo
+de fundo sólido (`bg-white/15`) pra sublinhado (`border-b-2 border-secondary`) — leitura
+mais contemporânea. **Cuidado real, resolvido antes de virar bug**: qualquer gradiente
+num container que hoje é `bg-primary` puro quebra o alto contraste em silêncio, porque o
+override `html.alto-contraste .bg-primary` casa por classe literal, não por cor
+computada — por isso `.bg-primary-gradient` já nasceu com seu próprio override
+(`html.alto-contraste .bg-primary-gradient { background-image: none !important;
+background-color: #000 !important }`) em vez de escrever `bg-gradient-to-br
+from-primary...` direto nos três componentes. `tsc`/`next lint` limpos; validado via
+`curl` no dev server (200 em `/` e `/licitacoes`, sem erro no log).
+
+## 2.24 Paleta "Fidelidade à marca" a partir da logo oficial (2026-08-09) — concluído
+
+Usuário mandou a logo oficial da Prefeitura e pediu sugestão de paleta a partir dela.
+Publiquei um artifact comparando 3 direções (A. fiel à marca, B. sóbria/baixo risco,
+C. tríade por domínio) com swatches + preview aplicado; usuário escolheu **A**.
+
+- **`globals.css`**: `--color-primary` `#1f3e73`→`#1e4d8c` (azul real da logo, menos
+  "corporativo escuro"; contraste com texto branco ainda ~8,4:1, folga grande acima do
+  mínimo AA), `--color-primary-light`/`-dark` recalculados pra manter a mesma relação
+  proporcional. `--color-secondary` `#e30613`→`#e4262e` (quase igual, a logo já usa
+  praticamente esse vermelho; ~4,55:1 com texto branco, passa AA com margem apertada).
+  `--color-shadow-light/dark` (rgb usado nas sombras tintadas da seção 2.23)
+  recalculado pro novo primary, senão desalinhava do resto da paleta.
+- **Verde novo, token próprio**: `--color-tertiary`/`-light`/`-dark` (`#2fa84f` /
+  `#4fc373` / `#1f7a38`), **não** um apelido de `--color-success` — um é identidade de
+  marca (logo), o outro é estado semântico, mantidos independentes de propósito.
+  `tertiary-dark` existe especificamente pro caso fundo-sólido-com-texto-branco (mesmo
+  motivo do fix de `accent-light`→`accent-dark` já documentado em `SecaoAcesso.tsx`):
+  `tertiary` puro com branco em cima dá só ~3:1, `tertiary-dark` dá ~5,4:1.
+- **Achado real durante a validação**: o Tailwind v4 **poda tokens de `@theme` que não
+  aparecem como classe literal em nenhum arquivo escaneado** — confirmado comparando
+  `--color-info` (sobrevive, mas por acaso não tem uso real também — a explicar depois
+  se for relevante) contra `--color-warning` (nunca teve uso, nunca é emitido no CSS
+  compilado, isso já era assim **antes** desta sessão, não é regressão). `tertiary`
+  simplesmente não aparecia no CSS até eu de fato referenciar as classes em algum
+  arquivo. Corrigido usando o token de verdade: estendido `CorSecao`
+  (`src/modules/transparencia/data/secoes.ts`) com `'tertiary'`, nova entrada em
+  `CORES_SECAO` (`SecaoAcesso.tsx`), e a seção **"Obras Públicas"** (única reatribuída —
+  as outras 11 seções continuam com a cor que já tinham) passou de `primary-dark` pra
+  `tertiary` — candidato mais natural (infraestrutura/obras), sem forçar uma decisão de
+  conteúdo em massa que seria escopo da opção C (não escolhida).
+- Confirmado via `curl` no CSS compilado do dev server: `--color-tertiary` e
+  `--color-tertiary-dark` presentes depois do uso real (antes, ausentes mesmo depois de
+  matar os processos e `rm -rf .next` — não era cache, era poda por ausência de uso
+  mesmo). `tertiary-light` segue sem uso real em nenhum componente, por isso não aparece
+  no CSS ainda — comportamento esperado, não é bug.
+- `tsc --noEmit` e `next lint` limpos; `/`, `/transparencia`, `/licitacoes` retornando
+  200 no dev server, sem erro/warning no log.
+- **Fora de escopo**: reatribuir as outras 11 seções do hub (decisão de conteúdo, não
+  feita sem pedido explícito); usar `tertiary` em qualquer componente fora de
+  `SecaoAcesso.tsx`/`ItemAcessoCard.tsx`.
+
+## 2.25 Segunda passada visual — "ouse mais" (2026-08-09) — concluído
+
+Usuário achou o resultado das seções 2.23/2.24 bom mas ainda conservador ("se comparado
+com a versão anterior parecer só 'mais bonito', não ousou o suficiente") e pediu uma
+segunda passada explicitamente mais ousada (gradientes, profundidade, glass "só onde faz
+sentido", tipografia mais expressiva), inspirada em Stripe/Linear/Vercel/Notion/Apple/
+gov.uk — sem virar futurista/extravagante nem perder legibilidade/acessibilidade.
+
+- **Hero**: fundo virou um "mesh" de 3 blobs desfocados (`bg-accent/25`,
+  `bg-tertiary/20`, `bg-secondary/15`) com deriva lenta via `@keyframes` (22-26s,
+  `ease-in-out infinite` — plenamente coberto pelo `prefers-reduced-motion` global já
+  existente, sem tratamento extra por componente). Palavra "Transparência" no headline
+  ganhou `.text-gradient-brand` (gradiente branco→azul-claro via `background-clip:
+  text`, com fallback `@supports` e override próprio pro alto contraste — só uma
+  palavra, não o headline inteiro, perde legibilidade rápido em bloco maior). Os 3 cards
+  de acesso rápido viraram glass (`Card` ganhou prop `glass`) e os ícones passaram de
+  tinta plana pra badge em gradiente (`from-primary`/`from-secondary`/`from-tertiary`),
+  um por card — mesma cor, mais peso visual.
+- **Novo `.card-glass`** (`globals.css`): opacidade alta de propósito (90%, não os
+  30-40% típicos de glassmorphism decorativo) — o texto de dentro precisa manter o
+  mesmo contraste de um card branco sólido, o vidro é só acabamento (blur + borda
+  clara), não redução de legibilidade. `@supports` com fallback sólido; override de
+  alto contraste vira superfície escura sólida igual ao resto (mesma limitação já
+  documentada sobre `text-primary` em chip sobre fundo escuro se aplica aqui).
+- **Header**: nav vira `bg-primary/85 backdrop-blur-md` só depois que a logo já recolheu
+  no scroll (não fica vidro o tempo todo) — desligado explicitamente quando
+  `altoContraste` é `true` (condição no componente, não seletor CSS — `bg-primary/85` é
+  uma classe diferente de `.bg-primary`, mesma pegadinha de sempre, resolvida na raiz
+  desta vez em vez de mais um override).
+- **`Card.tsx`**: hover ganhou `scale-[1.01]` e `hover:border-primary/25` além do
+  shadow/translate que já tinha (sombra em si já sai tintada de azul desde a seção
+  2.23, via `--shadow-*` global — não precisou de lógica por card).
+- **`NoticiasCarousel`**: conteúdo agora troca com crossfade (`key={ativo}` +
+  `.animate-fade-in`, 0.5s) em vez de troca abrupta; texto ganhou painel glass sutil
+  (`bg-white/10 backdrop-blur-sm`) e o fundo ganhou o mesmo tratamento de textura de
+  pontos + um blob do Hero, pra amarrar os dois momentos.
+- **Licitações**: `Badge.tsx` ganhou prop opcional `dotClassName` (indicador sólido
+  antes do texto) — cor nunca é só o dot, o texto do status continua sempre visível.
+  Novo `STATUS_BADGE_DOT` em `statusBadgeStyle.ts` (espelha `STATUS_BADGE_STYLE`,
+  mesma categoria/cor, só na versão -500 sólida) e `StatusLicitacaoDot` em
+  `enums.ts`; usado em `LicitacaoCard.tsx`. Contratos/Obras não migrados (fora de
+  escopo, mesmo módulo compartilhado, sem pedido explícito pra esses dois ainda).
+- **Footer**: `bg-primary` → `.bg-primary-gradient` (já seguro pro alto contraste desde
+  a seção 2.23); friso `border-t-4 border-secondary` virou uma barra de 4px com
+  gradiente linear combinando as 3 cores de marca (`primary-light`→`secondary`→
+  `tertiary`), classe `.hero-decor` (some no alto contraste, é só decoração).
+- **Validação**: `tsc --noEmit` e `next lint` limpos; `/`, `/transparencia`,
+  `/licitacoes` retornando 200 no dev server sem erro/warning no log; confirmado via
+  `curl` no CSS compilado que todas as classes novas (`.hero-decor`, `.card-glass`,
+  `.text-gradient-brand`, `.animate-blob-drift-*`, `.animate-fade-in`) e seus
+  respectivos overrides de `html.alto-contraste` foram de fato emitidos (não só
+  declarados — ver poda do Tailwind v4 documentada na seção 2.24).
+- **Fora de escopo**: ItemAcessoCard (ícones de seção do hub `/transparencia`)
+  continuam com tinta plana de propósito — grid denso de ~40 itens, gradiente em cada
+  ícone pesaria a leitura; badge dot+pill não migrado pra Contratos/Obras.
+
+## 2.26 Extensão pro resto do site público (2026-08-09) — concluído
+
+Usuário aprovou a segunda passada (2.25: "ficou na medida certa") e liberou estender
+pro resto do site. Como praticamente todo o site público já consumia os componentes
+compartilhados (`Button`/`Input`/`Select`/`Card`/`Badge`/`PageHeader`/`Pagination`)
+atualizados nas seções 2.23-2.25, e cor/sombra/radius vêm de `--theme` global, a maior
+parte do site já herdava o visual novo automaticamente — o trabalho real aqui foi
+fechar as pontas que ainda dependiam de padrão antigo, não redesenhar página por
+página:
+
+- **`text-text-secondary/60` → `text-text-muted`** em **66 arquivos** do site público
+  (`src/modules/**`, `src/components/**`, `src/app/**` exceto `/admin`) — sweep
+  mecânico via `sed`, mesmo padrão já validado em Licitações (seção 2.23). Admin
+  continua de fora de propósito, mesma linha das pendências já registradas.
+- **`/mapa-do-site`**: último `h1`+breadcrumb hand-rolado do site público, trocado pelo
+  `PageHeader` compartilhado (mesmo ajuste já feito em `/transparencia` na 2.23).
+- **Badge dot+pill (2.25) estendido pra Contratos e Obras** — os 2 outros consumidores
+  do `STATUS_BADGE_STYLE` compartilhado, pendência registrada explicitamente na 2.25:
+  novo `STATUS_BADGE_DOT` (já existia) espelhado em `contratoStatusDot()`
+  (`contratos/status.ts`) e `StatusObraDot` (`obras/types.ts`); aplicado em
+  `ContratoCard.tsx`, `ContratoDetalhe.tsx`, `LicitacaoContratos.tsx` (contrato dentro
+  do detalhe de licitação) e `ObraCard.tsx` — este último não usava nem o componente
+  `Badge` (span com classe copiada na mão), migrado pra `Badge` de verdade no processo.
+- **Validação real, não só leitura de código**: `tsc --noEmit` e `next lint` limpos;
+  `next build` completo (78 páginas estáticas + as dinâmicas) sem erro — rodado com o
+  dev server **parado** de propósito (mesmo incidente da 2.23 se rodar os dois ao mesmo
+  tempo). Dev server subido de novo depois, `.next` limpo; amostra de 10 rotas de
+  módulos diferentes tocados confirmada via `curl` (200 em todas, um `000` isolado em
+  `/` que era só corrida do primeiro request durante compilação do Turbopack — resolvido
+  sozinho no retry, sem erro real no log).
+- **Ainda fora de escopo**: painel admin inteiro (cor/token propagam automaticamente
+  via CSS global, mas botões/badges do admin não foram migrados pros componentes
+  compartilhados — pendência registrada desde a 2.22); ItemAcessoCard continua com
+  tinta plana (2.25); nenhuma página ganhou hero/glass/gradiente própria — esse
+  tratamento fica reservado pra Home de propósito, replicá-lo em todo lugar
+  contradiria a "não exagera" que guiou as duas rodadas anteriores.
+
+**Complemento no mesmo dia**: usuário perguntou se o público estava mesmo 100% migrado
+antes de mexer no admin — auditoria real (não só releitura do que já tinha sido feito)
+achou 2 lacunas genuínas que os sweeps anteriores não pegaram, ambas corrigidas:
+`LicitacaoDetalhe.tsx` (badge de status na página de detalhe usava `StatusLicitacaoStyle`
+mas nunca ganhou o dot da seção 2.25 — só `LicitacaoCard.tsx`/`LicitacaoContratos.tsx`
+tinham sido cobertos); `EmpresaInidoneaCard.tsx` (`gestao-fiscal`) usava
+`bg-red-100 text-red-700`/`bg-red-50 text-red-600` direto no código em vez do
+`STATUS_BADGE_STYLE`/`STATUS_BADGE_DOT` compartilhado — migrado pra
+`STATUS_BADGE_STYLE.cancelado`/`.error` (é uma lista de empresas inidôneas, sempre
+estado negativo, não precisa de mapa próprio). De quebra, 3 tabelas de valor negativo
+(`ServidorDetalhe.tsx`, `FolhaPagamentoMesView.tsx`, `TabelaCargos.tsx`, coluna de
+desconto) usavam `text-red-600` cru — trocado por `text-error`. Confirmado por grep que
+não sobra hex solto nem `bg-<cor>-<nº>`/`text-<cor>-<nº>` fora do sistema compartilhado
+no site público (as poucas ocorrências restantes checadas uma a uma: `TipoEdicaoDiario`
+é categoria, não status, fica com pílula plana de propósito; `text-yellow-400` em
+`AcessibilidadeMenu.tsx` é o próprio amarelo do alto contraste, intencional). `tsc`/
+`next lint` limpos, amostra de rotas confirmada via `curl`.
+
 ## 3. Como decidir o padrão de um módulo novo
 
 ```bash

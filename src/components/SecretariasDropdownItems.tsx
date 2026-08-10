@@ -18,7 +18,7 @@ export default function SecretariasDropdownItems({ onNavigate }: Props) {
 
   return (
     <>
-      {loading && <p className="px-4 py-2 text-text-secondary/60">Carregando...</p>}
+      {loading && <p className="px-4 py-2 text-text-muted">Carregando...</p>}
       {erro && <p className="px-4 py-2 text-error">Erro ao carregar secretarias.</p>}
 
       {!loading && !erro && data.map(unidade => (

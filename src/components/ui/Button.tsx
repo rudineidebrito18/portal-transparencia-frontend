@@ -13,10 +13,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 // novo, é a padronização do que já existia espalhado, classe idêntica, em cada
 // *Filtro.tsx/página admin.
 const variantClasses: Record<Variant, string> = {
-  primary: 'rounded-lg bg-primary text-white hover:bg-primary-dark',
-  outline: 'rounded-lg border border-border/30 hover:bg-neutral-light',
+  primary: 'rounded-lg bg-primary text-white shadow-sm hover:bg-primary-hover hover:shadow-md',
+  outline: 'rounded-lg border border-border/30 hover:bg-neutral-light hover:border-border/50',
   danger: 'rounded-lg border border-error text-error hover:bg-error/10',
-  ghost: 'text-text-secondary hover:text-red-600 font-normal transition-colors',
+  // Antes usava `hover:text-red-600` (vermelho genérico do Tailwind, fora da paleta) —
+  // trocado por `text-secondary` pra ficar no mesmo vermelho de marca usado em todo o
+  // resto do site.
+  ghost: 'text-text-secondary hover:text-secondary font-normal transition-colors',
 }
 
 const sizeClasses: Record<Size, string> = {

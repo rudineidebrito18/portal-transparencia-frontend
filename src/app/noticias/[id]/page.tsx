@@ -37,7 +37,7 @@ export default async function NoticiaDetalhePage({
       <h1 className="text-2xl sm:text-3xl font-black text-primary uppercase tracking-tight">
         {noticia.titulo}
       </h1>
-      <p className="text-sm text-text-secondary/60 mt-2">{formatarData(noticia.data)}</p>
+      <p className="text-sm text-text-muted mt-2">{formatarData(noticia.data)}</p>
       <div className="h-1.5 w-16 bg-secondary mt-3 mb-6 rounded-full" />
 
       {imagens.length > 0 && (

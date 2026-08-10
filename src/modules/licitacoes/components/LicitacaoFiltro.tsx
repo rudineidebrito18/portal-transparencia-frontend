@@ -90,7 +90,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* NÚMERO DO PROCESSO */}
             <div className="md:col-span-2">
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroProcesso">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="numeroProcesso">
                 Número do Processo
               </label>
               <Input
@@ -105,7 +105,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* MODALIDADE */}
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipoProcedimentoLicitacao">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="tipoProcedimentoLicitacao">
                 Modalidade
               </label>
               <Select
@@ -125,7 +125,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* STATUS */}
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="status">
                 Status
               </label>
               <Select
@@ -146,7 +146,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* NÚMERO + ANO */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numeroInstrumento">
+                <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="numeroInstrumento">
                   Número
                 </label>
                 <Input
@@ -160,7 +160,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
+                <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="ano">
                   Ano
                 </label>
                 <Select
@@ -181,7 +181,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* UNIDADE */}
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="unidadeId">
                 Unidade
               </label>
               <Select
@@ -200,7 +200,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* DATAS DE ABERTURA */}
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAberturaInicio">
+                <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataAberturaInicio">
                   Abertura (início)
                 </label>
                 <Input
@@ -213,7 +213,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAberturaFim">
+                <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataAberturaFim">
                   Abertura (fim)
                 </label>
                 <Input
@@ -229,7 +229,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
             {/* DATAS DE PUBLICAÇÃO */}
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataPublicacaoInicio">
+                <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataPublicacaoInicio">
                   Publicação (início)
                 </label>
                 <Input
@@ -242,7 +242,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
               </div>
 
               <div>
-                <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataPublicacaoFim">
+                <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataPublicacaoFim">
                   Publicação (fim)
                 </label>
                 <Input
@@ -257,7 +257,7 @@ export default function LicitacaoFiltro({ valoresIniciais, onFiltrar }: Props) {
 
             {/* COVID */}
             <div>
-              <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 flex items-center gap-1" htmlFor="covid">
+              <label className="text-xs uppercase font-semibold text-text-muted mb-1 flex items-center gap-1" htmlFor="covid">
                 <MdCoronavirus size={14} /> COVID-19
               </label>
               <Select

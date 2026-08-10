@@ -44,7 +44,7 @@ export default function TabelaCargos() {
         <span className="text-sm text-text-secondary">
           <strong className="text-primary">{totalElements}</strong> cargos encontrados
           {atualizadoEm && (
-            <span className="text-text-secondary/60"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+            <span className="text-text-muted"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
           )}
         </span>
 
@@ -90,7 +90,7 @@ export default function TabelaCargos() {
                 <MdGroups size={22} />
               </div>
               <div>
-                <p className="text-xs uppercase text-text-secondary/60">Servidores nesta página</p>
+                <p className="text-xs uppercase text-text-muted">Servidores nesta página</p>
                 <p className="text-xl font-bold text-primary">{totalServidores}</p>
               </div>
             </Card>
@@ -100,7 +100,7 @@ export default function TabelaCargos() {
                 <MdPayments size={22} />
               </div>
               <div>
-                <p className="text-xs uppercase text-text-secondary/60">Total líquido nesta página</p>
+                <p className="text-xs uppercase text-text-muted">Total líquido nesta página</p>
                 <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolhaLiquida)}</p>
               </div>
             </Card>
@@ -110,7 +110,7 @@ export default function TabelaCargos() {
           <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
             <table className="w-full text-sm bg-white">
               <thead>
-                <tr className="bg-neutral-light/60 text-text-secondary/60 text-xs uppercase">
+                <tr className="bg-neutral-light/60 text-text-muted text-xs uppercase">
                   <th className="text-left px-4 py-3 font-semibold">Cargo</th>
                   <th className="text-right px-4 py-3 font-semibold">Quantidade</th>
                   <th className="text-right px-4 py-3 font-semibold">Valor Bruto</th>
@@ -127,7 +127,7 @@ export default function TabelaCargos() {
                     <td className="px-4 py-3 text-right text-text-secondary">
                       {formatarMoeda(cargo.valorBruto)}
                     </td>
-                    <td className="px-4 py-3 text-right text-red-600">
+                    <td className="px-4 py-3 text-right text-error">
                       -{formatarMoeda(cargo.valorDesconto)}
                     </td>
                     <td className="px-4 py-3 text-right font-bold text-accent">

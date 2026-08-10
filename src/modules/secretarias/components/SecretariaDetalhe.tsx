@@ -86,7 +86,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
           </div>
 
           {(unidade.dataInicio || unidade.dataFim) && (
-            <p className="text-xs text-text-secondary/60 mt-2">
+            <p className="text-xs text-text-muted mt-2">
               Órgão vigente de {formatarData(unidade.dataInicio ?? undefined)} a {unidade.dataFim ? formatarData(unidade.dataFim) : 'o momento'}
             </p>
           )}
@@ -185,7 +185,7 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
               {setores.map(s => (
                 <Card key={s.id} className="p-4">
                   <p className="font-semibold text-sm text-text-secondary">{s.nome}</p>
-                  <p className="text-xs text-text-secondary/60 mt-1">{s.descricao}</p>
+                  <p className="text-xs text-text-muted mt-1">{s.descricao}</p>
                 </Card>
               ))}
             </div>
@@ -215,9 +215,9 @@ function PessoaCargoList({ lista, emptyMessage }: { lista: SecretariaDetalheType
         <Card key={p.id} className="p-4 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-text-secondary truncate">{p.nome}</p>
-            <p className="text-xs text-text-secondary/60">{p.cargo}</p>
+            <p className="text-xs text-text-muted">{p.cargo}</p>
           </div>
-          <p className="text-xs text-text-secondary/60 whitespace-nowrap shrink-0">
+          <p className="text-xs text-text-muted whitespace-nowrap shrink-0">
             {formatarData(p.dataInicio)} — {formatarData(p.dataFim)}
           </p>
         </Card>
@@ -255,10 +255,10 @@ function GestorList({ lista }: { lista: SecretariaDetalheType['gestores'] }) {
               {g.verificado && <SelinhoVerificado />}
               {g.ativo && <Badge className="bg-primary/10 text-primary">Vigente</Badge>}
             </div>
-            <p className="text-xs text-text-secondary/60">{g.cargo}</p>
+            <p className="text-xs text-text-muted">{g.cargo}</p>
           </div>
 
-          <p className="text-xs text-text-secondary/60 whitespace-nowrap shrink-0">
+          <p className="text-xs text-text-muted whitespace-nowrap shrink-0">
             {formatarData(g.dataInicio ?? undefined)} — {g.dataFim ? formatarData(g.dataFim) : 'o momento'}
           </p>
         </Card>

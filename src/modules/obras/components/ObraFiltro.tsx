@@ -82,7 +82,7 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numero">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="numero">
             Número
           </label>
           <Input
@@ -96,7 +96,7 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="status">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="status">
             Status
           </label>
           <Select id="status" name="status" value={filtros.status ?? ''} onChange={handleChange}>
@@ -108,7 +108,7 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipo">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="tipo">
             Tipo
           </label>
           <Select id="tipo" name="tipo" value={filtros.tipo ?? ''} onChange={handleChange}>
@@ -120,7 +120,7 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="unidadeId">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="unidadeId">
             Unidade
           </label>
           <Select id="unidadeId" name="unidadeId" value={filtros.unidadeId ?? ''} onChange={handleChange}>
@@ -132,7 +132,7 @@ export default function ObraFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="fornecedorId">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="fornecedorId">
             Fornecedor
           </label>
           <Select id="fornecedorId" name="fornecedorId" value={filtros.fornecedorId ?? ''} onChange={handleChange}>

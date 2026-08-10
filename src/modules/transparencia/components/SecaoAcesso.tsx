@@ -75,6 +75,18 @@ export const CORES_SECAO: Record<CorSecao, CorClasses> = {
     hoverBg: 'group-hover:bg-primary-dark',
     hoverTexto: 'group-hover:text-primary-dark',
   },
+  // Verde da logo (coqueiros) — 4ª cor de marca, token `tertiary` em globals.css. Mesmo
+  // raciocínio de contraste do `accent-light` acima: ícone vira branco no hover
+  // (`group-hover:text-white`) e branco sobre `tertiary` puro (#2fa84f) dá só ~3:1 —
+  // sob o mínimo confortável. `tertiary-dark` (#1f7a38) passa com folga (~5,4:1).
+  tertiary: {
+    badge: 'bg-tertiary/10 text-tertiary',
+    titulo: 'text-tertiary',
+    borda: 'border-l-tertiary',
+    texto: 'text-tertiary',
+    hoverBg: 'group-hover:bg-tertiary-dark',
+    hoverTexto: 'group-hover:text-tertiary',
+  },
 }
 
 export default function SecaoAcesso({ titulo, icon: Icon, cor, itens }: SecaoAcessoType) {

@@ -57,7 +57,7 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
         <div className="md:col-span-2">
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="descricao">
             Descrição
           </label>
           <Input
@@ -71,7 +71,7 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="tipoViagem">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="tipoViagem">
             Tipo de viagem
           </label>
           <Select
@@ -88,7 +88,7 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataInicial">
             Data inicial
           </label>
           <Input
@@ -101,7 +101,7 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataFinal">
             Data final
           </label>
           <Input

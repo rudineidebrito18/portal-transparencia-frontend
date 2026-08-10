@@ -67,7 +67,7 @@ export default function RelatorioExecucaoOrcamentariaFiltro({ valoresIniciais, o
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
         <div className="md:col-span-1 lg:col-span-1">
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="descricao">
             Descrição
           </label>
           <Input
@@ -81,7 +81,7 @@ export default function RelatorioExecucaoOrcamentariaFiltro({ valoresIniciais, o
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="ano">
             Ano
           </label>
           <Input
@@ -95,7 +95,7 @@ export default function RelatorioExecucaoOrcamentariaFiltro({ valoresIniciais, o
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="bimestre">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="bimestre">
             Bimestre
           </label>
           <Input

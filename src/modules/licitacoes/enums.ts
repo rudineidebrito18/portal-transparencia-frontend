@@ -24,7 +24,7 @@ export const StatusLicitacaoDescricao: Record<StatusLicitacao, string> = {
   [StatusLicitacao.ANULADA]: "Anulada"
 }
 
-import { STATUS_BADGE_STYLE } from "@/modules/shared/statusBadgeStyle"
+import { STATUS_BADGE_DOT, STATUS_BADGE_STYLE } from "@/modules/shared/statusBadgeStyle"
 
 // SUSPENSO usava vermelho aqui e cinza em Contratos pro mesmo conceito — unificado via
 // STATUS_BADGE_STYLE (mesma paleta semântica compartilhada entre Contratos/Licitações/Obras).
@@ -39,6 +39,21 @@ export const StatusLicitacaoStyle: Record<StatusLicitacao, string> = {
   [StatusLicitacao.SINC_ABERTO]: STATUS_BADGE_STYLE.info,
   [StatusLicitacao.SINC_ANDAMENTO]: STATUS_BADGE_STYLE.emAndamento,
   [StatusLicitacao.INCLUIDO_SISTEMA]: STATUS_BADGE_STYLE.neutro
+}
+
+// Espelha o mapa acima, categoria por categoria, só que pro indicador sólido
+// (Badge.tsx `dotClassName`) em vez da pílula clara.
+export const StatusLicitacaoDot: Record<StatusLicitacao, string> = {
+  [StatusLicitacao.EM_ABERTO]: STATUS_BADGE_DOT.info,
+  [StatusLicitacao.EM_ANDAMENTO]: STATUS_BADGE_DOT.emAndamento,
+  [StatusLicitacao.FINALIZADO]: STATUS_BADGE_DOT.concluido,
+  [StatusLicitacao.SUSPENSO]: STATUS_BADGE_DOT.suspenso,
+  [StatusLicitacao.DESERTA]: STATUS_BADGE_DOT.neutro,
+  [StatusLicitacao.FRACASSADA]: STATUS_BADGE_DOT.neutro,
+  [StatusLicitacao.ANULADA]: STATUS_BADGE_DOT.cancelado,
+  [StatusLicitacao.SINC_ABERTO]: STATUS_BADGE_DOT.info,
+  [StatusLicitacao.SINC_ANDAMENTO]: STATUS_BADGE_DOT.emAndamento,
+  [StatusLicitacao.INCLUIDO_SISTEMA]: STATUS_BADGE_DOT.neutro
 }
 
 export enum TipoProcedimentoLicitacao {

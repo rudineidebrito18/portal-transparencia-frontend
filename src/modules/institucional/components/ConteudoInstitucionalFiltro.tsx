@@ -60,7 +60,7 @@ export default function ConteudoInstitucionalFiltro({ valoresIniciais, onFiltrar
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="titulo">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="titulo">
             Título
           </label>
           <Input
@@ -74,7 +74,7 @@ export default function ConteudoInstitucionalFiltro({ valoresIniciais, onFiltrar
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataInicial">
             Publicação (início)
           </label>
           <Input
@@ -87,7 +87,7 @@ export default function ConteudoInstitucionalFiltro({ valoresIniciais, onFiltrar
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataFinal">
             Publicação (fim)
           </label>
           <Input

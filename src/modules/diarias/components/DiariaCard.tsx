@@ -21,7 +21,7 @@ export default function DiariaCard({ diaria }: Props) {
 
           <div>
             <h2 className="text-base font-bold text-primary leading-tight">{diaria.beneficiario}</h2>
-            <p className="text-xs text-text-secondary/60 mt-0.5">
+            <p className="text-xs text-text-muted mt-0.5">
               {diaria.cargo}
               {diaria.unidadeNome && ` · ${diaria.unidadeNome}`}
             </p>
@@ -33,26 +33,26 @@ export default function DiariaCard({ diaria }: Props) {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-2 text-sm">
         <div className="col-span-2">
-          <p className="text-xs uppercase text-text-secondary/60 flex items-center gap-1">
+          <p className="text-xs uppercase text-text-muted flex items-center gap-1">
             <MdLocationOn size={12} /> Destino
           </p>
           <p className="font-semibold text-text-secondary">{diaria.destino}</p>
         </div>
 
         <div>
-          <p className="text-xs uppercase text-text-secondary/60">Período</p>
+          <p className="text-xs uppercase text-text-muted">Período</p>
           <p className="font-semibold text-text-secondary">
             {formatarData(diaria.dataInicio)} a {formatarData(diaria.dataTermino)}
           </p>
         </div>
 
         <div>
-          <p className="text-xs uppercase text-text-secondary/60">Qtd. Diárias</p>
+          <p className="text-xs uppercase text-text-muted">Qtd. Diárias</p>
           <p className="font-semibold text-text-secondary">{diaria.quantDiarias}</p>
         </div>
 
         <div className="col-span-2">
-          <p className="text-xs uppercase text-text-secondary/60">Valor Concedido</p>
+          <p className="text-xs uppercase text-text-muted">Valor Concedido</p>
           <p className="font-bold text-accent">{formatarMoeda(diaria.valorConcedido)}</p>
         </div>
       </div>

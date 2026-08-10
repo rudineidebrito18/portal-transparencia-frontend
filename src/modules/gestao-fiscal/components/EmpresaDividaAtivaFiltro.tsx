@@ -58,7 +58,7 @@ export default function EmpresaDividaAtivaFiltro({ valoresIniciais, onFiltrar }:
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="nome">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="nome">
             Nome
           </label>
           <Input
@@ -72,7 +72,7 @@ export default function EmpresaDividaAtivaFiltro({ valoresIniciais, onFiltrar }:
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="razaoSocial">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="razaoSocial">
             Razão Social
           </label>
           <Input
@@ -86,7 +86,7 @@ export default function EmpresaDividaAtivaFiltro({ valoresIniciais, onFiltrar }:
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="cnpj">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="cnpj">
             CNPJ
           </label>
           <Input
@@ -100,7 +100,7 @@ export default function EmpresaDividaAtivaFiltro({ valoresIniciais, onFiltrar }:
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataInicial">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataInicial">
             Data (início)
           </label>
           <Input
@@ -113,7 +113,7 @@ export default function EmpresaDividaAtivaFiltro({ valoresIniciais, onFiltrar }:
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataFinal">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataFinal">
             Data (fim)
           </label>
           <Input

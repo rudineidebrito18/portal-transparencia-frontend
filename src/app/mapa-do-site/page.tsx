@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { MdExpandMore } from 'react-icons/md'
 
-import Breadcrumbs from '@/components/Breadcrumbs'
+import PageHeader from '@/components/PageHeader'
 import Card from '@/components/ui/Card'
 import { secoesAcessoInformacao } from '@/modules/transparencia/data/secoes'
 
@@ -53,12 +53,9 @@ function GrupoLinks({ titulo, links }: { titulo: string; links: { label: string;
 export default function MapaDoSite() {
   return (
     <div className="max-w-4xl mx-auto p-2">
-      <Breadcrumbs items={[{ label: 'Mapa do Site' }]} />
+      <PageHeader title="Mapa do Site" breadcrumbItems={[{ label: 'Mapa do Site' }]} />
 
-      <h1 className="text-3xl font-bold mb-2 text-primary uppercase">Mapa do Site</h1>
-      <div className="h-1 w-20 bg-secondary mb-6 rounded-full" />
-
-      <p className="text-sm text-text-secondary/70 max-w-3xl mb-8">
+      <p className="text-sm text-text-muted max-w-3xl mb-8">
         Lista completa das páginas deste portal, agrupadas por assunto — útil para quem
         prefere navegar vendo tudo de uma vez, ou chegou aqui direto de uma busca externa.
       </p>

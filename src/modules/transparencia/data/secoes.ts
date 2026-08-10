@@ -73,7 +73,7 @@ export interface ItemAcesso {
 // Cores já existentes em globals.css (@theme) — nada de tom novo, só reaproveita a
 // paleta da marca pra dar identidade visual a cada seção (ajuda a escanear as 14
 // seções da página). Ver mapeamento em CORES_SECAO (SecaoAcesso.tsx).
-export type CorSecao = 'primary' | 'accent' | 'secondary' | 'primary-light' | 'accent-dark' | 'accent-light' | 'primary-dark'
+export type CorSecao = 'primary' | 'accent' | 'secondary' | 'primary-light' | 'accent-dark' | 'accent-light' | 'primary-dark' | 'tertiary'
 
 export interface SecaoAcesso {
   titulo: string
@@ -161,7 +161,10 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Obras Públicas',
     icon: MdConstruction,
-    cor: 'primary-dark',
+    // Único uso do verde de marca (`tertiary`) nesta rodada — Obras Públicas era o
+    // candidato mais natural (infraestrutura/cidade em construção), evita reassinar as
+    // outras 11 seções sem uma decisão de conteúdo caso a caso.
+    cor: 'tertiary',
     itens: [
       { label: 'Obras Públicas', icon: MdConstruction, href: '/obras' },
       { label: 'Obras Paralisadas', icon: MdPauseCircleOutline, href: '/obras?status=paralisadas' },

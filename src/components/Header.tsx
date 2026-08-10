@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import {
   MdClose,
@@ -34,6 +35,7 @@ export default function Header() {
 
   const navRef = useRef<HTMLElement>(null);
   const logoBackgroundRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const fonteSalva = Number(localStorage.getItem(CHAVE_FONTE));
@@ -98,8 +100,19 @@ export default function Header() {
   }, []);
 
   const topbarHeight = 28;
-  const logoSectionHeight = 120;
+  const logoSectionHeight = 92;
   const navHeight = 48;
+
+  // Só marca ativo o item de topo (Diário Oficial/Transparência) — os dropdowns agrupam
+  // várias rotas e "qual sub-item está ativo" já é respondido pelo Breadcrumbs de cada
+  // página, não precisa duplicar aqui.
+  const linkAtivo = (href: string) => pathname === href;
+  const classeLink = (href: string) =>
+    `rounded-md transition-colors cursor-pointer border-b-2 ${
+      linkAtivo(href)
+        ? 'border-secondary font-semibold'
+        : 'border-transparent hover:bg-white/10'
+    }`;
   const fase1Max = logoSectionHeight - navHeight;
 
   let translateY = 0;
@@ -114,6 +127,16 @@ export default function Header() {
   }
 
   const headerHeight = topbarHeight + (logoVisible ? logoSectionHeight : fase1Max) + navMedidaHeight;
+
+  // "Glass on scroll": nav sólido no topo da página, e vira translúcido+desfocado só
+  // depois que a logo já recolheu — sensação de header flutuando sobre o conteúdo, sem
+  // ficar vidro o tempo todo (o pedido explícito era "glassmorphism só onde faz
+  // sentido"). Desligado no alto contraste de propósito: `bg-primary/85` é uma classe
+  // diferente de `.bg-primary` (o seletor de alto contraste casa por classe literal, não
+  // por cor computada — mesma pegadinha já documentada em `.bg-primary-gradient`), então
+  // em vez de mais um seletor CSS pra cobrir isso, a própria condição já usa o estado
+  // `altoContraste` que o componente já tem.
+  const navFlutuante = !logoVisible && !altoContraste;
 
   return (
     <>
@@ -135,18 +158,18 @@ export default function Header() {
 
         {/* 1. Topbar */}
         <div
-          className="sticky w-full bg-primary text-light text-sm flex justify-between items-center px-4 z-40 pointer-events-auto"
+          className="sticky w-full bg-primary text-light text-sm flex justify-between items-center px-4 z-40 pointer-events-auto border-b border-white/10"
           style={{ height: topbarHeight, lineHeight: `${topbarHeight}px` }}
         >
-          <div className="text-xs">Prefeitura Municipal de Lago dos Rodrigues</div>
-          <div className="hidden lg:flex items-center gap-3 text-xs">
+          <div className="text-xs text-white/80">Prefeitura Municipal de Lago dos Rodrigues</div>
+          <div className="hidden lg:flex items-center gap-4 text-xs text-white/80">
             <div className="flex items-center gap-1">
               <MdHeadsetMic />
-              <Link href="/ouvidoria" className="hover:underline">Ouvidoria</Link>
-              /
-              <Link href="/esic" className="hover:underline">SIC</Link>
+              <Link href="/ouvidoria" className="hover:text-white hover:underline transition-colors">Ouvidoria</Link>
+              <span aria-hidden="true">/</span>
+              <Link href="/esic" className="hover:text-white hover:underline transition-colors">SIC</Link>
             </div>
-            <Link href="/transparencia" className="flex items-center gap-1 hover:underline"><MdInfo /> Transparência</Link>
+            <Link href="/transparencia" className="flex items-center gap-1 hover:text-white hover:underline transition-colors"><MdInfo /> Transparência</Link>
             <AcessibilidadeMenu
               altoContraste={altoContraste}
               onAumentarFonte={() => aplicarFonte(fonte + PASSO)}
@@ -175,7 +198,7 @@ export default function Header() {
               backgroundImage: "url('/fundo_header.png')",
             }}
           >
-            <Link href="/" className="w-40 md:w-68 flex items-center ml-4 lg:ml-20 hover:opacity-90 transition-opacity">
+            <Link href="/" className="w-36 md:w-56 flex items-center ml-4 lg:ml-20 hover:opacity-90 transition-opacity">
               <Image
                 src="/logo_lago_r.png"
                 alt="Logo Lago dos Rodrigues"
@@ -187,40 +210,52 @@ export default function Header() {
           </div>
 
           {/* Nav */}
-          <nav ref={navRef} className="bg-primary text-light text-sm shadow">
-            <ul className={`flex flex-col lg:flex-row flex-wrap gap-2 justify-center items-center ${menuOpen ? 'flex' : 'hidden lg:flex'}`}>
-              <Link className="px-4 py-3 lg:py-2 hover:bg-secondary" href="/" onClick={() => setMenuOpen(false)}><MdHome /></Link>
+          <nav
+            ref={navRef}
+            className={`text-light text-sm shadow transition-colors duration-300 ${
+              navFlutuante ? 'bg-primary/85 backdrop-blur-md' : 'bg-primary'
+            }`}
+          >
+            <ul className={`flex flex-col lg:flex-row flex-wrap gap-1 justify-center items-center ${menuOpen ? 'flex' : 'hidden lg:flex'}`}>
+              <Link
+                className={`px-4 py-3 lg:py-2 flex items-center ${classeLink('/')}`}
+                href="/"
+                aria-label="Página inicial"
+                onClick={() => setMenuOpen(false)}
+              >
+                <MdHome size={18} />
+              </Link>
 
               <DropdownMenuItem label="A PREFEITURA">
-                <Link href="/prefeito" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Prefeito</Link>
-                <Link href="/vice-prefeito" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Vice-Prefeito</Link>
-                <Link href="/estrutura-organizacional" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Estrutura Organizacional</Link>
-                <Link href="/organograma" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Organograma</Link>
-                <Link href="/competencias" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Competências</Link>
-                <Link href="/carta-de-servicos" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Carta de Serviços</Link>
+                <Link href="/prefeito" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Prefeito</Link>
+                <Link href="/vice-prefeito" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Vice-Prefeito</Link>
+                <Link href="/estrutura-organizacional" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Estrutura Organizacional</Link>
+                <Link href="/organograma" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Organograma</Link>
+                <Link href="/competencias" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Competências</Link>
+                <Link href="/carta-de-servicos" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Carta de Serviços</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="SECRETARIAS">
                 <SecretariasDropdownItems onNavigate={() => setMenuOpen(false)} />
               </DropdownMenuItem>
 
-              <Link href="/diario-oficial" className="px-2 py-3 lg:py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>DIÁRIO OFICIAL</Link>
-              <Link href="/transparencia" className="px-2 py-3 lg:py-2 hover:bg-secondary cursor-pointer" onClick={() => setMenuOpen(false)}>TRANSPARÊNCIA</Link>
+              <Link href="/diario-oficial" className={`px-3 py-3 lg:py-2 ${classeLink('/diario-oficial')}`} onClick={() => setMenuOpen(false)}>DIÁRIO OFICIAL</Link>
+              <Link href="/transparencia" className={`px-3 py-3 lg:py-2 ${classeLink('/transparencia')}`} onClick={() => setMenuOpen(false)}>TRANSPARÊNCIA</Link>
 
               <DropdownMenuItem label="RECURSOS HUMANOS">
-                <Link href="/servidores" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Servidores</Link>
-                <Link href="/folha-pagamento" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Folha de Pagamento</Link>
+                <Link href="/servidores" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Servidores</Link>
+                <Link href="/folha-pagamento" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Folha de Pagamento</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
-                <Link href="/gestao-fiscal" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Gestão Fiscal</Link>
-                <Link href="/prestacao-contas" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Prestação de Contas</Link>
-                <Link href="/planejamento" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Planejamento (LDO, LOA, PPA)</Link>
+                <Link href="/gestao-fiscal" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Gestão Fiscal</Link>
+                <Link href="/prestacao-contas" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Prestação de Contas</Link>
+                <Link href="/planejamento" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Planejamento (LDO, LOA, PPA)</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="PUBLICAÇÕES">
-                <Link href="/noticias" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Notícias</Link>
-                <Link href="/avisos" className="px-4 py-3 lg:py-2 hover:bg-primary/10 block" onClick={() => setMenuOpen(false)}>Avisos</Link>
+                <Link href="/noticias" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Notícias</Link>
+                <Link href="/avisos" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Avisos</Link>
               </DropdownMenuItem>
 
               {/* Topbar (Ouvidoria/SIC/Acessibilidade) é `hidden lg:flex` — some inteira no
@@ -246,7 +281,7 @@ export default function Header() {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
           aria-expanded={menuOpen}
-          className="text-primary text-3xl bg-light rounded-full p-2 shadow-lg"
+          className="text-primary text-2xl bg-light rounded-full p-2.5 shadow-lg hover:bg-neutral-light transition-colors"
         >
           {menuOpen ? <MdClose /> : <MdMenu />}
         </button>

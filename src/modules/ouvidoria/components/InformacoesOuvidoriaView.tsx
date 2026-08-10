@@ -40,9 +40,9 @@ export default function InformacoesOuvidoriaView() {
             <MdLocationOn size={22} />
           </div>
           <div>
-            <p className="text-xs uppercase font-semibold text-text-secondary/60">Endereço</p>
+            <p className="text-xs uppercase font-semibold text-text-muted">Endereço</p>
             <p className="text-sm font-semibold text-text-secondary mt-1">{info.endereco}</p>
-            <p className="text-xs text-text-secondary/60 mt-2">{info.unidadeNome} — {info.responsavel}</p>
+            <p className="text-xs text-text-muted mt-2">{info.unidadeNome} — {info.responsavel}</p>
           </div>
         </Card>
 
@@ -51,7 +51,7 @@ export default function InformacoesOuvidoriaView() {
             <MdSchedule size={22} />
           </div>
           <div>
-            <p className="text-xs uppercase font-semibold text-text-secondary/60">Horário de atendimento</p>
+            <p className="text-xs uppercase font-semibold text-text-muted">Horário de atendimento</p>
             <p className="text-sm font-semibold text-text-secondary mt-1">{info.horarioAtendimento}</p>
           </div>
         </Card>
@@ -61,7 +61,7 @@ export default function InformacoesOuvidoriaView() {
             <MdPhone size={22} />
           </div>
           <div>
-            <p className="text-xs uppercase font-semibold text-text-secondary/60">Telefone</p>
+            <p className="text-xs uppercase font-semibold text-text-muted">Telefone</p>
             <p className="text-sm font-semibold text-text-secondary mt-1">{info.telefone}</p>
           </div>
         </Card>
@@ -71,14 +71,14 @@ export default function InformacoesOuvidoriaView() {
             <MdEmail size={22} />
           </div>
           <div>
-            <p className="text-xs uppercase font-semibold text-text-secondary/60">E-mail</p>
+            <p className="text-xs uppercase font-semibold text-text-muted">E-mail</p>
             <p className="text-sm font-semibold text-text-secondary mt-1">{info.email}</p>
           </div>
         </Card>
       </div>
 
       <Card className="p-5">
-        <p className="text-xs uppercase font-semibold text-text-secondary/60 mb-2">Prazos de resposta</p>
+        <p className="text-xs uppercase font-semibold text-text-muted mb-2">Prazos de resposta</p>
         <p className="text-sm text-text-secondary">{info.prazos}</p>
       </Card>
     </div>

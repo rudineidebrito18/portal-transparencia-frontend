@@ -1,9 +1,10 @@
 import { MdConstruction, MdLocationOn } from 'react-icons/md'
 
+import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
-import { ObraPublica, StatusObraDescricao, StatusObraStyle, TipoObraDescricao } from '../types'
+import { ObraPublica, StatusObraDescricao, StatusObraDot, StatusObraStyle, TipoObraDescricao } from '../types'
 
 interface Props {
   obra: ObraPublica
@@ -21,36 +22,36 @@ export default function ObraCard({ obra }: Props) {
 
           <div>
             <h2 className="text-base font-bold text-primary leading-tight">{obra.objeto}</h2>
-            <p className="text-xs text-text-secondary/60 mt-0.5 flex items-center gap-1">
+            <p className="text-xs text-text-muted mt-0.5 flex items-center gap-1">
               <MdLocationOn size={14} />
               {obra.local}
             </p>
           </div>
         </div>
 
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${StatusObraStyle[obra.status]}`}>
+        <Badge className={StatusObraStyle[obra.status]} dotClassName={StatusObraDot[obra.status]}>
           {obra.paralisada ? 'Paralisada' : StatusObraDescricao[obra.status]}
-        </span>
+        </Badge>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3 text-sm">
         <div>
-          <p className="text-xs uppercase text-text-secondary/60">Tipo</p>
+          <p className="text-xs uppercase text-text-muted">Tipo</p>
           <p className="font-semibold text-text-secondary">{TipoObraDescricao[obra.tipo]}</p>
         </div>
 
         <div>
-          <p className="text-xs uppercase text-text-secondary/60">Fonte</p>
+          <p className="text-xs uppercase text-text-muted">Fonte</p>
           <p className="font-semibold text-text-secondary">{obra.fonte}</p>
         </div>
 
         <div>
-          <p className="text-xs uppercase text-text-secondary/60">Início</p>
+          <p className="text-xs uppercase text-text-muted">Início</p>
           <p className="font-semibold text-text-secondary">{formatarData(obra.dataInicio)}</p>
         </div>
 
         <div>
-          <p className="text-xs uppercase text-text-secondary/60">
+          <p className="text-xs uppercase text-text-muted">
             {obra.dataTermino ? 'Término' : 'Previsão de término'}
           </p>
           <p className="font-semibold text-text-secondary">
@@ -59,18 +60,18 @@ export default function ObraCard({ obra }: Props) {
         </div>
 
         <div className="col-span-2">
-          <p className="text-xs uppercase text-text-secondary/60">Fornecedor</p>
+          <p className="text-xs uppercase text-text-muted">Fornecedor</p>
           <p className="font-semibold text-text-secondary">{obra.nomeFornecedor}</p>
         </div>
 
         <div className="col-span-2">
-          <p className="text-xs uppercase text-text-secondary/60">Valor Total</p>
+          <p className="text-xs uppercase text-text-muted">Valor Total</p>
           <p className="font-bold text-accent">{formatarMoeda(obra.valorTotal)}</p>
         </div>
       </div>
 
       <div>
-        <div className="flex items-center justify-between text-xs uppercase text-text-secondary/60 mb-1">
+        <div className="flex items-center justify-between text-xs uppercase text-text-muted mb-1">
           <span>Execução física</span>
           <span>{obra.percentualObra.toFixed(1)}%</span>
         </div>

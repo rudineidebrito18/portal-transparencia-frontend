@@ -69,7 +69,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
         <div className="md:col-span-2">
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="descricao">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="descricao">
             Descrição
           </label>
           <Input
@@ -83,7 +83,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="numero">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="numero">
             Número
           </label>
           <Input
@@ -97,7 +97,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="ano">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="ano">
             Ano
           </label>
           <Input
@@ -111,7 +111,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAberturaInicial">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataAberturaInicial">
             Abertura (início)
           </label>
           <Input
@@ -124,7 +124,7 @@ export default function ConcursoFiltro({ valoresIniciais, onFiltrar }: Props) {
         </div>
 
         <div>
-          <label className="text-xs uppercase font-semibold text-text-secondary/60 mb-1 block" htmlFor="dataAberturaFinal">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataAberturaFinal">
             Abertura (fim)
           </label>
           <Input

@@ -43,17 +43,30 @@ export default function TransparenciaHub() {
         .filter(secao => secao.itens.length > 0)
     : secoesAcessoInformacao
 
+  const totalItensFiltrados = secoesFiltradas.reduce((soma, secao) => soma + secao.itens.length, 0)
+
   return (
     <div>
-      <div className="relative max-w-lg mb-10">
-        <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary/40" size={20} />
-        <input
-          type="text"
-          value={buscaInput}
-          onChange={e => setBuscaInput(e.target.value)}
-          placeholder="Buscar por título de item..."
-          className="w-full border border-border/30 rounded-lg pl-10 pr-3 py-2.5 text-sm focus-visible:ring-2 focus-visible:ring-primary/40 outline-none"
-        />
+      <div className="max-w-lg mb-10">
+        <div className="relative">
+          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary/40" size={20} />
+          <input
+            type="text"
+            value={buscaInput}
+            onChange={e => setBuscaInput(e.target.value)}
+            placeholder="Buscar por título de item..."
+            aria-label="Buscar por título de item"
+            className="w-full border border-border/30 rounded-lg pl-10 pr-3 py-2.5 text-sm bg-white shadow-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary outline-none transition-all"
+          />
+        </div>
+
+        {termo && (
+          <p className="text-xs text-text-muted mt-2" aria-live="polite">
+            {totalItensFiltrados === 0
+              ? 'Nenhum resultado'
+              : `${totalItensFiltrados} ${totalItensFiltrados === 1 ? 'resultado encontrado' : 'resultados encontrados'}`}
+          </p>
+        )}
       </div>
 
       {secoesFiltradas.length === 0 ? (
