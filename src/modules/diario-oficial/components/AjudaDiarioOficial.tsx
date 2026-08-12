@@ -32,8 +32,10 @@ const PERGUNTAS: { pergunta: string; resposta: React.ReactNode }[] = [
     resposta: (
       <>
         Cada edição publicada tem um hash (uma espécie de impressão digital do arquivo) calculado
-        no momento da assinatura. Use o formulário abaixo com o número da edição pra ver o hash
-        oficial e conferir se bate com o do arquivo que você tem em mãos.
+        no momento da assinatura. Na página de verificação de autenticidade (rota{' '}
+        <code>/diario/validar</code>, acessível pelo QR Code impresso no PDF), você confere o hash
+        oficial da edição e pode selecionar o PDF baixado para comparar automaticamente o hash do
+        arquivo com o oficial — se forem iguais, o documento está íntegro.
       </>
     )
   },
@@ -41,8 +43,9 @@ const PERGUNTAS: { pergunta: string; resposta: React.ReactNode }[] = [
     pergunta: 'O que é o QR Code impresso na última página das edições?',
     resposta: (
       <>
-        É um atalho para a mesma verificação de autenticidade feita abaixo — aponta pra essa
-        página já com o número da edição preenchido, sem precisar digitar nada.
+        É um atalho para a página de verificação de autenticidade (<code>/diario/validar</code>),
+        que já abre com o número da edição preenchido — sem precisar digitar nada. Você também pode
+        fazer a verificação manualmente no formulário abaixo desta seção.
       </>
     )
   }

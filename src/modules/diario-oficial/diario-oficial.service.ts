@@ -1,7 +1,7 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
 import { diarioOficialMock } from './mocks/diario-oficial.mock'
-import { DiarioOficialInfo, EdicaoDiario, FiltroEdicaoDiario, ValidacaoPublicaDiario } from './types'
+import { DiarioOficialInfo, EdicaoDiario, FiltroEdicaoDiario, ResultadoBuscaEdicaoDiario, ValidacaoPublicaDiario } from './types'
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
@@ -17,6 +17,16 @@ export const diarioOficialService = {
 
     return api
       .get<Page<EdicaoDiario>>('/edicoes/filtro', { params })
+      .then(response => response.data)
+  },
+
+  // GET /edicoes/buscar-texto — busca por palavra-chave no conteúdo indexado das edições
+  // (Meilisearch). O backend devolve 503 se o motor de busca estiver indisponível.
+  buscarPorTexto(q: string, page: number, size: number): Promise<Page<ResultadoBuscaEdicaoDiario>> {
+    if (USE_MOCK) return diarioOficialMock.buscarPorTexto(q, page, size)
+
+    return api
+      .get<Page<ResultadoBuscaEdicaoDiario>>('/edicoes/buscar-texto', { params: { q, page, size } })
       .then(response => response.data)
   }
 }

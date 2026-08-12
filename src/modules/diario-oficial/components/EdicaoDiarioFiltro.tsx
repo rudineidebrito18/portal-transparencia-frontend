@@ -16,6 +16,7 @@ interface Props {
 }
 
 export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props) {
+  const [termo, setTermo] = useState(valoresIniciais?.termo ?? '')
   const [tipo, setTipo] = useState(valoresIniciais?.tipo ?? '')
   const [numeroEdicao, setNumeroEdicao] = useState(
     valoresIniciais?.numeroEdicao ? String(valoresIniciais.numeroEdicao) : ''
@@ -23,10 +24,11 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
   const [dataInicial, setDataInicial] = useState(valoresIniciais?.dataInicial ?? '')
   const [dataFinal, setDataFinal] = useState(valoresIniciais?.dataFinal ?? '')
 
-  const filtrosAtivosCount = [tipo, numeroEdicao, dataInicial, dataFinal].filter(v => v !== '').length
+  const filtrosAtivosCount = [termo, tipo, numeroEdicao, dataInicial, dataFinal].filter(v => v !== '').length
 
   function handleFiltrar() {
     onFiltrar({
+      termo: termo.trim() || undefined,
       tipo: tipo || undefined,
       numeroEdicao: numeroEdicao ? Number(numeroEdicao) : undefined,
       dataInicial: dataInicial || undefined,
@@ -42,6 +44,7 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
   }
 
   function limparFiltros() {
+    setTermo('')
     setTipo('')
     setNumeroEdicao('')
     setDataInicial('')
@@ -50,7 +53,26 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
   }
 
   return (
-    <FiltroCard subtituloPadrao="Refine por tipo, número e datas" filtrosAtivosCount={filtrosAtivosCount}>
+    <FiltroCard subtituloPadrao="Busque por palavra-chave no conteúdo ou refine por tipo, número e datas" filtrosAtivosCount={filtrosAtivosCount}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <div className="md:col-span-2">
+          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="termo">
+            Busca por conteúdo
+          </label>
+          <Input
+            id="termo"
+            type="search"
+            value={termo}
+            onChange={(e) => setTermo(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Palavra-chave dentro dos PDFs publicados (ex.: licitação, decreto, nome de lei)..."
+          />
+          <p className="text-xs text-text-muted mt-1">
+            Quando preenchida, a busca por conteúdo é usada no lugar dos filtros de tipo, número e datas.
+          </p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
 
         <div>

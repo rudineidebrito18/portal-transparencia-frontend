@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { MdDescription, MdVisibility } from 'react-icons/md'
+import { MdDescription, MdVisibility, MdVerifiedUser } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
@@ -39,13 +39,22 @@ export default function EdicaoCard({ edicao }: Props) {
         </div>
       </div>
 
-      <Link
-        href={hrefDocumento(urlDownloadEdicao(edicao.numeroEdicao), `Edição Nº ${edicao.numeroEdicao}`, { origemLabel: 'Diário Oficial', origemHref: '/diario-oficial' })}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
-      >
-        <MdVisibility size={18} />
-        Ver edição
-      </Link>
+      <div className="flex flex-col sm:items-end gap-2 shrink-0">
+        <Link
+          href={hrefDocumento(urlDownloadEdicao(edicao.numeroEdicao), `Edição Nº ${edicao.numeroEdicao}`, { origemLabel: 'Diário Oficial', origemHref: '/diario-oficial' })}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
+        >
+          <MdVisibility size={18} />
+          Ver edição
+        </Link>
+        <Link
+          href={`/diario/validar/${edicao.numeroEdicao}`}
+          className="flex items-center gap-1.5 text-sm text-text-secondary font-semibold hover:text-primary transition-colors"
+        >
+          <MdVerifiedUser size={16} />
+          Verificar autenticidade
+        </Link>
+      </div>
 
     </Card>
   )

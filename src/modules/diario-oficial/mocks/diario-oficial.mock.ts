@@ -3,7 +3,7 @@ import { fakerPT_BR as faker } from '@faker-js/faker'
 import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Page } from '@/modules/shared/types/Page'
 import { TipoEdicaoDiario } from '../enums'
-import { EdicaoDiario, FiltroEdicaoDiario } from '../types'
+import { EdicaoDiario, FiltroEdicaoDiario, ResultadoBuscaEdicaoDiario } from '../types'
 
 type ListParams = FiltroEdicaoDiario & {
   page?: number
@@ -51,5 +51,11 @@ export const diarioOficialMock = {
     const ordenadas = ordenar(dados as unknown as Record<string, unknown>[], sort) as unknown as EdicaoDiario[]
 
     return paginar(ordenadas, page, size)
+  },
+
+  // Mock não tem conteúdo de PDF indexado (a indexação é responsabilidade do backend +
+  // Meilisearch) — busca por palavra-chave só funciona contra o serviço real.
+  async buscarPorTexto(_q: string, _page: number, size: number): Promise<Page<ResultadoBuscaEdicaoDiario>> {
+    return { content: [], totalPages: 0, totalElements: 0, number: 0, size }
   }
 }

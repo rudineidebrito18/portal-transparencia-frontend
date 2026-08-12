@@ -8,6 +8,9 @@ export interface EdicaoDiario {
 }
 
 export interface FiltroEdicaoDiario {
+  // Busca por palavra-chave no conteúdo indexado (Meilisearch). Quando preenchido,
+  // substitui os demais filtros — o endpoint de busca não combina com tipo/número/datas.
+  termo?: string
   tipo?: string
   numeroEdicao?: number
   dataInicial?: string
@@ -42,6 +45,16 @@ export interface ValidacaoPublicaDiario {
   dataAssinatura: string | null
   hash: string
   statusIndexacao: 'PENDENTE' | 'INDEXADO' | 'FALHOU'
+}
+
+// GET /edicoes/buscar-texto — resultado da busca por palavra-chave no conteúdo indexado
+// (Meilisearch); trechoDestaque já vem com o termo marcado em <em> pelo motor de busca.
+export interface ResultadoBuscaEdicaoDiario {
+  id: number
+  numeroEdicao: number
+  tipo: string
+  dataPublicacao: string
+  trechoDestaque: string
 }
 
 // Edições anteriores à existência do sistema eletrônico (publicações físicas escaneadas) —

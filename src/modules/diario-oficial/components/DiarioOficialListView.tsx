@@ -1,6 +1,6 @@
 'use client'
 
-import { MdSwapVert } from 'react-icons/md'
+import { MdClose, MdSwapVert } from 'react-icons/md'
 
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
@@ -9,6 +9,8 @@ import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarDataHora } from '@/utils/date'
 import { useEdicoesDiario } from '../hooks/useEdicoesDiario'
+import { EdicaoDiario, ResultadoBuscaEdicaoDiario } from '../types'
+import BuscaResultadoCard from './BuscaResultadoCard'
 import EdicaoCard from './EdicaoCard'
 import EdicaoDiarioFiltro from './EdicaoDiarioFiltro'
 
@@ -28,38 +30,59 @@ export default function DiarioOficialListView() {
     ordenacao
   } = useEdicoesDiario()
 
+  // Quando o filtro "Busca por conteúdo" está preenchido (vive na URL, ex.: ?termo=licitação),
+  // a listagem exibe os resultados do Meilisearch no lugar da listagem estruturada.
+  const termoAtivo = (filtros.termo ?? '').trim()
+
   return (
     <div className="space-y-6">
 
-      {/* FILTRO */}
+      {/* FILTRO (inclui o campo "Busca por conteúdo") */}
       <EdicaoDiarioFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
 
-        <span className="text-sm text-text-secondary">
-          <strong className="text-primary">{totalElements}</strong> edições encontradas
-          {atualizadoEm && (
-            <span className="text-text-muted"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
-          )}
-        </span>
+        {termoAtivo ? (
+          <span className="text-sm text-text-secondary">
+            <strong className="text-primary">{totalElements}</strong> resultado(s) para{' '}
+            <strong>&ldquo;{termoAtivo}&rdquo;</strong>
+          </span>
+        ) : (
+          <span className="text-sm text-text-secondary">
+            <strong className="text-primary">{totalElements}</strong> edições encontradas
+            {atualizadoEm && (
+              <span className="text-text-muted"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+            )}
+          </span>
+        )}
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 text-text-secondary text-sm">
-            <MdSwapVert />
-            Ordenar
-          </div>
-
-          <Select
-            value={ordenacao || 'dataPublicacao,desc'}
-            onChange={(e) => setOrdenacao(e.target.value)}
-            aria-label="Ordenar por"
-            fullWidth={false}
+        {termoAtivo ? (
+          <button
+            onClick={() => setFiltros({ ...filtros, termo: undefined })}
+            className="flex items-center gap-1 text-sm text-primary font-semibold hover:underline"
           >
-            <option value="dataPublicacao,desc">Mais recentes</option>
-            <option value="dataPublicacao,asc">Mais antigas</option>
-          </Select>
-        </div>
+            <MdClose size={16} />
+            Limpar busca
+          </button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-text-secondary text-sm">
+              <MdSwapVert />
+              Ordenar
+            </div>
+
+            <Select
+              value={ordenacao || 'dataPublicacao,desc'}
+              onChange={(e) => setOrdenacao(e.target.value)}
+              aria-label="Ordenar por"
+              fullWidth={false}
+            >
+              <option value="dataPublicacao,desc">Mais recentes</option>
+              <option value="dataPublicacao,asc">Mais antigas</option>
+            </Select>
+          </div>
+        )}
 
       </div>
 
@@ -78,11 +101,21 @@ export default function DiarioOficialListView() {
           {/* LISTA */}
           <div className="grid gap-4">
             {edicoes.length > 0 ? (
-              edicoes.map(edicao => (
-                <EdicaoCard key={edicao.id} edicao={edicao} />
-              ))
+              termoAtivo ? (
+                edicoes.map(item => (
+                  <BuscaResultadoCard key={item.id} item={item as ResultadoBuscaEdicaoDiario} />
+                ))
+              ) : (
+                edicoes.map(edicao => (
+                  <EdicaoCard key={edicao.id} edicao={edicao as EdicaoDiario} />
+                ))
+              )
             ) : (
-              <EmptyState message="Nenhuma edição encontrada com os filtros aplicados." />
+              <EmptyState
+                message={termoAtivo
+                  ? 'Nenhuma edição encontrada com o termo buscado. Tente outra palavra-chave.'
+                  : 'Nenhuma edição encontrada com os filtros aplicados.'}
+              />
             )}
           </div>
 
