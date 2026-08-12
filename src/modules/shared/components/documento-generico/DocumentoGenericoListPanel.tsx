@@ -1,14 +1,17 @@
 'use client'
 
-import { MdSwapVert } from 'react-icons/md'
+import { useState } from 'react'
+import { MdDownload, MdSwapVert } from 'react-icons/md'
 
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import ModalExportar from '@/components/ui/ModalExportar'
 import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { usePageableResource } from '@/hooks/usePageableResource'
-import { formatarDataHora } from '@/utils/date'
+import { formatarData, formatarDataHora } from '@/utils/date'
+import { ColunaExportacao } from '@/utils/exportacao'
 import { DocumentoGenerico, FiltroDocumentoGenerico } from '../../types/DocumentoGenerico'
 import DocumentoGenericoCard from './DocumentoGenericoCard'
 import DocumentoGenericoFiltro from './DocumentoGenericoFiltro'
@@ -16,6 +19,11 @@ import DocumentoGenericoFiltro from './DocumentoGenericoFiltro'
 type Props = ReturnType<typeof usePageableResource<DocumentoGenerico, FiltroDocumentoGenerico>> & {
   origem?: { label: string; href: string }
 }
+
+const COLUNAS_EXPORTACAO: ColunaExportacao<DocumentoGenerico>[] = [
+  { chave: 'descricao', rotulo: 'Descrição' },
+  { chave: 'data', rotulo: 'Data de Publicação', formatar: item => formatarData(item.data) }
+]
 
 export default function DocumentoGenericoListPanel({
   data: documentos,
@@ -32,6 +40,12 @@ export default function DocumentoGenericoListPanel({
   ordenacao,
   origem
 }: Props) {
+  const [exportarAberto, setExportarAberto] = useState(false)
+  // Nome do arquivo derivado do label da origem (ex.: "Legislação" -> "legislacao"),
+  // pra cada módulo baixar com um nome próprio.
+  const nomeBaseArquivo =
+    origem?.label.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-') ?? 'documentos'
+
   return (
     <div className="space-y-6">
 
@@ -49,6 +63,16 @@ export default function DocumentoGenericoListPanel({
         </span>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setExportarAberto(true)}
+            disabled={documentos.length === 0}
+            aria-label="Exportar os dados exibidos na tela"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <MdDownload size={18} />
+            Exportar
+          </button>
+
           <div className="flex items-center gap-2 text-text-secondary text-sm">
             <MdSwapVert />
             Ordenar
@@ -94,6 +118,16 @@ export default function DocumentoGenericoListPanel({
           <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
         </>
       )}
+
+      {/* EXPORTAÇÃO (somente os dados da página atual) */}
+      <ModalExportar
+        aberto={exportarAberto}
+        aoFechar={() => setExportarAberto(false)}
+        titulo="Exportar documentos"
+        itens={documentos}
+        colunas={COLUNAS_EXPORTACAO}
+        nomeBaseArquivo={nomeBaseArquivo}
+      />
     </div>
   )
 }
