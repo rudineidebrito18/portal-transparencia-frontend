@@ -167,7 +167,9 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     cor: 'tertiary',
     itens: [
       { label: 'Obras Públicas', icon: MdConstruction, href: '/obras' },
-      { label: 'Obras Paralisadas', icon: MdPauseCircleOutline, href: '/obras?status=paralisadas' },
+      // O filtro de paralisada no backend é o booleano ?paralisada=true — "status=paralisadas"
+      // não existe no enum StatusObra (400) e quebrava a página ao abrir por este link.
+      { label: 'Obras Paralisadas', icon: MdPauseCircleOutline, href: '/obras?paralisada=true' },
     ],
   },
   {
