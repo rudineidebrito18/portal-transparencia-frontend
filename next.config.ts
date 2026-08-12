@@ -24,46 +24,6 @@ const nextConfig: NextConfig = {
         destination: `${backendRoot}/users/:path*`
       }
     ];
-  },
-  // As páginas agregadoras com abas foram eliminadas — cada item virou rota própria
-  // (ex.: /divida-ativa no lugar de /gestao-fiscal?categoria=divida-ativa). Os redirects
-  // preservam bookmarks antigos e links espalhados (header, breadcrumbs).
-  async redirects() {
-    const categoriaParaRota: Record<string, string> = {
-      "renuncia-fiscal": "/renuncias-fiscais",
-      "execucao-orcamentaria": "/rreo",
-      rgf: "/rgf",
-      "divida-ativa": "/divida-ativa",
-      inidoneas: "/empresas-inidoneas",
-      glossario: "/glossario-gestao-fiscal",
-      "transferencias-recebidas": "/transferencias-recebidas",
-      "transferencias-realizadas": "/transferencias-realizadas",
-      "acordos-firmados": "/acordos-firmados"
-    };
-
-    interface RegraRedirect {
-      source: string;
-      destination: string;
-      permanent: boolean;
-      has?: { type: "query"; key: string; value: string }[];
-    }
-
-    // /gestao-fiscal e /convenios: redireciona cada aba pra rota própria; sem
-    // ?categoria (ou com valor desconhecido) cai na rota da aba padrão antiga.
-    const regrasPorCategoria = (source: string, mapa: Record<string, string>): RegraRedirect[] =>
-      Object.entries(mapa).map(([categoria, destino]) => ({
-        source,
-        has: [{ type: "query", key: "categoria", value: categoria }],
-        destination: destino,
-        permanent: false
-      }));
-
-    return [
-      ...regrasPorCategoria("/gestao-fiscal", categoriaParaRota),
-      { source: "/gestao-fiscal", destination: "/renuncias-fiscais", permanent: false },
-      ...regrasPorCategoria("/convenios", categoriaParaRota),
-      { source: "/convenios", destination: "/transferencias-recebidas", permanent: false }
-    ];
   }
 };
 

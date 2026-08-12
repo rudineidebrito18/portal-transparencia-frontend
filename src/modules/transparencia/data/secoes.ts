@@ -105,9 +105,9 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdAttachMoney,
     cor: 'accent',
     itens: [
-      { label: 'Execução Orçamentária 2018 a 2024', icon: MdTrendingUp, href: '/rreo' },
-      { label: 'Execução Orçamentária (2025-2026)', icon: MdTrendingDown, href: '/rreo' },
-      { label: 'Empresas com Dívida Ativa', icon: MdMoneyOff, href: '/divida-ativa' },
+      { label: 'Execução Orçamentária 2018 a 2024', icon: MdTrendingUp, href: '/gestao-fiscal?categoria=execucao-orcamentaria' },
+      { label: 'Execução Orçamentária (2025-2026)', icon: MdTrendingDown, href: '/gestao-fiscal?categoria=execucao-orcamentaria' },
+      { label: 'Empresas com Dívida Ativa', icon: MdMoneyOff, href: '/gestao-fiscal?categoria=divida-ativa' },
     ],
   },
   {
@@ -115,9 +115,9 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdSwapHoriz,
     cor: 'secondary',
     itens: [
-      { label: 'Convênios e Transferências Recebidas', icon: MdCallReceived, href: '/transferencias-recebidas' },
-      { label: 'Convênios e Transferências Realizadas', icon: MdCallMade, href: '/transferencias-realizadas' },
-      { label: 'Acordos Firmados pelo Órgão', icon: MdHandshake, href: '/acordos-firmados' },
+      { label: 'Convênios e Transferências Recebidas', icon: MdCallReceived, href: '/convenios?categoria=transferencias-recebidas' },
+      { label: 'Convênios e Transferências Realizadas', icon: MdCallMade, href: '/convenios?categoria=transferencias-realizadas' },
+      { label: 'Acordos Firmados pelo Órgão', icon: MdHandshake, href: '/convenios?categoria=acordos-firmados' },
     ],
   },
   {
@@ -154,7 +154,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
       { label: 'Lista de Fiscais de Contrato', icon: MdBadge, href: '/fiscais-contratos' },
       { label: 'Licitantes Sancionados', icon: MdReportProblem, href: '/licitantes-sancionados' },
       { label: 'Relação de Licitantes Contratados', icon: MdListAlt },
-      { label: 'Empresas Inidôneas e Suspensas', icon: MdBlock, href: '/empresas-inidoneas' },
+      { label: 'Empresas Inidôneas e Suspensas', icon: MdBlock, href: '/gestao-fiscal?categoria=inidoneas' },
       { label: 'Licitações COVID-19', icon: MdCoronavirus, href: '/licitacoes?covid=true' },
     ],
   },
@@ -181,8 +181,8 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
       { label: 'Relatório de Gestão ou Atividade', icon: MdInsertChart, href: '/planejamento?categoria=rga' },
       { label: 'Julgamento de Contas pelo TCE (Parecer Prévio)', icon: MdBalance, href: '/prestacao-contas?categoria=julgamento-contas-tce' },
       { label: 'Resultado de Julgamento das Contas (Legislativo)', icon: MdHowToVote, href: '/prestacao-contas?categoria=julgamento-contas-legislativo' },
-      { label: 'Relatório de Gestão Fiscal (RGF)', icon: MdBarChart, href: '/rgf' },
-      { label: 'Rel. Res. de Execução Orçamentária (RREO)', icon: MdPieChart, href: '/rreo' },
+      { label: 'Relatório de Gestão Fiscal (RGF)', icon: MdBarChart, href: '/gestao-fiscal?categoria=rgf' },
+      { label: 'Rel. Res. de Execução Orçamentária (RREO)', icon: MdPieChart, href: '/gestao-fiscal?categoria=execucao-orcamentaria' },
       { label: 'Plano Estratégico Institucional (PEI)', icon: MdFlag, href: '/planejamento?categoria=plano-estrategico' },
       { label: 'Plano Plurianual (PPA)', icon: MdDateRange, href: '/planejamento?categoria=ppa' },
       { label: 'Lei de Diretrizes Orçamentárias (LDO)', icon: MdRule, href: '/planejamento?categoria=ldo' },
@@ -214,7 +214,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     cor: 'primary-light',
     itens: [
       { label: 'Execução Orçamentária (Emendas Parlamentares)', icon: MdEditNote, href: '/emendas-parlamentares' },
-      { label: 'Renúncias Fiscais', icon: MdPercent, href: '/renuncias-fiscais' },
+      { label: 'Renúncias Fiscais', icon: MdPercent, href: '/gestao-fiscal?categoria=renuncia-fiscal' },
     ],
   },
   {

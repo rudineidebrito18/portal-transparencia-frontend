@@ -31,7 +31,7 @@ export default function ConvenioCard({ documento }: Props) {
       </div>
 
       <Link
-        href={hrefDocumento(documento.caminhoArquivo, documento.descricao, { origemLabel: 'Transparência', origemHref: '/transparencia' })}
+        href={hrefDocumento(documento.caminhoArquivo, documento.descricao, { origemLabel: 'Convênios e Transferências', origemHref: '/convenios' })}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
         <MdVisibility size={18} />

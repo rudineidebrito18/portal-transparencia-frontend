@@ -59,7 +59,7 @@ export default function RelatoriosGestaoFiscalListView() {
             caminhoPdf={relatorio.caminhoPdf}
             caminhoWord={relatorio.caminhoWord}
             caminhoXls={relatorio.caminhoXls}
-            origem={{ label: 'RGF', href: '/rgf' }}
+            origem={{ label: 'Gestão Fiscal', href: '/gestao-fiscal?categoria=rgf' }}
           />
         )}
       />

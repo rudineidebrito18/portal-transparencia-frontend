@@ -2,18 +2,18 @@ import { Suspense } from 'react'
 
 import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
-import RenunciaFiscalListView from '@/modules/gestao-fiscal/components/RenunciaFiscalListView'
+import ConveniosView from '@/modules/convenios/components/ConveniosView'
 
-export default function RenunciasFiscaisPage() {
+export default function Convenios() {
   return (
     <div className="max-w-6xl mx-auto p-2">
-      <PageHeader title="Renúncias Fiscais" breadcrumbItems={[
-        { label: 'Transparência', href: '/transparencia' },
-        { label: 'Renúncias Fiscais' }
-      ]} />
+      <PageHeader title="Convênios e Transferências" breadcrumbItems={[
+          { label: 'Transparência', href: '/transparencia' },
+          { label: 'Convênios e Transferências' }
+        ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
-        <RenunciaFiscalListView />
+        <ConveniosView />
       </Suspense>
     </div>
   )
