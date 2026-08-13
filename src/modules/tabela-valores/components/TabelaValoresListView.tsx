@@ -1,18 +1,32 @@
 'use client'
 
-import { MdSwapVert } from 'react-icons/md'
+import { useState } from 'react'
+import { MdDownload, MdSwapVert } from 'react-icons/md'
 
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import ModalExportar from '@/components/ui/ModalExportar'
 import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
-import { formatarDataHora } from '@/utils/date'
+import { formatarData, formatarDataHora } from '@/utils/date'
+import { ColunaExportacao } from '@/utils/exportacao'
 import { useTabelaValores } from '../hooks/useTabelaValores'
+import { TabelaValores, TipoViagem, TipoViagemDescricao } from '../types'
 import TabelaValoresCard from './TabelaValoresCard'
 import TabelaValoresFiltro from './TabelaValoresFiltro'
 
-export default function TabelaValoresListView() {
+interface Props {
+  tipoViagem: TipoViagem
+}
+
+const COLUNAS_EXPORTACAO: ColunaExportacao<TabelaValores>[] = [
+  { chave: 'descricao', rotulo: 'Descrição' },
+  { chave: 'tipo', rotulo: 'Tipo de Viagem', formatar: item => TipoViagemDescricao[item.tipo] },
+  { chave: 'data', rotulo: 'Data de Publicação', formatar: item => formatarData(item.data) }
+]
+
+export default function TabelaValoresListView({ tipoViagem }: Props) {
   const {
     data: documentos,
     loading,
@@ -26,7 +40,8 @@ export default function TabelaValoresListView() {
     setFiltros,
     setOrdenacao,
     ordenacao
-  } = useTabelaValores()
+  } = useTabelaValores(tipoViagem)
+  const [exportarAberto, setExportarAberto] = useState(false)
 
   return (
     <div className="space-y-6">
@@ -45,6 +60,16 @@ export default function TabelaValoresListView() {
         </span>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setExportarAberto(true)}
+            disabled={documentos.length === 0}
+            aria-label="Exportar os dados exibidos na tela"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <MdDownload size={18} />
+            Exportar
+          </button>
+
           <div className="flex items-center gap-2 text-text-secondary text-sm">
             <MdSwapVert />
             Ordenar
@@ -90,6 +115,16 @@ export default function TabelaValoresListView() {
           <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
         </>
       )}
+
+      {/* EXPORTAÇÃO (somente os dados da página atual) */}
+      <ModalExportar
+        aberto={exportarAberto}
+        aoFechar={() => setExportarAberto(false)}
+        titulo="Exportar tabela de valores"
+        itens={documentos}
+        colunas={COLUNAS_EXPORTACAO}
+        nomeBaseArquivo={`tabela-valores-${tipoViagem.toLowerCase()}`}
+      />
     </div>
   )
 }

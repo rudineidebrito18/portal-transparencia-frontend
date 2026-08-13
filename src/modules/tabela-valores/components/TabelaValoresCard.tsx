@@ -29,7 +29,7 @@ export default function TabelaValoresCard({ documento }: Props) {
             </span>
           </div>
           <p className="text-sm text-text-secondary">
-            Referência de {formatarData(documento.data)}
+            Data de Publicação: {formatarData(documento.data)}
           </p>
         </div>
       </div>

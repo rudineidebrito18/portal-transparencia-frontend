@@ -6,8 +6,7 @@ import { MdRestartAlt, MdSearch } from 'react-icons/md'
 import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
 import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
-import { FiltroTabelaValores, TipoViagem, TipoViagemDescricao } from '../types'
+import { FiltroTabelaValores } from '../types'
 
 interface Props {
   valoresIniciais?: FiltroTabelaValores
@@ -16,7 +15,6 @@ interface Props {
 
 const initialState: FiltroTabelaValores = {
   descricao: '',
-  tipoViagem: undefined,
   dataInicial: '',
   dataFinal: ''
 }
@@ -28,7 +26,7 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
     ([, v]) => v !== undefined && v !== ''
   ).length
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
     setFiltros(prev => ({ ...prev, [name]: value === '' ? undefined : value }))
   }
@@ -53,7 +51,7 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
   }
 
   return (
-    <FiltroCard subtituloPadrao="Refine por descrição, tipo de viagem e datas" filtrosAtivosCount={filtrosAtivosCount}>
+    <FiltroCard subtituloPadrao="Refine por descrição e datas" filtrosAtivosCount={filtrosAtivosCount}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
         <div className="md:col-span-2">
@@ -68,23 +66,6 @@ export default function TabelaValoresFiltro({ valoresIniciais, onFiltrar }: Prop
             onKeyDown={handleKeyDown}
             placeholder="Ex: Tabela 2025"
           />
-        </div>
-
-        <div>
-          <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="tipoViagem">
-            Tipo de viagem
-          </label>
-          <Select
-            id="tipoViagem"
-            name="tipoViagem"
-            value={filtros.tipoViagem ?? ''}
-            onChange={handleChange}
-          >
-            <option value="">Todos</option>
-            {Object.values(TipoViagem).map(tipo => (
-              <option key={tipo} value={tipo}>{TipoViagemDescricao[tipo]}</option>
-            ))}
-          </Select>
         </div>
 
         <div>

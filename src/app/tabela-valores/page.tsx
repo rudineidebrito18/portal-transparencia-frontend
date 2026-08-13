@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 
 import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
-import TabelaValoresListView from '@/modules/tabela-valores/components/TabelaValoresListView'
+import TabelaValoresView from '@/modules/tabela-valores/components/TabelaValoresView'
 
 export default function TabelaValores() {
   return (
@@ -13,7 +13,7 @@ export default function TabelaValores() {
         ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
-        <TabelaValoresListView />
+        <TabelaValoresView />
       </Suspense>
     </div>
   )
