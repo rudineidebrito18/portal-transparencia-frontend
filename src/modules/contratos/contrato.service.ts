@@ -39,6 +39,17 @@ export const contratoService = {
       .then(response => response.data)
   },
 
+  // Contratos que têm pelo menos um aditivo — usado pela listagem pública de Aditivos de
+  // Contratos (lista contratos, não os aditivos soltos; cada card já leva direto pro
+  // contrato, cuja página de detalhes já mostra os aditivos dele).
+  listarComAditivos(params: ListarTodosParams): Promise<Page<ContratoLicitacao>> {
+    if (USE_MOCK) return contratoMock.listarComAditivos(params)
+
+    return api
+      .get<Page<ContratoLicitacao>>('/licitacoes/contratos/com-aditivos', { params })
+      .then(response => response.data)
+  },
+
   listarDocumentos(contratoId: number): Promise<Documento[]> {
     if (USE_MOCK) return contratoMock.listarDocumentos(contratoId)
 

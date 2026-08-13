@@ -155,5 +155,24 @@ export const contratoMock = {
 
   async listarAditivos(contratoId: number): Promise<Aditivo[]> {
     return gerarAditivosDoContrato(contratoId)
+  },
+
+  async listarComAditivos(
+    params: FiltroContrato & { page?: number; size?: number; sort?: string }
+  ): Promise<Page<ContratoLicitacao>> {
+    const { page = 0, size = 10, sort } = params
+
+    // Mesmo gerador determinístico (seed = contratoId) usado por listarAditivos — só entram
+    // aqui os contratos pra quem esse gerador de fato produz pelo menos um aditivo.
+    const dados = listarTodasLicitacoesMock()
+      .flatMap(gerarContratosDaLicitacao)
+      .filter(c => gerarAditivosDoContrato(c.id).length > 0)
+
+    const ordenados = ordenar(
+      dados as unknown as Record<string, unknown>[],
+      sort ?? 'dataAssinatura,desc'
+    ) as unknown as ContratoLicitacao[]
+
+    return paginar(ordenados, page, size)
   }
 }
