@@ -88,7 +88,7 @@ export default function ModalExportar<T>({
         {/* CABEÇALHO */}
         <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-border/30">
           <div>
-            <h2 id="modal-exportar-titulo" className="text-base font-bold text-text-primary">
+            <h2 id="modal-exportar-titulo" className="text-base font-bold text-text-secondary">
               {titulo}
             </h2>
             <p className="text-sm text-text-secondary/70">
@@ -133,7 +133,7 @@ export default function ModalExportar<T>({
                     <th
                       key={col.chave}
                       scope="col"
-                      className="text-left px-3 py-2 font-bold text-text-primary whitespace-nowrap"
+                      className="text-left px-3 py-2 font-bold text-text-secondary whitespace-nowrap"
                     >
                       {col.rotulo}
                     </th>
