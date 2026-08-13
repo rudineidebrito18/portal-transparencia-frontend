@@ -43,9 +43,20 @@ export default function DiariaListView() {
     filtros,
     setFiltros,
     setOrdenacao,
-    ordenacao
+    ordenacao,
+    exportando,
+    buscarTudoParaExportar
   } = useDiarias()
   const [exportarAberto, setExportarAberto] = useState(false)
+  const [itensExportar, setItensExportar] = useState<Diaria[]>([])
+  const [truncadoExportar, setTruncadoExportar] = useState(false)
+
+  async function handleExportar() {
+    const resultado = await buscarTudoParaExportar()
+    setItensExportar(resultado.itens)
+    setTruncadoExportar(resultado.truncado)
+    setExportarAberto(true)
+  }
 
   return (
     <div className="space-y-6">
@@ -65,13 +76,13 @@ export default function DiariaListView() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setExportarAberto(true)}
-            disabled={diarias.length === 0}
-            aria-label="Exportar os dados exibidos na tela"
+            onClick={handleExportar}
+            disabled={diarias.length === 0 || exportando}
+            aria-label="Exportar todos os resultados dos filtros aplicados"
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <MdDownload size={18} />
-            Exportar
+            <MdDownload size={18} className={exportando ? 'animate-pulse' : ''} />
+            {exportando ? 'Preparando...' : 'Exportar'}
           </button>
 
           <div className="flex items-center gap-2 text-text-secondary text-sm">
@@ -127,9 +138,10 @@ export default function DiariaListView() {
         aberto={exportarAberto}
         aoFechar={() => setExportarAberto(false)}
         titulo="Exportar diárias"
-        itens={diarias}
+        itens={itensExportar}
         colunas={COLUNAS_EXPORTACAO}
         nomeBaseArquivo="diarias"
+        truncado={truncadoExportar}
       />
     </div>
   )

@@ -41,10 +41,21 @@ export default function ConvenioListPanel({
   setFiltros,
   setOrdenacao,
   ordenacao,
+  exportando,
+  buscarTudoParaExportar,
   emptyMessage,
   nomeBaseArquivo
 }: Props) {
   const [exportarAberto, setExportarAberto] = useState(false)
+  const [itensExportar, setItensExportar] = useState<ConvenioDocumento[]>([])
+  const [truncadoExportar, setTruncadoExportar] = useState(false)
+
+  async function handleExportar() {
+    const resultado = await buscarTudoParaExportar()
+    setItensExportar(resultado.itens)
+    setTruncadoExportar(resultado.truncado)
+    setExportarAberto(true)
+  }
 
   return (
     <div className="space-y-6">
@@ -64,13 +75,13 @@ export default function ConvenioListPanel({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setExportarAberto(true)}
-            disabled={documentos.length === 0}
-            aria-label="Exportar os dados exibidos na tela"
+            onClick={handleExportar}
+            disabled={documentos.length === 0 || exportando}
+            aria-label="Exportar todos os resultados dos filtros aplicados"
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <MdDownload size={18} />
-            Exportar
+            <MdDownload size={18} className={exportando ? 'animate-pulse' : ''} />
+            {exportando ? 'Preparando...' : 'Exportar'}
           </button>
 
           <div className="flex items-center gap-2 text-text-secondary text-sm">
@@ -124,9 +135,10 @@ export default function ConvenioListPanel({
         aberto={exportarAberto}
         aoFechar={() => setExportarAberto(false)}
         titulo="Exportar documentos"
-        itens={documentos}
+        itens={itensExportar}
         colunas={COLUNAS_EXPORTACAO}
         nomeBaseArquivo={nomeBaseArquivo}
+        truncado={truncadoExportar}
       />
     </div>
   )

@@ -12,31 +12,37 @@ interface Props<T> {
   colunas: ColunaExportacao<T>[]
   nomeBaseArquivo: string
   aoFechar: () => void
+  truncado?: boolean
 }
 
 interface FormatoDisponivel {
   id: 'csv' | 'json' | 'xml' | 'pdf'
   rotulo: string
   extensao: string
+  cor: string
 }
 
+// Cor por formato só pra diferenciar visualmente os botões — sem significado semântico
+// (ex: vermelho do PDF não indica erro/perigo aqui, é só identidade do formato).
 const FORMATOS: FormatoDisponivel[] = [
-  { id: 'csv', rotulo: 'CSV', extensao: '.csv' },
-  { id: 'json', rotulo: 'JSON', extensao: '.json' },
-  { id: 'xml', rotulo: 'XML', extensao: '.xml' },
-  { id: 'pdf', rotulo: 'PDF', extensao: '.pdf' }
+  { id: 'csv', rotulo: 'CSV', extensao: '.csv', cor: 'bg-blue-600 hover:bg-blue-700' },
+  { id: 'json', rotulo: 'JSON', extensao: '.json', cor: 'bg-green-600 hover:bg-green-700' },
+  { id: 'xml', rotulo: 'XML', extensao: '.xml', cor: 'bg-purple-600 hover:bg-purple-700' },
+  { id: 'pdf', rotulo: 'PDF', extensao: '.pdf', cor: 'bg-red-600 hover:bg-red-700' }
 ]
 
-// Modal de exportação dos dados atuais (somente o que está na tela, não busca nada):
-// mostra uma prévia em tabela com os registros da página e os formatos de download
-// acima. Fecha com Escape/clique no overlay/×, como o ConfirmDialog do painel.
+// Modal de exportação: `itens` já vem pronto do chamador (todos os registros que batem
+// com os filtros/ordenação aplicados, buscados via buscarTudoParaExportar — não só a
+// página atual). Mostra uma prévia em tabela e os formatos de download. Fecha com
+// Escape/clique no overlay/×, como o ConfirmDialog do painel.
 export default function ModalExportar<T>({
   aberto,
   titulo,
   itens,
   colunas,
   nomeBaseArquivo,
-  aoFechar
+  aoFechar,
+  truncado = false
 }: Props<T>) {
   const fecharRef = useRef<HTMLButtonElement>(null)
 
@@ -83,7 +89,7 @@ export default function ModalExportar<T>({
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-exportar-titulo"
-        className="relative w-full max-w-3xl max-h-[85vh] flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-5xl max-h-[85vh] flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* CABEÇALHO */}
         <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-border/30">
@@ -92,8 +98,13 @@ export default function ModalExportar<T>({
               {titulo}
             </h2>
             <p className="text-sm text-text-secondary/70">
-              {itens.length} registro(s) na tela — exportação apenas do que está sendo exibido.
+              {itens.length} registro(s) — todos os resultados dos filtros aplicados.
             </p>
+            {truncado && (
+              <p className="text-sm text-amber-700 font-semibold mt-1">
+                O resultado tem mais registros do que o limite de exportação ({itens.length}). Refine os filtros para exportar tudo.
+              </p>
+            )}
           </div>
 
           <button
@@ -115,7 +126,7 @@ export default function ModalExportar<T>({
             <button
               key={formato.id}
               onClick={() => exportar(formato)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-all active:scale-95"
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-all active:scale-95 ${formato.cor}`}
             >
               <MdDownload size={16} />
               {formato.rotulo}
@@ -123,7 +134,7 @@ export default function ModalExportar<T>({
           ))}
         </div>
 
-        {/* TABELA PRÉVIA (só o conteúdo da página atual) */}
+        {/* TABELA PRÉVIA */}
         <div className="flex-1 overflow-auto px-6 py-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-text-secondary">
