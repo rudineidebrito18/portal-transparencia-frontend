@@ -15,11 +15,11 @@ export default function InfoBlock({ label, value, icon: Icon }: InfoBlockProps) 
           <Icon size={18} />
         </div>
       )}
-      <div className="overflow-hidden">
+      <div>
         <p className="text-xs uppercase font-semibold text-text-muted tracking-wide">
           {label}
         </p>
-        <p className="text-sm font-bold text-text-secondary truncate">
+        <p className="text-sm font-bold text-text-secondary break-words">
           {value || '-'}
         </p>
       </div>
