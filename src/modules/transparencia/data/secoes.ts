@@ -84,10 +84,7 @@ export interface SecaoAcesso {
 
 // Espelha 1:1 o checklist de funcionalidades do portal legado (mesmas 14 seções, mesma
 // ordem, mesmos rótulos) — usado pelo usuário pra conferir item por item contra o site
-// antigo. Itens sem `href` são gaps reais (ainda não implementados); itens que o
-// checklist lista separado mas cujo destino no nosso sistema é a mesma página/filtro
-// (ex.: duas faixas de ano de Execução Orçamentária) apontam pro mesmo `href` de
-// propósito, em vez de ficar sem link.
+// antigo. Itens sem `href` são gaps reais (ainda não implementados).
 export const secoesAcessoInformacao: SecaoAcesso[] = [
   {
     titulo: 'Informações Institucionais',
@@ -105,8 +102,8 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdAttachMoney,
     cor: 'accent',
     itens: [
-      { label: 'Execução Orçamentária 2018 a 2024', icon: MdTrendingUp, href: '/gestao-fiscal?categoria=execucao-orcamentaria' },
-      { label: 'Execução Orçamentária (2025-2026)', icon: MdTrendingDown, href: '/gestao-fiscal?categoria=execucao-orcamentaria' },
+      { label: 'Execução Orçamentária 2018 a 2024', icon: MdTrendingUp, href: '/execucao-orcamentaria/2018-2024' },
+      { label: 'Execução Orçamentária (2025-2026)', icon: MdTrendingDown, href: '/execucao-orcamentaria/2025-2026' },
       { label: 'Empresas com Dívida Ativa', icon: MdMoneyOff, href: '/gestao-fiscal?categoria=divida-ativa' },
     ],
   },
@@ -213,7 +210,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdReceiptLong,
     cor: 'primary-light',
     itens: [
-      { label: 'Execução Orçamentária (Emendas Parlamentares)', icon: MdEditNote, href: '/emendas-parlamentares' },
+      { label: 'Execução Orçamentária (Emendas Parlamentares)', icon: MdEditNote, href: '/emendas-parlamentares/execucao-orcamentaria' },
       { label: 'Renúncias Fiscais', icon: MdPercent, href: '/gestao-fiscal?categoria=renuncia-fiscal' },
     ],
   },
