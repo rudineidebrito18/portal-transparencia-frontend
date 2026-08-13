@@ -19,14 +19,15 @@ export default function FiscalContratoCard({ contrato }: Props) {
         </div>
 
         <div>
+          <p className="text-xs uppercase text-text-muted font-semibold mb-0.5">Nome do Fiscal</p>
           <h2 className="text-base font-bold text-primary leading-tight">
             {contrato.gestorContrato || 'Não informado'}
           </h2>
           <p className="text-sm text-text-secondary">
-            Contrato Nº {contrato.numeroContrato}/{contrato.exercicio} · {contrato.fornecedor}
+            Contrato Nº {contrato.numeroContrato}/{contrato.exercicio} · Fornecedor: {contrato.fornecedor}
           </p>
           <p className="text-xs text-text-secondary/70">
-            Vigência: {formatarData(contrato.dataInicio)} — {formatarData(contrato.dataTermino)}
+            Assinatura: {formatarData(contrato.dataAssinatura)} · Vigência: {formatarData(contrato.dataInicio)} — {formatarData(contrato.dataTermino)}
           </p>
         </div>
       </div>
