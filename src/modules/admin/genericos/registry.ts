@@ -45,6 +45,7 @@ export const REGISTRY_MODULOS_GENERICOS: ModuloGenericoConfig[] = [
   { slug: 'plano-estrategico', label: 'Plano Estratégico', categoria: 'Planejamento', basePath: '/planejamento/plano-estrategico', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'diario-oficial-legislacao', label: 'Legislação do Diário Oficial', categoria: 'Diário Oficial', basePath: '/diario-oficial/legislacao', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'licitantes-sancionados', label: 'Licitantes e/ou Contratados Sancionados', categoria: 'Licitações', basePath: '/licitacoes/licitantes-sancionados', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
+  { slug: 'licitantes-contratados', label: 'Relação de Licitantes Contratados', categoria: 'Licitações', basePath: '/licitacoes/licitantes-contratados', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
 
   // Forma com intervalo de data: acrescenta { dataInicio, dataFim }
   { slug: 'acordo-firmado-orgao', label: 'Acordo Firmado com Órgão', categoria: 'Convênios e Repasses', basePath: '/convenios/acordos-firmados-orgao', comIntervalo: true, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },

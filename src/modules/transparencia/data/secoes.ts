@@ -150,7 +150,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
       { label: 'Fiscal de Contratos (Ato Normativo)', icon: MdFactCheck, href: '/fiscal-contrato' },
       { label: 'Lista de Fiscais de Contrato', icon: MdBadge, href: '/fiscais-contratos' },
       { label: 'Licitantes Sancionados', icon: MdReportProblem, href: '/licitantes-sancionados' },
-      { label: 'Relação de Licitantes Contratados', icon: MdListAlt },
+      { label: 'Relação de Licitantes Contratados', icon: MdListAlt, href: '/licitantes-contratados' },
       { label: 'Empresas Inidôneas e Suspensas', icon: MdBlock, href: '/gestao-fiscal?categoria=inidoneas' },
       { label: 'Licitações COVID-19', icon: MdCoronavirus, href: '/licitacoes?covid=true' },
     ],
