@@ -36,24 +36,36 @@ export default function LicitacaoCard({ licitacao }: Props) {
     licitacao.tipoProcedimentoLicitacao
 
   return (
-    <Card className="p-5 flex flex-col gap-4">
+    <Card className="p-4 flex flex-col gap-2.5">
 
       {/* HEADER */}
       <div className="flex flex-wrap justify-between items-start gap-3">
-        <h2 className="text-base font-bold text-primary leading-tight">
-          {tipoLabel} {licitacao.numeroInstrumento}/{licitacao.ano}
-        </h2>
+        <div>
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">
+            Nº Sequencial: {licitacao.numeroSequencial}
+          </p>
+          <h2 className="text-base font-bold text-primary leading-tight mb-1.5">
+            Nº Instrumento: {licitacao.numeroInstrumento}/{licitacao.ano}
+          </h2>
+          <span className="inline-block text-xs font-bold uppercase bg-primary/10 text-primary px-2 py-0.5 rounded">
+            Modalidade: {tipoLabel}
+          </span>
+        </div>
 
-        <Badge className={statusStyle} dotClassName={statusDot}>{statusLabel}</Badge>
+        <div className="flex flex-col items-end gap-1">
+          <p className="text-xs uppercase text-text-muted font-semibold">Status</p>
+          <Badge className={statusStyle} dotClassName={statusDot}>{statusLabel}</Badge>
+        </div>
       </div>
 
       {/* OBJETO */}
-      <p className="text-sm text-text-secondary leading-relaxed line-clamp-3">
+      <p className="text-sm text-text-secondary leading-snug line-clamp-2">
+        <span className="font-semibold text-text-muted">Objeto: </span>
         {licitacao.objeto}
       </p>
 
       {/* GRID INFO */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
         <div>
           <p className="text-xs uppercase text-text-muted">Abertura</p>
           <p className="font-semibold text-text-secondary">
@@ -72,17 +84,17 @@ export default function LicitacaoCard({ licitacao }: Props) {
 
         <div className="col-span-2">
           <p className="text-xs uppercase text-text-muted">Unidade</p>
-          <p className="font-semibold text-text-secondary truncate">
+          <p className="font-semibold text-text-secondary break-words">
             {licitacao.unidade || "Não informada"}
           </p>
         </div>
       </div>
 
       {/* FOOTER */}
-      <div className="flex items-center justify-end pt-3 border-t border-border/20">
+      <div className="flex items-center justify-end pt-2 border-t border-border/20">
         <Link
           href={`/licitacoes/${licitacao.id}`}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
           <MdVisibility size={18} />
           Ver

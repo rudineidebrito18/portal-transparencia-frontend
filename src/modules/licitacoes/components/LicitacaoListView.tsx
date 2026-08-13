@@ -1,16 +1,38 @@
 'use client'
 
-import { MdSwapVert } from 'react-icons/md'
+import { useState } from 'react'
+import { MdDownload, MdSwapVert } from 'react-icons/md'
 
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import ModalExportar from '@/components/ui/ModalExportar'
 import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
-import { formatarDataHora } from '@/utils/date'
+import { formatarMoeda } from '@/utils/currency'
+import { formatarData, formatarDataHora } from '@/utils/date'
+import { ColunaExportacao } from '@/utils/exportacao'
+import { TipoProcedimentoDescricao, TipoProcedimentoLicitacao } from '../enums'
 import { useLicitacoes } from '../hooks/useLicitacoes'
+import { LicitacaoResumo } from '../types'
 import LicitacaoCard from './LicitacaoCard'
 import LicitacaoFiltro from './LicitacaoFiltro'
+
+const COLUNAS_EXPORTACAO: ColunaExportacao<LicitacaoResumo>[] = [
+  { chave: 'numeroSequencial', rotulo: 'Nº Sequencial' },
+  { chave: 'numeroInstrumento', rotulo: 'Nº Instrumento' },
+  { chave: 'ano', rotulo: 'Ano' },
+  {
+    chave: 'tipoProcedimentoLicitacao',
+    rotulo: 'Modalidade',
+    formatar: item => TipoProcedimentoDescricao[item.tipoProcedimentoLicitacao as TipoProcedimentoLicitacao] || item.tipoProcedimentoLicitacao
+  },
+  { chave: 'statusDescricao', rotulo: 'Status' },
+  { chave: 'objeto', rotulo: 'Objeto' },
+  { chave: 'unidade', rotulo: 'Unidade' },
+  { chave: 'dataAbertura', rotulo: 'Abertura', formatar: item => formatarData(item.dataAbertura) },
+  { chave: 'valorTotalDespesa', rotulo: 'Valor', formatar: item => item.valorTotalDespesa ? formatarMoeda(item.valorTotalDespesa) : 'Não informado' }
+]
 
 export default function LicitacaoListView() {
   const {
@@ -27,6 +49,7 @@ export default function LicitacaoListView() {
     setOrdenacao,
     ordenacao
   } = useLicitacoes()
+  const [exportarAberto, setExportarAberto] = useState(false)
 
   return (
     <div className="space-y-6">
@@ -45,6 +68,16 @@ export default function LicitacaoListView() {
         </span>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setExportarAberto(true)}
+            disabled={licitacoes.length === 0}
+            aria-label="Exportar os dados exibidos na tela"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <MdDownload size={18} />
+            Exportar
+          </button>
+
           <div className="flex items-center gap-2 text-text-secondary text-sm">
             <MdSwapVert />
             Ordenar
@@ -90,6 +123,16 @@ export default function LicitacaoListView() {
           <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
         </>
       )}
+
+      {/* EXPORTAÇÃO (somente os dados da página atual) */}
+      <ModalExportar
+        aberto={exportarAberto}
+        aoFechar={() => setExportarAberto(false)}
+        titulo="Exportar licitações"
+        itens={licitacoes}
+        colunas={COLUNAS_EXPORTACAO}
+        nomeBaseArquivo="licitacoes"
+      />
     </div>
   )
 }

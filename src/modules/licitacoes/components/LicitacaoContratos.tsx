@@ -73,11 +73,11 @@ export default function LicitacaoContratos({ licitacaoId }: Props) {
                 <MdBusiness size={18} />
               </div>
 
-              <div className="overflow-hidden">
+              <div>
                 <p className="text-xs uppercase font-semibold text-text-muted tracking-wide">
                   Fornecedor
                 </p>
-                <p className="text-sm font-semibold text-text-secondary truncate">
+                <p className="text-sm font-semibold text-text-secondary break-words">
                   {contrato.fornecedor}
                 </p>
               </div>

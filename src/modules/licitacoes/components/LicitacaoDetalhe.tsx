@@ -58,26 +58,33 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
         <div className="flex flex-col md:flex-row justify-between gap-4">
 
           <div>
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="text-xs font-bold uppercase bg-primary text-white px-2 py-1 rounded">
-                {tipoLabel}
+            <p className="text-xs font-semibold text-primary/70 uppercase tracking-wide mb-1">
+              Nº Sequencial: {licitacao.numeroSequencial}
+            </p>
+
+            <h1 className="text-2xl font-extrabold text-primary tracking-tight mb-2">
+              Nº Instrumento: {licitacao.numeroInstrumento}/{licitacao.ano}
+            </h1>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold uppercase bg-primary text-white px-2 py-0.5 rounded">
+                Modalidade: {tipoLabel}
               </span>
 
               {licitacao.covid && (
-                <span className="text-xs font-bold uppercase bg-red-500 text-white px-2 py-1 rounded">
+                <span className="text-xs font-bold uppercase bg-red-500 text-white px-2 py-0.5 rounded">
                   COVID-19
                 </span>
               )}
             </div>
-
-            <h1 className="text-2xl font-extrabold text-primary tracking-tight">
-              Instrumento Nº {licitacao.numeroInstrumento} / {licitacao.ano}
-            </h1>
           </div>
 
-          <Badge size="md" className={`self-start ${statusStyle}`} dotClassName={statusDot}>
-            {statusLabel}
-          </Badge>
+          <div className="flex flex-col items-start md:items-end gap-1">
+            <p className="text-xs uppercase text-text-muted font-semibold">Status</p>
+            <Badge size="md" className={statusStyle} dotClassName={statusDot}>
+              {statusLabel}
+            </Badge>
+          </div>
         </div>
       </div>
 
@@ -168,6 +175,10 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
 
             {/* DOCUMENTOS */}
             <div className="pt-6 border-t border-border/20">
+              <h3 className="font-bold text-primary uppercase text-sm tracking-wider mb-3 flex items-center gap-2">
+                <MdDescription /> Documentos da Licitação
+              </h3>
+
               <DocumentList documentos={licitacao.documentos} />
             </div>
 
