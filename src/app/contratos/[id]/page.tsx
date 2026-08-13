@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import ContratoDetalhe from '@/modules/contratos/components/ContratoDetalhe'
 import { contratoService } from '@/modules/contratos/contrato.service'
+import { licitacaoService } from '@/modules/licitacoes/licitacao.service'
 
 export default async function ContratoPage({
   params
@@ -27,6 +28,13 @@ export default async function ContratoPage({
     contratoService.listarAditivos(numericId)
   ])
 
+  // Documentos da licitação de origem, não os do contrato em si — pedido do checklist
+  // original. Busca best-effort: se a licitação não puder ser carregada por qualquer
+  // motivo, a página do contrato continua funcionando sem essa seção.
+  const documentosLicitacao = contrato.licitacaoId
+    ? await licitacaoService.buscarPorId(contrato.licitacaoId).then(l => l.documentos ?? []).catch(() => undefined)
+    : undefined
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <Breadcrumbs
@@ -44,7 +52,7 @@ export default async function ContratoPage({
         <div className="h-1.5 w-16 bg-secondary mt-2 rounded-full" />
       </div>
 
-      <ContratoDetalhe contrato={contrato} documentos={documentos} aditivos={aditivos} />
+      <ContratoDetalhe contrato={contrato} documentos={documentos} aditivos={aditivos} documentosLicitacao={documentosLicitacao} />
     </div>
   )
 }

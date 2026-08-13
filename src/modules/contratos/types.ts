@@ -11,6 +11,7 @@ export interface Aditivo {
 
 export interface ContratoLicitacao {
   id: number
+  numeroSequencial: number
   numeroContrato: number
   exercicio: number
   fornecedor: string
@@ -25,6 +26,7 @@ export interface ContratoLicitacao {
   status: string
   objeto: string
   numeroLicitacao: string
+  licitacaoId?: number
 }
 
 // GET /licitacoes/contratos/filtro (global, sem exigir licitacaoId) — Contrato.unidade é

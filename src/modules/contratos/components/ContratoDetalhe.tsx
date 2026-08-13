@@ -27,10 +27,14 @@ interface Props {
   contrato: ContratoLicitacao
   documentos: Documento[]
   aditivos: Aditivo[]
+  documentosLicitacao?: Documento[]
 }
 
-export default function ContratoDetalhe({ contrato, documentos, aditivos }: Props) {
+export default function ContratoDetalhe({ contrato, documentos, aditivos, documentosLicitacao }: Props) {
   const origem = { label: `Contrato Nº ${contrato.numeroContrato}/${contrato.exercicio}`, href: `/contratos/${contrato.id}` }
+  const origemLicitacao = contrato.licitacaoId
+    ? { label: `Licitação ${contrato.numeroLicitacao}`, href: `/licitacoes/${contrato.licitacaoId}` }
+    : undefined
 
   return (
     <div className="bg-light border border-border/30 rounded-2xl shadow-md overflow-hidden mb-10">
@@ -39,18 +43,34 @@ export default function ContratoDetalhe({ contrato, documentos, aditivos }: Prop
       <div className="p-6 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border/20">
         <div className="flex flex-col md:flex-row justify-between gap-4">
           <div>
-            <span className="text-xs font-bold uppercase bg-primary text-white px-2 py-1 rounded">
-              Licitação {contrato.numeroLicitacao}
-            </span>
+            <p className="text-xs font-semibold text-primary/70 uppercase tracking-wide mb-1">
+              Nº Sequencial: {contrato.numeroSequencial}
+            </p>
+
+            {origemLicitacao ? (
+              <Link
+                href={origemLicitacao.href}
+                className="inline-block text-xs font-bold uppercase bg-primary text-white px-2 py-0.5 rounded hover:bg-primary-dark transition-colors"
+              >
+                Licitação: {contrato.numeroLicitacao}
+              </Link>
+            ) : (
+              <span className="text-xs font-bold uppercase bg-primary text-white px-2 py-0.5 rounded">
+                Licitação: {contrato.numeroLicitacao}
+              </span>
+            )}
 
             <h1 className="text-2xl font-extrabold text-primary tracking-tight mt-2">
               Contrato Nº {contrato.numeroContrato} / {contrato.exercicio}
             </h1>
           </div>
 
-          <Badge size="md" className={`self-start ${contratoStatusStyle(contrato.status)}`} dotClassName={contratoStatusDot(contrato.status)}>
-            {contratoStatusLabel(contrato.status)}
-          </Badge>
+          <div className="flex flex-col items-start md:items-end gap-1">
+            <p className="text-xs uppercase text-text-muted font-semibold">Status</p>
+            <Badge size="md" className={contratoStatusStyle(contrato.status)} dotClassName={contratoStatusDot(contrato.status)}>
+              {contratoStatusLabel(contrato.status)}
+            </Badge>
+          </div>
         </div>
       </div>
 
@@ -102,6 +122,21 @@ export default function ContratoDetalhe({ contrato, documentos, aditivos }: Prop
 
           <DocumentList documentos={documentos} emptyMessage="Nenhum documento disponível." origem={origem} />
         </div>
+
+        {/* DOCUMENTOS DA LICITAÇÃO DE ORIGEM */}
+        {documentosLicitacao && origemLicitacao && (
+          <div className="mb-10">
+            <h3 className="font-bold text-primary uppercase text-sm tracking-wider mb-3 flex items-center gap-2">
+              <MdDescription /> Documentos da Licitação de Origem ({contrato.numeroLicitacao})
+            </h3>
+
+            <DocumentList
+              documentos={documentosLicitacao}
+              emptyMessage="Nenhum documento disponível na licitação de origem."
+              origem={origemLicitacao}
+            />
+          </div>
+        )}
 
         {/* ADITIVOS */}
         <div>

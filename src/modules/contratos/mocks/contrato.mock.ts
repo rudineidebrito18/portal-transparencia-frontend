@@ -24,6 +24,7 @@ function gerarContratosDaLicitacao(licitacao: LicitacaoCompleta): ContratoMockGe
 
     return {
       id: licitacao.id * 100 + i,
+      numeroSequencial: licitacao.id * 100 + i,
       numeroContrato: faker.number.int({ min: 1, max: 500 }),
       exercicio: licitacao.ano,
       fornecedor: faker.company.name().toUpperCase(),
@@ -38,6 +39,7 @@ function gerarContratosDaLicitacao(licitacao: LicitacaoCompleta): ContratoMockGe
       status: faker.helpers.arrayElement(['EM_ANDAMENTO', 'CONCLUIDO', 'RESCINDIDO', 'SUSPENSO']),
       objeto: licitacao.objeto,
       numeroLicitacao: `${licitacao.numeroInstrumento}/${licitacao.ano}`,
+      licitacaoId: licitacao.id,
       unidadeId: licitacao.unidadeId
     }
   })
