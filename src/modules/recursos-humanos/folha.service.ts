@@ -1,9 +1,15 @@
 import { api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
 import { folhaMock } from './mocks/folha.mock'
-import { FolhaPagamento, FolhaPagamentoServidor } from './types'
+import { FiltroFolhaPagamento, FolhaPagamento, FolhaPagamentoServidor } from './types'
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
+
+type ListarPorMesParams = FiltroFolhaPagamento & {
+  page?: number
+  size?: number
+  sort?: string
+}
 
 export const folhaService = {
   listarPorServidor(servidorId: number): Promise<FolhaPagamento[]> {
@@ -14,13 +20,17 @@ export const folhaService = {
       .then(response => response.data)
   },
 
-  // Backend agora pagina esse GET — pedimos uma página grande porque o hook consumidor
-  // (useFolhaPorMes) soma o total da folha do mês inteiro e pagina em memória.
-  listarPorMes(mes: number, ano: number): Promise<FolhaPagamentoServidor[]> {
-    if (USE_MOCK) return folhaMock.listarPorMes(mes, ano)
+  // mes/ano são obrigatórios no backend — se ausentes da URL (filtro ainda não aplicado
+  // pelo usuário), assume o mês/ano atual aqui, não no hook genérico usePageableResource.
+  listarPorMes(params: ListarPorMesParams): Promise<Page<FolhaPagamentoServidor>> {
+    const hoje = new Date()
+    const mes = params.mes ?? hoje.getMonth() + 1
+    const ano = params.ano ?? hoje.getFullYear()
+
+    if (USE_MOCK) return folhaMock.listarPorMes({ ...params, mes, ano })
 
     return api
-      .get<Page<FolhaPagamentoServidor>>('/recursos-humanos/folha/por-mes', { params: { mes, ano, size: 1000 } })
-      .then(response => response.data.content)
+      .get<Page<FolhaPagamentoServidor>>('/recursos-humanos/folha/por-mes', { params: { ...params, mes, ano } })
+      .then(response => response.data)
   }
 }

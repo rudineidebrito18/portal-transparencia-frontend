@@ -102,7 +102,7 @@ export interface FolhaPagamento {
   salarioLiquido: number
 }
 
-// Sem PUT/DELETE no backend — POST cria uma nova entrada (não há edição/estorno).
+// PUT/DELETE existem (admin-only) — ver folha.service.ts atualizar()/excluir().
 export type FolhaPagamentoRequest = Omit<FolhaPagamento, 'id'>
 
 export interface FolhaPagamentoServidor {
@@ -114,6 +114,32 @@ export interface FolhaPagamentoServidor {
   salarioLiquido: number
   nomeServidor: string
   cpfServidor: string
+  cargo?: string
+  unidadeNome?: string
+  cargaHoraria?: number
+  dataAdmissao?: string
+}
+
+export interface LinhaIgnorada {
+  cpfInformado: string
+  nomeInformado: string
+  motivo: 'SERVIDOR_NAO_CADASTRADO' | 'DUPLICADO'
+}
+
+export interface ImportacaoFolhaResumo {
+  id: number
+  mes: number
+  ano: number
+  dataImportacao: string
+  usuarioEmail: string
+  nomeArquivo: string
+  totalLinhas: number
+  totalLancados: number
+  totalIgnorados: number
+}
+
+export interface ImportacaoFolhaDetalhe extends ImportacaoFolhaResumo {
+  linhasIgnoradas: LinhaIgnorada[]
 }
 
 export interface Concurso {

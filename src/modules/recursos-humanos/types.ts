@@ -41,6 +41,19 @@ export interface FolhaPagamentoServidor {
   salarioLiquido: number
   nomeServidor: string
   cpfServidor: string
+  cargo?: string
+  unidadeNome?: string
+  cargaHoraria?: number
+  dataAdmissao?: string
+}
+
+export interface FiltroFolhaPagamento {
+  mes?: number
+  ano?: number
+  nomeServidor?: string
+  cpf?: string
+  cargo?: string
+  unidadeId?: number
 }
 
 export type RecursoDocumentoRH = 'estagiarios' | 'terceirizados'

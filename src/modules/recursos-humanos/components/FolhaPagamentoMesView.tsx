@@ -1,112 +1,113 @@
 'use client'
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { MdGroups, MdPayments, MdRestartAlt } from 'react-icons/md'
+import { useState } from 'react'
+import { MdDownload, MdSwapVert } from 'react-icons/md'
 
-import Button from '@/components/ui/Button'
-import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
-import FiltroCard from '@/components/ui/FiltroCard'
+import ModalExportar from '@/components/ui/ModalExportar'
 import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarMoeda } from '@/utils/currency'
-import { nomeMes } from '@/utils/date'
+import { formatarData, formatarDataHora, nomeMes } from '@/utils/date'
+import { ColunaExportacao } from '@/utils/exportacao'
 import { useFolhaPorMes } from '../hooks/useFolhaPorMes'
+import { FolhaPagamentoServidor } from '../types'
+import FolhaPagamentoFiltro from './FolhaPagamentoFiltro'
 
-const anoAtual = new Date().getFullYear()
-const anos = Array.from({ length: 6 }, (_, i) => anoAtual - i)
-const mesAtual = new Date().getMonth() + 1
+const COLUNAS_EXPORTACAO: ColunaExportacao<FolhaPagamentoServidor>[] = [
+  { chave: 'nomeServidor', rotulo: 'Servidor' },
+  { chave: 'cpfServidor', rotulo: 'CPF' },
+  { chave: 'cargo', rotulo: 'Cargo' },
+  { chave: 'unidadeNome', rotulo: 'Unidade' },
+  { chave: 'cargaHoraria', rotulo: 'Carga Horária' },
+  { chave: 'dataAdmissao', rotulo: 'Admissão', formatar: item => item.dataAdmissao ? formatarData(item.dataAdmissao) : '' },
+  { chave: 'salarioBruto', rotulo: 'Salário Bruto', formatar: item => formatarMoeda(item.salarioBruto) },
+  { chave: 'descontos', rotulo: 'Descontos', formatar: item => formatarMoeda(item.descontos) },
+  { chave: 'salarioLiquido', rotulo: 'Salário Líquido', formatar: item => formatarMoeda(item.salarioLiquido) }
+]
 
 export default function FolhaPagamentoMesView() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  const mes = Number(searchParams.get('mes') ?? mesAtual)
-  const ano = Number(searchParams.get('ano') ?? anoAtual)
-  const pagina = Number(searchParams.get('page') ?? 0)
-
-  function atualizarUrl(alteracoes: Record<string, string | number | undefined>) {
-    const novosParams = new URLSearchParams(searchParams.toString())
-
-    for (const [chave, valor] of Object.entries(alteracoes)) {
-      if (valor === undefined) {
-        novosParams.delete(chave)
-      } else {
-        novosParams.set(chave, String(valor))
-      }
-    }
-
-    const query = novosParams.toString()
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
-  }
-
   const {
     data: folhas,
-    totalRegistros,
-    totalFolha,
     loading,
     erro,
-    totalPaginas
-  } = useFolhaPorMes(mes, ano, pagina)
+    pagina,
+    totalPaginas,
+    totalElements,
+    atualizadoEm,
+    setPagina,
+    setOrdenacao,
+    ordenacao,
+    filtros,
+    setFiltros,
+    exportando,
+    buscarTudoParaExportar
+  } = useFolhaPorMes()
+  const [exportarAberto, setExportarAberto] = useState(false)
+  const [itensExportar, setItensExportar] = useState<FolhaPagamentoServidor[]>([])
+  const [truncadoExportar, setTruncadoExportar] = useState(false)
 
-  const filtrosAtivosCount = mes !== mesAtual || ano !== anoAtual ? 1 : 0
+  const anoAtual = new Date().getFullYear()
+  const mesAtual = new Date().getMonth() + 1
+  const mes = filtros.mes ?? mesAtual
+  const ano = filtros.ano ?? anoAtual
+
+  async function handleExportar() {
+    const resultado = await buscarTudoParaExportar()
+    setItensExportar(resultado.itens)
+    setTruncadoExportar(resultado.truncado)
+    setExportarAberto(true)
+  }
 
   return (
     <div className="space-y-6">
 
-      {/* FILTROS */}
-      <FiltroCard subtituloPadrao={`Exibindo ${nomeMes(mesAtual)} de ${anoAtual}`} filtrosAtivosCount={filtrosAtivosCount}>
+      <FolhaPagamentoFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
 
-          <div>
-            <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="mes">
-              Mês
-            </label>
-            <Select
-              id="mes"
-              value={mes}
-              onChange={(e) => atualizarUrl({ mes: Number(e.target.value), page: undefined })}
-            >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                <option key={m} value={m}>{nomeMes(m)}</option>
-              ))}
-            </Select>
+        <span className="text-sm text-text-secondary">
+          <strong className="text-primary">{totalElements}</strong> servidores na folha de {nomeMes(mes)}/{ano}
+          {atualizadoEm && (
+            <span className="text-text-muted"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
+          )}
+        </span>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportar}
+            disabled={folhas.length === 0 || exportando}
+            aria-label="Exportar todos os resultados dos filtros aplicados"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <MdDownload size={18} className={exportando ? 'animate-pulse' : ''} />
+            {exportando ? 'Preparando...' : 'Exportar'}
+          </button>
+
+          <div className="flex items-center gap-2 text-text-secondary text-sm">
+            <MdSwapVert />
+            Ordenar
           </div>
 
-          <div>
-            <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="ano">
-              Ano
-            </label>
-            <Select
-              id="ano"
-              value={ano}
-              onChange={(e) => atualizarUrl({ ano: Number(e.target.value), page: undefined })}
-            >
-              {anos.map(a => (
-                <option key={a} value={a}>{a}</option>
-              ))}
-            </Select>
-          </div>
-
+          <Select
+            value={ordenacao || 'servidor.name,asc'}
+            onChange={(e) => setOrdenacao(e.target.value)}
+            aria-label="Ordenar por"
+            fullWidth={false}
+          >
+            <option value="servidor.name,asc">Nome (A-Z)</option>
+            <option value="servidor.name,desc">Nome (Z-A)</option>
+            <option value="salarioLiquido,desc">Maior salário líquido</option>
+            <option value="salarioLiquido,asc">Menor salário líquido</option>
+          </Select>
         </div>
 
-        <div className="flex items-center justify-end mt-6 pt-4 border-t border-border/20">
-          <Button onClick={() => atualizarUrl({ mes: undefined, ano: undefined, page: undefined })} variant="ghost">
-            <MdRestartAlt />
-            Voltar pro mês atual
-          </Button>
-        </div>
+      </div>
 
-      </FiltroCard>
-
-      {/* ERRO */}
       {erro && <ErrorState message={erro} />}
 
-      {/* LOADING */}
       {loading ? (
         <div className="grid gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -119,36 +120,14 @@ export default function FolhaPagamentoMesView() {
             <EmptyState message={`Nenhum registro de folha de pagamento para ${nomeMes(mes)}/${ano}.`} />
           ) : (
             <>
-              {/* RESUMO */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <Card hoverable={false} className="p-5 flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                    <MdGroups size={22} />
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase text-text-muted">Servidores na Folha</p>
-                    <p className="text-xl font-bold text-primary">{totalRegistros}</p>
-                  </div>
-                </Card>
-
-                <Card hoverable={false} className="p-5 flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-accent/10 text-accent">
-                    <MdPayments size={22} />
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase text-text-muted">Total Líquido no Mês</p>
-                    <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolha)}</p>
-                  </div>
-                </Card>
-              </div>
-
-              {/* TABELA */}
               <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
                 <table className="w-full text-sm bg-white">
                   <thead>
                     <tr className="bg-neutral-light/60 text-text-muted text-xs uppercase">
                       <th className="text-left px-4 py-3 font-semibold">Servidor</th>
                       <th className="text-left px-4 py-3 font-semibold">CPF</th>
+                      <th className="text-left px-4 py-3 font-semibold">Cargo</th>
+                      <th className="text-left px-4 py-3 font-semibold">Unidade</th>
                       <th className="text-right px-4 py-3 font-semibold">Salário Bruto</th>
                       <th className="text-right px-4 py-3 font-semibold">Descontos</th>
                       <th className="text-right px-4 py-3 font-semibold">Salário Líquido</th>
@@ -159,6 +138,8 @@ export default function FolhaPagamentoMesView() {
                       <tr key={folha.id} className="border-t border-border/20">
                         <td className="px-4 py-3 font-semibold text-text-secondary">{folha.nomeServidor}</td>
                         <td className="px-4 py-3 text-text-secondary/70">{folha.cpfServidor}</td>
+                        <td className="px-4 py-3 text-text-secondary">{folha.cargo || 'Não informado'}</td>
+                        <td className="px-4 py-3 text-text-secondary">{folha.unidadeNome || 'Não informada'}</td>
                         <td className="px-4 py-3 text-right text-text-secondary">
                           {formatarMoeda(folha.salarioBruto)}
                         </td>
@@ -174,16 +155,21 @@ export default function FolhaPagamentoMesView() {
                 </table>
               </div>
 
-              {/* PAGINAÇÃO */}
-              <Pagination
-                pagina={pagina}
-                totalPaginas={totalPaginas}
-                onChange={(novaPagina) => atualizarUrl({ page: novaPagina || undefined })}
-              />
+              <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
             </>
           )}
         </>
       )}
+
+      <ModalExportar
+        aberto={exportarAberto}
+        aoFechar={() => setExportarAberto(false)}
+        titulo="Exportar folha de pagamento"
+        itens={itensExportar}
+        colunas={COLUNAS_EXPORTACAO}
+        nomeBaseArquivo={`folha-pagamento-${mes}-${ano}`}
+        truncado={truncadoExportar}
+      />
     </div>
   )
 }

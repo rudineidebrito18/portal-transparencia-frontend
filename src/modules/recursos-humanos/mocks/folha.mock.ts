@@ -1,7 +1,9 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
+import { Page } from '@/modules/shared/types/Page'
+import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { buscarServidorMockPorId } from './servidor.mock'
-import { FolhaPagamento, FolhaPagamentoServidor } from '../types'
+import { FiltroFolhaPagamento, FolhaPagamento, FolhaPagamentoServidor } from '../types'
 
 interface FolhaRecord extends FolhaPagamento {
   servidorId: number
@@ -69,8 +71,12 @@ export const folhaMock = {
       }))
   },
 
-  async listarPorMes(mes: number, ano: number): Promise<FolhaPagamentoServidor[]> {
-    return folhas
+  async listarPorMes(params: FiltroFolhaPagamento & { page?: number; size?: number; sort?: string }): Promise<Page<FolhaPagamentoServidor>> {
+    const { mes, ano, nomeServidor, cpf, cargo, unidadeId, page, size, sort } = params
+
+    type FolhaComUnidadeId = FolhaPagamentoServidor & { unidadeId?: number }
+
+    let dados: FolhaComUnidadeId[] = folhas
       .filter(f => f.mes === mes && f.ano === ano)
       .map(f => {
         const servidor = buscarServidorMockPorId(f.servidorId)
@@ -83,9 +89,33 @@ export const folhaMock = {
           descontos: f.desconto,
           salarioLiquido: f.salarioLiquido,
           nomeServidor: servidor?.name ?? 'Desconhecido',
-          cpfServidor: servidor?.cpf ?? '-'
+          cpfServidor: servidor?.cpf ?? '-',
+          cargo: servidor?.cargo,
+          unidadeNome: servidor?.unidade?.nome,
+          unidadeId: servidor?.unidade?.id,
+          cargaHoraria: servidor?.cargaHoraria,
+          dataAdmissao: servidor?.dataAdmissao
         }
       })
-      .sort((a, b) => a.nomeServidor.localeCompare(b.nomeServidor))
+
+    if (nomeServidor) {
+      dados = dados.filter(f => f.nomeServidor.toLowerCase().includes(nomeServidor.toLowerCase()))
+    }
+    if (cpf) {
+      dados = dados.filter(f => f.cpfServidor.includes(cpf))
+    }
+    if (cargo) {
+      dados = dados.filter(f => f.cargo === cargo)
+    }
+    if (unidadeId) {
+      dados = dados.filter(f => f.unidadeId === Number(unidadeId))
+    }
+
+    // 'servidor.name' é a chave de sort real do backend (ordena a entidade, não o DTO) —
+    // aqui no mock o campo equivalente já vem achatado como 'nomeServidor'.
+    const sortMock = sort?.replace('servidor.name', 'nomeServidor')
+    dados = ordenar(dados as unknown as Record<string, unknown>[], sortMock) as unknown as FolhaComUnidadeId[]
+
+    return paginar(dados, page, size)
   }
 }
