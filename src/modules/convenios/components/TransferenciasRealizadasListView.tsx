@@ -6,5 +6,5 @@ import ConvenioListPanel from './ConvenioListPanel'
 export default function TransferenciasRealizadasListView() {
   const resource = useTransferenciasRealizadas()
 
-  return <ConvenioListPanel {...resource} emptyMessage="Nenhuma transferência voluntária realizada encontrada." />
+  return <ConvenioListPanel {...resource} emptyMessage="Nenhuma transferência voluntária realizada encontrada." nomeBaseArquivo="convenios-transferencias-realizadas" />
 }

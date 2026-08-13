@@ -23,6 +23,9 @@ export default function ConvenioCard({ documento }: Props) {
           <h2 className="text-base font-bold text-primary leading-tight">
             {documento.descricao}
           </h2>
+          <p className="text-xs text-text-muted mt-0.5">
+            Data de Publicação: {formatarData(documento.data)}
+          </p>
           <p className="text-sm text-text-secondary flex items-center gap-1 mt-0.5">
             <MdDateRange size={14} />
             Vigência: {formatarData(documento.dataInicio)} a {formatarData(documento.dataFim)}
