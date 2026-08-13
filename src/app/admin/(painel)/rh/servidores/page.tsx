@@ -13,7 +13,7 @@ import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { unidadesService } from '@/modules/admin/geral/geral.service'
 import { Unidade } from '@/modules/admin/geral/types'
 import { servidorService } from '@/modules/admin/rh/servidor.service'
-import { FiltroServidor, Servidor, ServidorRequest } from '@/modules/admin/rh/types'
+import { FiltroServidor, Servidor, ServidorRequest, StatusServidor } from '@/modules/admin/rh/types'
 
 interface FormState {
   id: number | null
@@ -23,9 +23,10 @@ interface FormState {
   unidadeId: number
   dataAdmissao: string
   cargaHoraria: number
+  status: StatusServidor
 }
 
-const FORM_VAZIO: FormState = { id: null, cpf: '', name: '', cargo: '', unidadeId: 0, dataAdmissao: '', cargaHoraria: 40 }
+const FORM_VAZIO: FormState = { id: null, cpf: '', name: '', cargo: '', unidadeId: 0, dataAdmissao: '', cargaHoraria: 40, status: 'ATIVO' }
 
 const classeInput =
   'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
@@ -72,7 +73,8 @@ export default function ServidoresAdminPage() {
       cargo: s.cargo,
       unidadeId: s.unidade?.id ?? 0,
       dataAdmissao: s.dataAdmissao,
-      cargaHoraria: s.cargaHoraria
+      cargaHoraria: s.cargaHoraria,
+      status: s.status
     })
   }
 
@@ -104,7 +106,8 @@ export default function ServidoresAdminPage() {
       cargo: form.cargo,
       unidade: { id: form.unidadeId },
       dataAdmissao: form.dataAdmissao,
-      cargaHoraria: form.cargaHoraria
+      cargaHoraria: form.cargaHoraria,
+      status: form.status
     }
 
     try {
@@ -166,6 +169,15 @@ export default function ServidoresAdminPage() {
           {unidades.map(u => (
             <option key={u.id} value={u.id}>{u.nome}</option>
           ))}
+        </select>
+        <select
+          value={filtros.status ?? ''}
+          onChange={e => setFiltros({ ...filtros, status: (e.target.value || undefined) as StatusServidor | undefined })}
+          className={`${classeInput} w-auto`}
+        >
+          <option value="">Ativos e desligados</option>
+          <option value="ATIVO">Ativos</option>
+          <option value="DESLIGADO">Desligados</option>
         </select>
         <div className="flex items-center gap-2 text-sm text-admin-text-muted">
           <span>Admissão:</span>
@@ -267,6 +279,22 @@ export default function ServidoresAdminPage() {
               </div>
             </div>
 
+            <div>
+              <label className={classeLabel} htmlFor="status">Status</label>
+              <select
+                id="status"
+                value={form.status}
+                onChange={e => setForm({ ...form, status: e.target.value as StatusServidor })}
+                className={`${classeInput} md:w-60`}
+              >
+                <option value="ATIVO">Ativo</option>
+                <option value="DESLIGADO">Desligado</option>
+              </select>
+              <p className="text-xs text-admin-text-faint mt-1">
+                Desligar preserva o histórico de folha de pagamento — excluir o cadastro é bloqueado enquanto houver folha lançada.
+              </p>
+            </div>
+
             {erroForm && <AdminErrorState message={erroForm} />}
 
             <div className="flex gap-2">
@@ -307,6 +335,7 @@ export default function ServidoresAdminPage() {
                   <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Unidade</th>
                   <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Admissão</th>
                   <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Carga horária</th>
+                  <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Status</th>
                   <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint text-right">Ações</th>
                 </tr>
               </thead>
@@ -319,6 +348,11 @@ export default function ServidoresAdminPage() {
                     <td className="p-3.5 text-admin-text-muted">{s.unidade?.nome ?? '-'}</td>
                     <td className="p-3.5 text-admin-text-muted tabular-nums">{s.dataAdmissao}</td>
                     <td className="p-3.5 text-admin-text-muted tabular-nums">{s.cargaHoraria}h</td>
+                    <td className="p-3.5">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${s.status === 'DESLIGADO' ? 'bg-admin-error-light text-admin-error' : 'bg-admin-success-light text-admin-success'}`}>
+                        {s.status === 'DESLIGADO' ? 'Desligado' : 'Ativo'}
+                      </span>
+                    </td>
                     <td className="p-3.5 text-right">
                       <div className="flex items-center justify-end gap-1">
                         {podeEditar(usuario, 'rh') && (

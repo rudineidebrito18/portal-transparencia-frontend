@@ -1,5 +1,7 @@
 import { Unidade } from '@/modules/admin/geral/types'
 
+export type StatusServidor = 'ATIVO' | 'DESLIGADO'
+
 export interface Servidor {
   id: number
   cpf: string
@@ -12,6 +14,9 @@ export interface Servidor {
   unidade?: Pick<Unidade, 'id' | 'nome'>
   dataAdmissao: string
   cargaHoraria: number
+  // Desligar preserva o histórico de folha (excluir o registro é bloqueado enquanto houver
+  // folha lançada — 2026-08-13, ver ServidorServiceImpl.deleteServidor no backend).
+  status: StatusServidor
 }
 
 // Backend aceita `unidade: {id}` sozinho (sem `nome`) e resolve a FK — confirmado via curl.
@@ -22,6 +27,7 @@ export interface ServidorRequest {
   unidade: { id: number }
   dataAdmissao: string
   cargaHoraria: number
+  status: StatusServidor
 }
 
 export interface FiltroServidor {
@@ -32,6 +38,7 @@ export interface FiltroServidor {
   dataAdmissaoInicio?: string
   dataAdmissaoFim?: string
   cargaHoraria?: number
+  status?: StatusServidor
 }
 
 export interface Cargo {
