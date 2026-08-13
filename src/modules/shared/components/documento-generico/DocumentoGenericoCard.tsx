@@ -25,7 +25,7 @@ export default function DocumentoGenericoCard({ documento, origem }: Props) {
             {documento.descricao}
           </h2>
           <p className="text-sm text-text-secondary">
-            Referência de {formatarData(documento.data)}
+            Data de Publicação: {formatarData(documento.data)}
           </p>
         </div>
       </div>
