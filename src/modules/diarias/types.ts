@@ -1,5 +1,6 @@
 export interface Diaria {
   id: number
+  numeroSequencial: number
   dataInicio: string
   dataTermino: string
   beneficiario: string

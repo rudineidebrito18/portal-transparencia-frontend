@@ -1,5 +1,6 @@
 import { MdFlightTakeoff, MdLocationOn } from 'react-icons/md'
 
+import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
@@ -20,16 +21,23 @@ export default function DiariaCard({ diaria }: Props) {
           </div>
 
           <div>
-            <h2 className="text-base font-bold text-primary leading-tight">{diaria.beneficiario}</h2>
+            <h2 className="text-base font-bold text-primary leading-tight">Beneficiário: {diaria.beneficiario}</h2>
             <p className="text-xs text-text-muted mt-0.5">
-              {diaria.cargo}
-              {diaria.unidadeNome && ` · ${diaria.unidadeNome}`}
+              Cargo: {diaria.cargo}
+              {diaria.unidadeNome && ` · Unidade: ${diaria.unidadeNome}`}
             </p>
           </div>
         </div>
+
+        <Badge className="bg-primary/10 text-primary shrink-0">
+          Nº {diaria.numeroSequencial}
+        </Badge>
       </div>
 
-      <p className="text-sm text-text-secondary leading-relaxed">{diaria.motivo}</p>
+      <p className="text-sm text-text-secondary leading-relaxed">
+        <span className="font-semibold text-text-muted">Motivo: </span>
+        {diaria.motivo}
+      </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-2 text-sm">
         <div className="col-span-2">

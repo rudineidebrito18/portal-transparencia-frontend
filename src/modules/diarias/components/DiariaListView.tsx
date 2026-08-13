@@ -1,16 +1,34 @@
 'use client'
 
-import { MdSwapVert } from 'react-icons/md'
+import { useState } from 'react'
+import { MdDownload, MdSwapVert } from 'react-icons/md'
 
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import ModalExportar from '@/components/ui/ModalExportar'
 import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
-import { formatarDataHora } from '@/utils/date'
+import { formatarData, formatarDataHora } from '@/utils/date'
+import { formatarMoeda } from '@/utils/currency'
+import { ColunaExportacao } from '@/utils/exportacao'
 import { useDiarias } from '../hooks/useDiarias'
+import { Diaria } from '../types'
 import DiariaCard from './DiariaCard'
 import DiariaFiltro from './DiariaFiltro'
+
+const COLUNAS_EXPORTACAO: ColunaExportacao<Diaria>[] = [
+  { chave: 'numeroSequencial', rotulo: 'Nº Sequencial' },
+  { chave: 'beneficiario', rotulo: 'Beneficiário' },
+  { chave: 'cargo', rotulo: 'Cargo' },
+  { chave: 'unidadeNome', rotulo: 'Unidade' },
+  { chave: 'destino', rotulo: 'Destino' },
+  { chave: 'motivo', rotulo: 'Motivo' },
+  { chave: 'dataInicio', rotulo: 'Início', formatar: item => formatarData(item.dataInicio) },
+  { chave: 'dataTermino', rotulo: 'Término', formatar: item => formatarData(item.dataTermino) },
+  { chave: 'quantDiarias', rotulo: 'Qtd. Diárias' },
+  { chave: 'valorConcedido', rotulo: 'Valor Concedido', formatar: item => formatarMoeda(item.valorConcedido) }
+]
 
 export default function DiariaListView() {
   const {
@@ -27,6 +45,7 @@ export default function DiariaListView() {
     setOrdenacao,
     ordenacao
   } = useDiarias()
+  const [exportarAberto, setExportarAberto] = useState(false)
 
   return (
     <div className="space-y-6">
@@ -45,6 +64,16 @@ export default function DiariaListView() {
         </span>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setExportarAberto(true)}
+            disabled={diarias.length === 0}
+            aria-label="Exportar os dados exibidos na tela"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <MdDownload size={18} />
+            Exportar
+          </button>
+
           <div className="flex items-center gap-2 text-text-secondary text-sm">
             <MdSwapVert />
             Ordenar
@@ -92,6 +121,16 @@ export default function DiariaListView() {
           <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
         </>
       )}
+
+      {/* EXPORTAÇÃO (somente os dados da página atual) */}
+      <ModalExportar
+        aberto={exportarAberto}
+        aoFechar={() => setExportarAberto(false)}
+        titulo="Exportar diárias"
+        itens={diarias}
+        colunas={COLUNAS_EXPORTACAO}
+        nomeBaseArquivo="diarias"
+      />
     </div>
   )
 }

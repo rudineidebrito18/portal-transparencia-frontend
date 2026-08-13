@@ -38,6 +38,7 @@ function gerarDiaria(id: number): Diaria {
 
   return {
     id,
+    numeroSequencial: id,
     dataInicio: dataInicio.toISOString().split('T')[0],
     dataTermino: dataTermino.toISOString().split('T')[0],
     beneficiario: faker.person.fullName(),
