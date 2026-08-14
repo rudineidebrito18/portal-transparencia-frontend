@@ -1,12 +1,12 @@
 import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 
-export default function LoadingRecursosHumanos() {
+export default function LoadingEstagiarios() {
   return (
     <div className="max-w-6xl mx-auto p-2">
-      <PageHeader title="Recursos Humanos" breadcrumbItems={[
+      <PageHeader title="Estagiários" breadcrumbItems={[
           { label: 'Transparência', href: '/transparencia' },
-          { label: 'Recursos Humanos' }
+          { label: 'Estagiários' }
         ]} />
 
       <div className="grid gap-4">

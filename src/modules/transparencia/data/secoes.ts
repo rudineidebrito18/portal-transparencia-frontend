@@ -126,8 +126,8 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
       { label: 'Servidores', icon: MdBadge, href: '/servidores' },
       { label: 'Cargos', icon: MdTableChart, href: '/cargos' },
       { label: 'Concursos', icon: MdAssignmentInd, href: '/concursos' },
-      { label: 'Estagiários', icon: MdWorkOutline, href: '/recursos-humanos?categoria=estagiarios' },
-      { label: 'Terceirizados', icon: MdBusinessCenter, href: '/recursos-humanos?categoria=terceirizados' },
+      { label: 'Estagiários', icon: MdWorkOutline, href: '/estagiarios' },
+      { label: 'Terceirizados', icon: MdBusinessCenter, href: '/terceirizados' },
     ],
   },
   {
