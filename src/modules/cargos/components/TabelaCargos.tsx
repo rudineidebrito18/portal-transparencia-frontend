@@ -1,16 +1,29 @@
 'use client'
 
-import { MdSwapVert } from 'react-icons/md'
+import { useState } from 'react'
+import { MdDownload, MdSwapVert } from 'react-icons/md'
 
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
+import ModalExportar from '@/components/ui/ModalExportar'
 import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarDataHora } from '@/utils/date'
 import { formatarMoeda } from '@/utils/currency'
+import { ColunaExportacao } from '@/utils/exportacao'
 import { useCargos } from '../hooks/useCargos'
+import { Cargo } from '../types'
 import CargoFiltro from './CargoFiltro'
+
+const COLUNAS_EXPORTACAO: ColunaExportacao<Cargo>[] = [
+  { chave: 'cargo', rotulo: 'Cargo' },
+  { chave: 'quantidade', rotulo: 'Quantidade' },
+  { chave: 'valorBruto', rotulo: 'Valor Bruto', formatar: item => formatarMoeda(item.valorBruto) },
+  { chave: 'valorDesconto', rotulo: 'Descontos', formatar: item => formatarMoeda(item.valorDesconto) },
+  { chave: 'valorLiquido', rotulo: 'Valor Líquido', formatar: item => formatarMoeda(item.valorLiquido) },
+  { chave: 'media', rotulo: 'Média por Servidor', formatar: item => formatarMoeda(item.media) }
+]
 
 export default function TabelaCargos() {
   const {
@@ -25,8 +38,20 @@ export default function TabelaCargos() {
     filtros,
     setFiltros,
     setOrdenacao,
-    ordenacao
+    ordenacao,
+    exportando,
+    buscarTudoParaExportar
   } = useCargos()
+  const [exportarAberto, setExportarAberto] = useState(false)
+  const [itensExportar, setItensExportar] = useState<Cargo[]>([])
+  const [truncadoExportar, setTruncadoExportar] = useState(false)
+
+  async function handleExportar() {
+    const resultado = await buscarTudoParaExportar()
+    setItensExportar(resultado.itens)
+    setTruncadoExportar(resultado.truncado)
+    setExportarAberto(true)
+  }
 
   return (
     <div className="space-y-6">
@@ -45,6 +70,16 @@ export default function TabelaCargos() {
         </span>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportar}
+            disabled={cargos.length === 0 || exportando}
+            aria-label="Exportar todos os resultados dos filtros aplicados"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <MdDownload size={18} className={exportando ? 'animate-pulse' : ''} />
+            {exportando ? 'Preparando...' : 'Exportar'}
+          </button>
+
           <div className="flex items-center gap-2 text-text-secondary text-sm">
             <MdSwapVert />
             Ordenar
@@ -118,6 +153,16 @@ export default function TabelaCargos() {
           <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
         </>
       )}
+
+      <ModalExportar
+        aberto={exportarAberto}
+        aoFechar={() => setExportarAberto(false)}
+        titulo="Exportar cargos"
+        itens={itensExportar}
+        colunas={COLUNAS_EXPORTACAO}
+        nomeBaseArquivo="cargos"
+        truncado={truncadoExportar}
+      />
     </div>
   )
 }
