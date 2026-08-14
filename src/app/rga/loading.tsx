@@ -1,12 +1,12 @@
 import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 
-export default function LoadingPlanejamento() {
+export default function LoadingRga() {
   return (
     <div className="max-w-6xl mx-auto p-2">
-      <PageHeader title="Planejamento" breadcrumbItems={[
+      <PageHeader title="Relatório de Gestão ou Atividade (RGA)" breadcrumbItems={[
           { label: 'Transparência', href: '/transparencia' },
-          { label: 'Planejamento' }
+          { label: 'Relatório de Gestão ou Atividade (RGA)' }
         ]} />
 
       <div className="grid gap-4">

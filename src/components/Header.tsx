@@ -249,8 +249,6 @@ export default function Header() {
 
               <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
                 <Link href="/gestao-fiscal" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Gestão Fiscal</Link>
-                <Link href="/prestacao-contas" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Prestação de Contas</Link>
-                <Link href="/planejamento" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Planejamento (LDO, LOA, PPA)</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem label="PUBLICAÇÕES">
