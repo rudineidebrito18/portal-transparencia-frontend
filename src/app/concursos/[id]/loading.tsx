@@ -7,7 +7,7 @@ export default function LoadingConcurso() {
       <Breadcrumbs
         items={[
           { label: 'Transparência', href: '/transparencia' },
-          { label: 'Concursos e seleções públicas', href: '/concursos' }
+          { label: 'Concursos', href: '/concursos' }
         ]}
       />
 

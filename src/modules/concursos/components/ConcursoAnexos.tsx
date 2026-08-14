@@ -59,7 +59,7 @@ export default function ConcursoAnexos({ concursoId }: Props) {
           </div>
 
           <Link
-            href={hrefDocumento(anexo.caminhoArquivo, anexo.descricao, { origemLabel: 'Concursos e Seleções Públicas', origemHref: '/concursos' })}
+            href={hrefDocumento(anexo.caminhoArquivo, anexo.descricao, { origemLabel: 'Concursos', origemHref: '/concursos' })}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
           >
             <MdVisibility size={16} />

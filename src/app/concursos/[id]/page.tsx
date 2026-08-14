@@ -27,7 +27,7 @@ export default async function ConcursoPage({
       <Breadcrumbs
         items={[
           { label: 'Transparência', href: '/transparencia' },
-          { label: 'Concursos e seleções públicas', href: '/concursos' },
+          { label: 'Concursos', href: '/concursos' },
           { label: `Nº ${concurso.numero}/${concurso.ano}` }
         ]}
       />

@@ -6,7 +6,7 @@ export default function LoadingConcursos() {
     <div className="max-w-6xl mx-auto p-2">
       <PageHeader title="Concursos" breadcrumbItems={[
           { label: 'Transparência', href: '/transparencia' },
-          { label: 'Concursos e seleções públicas' }
+          { label: 'Concursos' }
         ]} />
 
       <div className="grid gap-4">
