@@ -5,7 +5,7 @@ import { useRenunciaFiscal } from '../hooks/useRenunciaFiscal'
 
 export default function RenunciaFiscalListView() {
   const resource = useRenunciaFiscal()
-  const origem = { label: 'Gestão Fiscal', href: '/gestao-fiscal?categoria=renuncia-fiscal' }
+  const origem = { label: 'Renúncia Fiscal', href: '/renuncia-fiscal' }
 
   return <DocumentoGenericoListPanel {...resource} origem={origem} />
 }

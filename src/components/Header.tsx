@@ -247,10 +247,6 @@ export default function Header() {
                 <Link href="/folha-pagamento" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Folha de Pagamento</Link>
               </DropdownMenuItem>
 
-              <DropdownMenuItem label="LRF E CONTAS PÚBLICAS">
-                <Link href="/gestao-fiscal" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Gestão Fiscal</Link>
-              </DropdownMenuItem>
-
               <DropdownMenuItem label="PUBLICAÇÕES">
                 <Link href="/noticias" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Notícias</Link>
                 <Link href="/avisos" className="px-4 py-3 lg:py-2 rounded-md hover:bg-primary/10 transition-colors block" onClick={() => setMenuOpen(false)}>Avisos</Link>

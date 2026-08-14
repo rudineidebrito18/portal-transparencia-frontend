@@ -7,11 +7,11 @@ interface Props {
   reset: () => void
 }
 
-export default function ErrorGestaoFiscal({ error, reset }: Props) {
+export default function ErrorRgf({ error, reset }: Props) {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <ErrorState
-        title="Não foi possível carregar os dados de gestão fiscal."
+        title="Não foi possível carregar os dados do RGF."
         message={error.message}
         onRetry={reset}
         className="p-8"

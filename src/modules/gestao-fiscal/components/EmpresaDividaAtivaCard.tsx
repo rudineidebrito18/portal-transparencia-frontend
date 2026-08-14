@@ -50,7 +50,7 @@ export default function EmpresaDividaAtivaCard({ empresa }: Props) {
 
       <div className="flex items-center justify-end pt-2 border-t border-border/20">
         <Link
-          href={hrefDocumento(empresa.caminhoPdf, empresa.nome, { origemLabel: 'Gestão Fiscal', origemHref: '/gestao-fiscal?categoria=divida-ativa' })}
+          href={hrefDocumento(empresa.caminhoPdf, empresa.nome, { origemLabel: 'Empresas em Dívida Ativa', origemHref: '/divida-ativa' })}
           className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
           <MdVisibility size={18} />

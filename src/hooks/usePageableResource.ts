@@ -16,7 +16,7 @@ type UsePageableResourceProps<T, F> = {
 }
 
 // 'categoria' não é um filtro de busca, é a aba ativa nas views com abas
-// (ex: GestaoFiscalView) — também mora na URL, mas não deve ir pro backend.
+// (ex: SaudeView) — também mora na URL, mas não deve ir pro backend.
 const PARAMS_RESERVADOS = new Set(['page', 'sort', 'categoria'])
 
 // Teto de registros buscados para exportação "tudo" (não só a página atual). Também é o

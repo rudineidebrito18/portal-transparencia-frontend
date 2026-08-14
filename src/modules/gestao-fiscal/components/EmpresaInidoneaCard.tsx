@@ -42,7 +42,7 @@ export default function EmpresaInidoneaCard({ empresa }: Props) {
         </div>
 
         <Link
-          href={hrefDocumento(empresa.caminhoPdf, empresa.empresa, { origemLabel: 'Gestão Fiscal', origemHref: '/gestao-fiscal?categoria=inidoneas' })}
+          href={hrefDocumento(empresa.caminhoPdf, empresa.empresa, { origemLabel: 'Empresas Inidôneas e Suspensas', origemHref: '/empresas-inidoneas' })}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
           <MdVisibility size={18} />
