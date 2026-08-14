@@ -75,5 +75,12 @@ export const concursoMock = {
     }
 
     return gerarAnexos(concursoId)
+  },
+
+  async buscarPorId(id: number): Promise<Concurso> {
+    const concurso = CONCURSOS.find(c => c.id === id)
+    if (!concurso) throw criarErroNaoEncontrado(`Concurso ${id} não encontrado (mock)`)
+
+    return concurso
   }
 }

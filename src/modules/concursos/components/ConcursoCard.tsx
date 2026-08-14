@@ -1,7 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
-import { MdExpandLess, MdExpandMore, MdFolderOpen } from 'react-icons/md'
+import { MdExpandLess, MdExpandMore, MdFolderOpen, MdVisibility } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
 import { formatarData } from '@/utils/date'
@@ -20,7 +21,10 @@ export default function ConcursoCard({ concurso }: Props) {
 
       {/* HEADER */}
       <div>
-        <h2 className="text-base font-bold text-primary leading-tight">
+        <p className="text-xs uppercase font-semibold text-text-muted">
+          Concurso Nº {concurso.numero}/{concurso.ano}
+        </p>
+        <h2 className="text-base font-bold text-primary leading-tight mt-0.5">
           {concurso.descricao}
         </h2>
         <p className="text-sm text-text-secondary leading-relaxed mt-2">
@@ -53,16 +57,26 @@ export default function ConcursoCard({ concurso }: Props) {
         )}
       </div>
 
-      {/* ANEXOS */}
+      {/* ANEXOS + DETALHES */}
       <div className="pt-3 border-t border-border/20">
-        <button
-          onClick={() => setAnexosAbertos(!anexosAbertos)}
-          className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
-        >
-          <MdFolderOpen size={18} />
-          Anexos
-          {anexosAbertos ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
-        </button>
+        <div className="flex items-center justify-between gap-3">
+          <button
+            onClick={() => setAnexosAbertos(!anexosAbertos)}
+            className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
+          >
+            <MdFolderOpen size={18} />
+            Anexos
+            {anexosAbertos ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </button>
+
+          <Link
+            href={`/concursos/${concurso.id}`}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
+          >
+            <MdVisibility size={18} />
+            Ver detalhes
+          </Link>
+        </div>
 
         {anexosAbertos && (
           <div className="mt-3">

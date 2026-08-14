@@ -20,5 +20,11 @@ export const concursoService = {
     return api
       .get<AnexoConcurso[]>(`/recursos-humanos/concursos/${concursoId}/anexos`)
       .then(r => r.data)
+  },
+
+  buscarPorId(id: number): Promise<Concurso> {
+    if (USE_MOCK) return concursoMock.buscarPorId(id)
+
+    return api.get<Concurso>(`/recursos-humanos/concursos/${id}`).then(r => r.data)
   }
 }

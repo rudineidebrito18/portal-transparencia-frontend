@@ -7,7 +7,7 @@ import ConcursosListView from '@/modules/concursos/components/ConcursosListView'
 export default function Concursos() {
   return (
     <div className="max-w-6xl mx-auto p-2">
-      <PageHeader title="Concursos e Seleções Públicas" breadcrumbItems={[
+      <PageHeader title="Concursos" breadcrumbItems={[
           { label: 'Transparência', href: '/transparencia' },
           { label: 'Concursos e seleções públicas' }
         ]} />
