@@ -10,13 +10,13 @@ import Select from '@/components/ui/Select'
 import { formatarDataHora } from '@/utils/date'
 import { ColunaExportacao } from '@/utils/exportacao'
 import { useRelatoriosGestaoFiscal } from '../hooks/useGestaoFiscal'
-import { RelatorioGestaoFiscal } from '../types'
+import { LABEL_PERIODO_RGF, RelatorioGestaoFiscal } from '../types'
 import RelatorioGestaoFiscalFiltro from './RelatorioGestaoFiscalFiltro'
 import RelatorioMultiFormatoCard from './RelatorioMultiFormatoCard'
 
 const COLUNAS_EXPORTACAO: ColunaExportacao<RelatorioGestaoFiscal>[] = [
   { chave: 'ano', rotulo: 'Ano' },
-  { chave: 'periodo', rotulo: 'Período' }
+  { chave: 'periodo', rotulo: 'Período', formatar: item => LABEL_PERIODO_RGF[item.periodo] }
 ]
 
 export default function RelatoriosGestaoFiscalListView() {
@@ -84,7 +84,7 @@ export default function RelatoriosGestaoFiscalListView() {
         renderItem={relatorio => (
           <RelatorioMultiFormatoCard
             key={relatorio.id}
-            titulo={`Relatório de Gestão Fiscal - ${relatorio.periodo}`}
+            titulo={`Relatório de Gestão Fiscal - ${LABEL_PERIODO_RGF[relatorio.periodo]}`}
             subtitulo={String(relatorio.ano)}
             caminhoPdf={relatorio.caminhoPdf}
             caminhoWord={relatorio.caminhoWord}

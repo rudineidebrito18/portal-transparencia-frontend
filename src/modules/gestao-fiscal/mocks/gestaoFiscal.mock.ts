@@ -81,8 +81,8 @@ function gerarRelatoriosGestaoFiscal(): RelatorioGestaoFiscal[] {
   let id = 1
 
   for (const ano of [2023, 2024, 2025]) {
-    for (const periodo of ['1º Quadrimestre', '2º Quadrimestre', '3º Quadrimestre']) {
-      if (ano === 2025 && periodo !== '1º Quadrimestre') continue
+    for (const periodo of ['PRIMEIRO_QUADRIMESTRE', 'SEGUNDO_QUADRIMESTRE', 'TERCEIRO_QUADRIMESTRE'] as const) {
+      if (ano === 2025 && periodo !== 'PRIMEIRO_QUADRIMESTRE') continue
 
       registros.push({
         id: id++,

@@ -29,10 +29,20 @@ export interface RelatorioExecucaoOrcamentaria {
   caminhoXls?: string
 }
 
+// Quadrimestral (art. 55 da LRF) — regra padrão pra municípios acima de 50 mil habitantes,
+// que é o caso deste sistema (não modela a exceção semestral do art. 63).
+export type PeriodoRgf = 'PRIMEIRO_QUADRIMESTRE' | 'SEGUNDO_QUADRIMESTRE' | 'TERCEIRO_QUADRIMESTRE'
+
+export const LABEL_PERIODO_RGF: Record<PeriodoRgf, string> = {
+  PRIMEIRO_QUADRIMESTRE: '1º Quadrimestre',
+  SEGUNDO_QUADRIMESTRE: '2º Quadrimestre',
+  TERCEIRO_QUADRIMESTRE: '3º Quadrimestre'
+}
+
 export interface RelatorioGestaoFiscal {
   id: number
   ano: number
-  periodo: string
+  periodo: PeriodoRgf
   caminhoPdf?: string
   caminhoWord?: string
   caminhoXls?: string
@@ -62,5 +72,5 @@ export interface FiltroRelatorioExecucaoOrcamentaria {
 
 export interface FiltroRelatorioGestaoFiscal {
   ano?: number
-  periodo?: string
+  periodo?: PeriodoRgf
 }

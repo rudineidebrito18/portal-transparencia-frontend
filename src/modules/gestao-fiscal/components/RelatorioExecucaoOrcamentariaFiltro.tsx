@@ -6,7 +6,10 @@ import { MdRestartAlt, MdSearch } from 'react-icons/md'
 import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
 import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 import { FiltroRelatorioExecucaoOrcamentaria } from '../types'
+
+const BIMESTRES = [1, 2, 3, 4, 5, 6]
 
 interface Props {
   valoresIniciais?: FiltroRelatorioExecucaoOrcamentaria
@@ -98,14 +101,17 @@ export default function RelatorioExecucaoOrcamentariaFiltro({ valoresIniciais, o
           <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="bimestre">
             Bimestre
           </label>
-          <Input
+          <Select
             id="bimestre"
             name="bimestre"
             value={filtros.bimestre ?? ''}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder="1 a 6"
-          />
+            onChange={e => setFiltros(prev => ({ ...prev, bimestre: e.target.value ? Number(e.target.value) : undefined }))}
+          >
+            <option value="">Todos</option>
+            {BIMESTRES.map(b => (
+              <option key={b} value={b}>{b}º Bimestre</option>
+            ))}
+          </Select>
         </div>
 
       </div>

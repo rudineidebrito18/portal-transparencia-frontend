@@ -6,7 +6,8 @@ import { MdRestartAlt, MdSearch } from 'react-icons/md'
 import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
 import Input from '@/components/ui/Input'
-import { FiltroRelatorioGestaoFiscal } from '../types'
+import Select from '@/components/ui/Select'
+import { FiltroRelatorioGestaoFiscal, LABEL_PERIODO_RGF, PeriodoRgf } from '../types'
 
 interface Props {
   valoresIniciais?: FiltroRelatorioGestaoFiscal
@@ -15,7 +16,7 @@ interface Props {
 
 const initialState: FiltroRelatorioGestaoFiscal = {
   ano: undefined,
-  periodo: ''
+  periodo: undefined
 }
 
 export default function RelatorioGestaoFiscalFiltro({ valoresIniciais, onFiltrar }: Props) {
@@ -83,14 +84,17 @@ export default function RelatorioGestaoFiscalFiltro({ valoresIniciais, onFiltrar
           <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="periodo">
             Período
           </label>
-          <Input
+          <Select
             id="periodo"
             name="periodo"
             value={filtros.periodo ?? ''}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Ex: 1º Quadrimestre"
-          />
+            onChange={e => setFiltros(prev => ({ ...prev, periodo: (e.target.value || undefined) as PeriodoRgf | undefined }))}
+          >
+            <option value="">Todos</option>
+            {Object.entries(LABEL_PERIODO_RGF).map(([valor, label]) => (
+              <option key={valor} value={valor}>{label}</option>
+            ))}
+          </Select>
         </div>
 
       </div>
