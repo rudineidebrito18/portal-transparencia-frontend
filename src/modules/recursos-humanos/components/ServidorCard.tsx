@@ -11,26 +11,24 @@ interface Props {
 
 export default function ServidorCard({ servidor }: Props) {
   return (
-    <Card className="p-5 flex flex-col gap-4">
+    <Card className="p-4 flex flex-col gap-2.5">
 
       {/* HEADER */}
-      <div className="flex justify-between items-start gap-3">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10 text-primary">
-            <MdBadge size={20} />
-          </div>
+      <div className="flex items-center gap-3">
+        <div className="p-2 rounded-lg bg-primary/10 text-primary">
+          <MdBadge size={20} />
+        </div>
 
-          <div>
-            <h2 className="text-base font-bold text-primary leading-tight">
-              {servidor.name}
-            </h2>
-            <p className="text-xs text-text-muted mt-0.5">{servidor.cargo}</p>
-          </div>
+        <div>
+          <h2 className="text-base font-bold text-primary leading-tight">
+            Nome: {servidor.name}
+          </h2>
+          <p className="text-xs text-text-muted mt-0.5">Cargo: {servidor.cargo}</p>
         </div>
       </div>
 
       {/* GRID INFO */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-1.5 text-sm">
         <div>
           <p className="text-xs uppercase text-text-muted">Admissão</p>
           <p className="font-semibold text-text-secondary">
@@ -47,7 +45,7 @@ export default function ServidorCard({ servidor }: Props) {
           </p>
         </div>
 
-        <div className="col-span-2">
+        <div>
           <p className="text-xs uppercase text-text-muted">Unidade</p>
           <p className="font-semibold text-text-secondary truncate">
             {servidor.unidade?.nome || 'Não informada'}
@@ -56,10 +54,10 @@ export default function ServidorCard({ servidor }: Props) {
       </div>
 
       {/* FOOTER */}
-      <div className="flex items-center justify-end pt-3 border-t border-border/20">
+      <div className="flex items-center justify-end pt-2 border-t border-border/20">
         <Link
           href={`/servidores/${servidor.id}`}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
           <MdVisibility size={18} />
           Ver
