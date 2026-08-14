@@ -11,15 +11,20 @@ import { FiltroDocumentoGenerico } from '../../types/DocumentoGenerico'
 interface Props {
   valoresIniciais?: FiltroDocumentoGenerico
   onFiltrar: (filtros: FiltroDocumentoGenerico) => void
+  // Só true nos módulos "quase genéricos" com campo de exercício próprio (Parecer Prévio,
+  // Julgamento de Contas TCE — item 22 do backlog). Mantém o filtro genérico enxuto pros
+  // outros ~20 módulos que não têm esse campo.
+  comExercicio?: boolean
 }
 
 const initialState: FiltroDocumentoGenerico = {
   descricao: '',
   dataInicial: '',
-  dataFinal: ''
+  dataFinal: '',
+  exercicio: undefined
 }
 
-export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: Props) {
+export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar, comExercicio = false }: Props) {
   const [filtros, setFiltros] = useState<FiltroDocumentoGenerico>({ ...initialState, ...valoresIniciais })
 
   const filtrosAtivosCount = Object.entries(filtros).filter(
@@ -28,7 +33,14 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
-    setFiltros(prev => ({ ...prev, [name]: value === '' ? undefined : value }))
+
+    setFiltros(prev => {
+      const novoValor = name === 'exercicio'
+        ? (value ? Number(value) : undefined)
+        : (value === '' ? undefined : value)
+
+      return { ...prev, [name]: novoValor }
+    })
   }
 
   function handleFiltrar() {
@@ -51,10 +63,13 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
   }
 
   return (
-    <FiltroCard subtituloPadrao="Refine por descrição e datas" filtrosAtivosCount={filtrosAtivosCount}>
+    <FiltroCard
+      subtituloPadrao={comExercicio ? 'Refine por descrição, exercício e datas' : 'Refine por descrição e datas'}
+      filtrosAtivosCount={filtrosAtivosCount}
+    >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
-        <div className="md:col-span-2">
+        <div className={comExercicio ? '' : 'md:col-span-2'}>
           <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="descricao">
             Descrição
           </label>
@@ -67,6 +82,22 @@ export default function DocumentoGenericoFiltro({ valoresIniciais, onFiltrar }: 
             placeholder="Ex: Balanço 2024"
           />
         </div>
+
+        {comExercicio && (
+          <div>
+            <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="exercicio">
+              Exercício
+            </label>
+            <Input
+              id="exercicio"
+              name="exercicio"
+              value={filtros.exercicio ?? ''}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Ex: 2025"
+            />
+          </div>
+        )}
 
         <div>
           <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="dataInicial">

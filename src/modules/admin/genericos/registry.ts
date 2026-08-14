@@ -6,6 +6,10 @@ export interface ModuloGenericoConfig {
   categoria: string
   basePath: string
   comIntervalo: boolean
+  // Só true nos módulos "quase genéricos" com campo de exercício próprio (padrão V28/item 22
+  // do backlog: Parecer Prévio, Julgamento de Contas TCE) — mostra o campo extra no formulário
+  // e na tabela, sem afetar os demais módulos genéricos puros.
+  comExercicio?: boolean
   // Nível mínimo pra editar/excluir — criar é sempre ROLE_MANAGER (seção 4/6.7
   // do prompt-frontend-dashboard-admin.md). Valor vem direto da coluna
   // "Editar/excluir" de cada linha das tabelas da seção 6.7 (não é derivado
@@ -27,8 +31,8 @@ export const REGISTRY_MODULOS_GENERICOS: ModuloGenericoConfig[] = [
   { slug: 'transferencia-voluntaria', label: 'Transferência Voluntária (EC 105)', categoria: 'Convênios e Repasses', basePath: '/execucao-orcamentaria/transferencia-voluntaria', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'julgamento-contas-legislativo', label: 'Julgamento de Contas (Legislativo)', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/julgamento-contas-legislativo', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'balanco-geral', label: 'Balanço Geral', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/balanco-geral', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
-  { slug: 'parecer-previo', label: 'Parecer Prévio', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/parecer-previo', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
-  { slug: 'julgamento-contas-tce', label: 'Julgamento de Contas (TCE)', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/julgamento-contas-tce', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
+  { slug: 'parecer-previo', label: 'Parecer Prévio', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/parecer-previo', comIntervalo: false, comExercicio: true, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
+  { slug: 'julgamento-contas-tce', label: 'Julgamento de Contas (TCE)', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/julgamento-contas-tce', comIntervalo: false, comExercicio: true, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'prestacao-contas-anos-anteriores', label: 'Prestação de Contas — Anos Anteriores', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/prestacao-contas-anos-anteriores', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'lei', label: 'Lei', categoria: 'Legislação', basePath: '/legislacao/lei', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },
   { slug: 'competencias', label: 'Competências', categoria: 'Institucional', basePath: '/institucional/competencias', comIntervalo: false, papelMinimoEdicao: 'ROLE_MANAGER' },

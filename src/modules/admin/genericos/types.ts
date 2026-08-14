@@ -4,6 +4,8 @@ export interface DocumentoGenericoAdmin {
   descricao: string
   data: string
   caminhoArquivo: string
+  // Só nos módulos com ModuloGenericoConfig.comExercicio (Parecer Prévio, Julgamento TCE).
+  exercicio?: number
 }
 
 export interface DocumentoGenericoComIntervaloAdmin extends DocumentoGenericoAdmin {
@@ -16,10 +18,12 @@ export interface DocumentoGenericoRequest {
   data: string
   dataInicio?: string
   dataFim?: string
+  exercicio?: number
 }
 
 export interface FiltroDocumentoGenericoAdmin {
   descricao?: string
   dataInicial?: string
   dataFinal?: string
+  exercicio?: number
 }

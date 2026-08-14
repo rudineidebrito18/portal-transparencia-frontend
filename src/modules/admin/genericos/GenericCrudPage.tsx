@@ -30,9 +30,10 @@ interface FormState {
   data: string
   dataInicio: string
   dataFim: string
+  exercicio: string
 }
 
-const FORM_VAZIO: FormState = { id: null, descricao: '', data: '', dataInicio: '', dataFim: '' }
+const FORM_VAZIO: FormState = { id: null, descricao: '', data: '', dataInicio: '', dataFim: '', exercicio: '' }
 
 function formatarTamanho(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -111,7 +112,8 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
       descricao: registro.descricao,
       data: registro.data,
       dataInicio: registro.dataInicio ?? '',
-      dataFim: registro.dataFim ?? ''
+      dataFim: registro.dataFim ?? '',
+      exercicio: registro.exercicio != null ? String(registro.exercicio) : ''
     })
   }
 
@@ -140,7 +142,8 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
     const dados: DocumentoGenericoRequest = {
       descricao: form.descricao,
       data: form.data,
-      ...(config.comIntervalo ? { dataInicio: form.dataInicio, dataFim: form.dataFim } : {})
+      ...(config.comIntervalo ? { dataInicio: form.dataInicio, dataFim: form.dataFim } : {}),
+      ...(config.comExercicio ? { exercicio: form.exercicio ? Number(form.exercicio) : undefined } : {})
     }
 
     try {
@@ -194,6 +197,15 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
           }}
           className={`${classeInput} flex-1 min-w-[200px]`}
         />
+        {config.comExercicio && (
+          <input
+            type="number"
+            placeholder="Exercício"
+            value={filtros.exercicio ?? ''}
+            onChange={e => setFiltros({ ...filtros, exercicio: e.target.value ? Number(e.target.value) : undefined })}
+            className={`${classeInput} w-32`}
+          />
+        )}
         <input
           type="date"
           value={filtros.dataInicial ?? ''}
@@ -236,6 +248,21 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
                   />
                 </CampoForm>
               </div>
+
+              {config.comExercicio && (
+                <div className="w-32">
+                  <CampoForm id="exercicio" label="Exercício">
+                    <input
+                      type="number"
+                      id="exercicio"
+                      required
+                      value={form.exercicio}
+                      onChange={e => setForm({ ...form, exercicio: e.target.value })}
+                      className={classeInput}
+                    />
+                  </CampoForm>
+                </div>
+              )}
 
               {config.comIntervalo && (
                 <>
@@ -348,6 +375,9 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
                 <tr className="border-b border-admin-border text-left">
                   <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Descrição</th>
                   <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Data</th>
+                  {config.comExercicio && (
+                    <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Exercício</th>
+                  )}
                   {config.comIntervalo && (
                     <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Vigência</th>
                   )}
@@ -360,6 +390,9 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
                   <tr key={registro.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
                     <td className="p-3.5 text-admin-text">{registro.descricao}</td>
                     <td className="p-3.5 text-admin-text-muted tabular-nums">{registro.data}</td>
+                    {config.comExercicio && (
+                      <td className="p-3.5 text-admin-text-muted tabular-nums">{registro.exercicio ?? '—'}</td>
+                    )}
                     {config.comIntervalo && (
                       <td className="p-3.5 text-admin-text-muted tabular-nums">
                         {registro.dataInicio} — {registro.dataFim}

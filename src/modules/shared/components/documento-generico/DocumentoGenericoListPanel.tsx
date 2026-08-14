@@ -18,11 +18,18 @@ import DocumentoGenericoFiltro from './DocumentoGenericoFiltro'
 
 type Props = ReturnType<typeof usePageableResource<DocumentoGenerico, FiltroDocumentoGenerico>> & {
   origem?: { label: string; href: string }
+  // Ver DocumentoGenericoFiltro — só true nos módulos "quase genéricos" com exercício próprio.
+  comExercicio?: boolean
 }
 
 const COLUNAS_EXPORTACAO: ColunaExportacao<DocumentoGenerico>[] = [
   { chave: 'descricao', rotulo: 'Descrição' },
   { chave: 'data', rotulo: 'Data de Publicação', formatar: item => formatarData(item.data) }
+]
+
+const COLUNAS_EXPORTACAO_COM_EXERCICIO: ColunaExportacao<DocumentoGenerico>[] = [
+  ...COLUNAS_EXPORTACAO,
+  { chave: 'exercicio', rotulo: 'Exercício' }
 ]
 
 export default function DocumentoGenericoListPanel({
@@ -40,7 +47,8 @@ export default function DocumentoGenericoListPanel({
   ordenacao,
   exportando,
   buscarTudoParaExportar,
-  origem
+  origem,
+  comExercicio = false
 }: Props) {
   const [exportarAberto, setExportarAberto] = useState(false)
   const [itensExportar, setItensExportar] = useState<DocumentoGenerico[]>([])
@@ -61,7 +69,7 @@ export default function DocumentoGenericoListPanel({
     <div className="space-y-6">
 
       {/* FILTRO */}
-      <DocumentoGenericoFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
+      <DocumentoGenericoFiltro valoresIniciais={filtros} onFiltrar={setFiltros} comExercicio={comExercicio} />
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
@@ -136,7 +144,7 @@ export default function DocumentoGenericoListPanel({
         aoFechar={() => setExportarAberto(false)}
         titulo="Exportar documentos"
         itens={itensExportar}
-        colunas={COLUNAS_EXPORTACAO}
+        colunas={comExercicio ? COLUNAS_EXPORTACAO_COM_EXERCICIO : COLUNAS_EXPORTACAO}
         nomeBaseArquivo={nomeBaseArquivo}
         truncado={truncadoExportar}
       />

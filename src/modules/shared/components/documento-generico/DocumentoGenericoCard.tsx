@@ -27,6 +27,11 @@ export default function DocumentoGenericoCard({ documento, origem }: Props) {
           <p className="text-sm text-text-secondary">
             Data de Publicação: {formatarData(documento.data)}
           </p>
+          {documento.exercicio != null && (
+            <p className="text-sm text-text-secondary">
+              Exercício: {documento.exercicio}
+            </p>
+          )}
         </div>
       </div>
 
