@@ -1,8 +1,7 @@
 'use client'
 
-import { MdGroups, MdPayments, MdSwapVert } from 'react-icons/md'
+import { MdSwapVert } from 'react-icons/md'
 
-import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import Pagination from '@/components/ui/Pagination'
@@ -28,9 +27,6 @@ export default function TabelaCargos() {
     setOrdenacao,
     ordenacao
   } = useCargos()
-
-  const totalServidores = cargos.reduce((soma, c) => soma + c.quantidade, 0)
-  const totalFolhaLiquida = cargos.reduce((soma, c) => soma + c.valorLiquido, 0)
 
   return (
     <div className="space-y-6">
@@ -83,29 +79,6 @@ export default function TabelaCargos() {
         <EmptyState message="Nenhum cargo encontrado com os filtros aplicados." />
       ) : (
         <>
-          {/* RESUMO */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Card hoverable={false} className="p-5 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                <MdGroups size={22} />
-              </div>
-              <div>
-                <p className="text-xs uppercase text-text-muted">Servidores nesta página</p>
-                <p className="text-xl font-bold text-primary">{totalServidores}</p>
-              </div>
-            </Card>
-
-            <Card hoverable={false} className="p-5 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-accent/10 text-accent">
-                <MdPayments size={22} />
-              </div>
-              <div>
-                <p className="text-xs uppercase text-text-muted">Total líquido nesta página</p>
-                <p className="text-xl font-bold text-accent">{formatarMoeda(totalFolhaLiquida)}</p>
-              </div>
-            </Card>
-          </div>
-
           {/* TABELA */}
           <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
             <table className="w-full text-sm bg-white">
