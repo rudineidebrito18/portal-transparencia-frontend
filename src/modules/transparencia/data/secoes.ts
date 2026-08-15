@@ -193,7 +193,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     itens: [
       { label: 'E-SIC', icon: MdMailOutline, href: '/esic' },
       { label: 'Ouvidoria', icon: MdSupportAgent, href: '/ouvidoria' },
-      { label: 'Formulário para Manifestação', icon: MdContactMail, href: '/ouvidoria' },
+      { label: 'Formulário para Manifestação', icon: MdContactMail, href: '/manifestacao' },
     ],
   },
   {
