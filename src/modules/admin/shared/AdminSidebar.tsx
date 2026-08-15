@@ -18,7 +18,8 @@ import {
   MdNewspaper,
   MdSchool,
   MdSpaceDashboard,
-  MdSupportAgent
+  MdSupportAgent,
+  MdVolunteerActivism
 } from 'react-icons/md'
 
 import { useAuth } from '@/modules/auth/AuthContext'
@@ -97,6 +98,20 @@ const LINKS_SAUDE_BESPOKE = [
   { href: '/admin/institucional/conselho-saude', label: 'Conselho Municipal de Saúde' }
 ]
 
+// Mescla com a categoria "Educação" do registry genérico (Lista de Espera — Creche,
+// Lista de Solicitação de Matrícula, Plano de Educação, Lista de Alunos), mesmo motivo
+// do LINKS_RH_BESPOKE acima.
+const LINKS_EDUCACAO_BESPOKE = [
+  { href: '/admin/institucional/conselho-educacao', label: 'Conselho Municipal de Educação' }
+]
+
+// Assistência Social não tem categoria no registry genérico (nenhum módulo genérico
+// nesse domínio ainda) — categoria manual própria, mesmo padrão de
+// LINKS_INSTITUCIONAL_GERAL/LINKS_ESIC_OUVIDORIA abaixo, não do mecanismo de merge.
+const LINKS_ASSISTENCIA_SOCIAL = [
+  { href: '/admin/institucional/conselho-assistencia-social', label: 'Conselho Municipal de Assistência Social' }
+]
+
 // Ícone por categoria — só nos cabeçalhos (não em cada link individual, seriam ~50
 // ícones sem significado real distinto). `Institucional`/`Geral` reaproveitam o mesmo
 // bloco visual já que a sidebar não os separa hoje.
@@ -112,7 +127,8 @@ const ICONE_CATEGORIA: Record<string, ComponentType<{ size?: number; className?:
   'Prestação de Contas': MdFactCheck,
   Legislação: MdMenuBook,
   Saúde: MdLocalHospital,
-  Educação: MdSchool
+  Educação: MdSchool,
+  'Assistência Social': MdVolunteerActivism
 }
 
 // Cabeçalho de categoria. Expandida: só um rótulo, não navega. Colapsada: vira botão
@@ -310,7 +326,8 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
 
         {[
           { categoria: 'Institucional e Geral', links: LINKS_INSTITUCIONAL_GERAL },
-          { categoria: 'ESIC e Ouvidoria', links: LINKS_ESIC_OUVIDORIA }
+          { categoria: 'ESIC e Ouvidoria', links: LINKS_ESIC_OUVIDORIA },
+          { categoria: 'Assistência Social', links: LINKS_ASSISTENCIA_SOCIAL }
         ].map(({ categoria, links }) => {
           const Icone = ICONE_CATEGORIA[categoria]
           return (
@@ -332,6 +349,7 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
             (categoria === 'Fiscal e Orçamentário' && LINKS_ANTICORRUPCAO_BESPOKE) ||
             (categoria === 'Diário Oficial' && LINKS_DIARIO_OFICIAL_BESPOKE) ||
             (categoria === 'Saúde' && LINKS_SAUDE_BESPOKE) ||
+            (categoria === 'Educação' && LINKS_EDUCACAO_BESPOKE) ||
             []
 
           return (

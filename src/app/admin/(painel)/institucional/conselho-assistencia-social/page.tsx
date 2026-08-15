@@ -1,12 +1,12 @@
 import ConselhoMunicipalListPage from '@/modules/admin/institucional/components/ConselhoMunicipalListPage'
 import { TipoConselho, TipoConselhoDescricao } from '@/modules/conselho-municipal/types'
 
-export default function ConselhoSaudeAdminPage() {
+export default function ConselhoAssistenciaSocialAdminPage() {
   return (
     <ConselhoMunicipalListPage
-      tipo={TipoConselho.SAUDE}
-      titulo={TipoConselhoDescricao[TipoConselho.SAUDE]}
-      basePath="/admin/institucional/conselho-saude"
+      tipo={TipoConselho.ASSISTENCIA_SOCIAL}
+      titulo={TipoConselhoDescricao[TipoConselho.ASSISTENCIA_SOCIAL]}
+      basePath="/admin/institucional/conselho-assistencia-social"
     />
   )
 }

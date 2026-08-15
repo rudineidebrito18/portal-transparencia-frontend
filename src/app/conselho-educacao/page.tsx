@@ -1,6 +1,6 @@
 import ConselhoMunicipalView from '@/modules/conselho-municipal/components/ConselhoMunicipalView'
 import { TipoConselho, TipoConselhoDescricao } from '@/modules/conselho-municipal/types'
 
-export default function ConselhoSaude() {
-  return <ConselhoMunicipalView tipo={TipoConselho.SAUDE} titulo={TipoConselhoDescricao[TipoConselho.SAUDE]} />
+export default function ConselhoEducacao() {
+  return <ConselhoMunicipalView tipo={TipoConselho.EDUCACAO} titulo={TipoConselhoDescricao[TipoConselho.EDUCACAO]} />
 }

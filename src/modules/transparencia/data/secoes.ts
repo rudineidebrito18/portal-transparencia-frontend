@@ -230,7 +230,8 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdSchool,
     cor: 'accent-light',
     itens: [
-      { label: 'Conselho Municipal (Educação e Assistência Social)', icon: MdVolunteerActivism },
+      { label: 'Conselho Municipal de Educação', icon: MdSchool, href: '/conselho-educacao' },
+      { label: 'Conselho Municipal de Assistência Social', icon: MdVolunteerActivism, href: '/conselho-assistencia-social' },
       { label: 'Plano Educação', icon: MdMenuBook, href: '/educacao?categoria=planos' },
       { label: 'Lista de Solicitações de Matrículas', icon: MdAssignment, href: '/educacao?categoria=lista-solicitacao-matricula' },
       { label: 'Lista de Alunos', icon: MdPeopleAlt, href: '/educacao?categoria=lista-alunos' },
