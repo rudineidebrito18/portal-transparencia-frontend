@@ -91,6 +91,12 @@ const LINKS_DIARIO_OFICIAL_BESPOKE = [
   { href: '/admin/diario-oficial/edicoes-nao-eletronicas', label: 'Diário Oficial — Edições Não Eletrônicas' }
 ]
 
+// Mescla com a categoria "Saúde" do registry genérico (Unidade de Saúde, Medicamentos,
+// Plano de Saúde, Relatórios de Saúde), mesmo motivo do LINKS_RH_BESPOKE acima.
+const LINKS_SAUDE_BESPOKE = [
+  { href: '/admin/institucional/conselho-saude', label: 'Conselho Municipal de Saúde' }
+]
+
 // Ícone por categoria — só nos cabeçalhos (não em cada link individual, seriam ~50
 // ícones sem significado real distinto). `Institucional`/`Geral` reaproveitam o mesmo
 // bloco visual já que a sidebar não os separa hoje.
@@ -325,6 +331,7 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
             (categoria === 'Convênios e Repasses' && LINKS_CONVENIOS_BESPOKE) ||
             (categoria === 'Fiscal e Orçamentário' && LINKS_ANTICORRUPCAO_BESPOKE) ||
             (categoria === 'Diário Oficial' && LINKS_DIARIO_OFICIAL_BESPOKE) ||
+            (categoria === 'Saúde' && LINKS_SAUDE_BESPOKE) ||
             []
 
           return (

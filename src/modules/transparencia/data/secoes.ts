@@ -219,7 +219,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdLocalHospital,
     cor: 'accent-dark',
     itens: [
-      { label: 'Conselho Municipal de Saúde', icon: MdGroup },
+      { label: 'Conselho Municipal de Saúde', icon: MdGroup, href: '/conselho-saude' },
       { label: 'Unidades Saúde', icon: MdLocationOn, href: '/saude?categoria=unidade' },
       { label: 'Medicamentos', icon: MdLocalPharmacy, href: '/saude?categoria=medicamentos' },
       { label: 'Plano de Saúde, Relatório de Gestão, e Programação Anual', icon: MdHealthAndSafety, href: '/saude?categoria=planos' },
