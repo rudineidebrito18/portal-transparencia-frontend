@@ -81,7 +81,8 @@ function NoTopo({
     <div
       className={`inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold uppercase tracking-wide shadow-sm
         ${destaque ? 'bg-white text-primary border-2 border-primary' : 'bg-primary text-white'}
-        ${href ? 'hover:opacity-90 transition-opacity' : ''}`}
+        ${href && destaque ? 'hover:bg-primary hover:text-white hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all' : ''}
+        ${href && !destaque ? 'hover:bg-primary-hover hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all' : ''}`}
     >
       <Icon size={18} className="shrink-0" />
       {titulo}
@@ -108,7 +109,7 @@ function GrupoNos({ nos, titulo: tituloGrupo }: { nos: (No & { href?: string })[
           const conteudo = (
             <div
               className={`flex items-center gap-2 rounded-lg border border-border/30 bg-white px-4 py-2.5 text-xs font-semibold text-text-secondary shadow-sm max-w-[220px]
-                ${href ? 'hover:border-primary/40 hover:text-primary transition-colors' : ''}`}
+                ${href ? 'hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary active:scale-95 transition-all' : ''}`}
             >
               <Icon size={16} className="shrink-0 text-primary" />
               <span>{tituloNo}</span>
