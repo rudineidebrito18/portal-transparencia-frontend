@@ -1,4 +1,5 @@
-import { FormularioEsicRequest, InformacoesEsic } from '../types'
+import { Page } from '@/modules/shared/types/Page'
+import { DocumentoClassificadoSigilo, FormularioEsicPublico, FormularioEsicRequest, InformacoesEsic } from '../types'
 
 const INFORMACOES: InformacoesEsic = {
   id: 1,
@@ -21,5 +22,23 @@ export const esicMock = {
 
   async enviarFormulario(dados: FormularioEsicRequest): Promise<void> {
     console.log('[mock] formulário e-SIC enviado:', dados)
+  },
+
+  async listarPublicas(): Promise<Page<FormularioEsicPublico>> {
+    const itens: FormularioEsicPublico[] = [
+      {
+        protocolo: 'ESIC-000001',
+        tipoSolicitacao: 'SOLICITACAO_INFORMACAO',
+        solicitacao: 'Gostaria de saber o valor total gasto com merenda escolar em 2025.',
+        resposta: 'O valor total investido em merenda escolar em 2025 foi de R$ 320.000,00, conforme execução orçamentária publicada no Portal da Transparência.',
+        status: 'RESPONDIDA',
+        criadoEm: '2026-06-10T09:30:00'
+      }
+    ]
+    return { content: itens, totalPages: 1, totalElements: itens.length, number: 0, size: 10 }
+  },
+
+  async listarDocumentosClassificadosSigilo(): Promise<Page<DocumentoClassificadoSigilo>> {
+    return { content: [], totalPages: 1, totalElements: 0, number: 0, size: 10 }
   }
 }

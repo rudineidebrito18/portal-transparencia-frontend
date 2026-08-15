@@ -77,9 +77,13 @@ const LINKS_INSTITUCIONAL_GERAL = [
   { href: '/admin/institucional/estrutura-organizacional', label: 'Estrutura Organizacional' }
 ]
 
+// Mescla com a categoria "ESIC e Ouvidoria" do registry genérico (Regulamentação, Declaração
+// de Solicitações, Declaração de Sigilo — item 29 do backlog), mesmo motivo do
+// LINKS_RH_BESPOKE acima — por isso não faz mais parte do bloco 100% manual mais abaixo.
 const LINKS_ESIC_OUVIDORIA = [
   { href: '/admin/esic/config', label: 'E-SIC — Configuração' },
   { href: '/admin/esic/formularios', label: 'E-SIC — Formulários Recebidos' },
+  { href: '/admin/esic/documentos-classificados-sigilo', label: 'E-SIC — Documentos por Grau de Sigilo' },
   { href: '/admin/ouvidoria/config', label: 'Ouvidoria — Configuração' },
   { href: '/admin/ouvidoria/formularios', label: 'Ouvidoria — Formulários Recebidos' }
 ]
@@ -326,7 +330,6 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
 
         {[
           { categoria: 'Institucional e Geral', links: LINKS_INSTITUCIONAL_GERAL },
-          { categoria: 'ESIC e Ouvidoria', links: LINKS_ESIC_OUVIDORIA },
           { categoria: 'Assistência Social', links: LINKS_ASSISTENCIA_SOCIAL }
         ].map(({ categoria, links }) => {
           const Icone = ICONE_CATEGORIA[categoria]
@@ -350,6 +353,7 @@ export default function AdminSidebar({ colapsada, onExpandir }: Props) {
             (categoria === 'Diário Oficial' && LINKS_DIARIO_OFICIAL_BESPOKE) ||
             (categoria === 'Saúde' && LINKS_SAUDE_BESPOKE) ||
             (categoria === 'Educação' && LINKS_EDUCACAO_BESPOKE) ||
+            (categoria === 'ESIC e Ouvidoria' && LINKS_ESIC_OUVIDORIA) ||
             []
 
           return (

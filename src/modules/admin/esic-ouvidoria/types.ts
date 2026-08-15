@@ -36,6 +36,24 @@ export interface EsicInfo {
 
 export type EsicInfoRequest = Omit<EsicInfo, 'id'>
 
+export type GrauSigilo = 'PUBLICO' | 'RESERVADO' | 'SECRETO' | 'ULTRASSECRETO'
+
+export const LABELS_GRAU_SIGILO: Record<GrauSigilo, string> = {
+  PUBLICO: 'Público',
+  RESERVADO: 'Reservado',
+  SECRETO: 'Secreto',
+  ULTRASSECRETO: 'Ultrassecreto'
+}
+
+export type StatusEsic = 'RECEBIDA' | 'EM_ANALISE' | 'RESPONDIDA' | 'INDEFERIDA'
+
+export const LABELS_STATUS_ESIC: Record<StatusEsic, string> = {
+  RECEBIDA: 'Recebida',
+  EM_ANALISE: 'Em análise',
+  RESPONDIDA: 'Respondida',
+  INDEFERIDA: 'Indeferida'
+}
+
 export interface FormularioEsic {
   id: number
   tipoSolicitacao: TipoSolicitacaoEsic
@@ -44,6 +62,17 @@ export interface FormularioEsic {
   nome: string
   email: string
   criadoEm: string
+  protocolo: string
+  status: StatusEsic
+  grauSigilo: GrauSigilo
+  dataLimiteResposta: string | null
+  resposta: string | null
+}
+
+export interface FormularioEsicStatusUpdateRequest {
+  status?: StatusEsic
+  grauSigilo?: GrauSigilo
+  resposta?: string
 }
 
 export interface FiltroFormularioEsic {

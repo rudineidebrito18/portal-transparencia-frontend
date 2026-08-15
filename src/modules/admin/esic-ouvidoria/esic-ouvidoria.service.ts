@@ -1,6 +1,16 @@
 import { ApiError, api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
-import { EsicInfo, EsicInfoRequest, FiltroFormularioEsic, FiltroFormularioOuvidoria, FormularioEsic, FormularioOuvidoria, OuvidoriaInfo, OuvidoriaInfoRequest } from './types'
+import {
+  EsicInfo,
+  EsicInfoRequest,
+  FiltroFormularioEsic,
+  FiltroFormularioOuvidoria,
+  FormularioEsic,
+  FormularioEsicStatusUpdateRequest,
+  FormularioOuvidoria,
+  OuvidoriaInfo,
+  OuvidoriaInfoRequest
+} from './types'
 
 export const esicInfoService = {
   // GET devolve 404 antes da primeira configuração (PUT faz upsert), igual ouvidoria.
@@ -24,6 +34,12 @@ type ListarFormularioParams = FiltroFormularioEsic & { page?: number; size?: num
 export const esicFormularioService = {
   listar(params: ListarFormularioParams): Promise<Page<FormularioEsic>> {
     return api.get<Page<FormularioEsic>>('/esic/formulario/filtro', { params }).then(r => r.data)
+  },
+
+  // Triagem: status/grauSigilo/resposta são decisão da administração, nunca do cidadão
+  // no envio (ver FormularioEsicServiceImpl.salvar no backend — nasce sempre PUBLICO/RECEBIDA).
+  atualizarStatus(id: number, dados: FormularioEsicStatusUpdateRequest): Promise<FormularioEsic> {
+    return api.patch<FormularioEsic>(`/esic/formulario/${id}/status`, dados).then(r => r.data)
   }
 }
 
