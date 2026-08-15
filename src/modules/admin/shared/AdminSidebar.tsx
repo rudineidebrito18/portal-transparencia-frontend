@@ -72,7 +72,8 @@ const LINKS_INSTITUCIONAL_GERAL = [
   { href: '/admin/geral/vice-prefeito', label: 'Perfil do Vice-Prefeito' },
   { href: '/admin/geral/fornecedores', label: 'Fornecedores' },
   { href: '/admin/geral/unidades', label: 'Unidades' },
-  { href: '/admin/geral/tabela-valores', label: 'Tabela de Valores de Diária' }
+  { href: '/admin/geral/tabela-valores', label: 'Tabela de Valores de Diária' },
+  { href: '/admin/institucional/estrutura-organizacional', label: 'Estrutura Organizacional' }
 ]
 
 const LINKS_ESIC_OUVIDORIA = [

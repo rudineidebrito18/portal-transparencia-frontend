@@ -1,9 +1,10 @@
 import PageHeader from '@/components/PageHeader'
 import PdfViewer from '@/components/ui/PdfViewer'
 
-// TODO: substituir por /pdfs/estrutura-organizacional.pdf (ou equivalente) quando o
-// arquivo real estiver disponível — não há endpoint de backend pra esse recurso.
-const PDF_SRC = '/test.pdf'
+// URL é fixa (recurso singleton, EstruturaOrganizacionalController) — não depende de ID.
+// Se o admin ainda não fez upload, o backend responde 404 e o PdfViewer já mostra o
+// estado de erro apropriado (HEAD check antes do iframe), sem precisar de lógica extra aqui.
+const PDF_SRC = '/api/institucional/estrutura-organizacional/arquivo'
 
 export default function EstruturaOrganizacional() {
   return (
