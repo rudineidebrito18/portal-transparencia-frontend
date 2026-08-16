@@ -29,6 +29,7 @@ export const REGISTRY_MODULOS_GENERICOS: ModuloGenericoConfig[] = [
   { slug: 'ldo', label: 'LDO', categoria: 'Planejamento', basePath: '/planejamento/ldo', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'loa', label: 'LOA', categoria: 'Planejamento', basePath: '/planejamento/loa', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'transferencia-voluntaria', label: 'Transferência Voluntária (EC 105)', categoria: 'Convênios e Repasses', basePath: '/execucao-orcamentaria/transferencia-voluntaria', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
+  { slug: 'emenda-municipal', label: 'Emendas Municipais', categoria: 'Convênios e Repasses', basePath: '/convenios/emenda-municipal', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'julgamento-contas-legislativo', label: 'Julgamento de Contas (Legislativo)', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/julgamento-contas-legislativo', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'balanco-geral', label: 'Balanço Geral', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/balanco-geral', comIntervalo: false, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },
   { slug: 'parecer-previo', label: 'Parecer Prévio', categoria: 'Prestação de Contas', basePath: '/prestacao-contas/parecer-previo', comIntervalo: false, comExercicio: true, papelMinimoEdicao: 'ROLE_ADMINISTRATOR' },

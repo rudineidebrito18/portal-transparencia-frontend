@@ -244,7 +244,7 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     itens: [
       { label: 'Emendas Federais', icon: MdPublic, href: '/emendas-parlamentares' },
       { label: 'Emendas Estaduais', icon: MdLocationOn, href: '/emendas-parlamentares' },
-      { label: 'Emendas Municipais', icon: MdAccountBalance, href: '/emendas-parlamentares' },
+      { label: 'Emendas Municipais', icon: MdAccountBalance, href: '/emendas-municipais' },
       { label: 'Execução Orçamentária e Financeira', icon: MdAttachMoney, href: '/emendas-parlamentares' },
     ],
   },
