@@ -242,10 +242,13 @@ export const secoesAcessoInformacao: SecaoAcesso[] = [
     icon: MdPolicy,
     cor: 'primary-dark',
     itens: [
-      { label: 'Emendas Federais', icon: MdPublic, href: '/emendas-parlamentares' },
-      { label: 'Emendas Estaduais', icon: MdLocationOn, href: '/emendas-parlamentares' },
+      { label: 'Emendas Federais', icon: MdPublic, href: '/emendas-federais' },
+      // Estaduais e "Execução Orçamentária e Financeira" ainda não têm página própria
+      // (PLANO_MODULO_EMENDAS.md Fase 4 e backlog item 36) — apontam pra Federais enquanto isso,
+      // mesmo placeholder compartilhado que já existia antes desta PR.
+      { label: 'Emendas Estaduais', icon: MdLocationOn, href: '/emendas-federais' },
       { label: 'Emendas Municipais', icon: MdAccountBalance, href: '/emendas-municipais' },
-      { label: 'Execução Orçamentária e Financeira', icon: MdAttachMoney, href: '/emendas-parlamentares' },
+      { label: 'Execução Orçamentária e Financeira', icon: MdAttachMoney, href: '/emendas-federais' },
     ],
   },
 ]

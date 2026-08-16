@@ -2,18 +2,18 @@ import { Suspense } from 'react'
 
 import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
-import EmendaParlamentarListView from '@/modules/emendas-parlamentares/components/EmendaParlamentarListView'
+import EmendaFederalListView from '@/modules/emendas-federais/components/EmendaFederalListView'
 
-export default function EmendasParlamentares() {
+export default function EmendasFederais() {
   return (
     <div className="max-w-6xl mx-auto p-2">
-      <PageHeader title="Emendas Parlamentares" breadcrumbItems={[
+      <PageHeader title="Emendas Federais" breadcrumbItems={[
           { label: 'Transparência', href: '/transparencia' },
-          { label: 'Emendas parlamentares' }
+          { label: 'Emendas federais' }
         ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} />)}</div>}>
-        <EmendaParlamentarListView />
+        <EmendaFederalListView />
       </Suspense>
     </div>
   )

@@ -25,3 +25,27 @@ export const FormaRepasseEmendaDescricao: Record<FormaRepasseEmenda, string> = {
   [FormaRepasseEmenda.CONVENIO]: 'Convênio',
   [FormaRepasseEmenda.FUNDO_A_FUNDO]: 'Fundo a Fundo'
 }
+
+export enum FonteEmenda {
+  CGU = 'CGU',
+  TRANSFEREGOV = 'TRANSFEREGOV',
+  SENADO = 'SENADO',
+  MA_FEDERAL = 'MA_FEDERAL'
+}
+
+export const FonteEmendaDescricao: Record<FonteEmenda, string> = {
+  [FonteEmenda.CGU]: 'Portal da Transparência (CGU)',
+  [FonteEmenda.TRANSFEREGOV]: 'Transferegov',
+  [FonteEmenda.SENADO]: 'Senado Federal',
+  [FonteEmenda.MA_FEDERAL]: 'Orçamento do Estado do Maranhão'
+}
+
+export enum OrigemCadastroEmenda {
+  MANUAL = 'MANUAL',
+  API = 'API'
+}
+
+export const OrigemCadastroEmendaDescricao: Record<OrigemCadastroEmenda, string> = {
+  [OrigemCadastroEmenda.MANUAL]: 'Cadastrado manualmente',
+  [OrigemCadastroEmenda.API]: 'Sincronizado com fonte oficial'
+}

@@ -7,11 +7,11 @@ import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
 import Select from '@/components/ui/Select'
 import { TipoEmenda, TipoEmendaDescricao } from '../enums'
-import { FiltroEmendaParlamentar } from '../types'
+import { FiltroEmendaFederal } from '../types'
 
 interface Props {
-  valoresIniciais?: FiltroEmendaParlamentar
-  onFiltrar: (filtros: FiltroEmendaParlamentar) => void
+  valoresIniciais?: FiltroEmendaFederal
+  onFiltrar: (filtros: FiltroEmendaFederal) => void
 }
 
 const anoAtual = new Date().getFullYear()
@@ -19,7 +19,7 @@ const anos = Array.from({ length: 10 }, (_, i) => anoAtual - i)
 
 // O backend só filtra por tipo OU por ano (endpoints separados), nunca os dois ao
 // mesmo tempo — por isso escolher um aqui limpa o outro automaticamente.
-export default function EmendaParlamentarFiltro({ valoresIniciais, onFiltrar }: Props) {
+export default function EmendaFederalFiltro({ valoresIniciais, onFiltrar }: Props) {
   const [tipo, setTipo] = useState(valoresIniciais?.tipo ?? '')
   const [ano, setAno] = useState(valoresIniciais?.ano ? String(valoresIniciais.ano) : '')
 
@@ -60,7 +60,7 @@ export default function EmendaParlamentarFiltro({ valoresIniciais, onFiltrar }: 
 
         <div>
           <label className="text-xs uppercase font-semibold text-text-muted mb-1 block" htmlFor="ano">
-            Ano de Publicação
+            Ano
           </label>
           <Select
             id="ano"

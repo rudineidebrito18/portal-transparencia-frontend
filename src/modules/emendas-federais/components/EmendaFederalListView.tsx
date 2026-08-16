@@ -8,11 +8,11 @@ import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarDataHora } from '@/utils/date'
-import { useEmendasParlamentares } from '../hooks/useEmendasParlamentares'
-import EmendaParlamentarCard from './EmendaParlamentarCard'
-import EmendaParlamentarFiltro from './EmendaParlamentarFiltro'
+import { useEmendasFederais } from '../hooks/useEmendasFederais'
+import EmendaFederalCard from './EmendaFederalCard'
+import EmendaFederalFiltro from './EmendaFederalFiltro'
 
-export default function EmendaParlamentarListView() {
+export default function EmendaFederalListView() {
   const {
     data: emendas,
     loading,
@@ -26,13 +26,13 @@ export default function EmendaParlamentarListView() {
     setFiltros,
     ordenacao,
     setOrdenacao
-  } = useEmendasParlamentares()
+  } = useEmendasFederais()
 
   return (
     <div className="space-y-6">
 
       {/* FILTRO */}
-      <EmendaParlamentarFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
+      <EmendaFederalFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm">
@@ -50,15 +50,14 @@ export default function EmendaParlamentarListView() {
           </div>
 
           <Select
-            value={ordenacao || 'dataPublicacao,desc'}
+            value={ordenacao || 'atualizadoEm,desc'}
             onChange={(e) => setOrdenacao(e.target.value)}
             aria-label="Ordenar por"
             fullWidth={false}
           >
-            <option value="dataPublicacao,desc">Mais recentes</option>
-            <option value="dataPublicacao,asc">Mais antigas</option>
-            <option value="valorRepassado,desc">Maior valor repassado</option>
-            <option value="valorRepassado,asc">Menor valor repassado</option>
+            <option value="atualizadoEm,desc">Atualizadas recentemente</option>
+            <option value="valorPago,desc">Maior valor pago</option>
+            <option value="valorPago,asc">Menor valor pago</option>
           </Select>
         </div>
       </div>
@@ -79,10 +78,10 @@ export default function EmendaParlamentarListView() {
           <div className="grid gap-4">
             {emendas.length > 0 ? (
               emendas.map(item => (
-                <EmendaParlamentarCard key={item.id} emenda={item} />
+                <EmendaFederalCard key={item.id} emenda={item} />
               ))
             ) : (
-              <EmptyState message="Nenhuma emenda parlamentar encontrada com os filtros aplicados." />
+              <EmptyState message="Nenhuma emenda federal encontrada com os filtros aplicados." />
             )}
           </div>
 
