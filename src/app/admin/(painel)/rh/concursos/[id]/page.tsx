@@ -178,7 +178,7 @@ export default function AnexosConcursoAdminPage() {
                     <td className="p-3.5 text-admin-text-muted tabular-nums">{a.data}</td>
                     <td className="p-3.5">
                       <Link
-                        href={hrefDocumento(a.caminhoArquivo, a.descricao, { admin: true })}
+                        href={hrefDocumento(anexoConcursoService.urlArquivo(a.id), a.descricao, { admin: true })}
                         className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                       >
                         <MdVisibility size={15} /> Ver documento

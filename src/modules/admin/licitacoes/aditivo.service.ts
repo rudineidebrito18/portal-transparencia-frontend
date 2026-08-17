@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { Aditivo } from '@/modules/contratos/types'
 import { AditivoRequest } from './types'
@@ -35,5 +36,9 @@ export const aditivoService = {
 
   excluir(id: number): Promise<void> {
     return api.delete(`${BASE}/${id}`).then(() => undefined)
+  },
+
+  urlArquivo(id: number): string {
+    return urlArquivoDocumento(BASE, id)
   }
 }

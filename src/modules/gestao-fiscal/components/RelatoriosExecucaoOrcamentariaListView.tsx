@@ -9,6 +9,7 @@ import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import { formatarDataHora } from '@/utils/date'
 import { ColunaExportacao } from '@/utils/exportacao'
+import { gestaoFiscalService } from '../gestaoFiscal.service'
 import { useRelatoriosExecucaoOrcamentaria } from '../hooks/useGestaoFiscal'
 import { RelatorioExecucaoOrcamentaria } from '../types'
 import RelatorioExecucaoOrcamentariaFiltro from './RelatorioExecucaoOrcamentariaFiltro'
@@ -87,9 +88,12 @@ export default function RelatoriosExecucaoOrcamentariaListView() {
             key={relatorio.id}
             titulo={relatorio.descricao}
             subtitulo={`${relatorio.bimestre}º Bimestre de ${relatorio.ano}`}
-            caminhoPdf={relatorio.caminhoPdf}
-            caminhoWord={relatorio.caminhoWord}
-            caminhoXls={relatorio.caminhoXls}
+            temPdf={!!relatorio.caminhoPdf}
+            temWord={!!relatorio.caminhoWord}
+            temXls={!!relatorio.caminhoXls}
+            urlPdf={gestaoFiscalService.urlFormatoRelatorioExecucaoOrcamentaria(relatorio.id, 'pdf')}
+            urlWord={gestaoFiscalService.urlFormatoRelatorioExecucaoOrcamentaria(relatorio.id, 'word')}
+            urlXls={gestaoFiscalService.urlFormatoRelatorioExecucaoOrcamentaria(relatorio.id, 'xls')}
             origem={{ label: 'Relatório Resumido da Execução Orçamentária', href: '/rreo' }}
           />
         )}

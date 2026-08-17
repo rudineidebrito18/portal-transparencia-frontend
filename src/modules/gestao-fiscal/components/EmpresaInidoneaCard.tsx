@@ -6,6 +6,7 @@ import Card from '@/components/ui/Card'
 import { STATUS_BADGE_DOT, STATUS_BADGE_STYLE } from '@/modules/shared/statusBadgeStyle'
 import { formatarData } from '@/utils/date'
 import { hrefDocumento } from '@/utils/documento'
+import { gestaoFiscalService } from '../gestaoFiscal.service'
 import { EmpresaInidonea } from '../types'
 
 interface Props {
@@ -42,7 +43,7 @@ export default function EmpresaInidoneaCard({ empresa }: Props) {
         </div>
 
         <Link
-          href={hrefDocumento(empresa.caminhoPdf, empresa.empresa, { origemLabel: 'Empresas Inidôneas e Suspensas', origemHref: '/empresas-inidoneas' })}
+          href={hrefDocumento(gestaoFiscalService.urlArquivoEmpresaInidonea(empresa.id), empresa.empresa, { origemLabel: 'Empresas Inidôneas e Suspensas', origemHref: '/empresas-inidoneas' })}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
         >
           <MdVisibility size={18} />

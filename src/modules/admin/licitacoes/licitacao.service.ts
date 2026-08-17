@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { LicitacaoDetalhe, LicitacaoResumo } from '@/modules/licitacoes/types'
 import { DocumentoUploadRequest, Documento, FiltroLicitacaoAdmin, LicitacaoOrgao, LicitacaoOrgaoRequest, LicitacaoRequest } from './types'
@@ -53,6 +54,10 @@ export const licitacaoService = {
 
   excluirDocumento(licitacaoId: number, documentoId: number): Promise<void> {
     return api.delete(`${BASE}/${licitacaoId}/documento/${documentoId}`).then(() => undefined)
+  },
+
+  urlDocumento(licitacaoId: number, documentoId: number): string {
+    return urlArquivoDocumento(`${BASE}/${licitacaoId}/documentos`, documentoId)
   },
 
   // Sem paginação (volume baixo por licitação) — padrão PNCP de gerenciador + participantes

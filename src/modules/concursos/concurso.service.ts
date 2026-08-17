@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { concursoMock } from './mocks/concurso.mock'
 import { AnexoConcurso, Concurso, FiltroConcurso } from './types'
@@ -26,5 +27,9 @@ export const concursoService = {
     if (USE_MOCK) return concursoMock.buscarPorId(id)
 
     return api.get<Concurso>(`/recursos-humanos/concursos/${id}`).then(r => r.data)
+  },
+
+  urlArquivoAnexo(anexoId: number): string {
+    return urlArquivoDocumento('recursos-humanos/concursos/anexos', anexoId)
   }
 }

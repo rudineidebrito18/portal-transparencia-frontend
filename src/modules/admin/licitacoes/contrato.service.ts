@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { ContratoLicitacao } from '@/modules/contratos/types'
 import { ContratoLicitacaoRequest, Documento, DocumentoUploadRequest } from './types'
@@ -51,5 +52,9 @@ export const contratoService = {
 
   excluirDocumento(contratoId: number, documentoId: number): Promise<void> {
     return api.delete(`${BASE}/contratos/${contratoId}/documento/${documentoId}`).then(() => undefined)
+  },
+
+  urlDocumento(contratoId: number, documentoId: number): string {
+    return urlArquivoDocumento(`licitacoes/contratos/${contratoId}/documento`, documentoId)
   }
 }

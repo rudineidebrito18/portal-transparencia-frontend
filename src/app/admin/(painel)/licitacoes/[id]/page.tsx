@@ -435,7 +435,7 @@ function AbaDocumentos({ licitacaoId }: { licitacaoId: number }) {
                     <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarData(d.dataEnvio)}</td>
                     <td className="p-3.5">
                       <Link
-                        href={hrefDocumento(d.caminhoPdf, d.assunto, { admin: true })}
+                        href={hrefDocumento(licitacaoService.urlDocumento(licitacaoId, d.id), d.assunto, { admin: true })}
                         className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                       >
                         <MdVisibility size={15} /> Ver documento

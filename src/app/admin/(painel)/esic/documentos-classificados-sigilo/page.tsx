@@ -12,7 +12,7 @@ import AdminErrorState from '@/modules/admin/shared/AdminErrorState'
 import AdminPagination from '@/modules/admin/shared/AdminPagination'
 import ConfirmDialog from '@/modules/admin/shared/ConfirmDialog'
 import { criarServicoAdminDocumentoGenerico } from '@/modules/admin/genericos/service'
-import { hrefDocumento } from '@/utils/documento'
+import { hrefDocumento, urlArquivoDocumento } from '@/utils/documento'
 import { DocumentoClassificadoSigilo, GrauSigilo, LABELS_GRAU_SIGILO } from '@/modules/esic/types'
 
 const BASE_PATH = '/esic/documentos-classificados-sigilo'
@@ -309,7 +309,7 @@ export default function DocumentosClassificadosSigiloAdminPage() {
                     <td className="p-3.5">
                       {registro.caminhoArquivo && (
                         <Link
-                          href={hrefDocumento(registro.caminhoArquivo, registro.descricao ?? 'Documento', { admin: true })}
+                          href={hrefDocumento(urlArquivoDocumento(BASE_PATH, registro.id), registro.descricao ?? 'Documento', { admin: true })}
                           className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                         >
                           <MdVisibility size={15} /> Ver

@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import {
   transferenciasRecebidasMock,
@@ -29,6 +30,10 @@ function criarServicoConvenio(path: string, mock: MockConvenio) {
       return api
         .get<Page<ConvenioDocumento>>(`/${path}/filtro`, { params })
         .then(response => response.data)
+    },
+
+    urlArquivo(id: number): string {
+      return urlArquivoDocumento(path, id)
     }
   }
 }

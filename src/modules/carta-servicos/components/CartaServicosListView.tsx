@@ -16,7 +16,7 @@ import { useCartaServicos } from '../hooks/useCartaServicos'
 // (atualiza raramente, diferente de relatório mensal/anual recorrente), filtro por título
 // seria ruído.
 export default function CartaServicosListView() {
-  const { data: documentos, loading, erro, pagina, totalPaginas, setPagina } = useCartaServicos()
+  const { data: documentos, loading, erro, pagina, totalPaginas, setPagina, urlArquivo } = useCartaServicos()
 
   return (
     <div className="space-y-8">
@@ -47,7 +47,7 @@ export default function CartaServicosListView() {
                   <p className="text-xs text-text-secondary/50 mb-2">
                     Referência de {formatarData(documento.data)}
                   </p>
-                  <PdfViewer src={documento.caminhoArquivo} titulo={documento.descricao} />
+                  <PdfViewer src={urlArquivo(documento.id)} titulo={documento.descricao} />
                 </div>
               ))}
             </div>

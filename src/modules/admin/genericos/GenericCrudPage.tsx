@@ -20,7 +20,7 @@ import {
   DocumentoGenericoRequest,
   FiltroDocumentoGenericoAdmin
 } from './types'
-import { hrefDocumento } from '@/utils/documento'
+import { hrefDocumento, urlArquivoDocumento } from '@/utils/documento'
 
 type Registro = DocumentoGenericoAdmin & Partial<Pick<DocumentoGenericoComIntervaloAdmin, 'dataInicio' | 'dataFim'>>
 
@@ -401,7 +401,7 @@ export default function GenericCrudPage({ config }: { config: ModuloGenericoConf
                     <td className="p-3.5">
                       {registro.caminhoArquivo && (
                         <Link
-                          href={hrefDocumento(registro.caminhoArquivo, registro.descricao, { admin: true })}
+                          href={hrefDocumento(urlArquivoDocumento(config.basePath, registro.id), registro.descricao, { admin: true })}
                           className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                         >
                           <MdVisibility size={15} /> Ver

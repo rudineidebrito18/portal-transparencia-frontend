@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { AnexoConcurso, AnexoConcursoRequest, Concurso, ConcursoRequest, FiltroConcurso } from './types'
 
@@ -45,5 +46,9 @@ export const anexoConcursoService = {
 
   excluir(id: number): Promise<void> {
     return api.delete(`${BASE}/anexos/${id}`).then(() => undefined)
+  },
+
+  urlArquivo(id: number): string {
+    return urlArquivoDocumento(`${BASE}/anexos`, id)
   }
 }

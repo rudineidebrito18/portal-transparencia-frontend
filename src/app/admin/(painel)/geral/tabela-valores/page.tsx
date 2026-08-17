@@ -266,7 +266,7 @@ export default function TabelaValoresAdminPage() {
                     <td className="p-3.5">
                       {item.caminhoArquivo ? (
                         <Link
-                          href={hrefDocumento(item.caminhoArquivo, item.descricao, { admin: true })}
+                          href={hrefDocumento(tabelaValoresService.urlArquivo(item.id), item.descricao, { admin: true })}
                           className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                         >
                           <MdVisibility size={15} /> Ver

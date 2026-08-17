@@ -10,9 +10,10 @@ import { EdicaoNaoEletronica } from '../types'
 
 interface Props {
   edicao: EdicaoNaoEletronica
+  urlArquivo: string
 }
 
-export default function EdicaoNaoEletronicaCard({ edicao }: Props) {
+export default function EdicaoNaoEletronicaCard({ edicao, urlArquivo }: Props) {
   const tipoKey = edicao.tipo as TipoEdicaoDiario
   const tipoLabel = TipoEdicaoDiarioDescricao[tipoKey] ?? edicao.tipo
   const tipoStyle = TipoEdicaoDiarioStyle[tipoKey] ?? 'bg-gray-100 text-gray-600'
@@ -37,7 +38,7 @@ export default function EdicaoNaoEletronicaCard({ edicao }: Props) {
       </div>
 
       <Link
-        href={hrefDocumento(edicao.caminhoArquivo, edicao.descricao, { origemLabel: 'Diário Oficial', origemHref: '/diario-oficial?categoria=nao-eletronicas' })}
+        href={hrefDocumento(urlArquivo, edicao.descricao, { origemLabel: 'Diário Oficial', origemHref: '/diario-oficial?categoria=nao-eletronicas' })}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
         <MdVisibility size={18} />

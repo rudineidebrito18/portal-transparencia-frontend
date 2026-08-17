@@ -8,6 +8,7 @@ import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Skeleton from '@/components/ui/Skeleton'
 import { formatarDataHora } from '@/utils/date'
+import { edicaoNaoEletronicaService } from '../edicaoNaoEletronica.service'
 import { useEdicoesNaoEletronicas } from '../hooks/useEdicoesNaoEletronicas'
 import EdicaoNaoEletronicaCard from './EdicaoNaoEletronicaCard'
 import EdicaoNaoEletronicaFiltro from './EdicaoNaoEletronicaFiltro'
@@ -83,7 +84,7 @@ export default function EdicoesNaoEletronicasListView() {
           <div className="grid gap-4">
             {edicoes.length > 0 ? (
               edicoes.map(edicao => (
-                <EdicaoNaoEletronicaCard key={edicao.id} edicao={edicao} />
+                <EdicaoNaoEletronicaCard key={edicao.id} edicao={edicao} urlArquivo={edicaoNaoEletronicaService.urlArquivo(edicao.id)} />
               ))
             ) : (
               <EmptyState message="Nenhuma edição encontrada com os filtros aplicados." />

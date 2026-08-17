@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { esicMock } from './mocks/esic.mock'
 import { DocumentoClassificadoSigilo, FormularioEsicPublico, FormularioEsicRequest, InformacoesEsic } from './types'
@@ -33,5 +34,9 @@ export const esicService = {
     return api
       .get<Page<DocumentoClassificadoSigilo>>('/esic/documentos-classificados-sigilo', { params: { size: 50 } })
       .then(r => r.data.content)
+  },
+
+  urlArquivoDocumentoClassificadoSigilo(id: number): string {
+    return urlArquivoDocumento('esic/documentos-classificados-sigilo', id)
   }
 }

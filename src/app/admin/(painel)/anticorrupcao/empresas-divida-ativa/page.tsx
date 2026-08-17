@@ -332,7 +332,7 @@ export default function EmpresasDividaAtivaAdminPage() {
                     <td className="p-3.5">
                       {e.caminhoPdf ? (
                         <Link
-                          href={hrefDocumento(e.caminhoPdf, e.nome, { admin: true })}
+                          href={hrefDocumento(empresaDividaAtivaService.urlArquivo(e.id), e.nome, { admin: true })}
                           className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                         >
                           <MdVisibility size={15} /> Ver

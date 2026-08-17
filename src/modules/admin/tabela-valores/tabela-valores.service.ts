@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { FiltroTabelaValores, TabelaValores, TabelaValoresRequest } from './types'
 
@@ -37,5 +38,9 @@ export const tabelaValoresService = {
 
   excluir(id: number): Promise<void> {
     return api.delete(`${BASE}/${id}`).then(() => undefined)
+  },
+
+  urlArquivo(id: number): string {
+    return urlArquivoDocumento(BASE, id)
   }
 }

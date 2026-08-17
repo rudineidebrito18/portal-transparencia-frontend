@@ -1,5 +1,6 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { tabelaValoresMock } from './mocks/tabelaValores.mock'
 import { FiltroTabelaValores, TabelaValores } from './types'
 
@@ -18,5 +19,9 @@ export const tabelaValoresService = {
     return api
       .get<Page<TabelaValores>>('/tabela-valores/buscar', { params })
       .then(response => response.data)
+  },
+
+  urlArquivo(id: number): string {
+    return urlArquivoDocumento('tabela-valores', id)
   }
 }

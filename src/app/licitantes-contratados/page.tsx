@@ -26,7 +26,7 @@ export default async function LicitantesContratadosPage() {
         ]} />
 
       {documento ? (
-        <PdfViewer src={documento.caminhoArquivo} titulo={documento.descricao} />
+        <PdfViewer src={licitanteContratadoService.urlArquivo('licitantes-contratados', documento.id)} titulo={documento.descricao} />
       ) : (
         <EmptyState message="Nenhum documento publicado ainda." />
       )}

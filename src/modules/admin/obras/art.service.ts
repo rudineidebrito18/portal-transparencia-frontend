@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Art, ArtRequest } from './types'
 
 const base = (obraId: number) => `/obras/${obraId}/arts`
@@ -31,5 +32,9 @@ export const artService = {
 
   excluir(obraId: number, id: number): Promise<void> {
     return api.delete(`${base(obraId)}/${id}`).then(() => undefined)
+  },
+
+  urlArquivo(obraId: number, id: number): string {
+    return urlArquivoDocumento(base(obraId), id)
   }
 }

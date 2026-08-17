@@ -9,9 +9,10 @@ import { DocumentoGenerico } from '../../types/DocumentoGenerico'
 interface Props {
   documento: DocumentoGenerico
   origem?: { label: string; href: string }
+  urlArquivo: string
 }
 
-export default function DocumentoGenericoCard({ documento, origem }: Props) {
+export default function DocumentoGenericoCard({ documento, origem, urlArquivo }: Props) {
   return (
     <Card className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
@@ -36,7 +37,7 @@ export default function DocumentoGenericoCard({ documento, origem }: Props) {
       </div>
 
       <Link
-        href={hrefDocumento(documento.caminhoArquivo, documento.descricao, { origemLabel: origem?.label, origemHref: origem?.href })}
+        href={hrefDocumento(urlArquivo, documento.descricao, { origemLabel: origem?.label, origemHref: origem?.href })}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
         <MdVisibility size={18} />

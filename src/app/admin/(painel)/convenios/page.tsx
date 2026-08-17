@@ -389,7 +389,7 @@ export default function ConveniosAdminPage() {
                     <td className="p-3.5">
                       {c.caminhoPdf ? (
                         <Link
-                          href={hrefDocumento(c.caminhoPdf, `Convênio Nº ${c.numero}`, { admin: true })}
+                          href={hrefDocumento(convenioService.urlArquivo(c.id), `Convênio Nº ${c.numero}`, { admin: true })}
                           className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                         >
                           <MdVisibility size={15} /> Ver

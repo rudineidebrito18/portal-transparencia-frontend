@@ -692,7 +692,7 @@ function AbaAnexos({ obraId }: { obraId: number }) {
                     <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarData(a.data)}</td>
                     <td className="p-3.5">
                       <Link
-                        href={hrefDocumento(a.caminhoArquivo, a.descricao, { admin: true })}
+                        href={hrefDocumento(anexoObraService.urlArquivo(obraId, a.id), a.descricao, { admin: true })}
                         className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                       >
                         <MdVisibility size={15} /> Ver
@@ -903,7 +903,7 @@ function AbaArts({ obraId }: { obraId: number }) {
                     <td className="p-3.5 text-admin-text">{a.responsavel}</td>
                     <td className="p-3.5">
                       <Link
-                        href={hrefDocumento(a.caminhoPdf, `Nº ${a.numero}`, { admin: true })}
+                        href={hrefDocumento(artService.urlArquivo(obraId, a.id), `Nº ${a.numero}`, { admin: true })}
                         className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                       >
                         <MdVisibility size={15} /> Ver

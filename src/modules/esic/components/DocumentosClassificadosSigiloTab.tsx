@@ -62,7 +62,7 @@ export default function DocumentosClassificadosSigiloTab() {
                   <Badge className="bg-neutral-light text-text-secondary">{LABELS_GRAU_SIGILO[doc.grauSigilo]}</Badge>
                 )}
                 <Link
-                  href={hrefDocumento(doc.caminhoArquivo, doc.descricao ?? 'Documento', { origemLabel: 'E-SIC', origemHref: '/esic' })}
+                  href={hrefDocumento(esicService.urlArquivoDocumentoClassificadoSigilo(doc.id), doc.descricao ?? 'Documento', { origemLabel: 'E-SIC', origemHref: '/esic' })}
                   className="text-xs font-semibold text-primary hover:underline whitespace-nowrap"
                 >
                   Ver arquivo

@@ -20,6 +20,8 @@ import { Documento } from '@/modules/shared/types/Documento'
 import { formatarMoeda } from '@/utils/currency'
 import { formatarData } from '@/utils/date'
 import { hrefDocumento } from '@/utils/documento'
+import { licitacaoService } from '@/modules/licitacoes/licitacao.service'
+import { contratoService } from '../contrato.service'
 import { contratoStatusDot, contratoStatusLabel, contratoStatusStyle } from '../status'
 import { Aditivo, ContratoLicitacao } from '../types'
 
@@ -120,7 +122,12 @@ export default function ContratoDetalhe({ contrato, documentos, aditivos, docume
             <MdDescription /> Documentos do Contrato
           </h3>
 
-          <DocumentList documentos={documentos} emptyMessage="Nenhum documento disponível." origem={origem} />
+          <DocumentList
+            documentos={documentos}
+            emptyMessage="Nenhum documento disponível."
+            origem={origem}
+            urlArquivo={doc => contratoService.urlDocumento(contrato.id, doc.id)}
+          />
         </div>
 
         {/* DOCUMENTOS DA LICITAÇÃO DE ORIGEM */}
@@ -134,6 +141,7 @@ export default function ContratoDetalhe({ contrato, documentos, aditivos, docume
               documentos={documentosLicitacao}
               emptyMessage="Nenhum documento disponível na licitação de origem."
               origem={origemLicitacao}
+              urlArquivo={doc => licitacaoService.urlDocumento(contrato.licitacaoId!, doc.id)}
             />
           </div>
         )}
@@ -160,7 +168,7 @@ export default function ContratoDetalhe({ contrato, documentos, aditivos, docume
                   </div>
 
                   <Link
-                    href={hrefDocumento(aditivo.caminhoPdf, aditivo.objeto, { origemLabel: origem.label, origemHref: origem.href })}
+                    href={hrefDocumento(contratoService.urlArquivoAditivo(aditivo.id), aditivo.objeto, { origemLabel: origem.label, origemHref: origem.href })}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
                   >
                     <MdVisibility size={18} />

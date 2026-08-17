@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento, urlFormatoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { gestaoFiscalMock } from './mocks/gestaoFiscal.mock'
 import {
@@ -47,5 +48,21 @@ export const gestaoFiscalService = {
     return api
       .get<Page<RelatorioGestaoFiscal>>('/gestao-fiscal/relatorios/filtro', { params })
       .then(r => r.data)
+  },
+
+  urlArquivoEmpresaDividaAtiva(id: number): string {
+    return urlArquivoDocumento('gestao-fiscal/empresas-divida-ativa', id)
+  },
+
+  urlArquivoEmpresaInidonea(id: number): string {
+    return urlArquivoDocumento('gestao-fiscal/empresas-inidoneas', id)
+  },
+
+  urlFormatoRelatorioExecucaoOrcamentaria(id: number, formato: 'pdf' | 'word' | 'xls'): string {
+    return urlFormatoDocumento('gestao-fiscal/relatorio-execucao-orcamentaria', id, formato)
+  },
+
+  urlFormatoRelatorioGestaoFiscal(id: number, formato: 'pdf' | 'word' | 'xls'): string {
+    return urlFormatoDocumento('gestao-fiscal/relatorios', id, formato)
   }
 }

@@ -1,5 +1,6 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { edicaoNaoEletronicaMock } from './mocks/edicaoNaoEletronica.mock'
 import { EdicaoNaoEletronica, FiltroEdicaoNaoEletronica } from './types'
 
@@ -21,5 +22,9 @@ export const edicaoNaoEletronicaService = {
     return api
       .get<Page<EdicaoNaoEletronica>>('/diario-oficial/edicoes-nao-eletronicas/filtro', { params })
       .then(response => response.data)
+  },
+
+  urlArquivo(id: number): string {
+    return urlArquivoDocumento('diario-oficial/edicoes-nao-eletronicas', id)
   }
 }

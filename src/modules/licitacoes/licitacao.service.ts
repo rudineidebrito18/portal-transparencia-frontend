@@ -1,5 +1,6 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { licitacaoMock } from './mocks/licitacao.mock'
 import { FiltroLicitacao, LicitacaoDetalhe, LicitacaoResumo } from './types'
 
@@ -26,5 +27,9 @@ export const licitacaoService = {
     return api
       .get<LicitacaoDetalhe>(`/licitacoes/${id}`)
       .then(response => response.data)
+  },
+
+  urlDocumento(licitacaoId: number, documentoId: number): string {
+    return urlArquivoDocumento(`licitacoes/${licitacaoId}/documentos`, documentoId)
   }
 }

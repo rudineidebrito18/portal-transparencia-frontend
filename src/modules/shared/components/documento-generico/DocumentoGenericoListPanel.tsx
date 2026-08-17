@@ -20,6 +20,9 @@ type Props = ReturnType<typeof usePageableResource<DocumentoGenerico, FiltroDocu
   origem?: { label: string; href: string }
   // Ver DocumentoGenericoFiltro — só true nos módulos "quase genéricos" com exercício próprio.
   comExercicio?: boolean
+  // Vem de criarUseDocumentosGenerico — nunca usar documento.caminhoArquivo como URL, ver
+  // urlArquivoDocumento em utils/documento.ts pro motivo.
+  urlArquivo: (id: number) => string
 }
 
 const COLUNAS_EXPORTACAO: ColunaExportacao<DocumentoGenerico>[] = [
@@ -48,7 +51,8 @@ export default function DocumentoGenericoListPanel({
   exportando,
   buscarTudoParaExportar,
   origem,
-  comExercicio = false
+  comExercicio = false,
+  urlArquivo
 }: Props) {
   const [exportarAberto, setExportarAberto] = useState(false)
   const [itensExportar, setItensExportar] = useState<DocumentoGenerico[]>([])
@@ -126,7 +130,7 @@ export default function DocumentoGenericoListPanel({
           <div className="grid gap-4">
             {documentos.length > 0 ? (
               documentos.map(item => (
-                <DocumentoGenericoCard key={item.id} documento={item} origem={origem} />
+                <DocumentoGenericoCard key={item.id} documento={item} origem={origem} urlArquivo={urlArquivo(item.id)} />
               ))
             ) : (
               <EmptyState message="Nenhum documento encontrado com os filtros aplicados." />

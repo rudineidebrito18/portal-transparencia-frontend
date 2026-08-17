@@ -301,7 +301,7 @@ export default function EmpresasInidoneasAdminPage() {
                     <td className="p-3.5">
                       {e.caminhoPdf ? (
                         <Link
-                          href={hrefDocumento(e.caminhoPdf, e.empresa, { admin: true })}
+                          href={hrefDocumento(empresaInidoneaService.urlArquivo(e.id), e.empresa, { admin: true })}
                           className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                         >
                           <MdVisibility size={15} /> Ver

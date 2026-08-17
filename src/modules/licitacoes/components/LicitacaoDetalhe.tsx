@@ -25,6 +25,7 @@ import {
   TipoProcedimentoDescricao,
   TipoProcedimentoLicitacao
 } from '../enums'
+import { licitacaoService } from '../licitacao.service'
 import { LicitacaoDetalhe as LicitacaoDetalheType } from '../types'
 import LicitacaoContratos from './LicitacaoContratos'
 
@@ -179,7 +180,7 @@ export default function LicitacaoDetalhe({ id, licitacao }: Props) {
                 <MdDescription /> Documentos da Licitação
               </h3>
 
-              <DocumentList documentos={licitacao.documentos} />
+              <DocumentList documentos={licitacao.documentos} urlArquivo={doc => licitacaoService.urlDocumento(id, doc.id)} />
             </div>
 
           </div>

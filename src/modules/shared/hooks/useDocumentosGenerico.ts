@@ -14,6 +14,7 @@ type ListarParams = FiltroDocumentoGenerico & {
 
 interface ServicoDocumentoGenerico<TRecurso extends string> {
   listar(recurso: TRecurso, params: ListarParams): Promise<Page<DocumentoGenerico>>
+  urlArquivo(recurso: TRecurso, id: number): string
 }
 
 export function criarUseDocumentosGenerico<TRecurso extends string>(
@@ -25,10 +26,17 @@ export function criarUseDocumentosGenerico<TRecurso extends string>(
       [recurso]
     )
 
-    return usePageableResource<DocumentoGenerico, FiltroDocumentoGenerico>({
+    const resource = usePageableResource<DocumentoGenerico, FiltroDocumentoGenerico>({
       fetchFunction,
       initialSort: 'data,desc',
       size: 10
     })
+
+    const urlArquivo = useCallback(
+      (id: number) => service.urlArquivo(recurso, id),
+      [recurso]
+    )
+
+    return { ...resource, urlArquivo }
   }
 }

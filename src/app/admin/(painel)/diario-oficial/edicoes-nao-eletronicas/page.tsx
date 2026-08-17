@@ -292,7 +292,7 @@ export default function EdicoesNaoEletronicasAdminPage() {
                     </td>
                     <td className="p-3.5">
                       <Link
-                        href={hrefDocumento(item.caminhoArquivo, item.descricao, { admin: true })}
+                        href={hrefDocumento(edicaoNaoEletronicaAdminService.urlArquivo(item.id), item.descricao, { admin: true })}
                         className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                       >
                         <MdVisibility size={15} /> Ver

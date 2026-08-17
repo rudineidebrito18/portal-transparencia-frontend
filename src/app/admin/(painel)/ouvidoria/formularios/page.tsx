@@ -125,7 +125,7 @@ export default function OuvidoriaFormulariosAdminPage() {
                     <td className="p-3.5 whitespace-nowrap">
                       {item.caminhoArquivo ? (
                         <Link
-                          href={hrefDocumento(item.caminhoArquivo, `Manifestação de ${item.nome ?? 'anônimo'}`, { admin: true })}
+                          href={hrefDocumento(ouvidoriaFormularioService.urlArquivo(item.id), `Manifestação de ${item.nome ?? 'anônimo'}`, { admin: true })}
                           className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                         >
                           <MdVisibility size={15} /> Ver anexo

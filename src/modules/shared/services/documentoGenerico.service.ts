@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '../types/Page'
 import { DocumentoGenerico, FiltroDocumentoGenerico } from '../types/DocumentoGenerico'
 
@@ -27,6 +28,10 @@ export function criarServicoDocumentoGenerico<TRecurso extends string>(
       return api
         .get<Page<DocumentoGenerico>>(`/${basePath}/${recurso}/filtro`, { params })
         .then(response => response.data)
+    },
+
+    urlArquivo(recurso: TRecurso, id: number): string {
+      return urlArquivoDocumento(`${basePath}/${recurso}`, id)
     }
   }
 }

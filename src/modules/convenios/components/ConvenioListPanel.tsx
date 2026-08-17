@@ -19,6 +19,7 @@ import ConvenioCard from './ConvenioCard'
 type Props = ReturnType<typeof usePageableResource<ConvenioDocumento, FiltroConvenio>> & {
   emptyMessage: string
   nomeBaseArquivo: string
+  urlArquivo: (id: number) => string
 }
 
 const COLUNAS_EXPORTACAO: ColunaExportacao<ConvenioDocumento>[] = [
@@ -44,7 +45,8 @@ export default function ConvenioListPanel({
   exportando,
   buscarTudoParaExportar,
   emptyMessage,
-  nomeBaseArquivo
+  nomeBaseArquivo,
+  urlArquivo
 }: Props) {
   const [exportarAberto, setExportarAberto] = useState(false)
   const [itensExportar, setItensExportar] = useState<ConvenioDocumento[]>([])
@@ -118,7 +120,7 @@ export default function ConvenioListPanel({
           <div className="grid gap-4">
             {documentos.length > 0 ? (
               documentos.map(item => (
-                <ConvenioCard key={item.id} documento={item} />
+                <ConvenioCard key={item.id} documento={item} urlArquivo={urlArquivo(item.id)} />
               ))
             ) : (
               <EmptyState message={emptyMessage} />

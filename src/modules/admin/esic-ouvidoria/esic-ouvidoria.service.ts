@@ -1,4 +1,5 @@
 import { ApiError, api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import {
   EsicInfo,
@@ -69,5 +70,9 @@ type ListarFormularioOuvidoriaParams = FiltroFormularioOuvidoria & { page?: numb
 export const ouvidoriaFormularioService = {
   listar(params: ListarFormularioOuvidoriaParams): Promise<Page<FormularioOuvidoria>> {
     return api.get<Page<FormularioOuvidoria>>('/ouvidoria/formulario/filtro', { params }).then(r => r.data)
+  },
+
+  urlArquivo(id: number): string {
+    return urlArquivoDocumento('ouvidoria/formulario', id)
   }
 }

@@ -1,6 +1,7 @@
 import { Page } from '@/modules/shared/types/Page'
 import { Documento } from '@/modules/shared/types/Documento'
 import { api } from '@/services/api'
+import { urlArquivoDocumento } from '@/utils/documento'
 import { contratoMock } from './mocks/contrato.mock'
 import { Aditivo, ContratoLicitacao, FiltroContrato } from './types'
 
@@ -66,5 +67,13 @@ export const contratoService = {
     return api
       .get<Page<Aditivo>>('/licitacoes/contratos/aditivos', { params: { contratoLicitacaoId: contratoId, size: 100 } })
       .then(response => response.data.content)
+  },
+
+  urlDocumento(contratoId: number, documentoId: number): string {
+    return urlArquivoDocumento(`licitacoes/contratos/${contratoId}/documento`, documentoId)
+  },
+
+  urlArquivoAditivo(id: number): string {
+    return urlArquivoDocumento('licitacoes/contratos/aditivos', id)
   }
 }

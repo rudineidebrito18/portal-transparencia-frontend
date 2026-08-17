@@ -294,7 +294,7 @@ function AbaDocumento({ contratoId }: { contratoId: number }) {
                     <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarData(d.dataEnvio)}</td>
                     <td className="p-3.5">
                       <Link
-                        href={hrefDocumento(d.caminhoPdf, d.assunto, { admin: true })}
+                        href={hrefDocumento(contratoService.urlDocumento(contratoId, d.id), d.assunto, { admin: true })}
                         className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                       >
                         <MdVisibility size={15} /> Ver documento
@@ -546,7 +546,7 @@ function AbaAditivos({ contratoId }: { contratoId: number }) {
                     <td className="p-3.5">
                       {a.caminhoPdf ? (
                         <Link
-                          href={hrefDocumento(a.caminhoPdf, a.objeto, { admin: true })}
+                          href={hrefDocumento(aditivoService.urlArquivo(a.id), a.objeto, { admin: true })}
                           className="inline-flex items-center gap-1 text-admin-accent hover:underline"
                         >
                           <MdVisibility size={15} /> Ver documento

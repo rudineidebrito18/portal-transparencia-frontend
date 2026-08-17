@@ -8,9 +8,10 @@ import { ConvenioDocumento } from '../types'
 
 interface Props {
   documento: ConvenioDocumento
+  urlArquivo: string
 }
 
-export default function ConvenioCard({ documento }: Props) {
+export default function ConvenioCard({ documento, urlArquivo }: Props) {
   return (
     <Card className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
@@ -34,7 +35,7 @@ export default function ConvenioCard({ documento }: Props) {
       </div>
 
       <Link
-        href={hrefDocumento(documento.caminhoArquivo, documento.descricao, { origemLabel: 'Convênios e Transferências', origemHref: '/convenios' })}
+        href={hrefDocumento(urlArquivo, documento.descricao, { origemLabel: 'Convênios e Transferências', origemHref: '/convenios' })}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all whitespace-nowrap"
       >
         <MdVisibility size={18} />

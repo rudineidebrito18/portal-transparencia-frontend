@@ -194,8 +194,15 @@ export default function SecretariaDetalhe({ detalhe }: Props) {
           )
         )}
 
+        {/* decretosComoDocumento.caminhoPdf já é o arquivoUrl pronto vindo do backend (ver
+            mapeamento acima) — não é o caminhoArquivo opaco de outros módulos. */}
         {aba === 'decretos' && (
-          <DocumentList documentos={decretosComoDocumento} emptyMessage="Nenhum decreto cadastrado." origem={origem} />
+          <DocumentList
+            documentos={decretosComoDocumento}
+            emptyMessage="Nenhum decreto cadastrado."
+            origem={origem}
+            urlArquivo={doc => doc.caminhoPdf}
+          />
         )}
 
         {aba === 'obras' && (

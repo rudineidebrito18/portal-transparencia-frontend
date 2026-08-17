@@ -9,6 +9,7 @@ import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import { formatarDataHora } from '@/utils/date'
 import { ColunaExportacao } from '@/utils/exportacao'
+import { gestaoFiscalService } from '../gestaoFiscal.service'
 import { useRelatoriosGestaoFiscal } from '../hooks/useGestaoFiscal'
 import { LABEL_PERIODO_RGF, RelatorioGestaoFiscal } from '../types'
 import RelatorioGestaoFiscalFiltro from './RelatorioGestaoFiscalFiltro'
@@ -86,9 +87,12 @@ export default function RelatoriosGestaoFiscalListView() {
             key={relatorio.id}
             titulo={`Relatório de Gestão Fiscal - ${LABEL_PERIODO_RGF[relatorio.periodo]}`}
             subtitulo={String(relatorio.ano)}
-            caminhoPdf={relatorio.caminhoPdf}
-            caminhoWord={relatorio.caminhoWord}
-            caminhoXls={relatorio.caminhoXls}
+            temPdf={!!relatorio.caminhoPdf}
+            temWord={!!relatorio.caminhoWord}
+            temXls={!!relatorio.caminhoXls}
+            urlPdf={gestaoFiscalService.urlFormatoRelatorioGestaoFiscal(relatorio.id, 'pdf')}
+            urlWord={gestaoFiscalService.urlFormatoRelatorioGestaoFiscal(relatorio.id, 'word')}
+            urlXls={gestaoFiscalService.urlFormatoRelatorioGestaoFiscal(relatorio.id, 'xls')}
             origem={{ label: 'Relatório de Gestão Fiscal', href: '/rgf' }}
           />
         )}

@@ -7,9 +7,12 @@ import { hrefDocumento } from '@/utils/documento'
 interface Props {
   titulo: string
   subtitulo: string
-  caminhoPdf?: string
-  caminhoWord?: string
-  caminhoXls?: string
+  temPdf?: boolean
+  temWord?: boolean
+  temXls?: boolean
+  urlPdf: string
+  urlWord: string
+  urlXls: string
   origem?: { label: string; href: string }
 }
 
@@ -17,10 +20,12 @@ const classeBotao = 'flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 
 
 // PDF abre na rota dedicada /documento (mesmo padrão do PdfViewer.tsx) — Word/Excel não
 // têm visualizador confiável no navegador, então continuam como link de abrir/baixar normal.
-export default function RelatorioMultiFormatoCard({ titulo, subtitulo, caminhoPdf, caminhoWord, caminhoXls, origem }: Props) {
+// urlPdf/urlWord/urlXls vêm sempre prontas do chamador (urlFormatoDocumento) — os
+// booleanos temPdf/temWord/temXls é que decidem se o botão aparece, nunca o valor da URL.
+export default function RelatorioMultiFormatoCard({ titulo, subtitulo, temPdf = true, temWord = true, temXls = true, urlPdf, urlWord, urlXls, origem }: Props) {
   const outrosFormatos = [
-    { label: 'Word', caminho: caminhoWord },
-    { label: 'Excel', caminho: caminhoXls }
+    { label: 'Word', caminho: temWord ? urlWord : undefined },
+    { label: 'Excel', caminho: temXls ? urlXls : undefined }
   ].filter(f => f.caminho)
 
   return (
@@ -38,8 +43,8 @@ export default function RelatorioMultiFormatoCard({ titulo, subtitulo, caminhoPd
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        {caminhoPdf && (
-          <Link href={hrefDocumento(caminhoPdf, titulo, { origemLabel: origem?.label, origemHref: origem?.href })} className={classeBotao}>
+        {temPdf && (
+          <Link href={hrefDocumento(urlPdf, titulo, { origemLabel: origem?.label, origemHref: origem?.href })} className={classeBotao}>
             <MdVisibility size={16} />
             Ver PDF
           </Link>

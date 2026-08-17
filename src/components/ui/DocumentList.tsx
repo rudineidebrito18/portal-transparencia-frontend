@@ -11,9 +11,13 @@ interface Props {
   documentos?: Documento[]
   emptyMessage?: string
   origem?: { label: string; href: string }
+  // Cada chamador monta a URL de download do seu jeito (bases/IDs aninhados diferentes —
+  // ver urlArquivoDocumento em utils/documento.ts) — o componente nunca deve usar
+  // doc.caminhoPdf como URL, é só o path interno de armazenamento vindo da API.
+  urlArquivo: (doc: Documento) => string
 }
 
-export default function DocumentList({ documentos, emptyMessage = 'Nenhum documento disponível.', origem }: Props) {
+export default function DocumentList({ documentos, emptyMessage = 'Nenhum documento disponível.', origem, urlArquivo }: Props) {
 
   if (!documentos?.length) {
     return <EmptyState message={emptyMessage} />
@@ -46,7 +50,7 @@ export default function DocumentList({ documentos, emptyMessage = 'Nenhum docume
 
           {/* BOTÃO */}
           <Link
-            href={hrefDocumento(doc.caminhoPdf, doc.assunto, { origemLabel: origem?.label, origemHref: origem?.href })}
+            href={hrefDocumento(urlArquivo(doc), doc.assunto, { origemLabel: origem?.label, origemHref: origem?.href })}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all"
           >
             <MdVisibility size={18} />
