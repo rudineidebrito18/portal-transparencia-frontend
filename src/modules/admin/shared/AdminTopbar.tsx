@@ -45,6 +45,8 @@ const ENTRADAS_BESPOKE: EntradaBusca[] = [
   { href: '/admin/licitacoes', label: 'Licitações', categoria: 'Licitações' },
   { href: '/admin/convenios', label: 'Convênios', categoria: 'Convênios e Repasses' },
   { href: '/admin/emendas-federais', label: 'Emendas Federais', categoria: 'Convênios e Repasses' },
+  { href: '/admin/emendas-estaduais', label: 'Emendas Estaduais', categoria: 'Convênios e Repasses' },
+  { href: '/admin/emendas-config', label: 'Emendas — Configuração', categoria: 'Convênios e Repasses' },
   { href: '/admin/obras', label: 'Obras Públicas', categoria: 'Convênios e Repasses' },
   { href: '/admin/anticorrupcao/empresas-divida-ativa', label: 'Empresas em Dívida Ativa', categoria: 'Fiscal e Orçamentário' },
   { href: '/admin/anticorrupcao/empresas-inidoneas', label: 'Empresas Inidôneas ou Suspensas', categoria: 'Fiscal e Orçamentário' },

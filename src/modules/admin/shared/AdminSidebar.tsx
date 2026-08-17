@@ -48,6 +48,8 @@ const LINKS_RH_BESPOKE = [
 const LINKS_CONVENIOS_BESPOKE = [
   { href: '/admin/convenios', label: 'Convênios' },
   { href: '/admin/emendas-federais', label: 'Emendas Federais' },
+  { href: '/admin/emendas-estaduais', label: 'Emendas Estaduais' },
+  { href: '/admin/emendas-config', label: 'Emendas — Configuração' },
   { href: '/admin/obras', label: 'Obras Públicas' }
 ]
 
