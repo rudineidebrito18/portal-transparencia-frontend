@@ -20,10 +20,14 @@ export const api = axios.create({
   }
 });
 
-// Anexa o token do painel admin quando presente — inofensivo pras chamadas
-// públicas do site (GET sem token continua funcionando normalmente).
+// Anexa o token do painel admin quando presente — mas só em páginas do /admin. O cookie
+// admin_token é do painel: mandá-lo junto nas chamadas das páginas públicas client-side
+// (/servidores, /folha-pagamento...) fazia o backend — que decide o mascaramento de CPF por
+// requisição, não por endpoint — devolver CPF completo pro público quando o admin estava
+// logado (análise 2026-08-18). No servidor (SSR) o token nem existe (cookie é do browser).
 api.interceptors.request.use((config) => {
-  const token = lerTokenCookie();
+  const noPainel = typeof window === 'undefined' || window.location.pathname.startsWith('/admin')
+  const token = noPainel ? lerTokenCookie() : null
   if (token) config.headers.Authorization = `Bearer ${token}`;
 
   // Upload de arquivo (multipart/form-data) precisa de mais tempo que os 10s
