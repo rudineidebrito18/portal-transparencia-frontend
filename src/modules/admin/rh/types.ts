@@ -154,6 +154,24 @@ export interface LinhaIgnorada {
   motivo: 'SERVIDOR_NAO_CADASTRADO' | 'DUPLICADO'
 }
 
+// Prévia da importação de folha (POST /importar/preview, não salva nada): mês/ano detectados
+// no arquivo e as três categorias de linhas que seriam ignoradas na importação real.
+export interface FolhaLinhaPreview {
+  cpf: string
+  nome: string
+}
+
+export interface ImportacaoFolhaPreview {
+  mes: number
+  ano: number
+  totalLinhas: number
+  totalLancamentos: number
+  totalIgnorados: number
+  servidoresNaoCadastrados: FolhaLinhaPreview[]
+  linhasDuplicadasNoArquivo: FolhaLinhaPreview[]
+  jaLancadosNoMes: FolhaLinhaPreview[]
+}
+
 export interface ImportacaoFolhaResumo {
   id: number
   mes: number

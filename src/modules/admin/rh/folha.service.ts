@@ -5,6 +5,7 @@ import {
   FolhaPagamentoRequest,
   FolhaPagamentoServidor,
   ImportacaoFolhaDetalhe,
+  ImportacaoFolhaPreview,
   ImportacaoFolhaResumo
 } from './types'
 
@@ -37,11 +38,20 @@ export const folhaService = {
       .then(r => r.data.content)
   },
 
-  // Mês/ano vêm do próprio arquivo (Servidores.CSV) — não são mais escolhidos na tela.
-  importar(arquivoServidores: File, arquivoRubricas: File): Promise<ImportacaoFolhaDetalhe> {
+  // Rubricas.CSV foi descontinuado — a importação recebe só o Servidores.CSV (resumo por
+  // servidor, pipe-delimited, sem cabeçalho). Mês/ano vêm do próprio arquivo.
+  previewImportacao(arquivoServidores: File): Promise<ImportacaoFolhaPreview> {
     const formData = new FormData()
     formData.append('arquivoServidores', arquivoServidores)
-    formData.append('arquivoRubricas', arquivoRubricas)
+
+    return api
+      .post<ImportacaoFolhaPreview>(`${BASE}/importar/preview`, formData)
+      .then(r => r.data)
+  },
+
+  importar(arquivoServidores: File): Promise<ImportacaoFolhaDetalhe> {
+    const formData = new FormData()
+    formData.append('arquivoServidores', arquivoServidores)
 
     return api
       .post<ImportacaoFolhaDetalhe>(`${BASE}/importar`, formData)
