@@ -30,7 +30,9 @@ function gerarHistoricoServidor(servidorId: number): FolhaRecord[] {
 
   faker.seed(servidorId + 1000)
 
-  const salarioBase = CARGO_SALARIO_BASE[servidor.cargo] ?? 2500
+  // Folha usa o cargo PRINCIPAL do servidor (primeiro da lista) — mesmo comportamento do backend.
+  const principal = servidor.cargos[0]
+  const salarioBase = principal ? CARGO_SALARIO_BASE[principal.cargo] ?? 2500 : 2500
   const hoje = new Date()
 
   return Array.from({ length: MESES_HISTORICO }, (_, i) => {
@@ -80,6 +82,7 @@ export const folhaMock = {
       .filter(f => f.mes === mes && f.ano === ano)
       .map(f => {
         const servidor = buscarServidorMockPorId(f.servidorId)
+        const principal = servidor?.cargos[0]
 
         return {
           id: f.id,
@@ -90,11 +93,11 @@ export const folhaMock = {
           salarioLiquido: f.salarioLiquido,
           nomeServidor: servidor?.name ?? 'Desconhecido',
           cpfServidor: servidor?.cpf ?? '-',
-          cargo: servidor?.cargo,
-          unidadeNome: servidor?.unidade?.nome,
-          unidadeId: servidor?.unidade?.id,
-          cargaHoraria: servidor?.cargaHoraria,
-          dataAdmissao: servidor?.dataAdmissao
+          cargo: principal?.cargo,
+          unidadeNome: principal?.unidade?.nome,
+          unidadeId: principal?.unidade?.id,
+          cargaHoraria: principal?.cargaHoraria,
+          dataAdmissao: principal?.dataAdmissao
         }
       })
 

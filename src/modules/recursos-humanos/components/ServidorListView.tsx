@@ -58,8 +58,8 @@ export default function ServidorListView() {
           >
             <option value="name,asc">Nome (A-Z)</option>
             <option value="name,desc">Nome (Z-A)</option>
-            <option value="dataAdmissao,desc">Admissão mais recente</option>
-            <option value="dataAdmissao,asc">Admissão mais antiga</option>
+            {/* dataAdmissao/cargaHoraria saíram do Servidor (foram pro cargo 1-N) e não são
+                mais ordenáveis pelo backend — só o nome é suportado no Pageable agora. */}
           </Select>
         </div>
 

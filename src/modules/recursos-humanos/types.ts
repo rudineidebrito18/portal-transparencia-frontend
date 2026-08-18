@@ -3,14 +3,27 @@ export interface Unidade {
   nome: string
 }
 
+// Cargo do servidor (1-N): cada cargo tem unidade/carga horária/data de admissão próprios.
+// Na resposta do GET, `cargos` vem ordenado com o principal primeiro (ver ServidorMapper.toDto
+// no backend) — o primeiro item é a referência da folha de pagamento.
+export interface ServidorCargo {
+  id: number
+  cargo: string
+  codigoCargo?: string
+  codigoOrgao?: string
+  unidade?: Unidade
+  dataAdmissao?: string
+  cargaHoraria?: number
+  ativo: boolean
+  principal: boolean
+}
+
 export interface Servidor {
   id: number
   cpf: string
   name: string
-  cargo: string
-  unidade?: Unidade
-  dataAdmissao: string
-  cargaHoraria: number
+  status: 'ATIVO' | 'DESLIGADO'
+  cargos: ServidorCargo[]
 }
 
 export interface FiltroServidor {

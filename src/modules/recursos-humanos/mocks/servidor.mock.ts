@@ -2,7 +2,7 @@ import { fakerPT_BR as faker } from '@faker-js/faker'
 
 import { criarErroNaoEncontrado, ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
 import { Page } from '@/modules/shared/types/Page'
-import { FiltroServidor, Servidor, Unidade } from '../types'
+import { FiltroServidor, Servidor, ServidorCargo, Unidade } from '../types'
 
 type ListParams = FiltroServidor & {
   page?: number
@@ -38,17 +38,33 @@ function gerarCpf(): string {
   return `${n()}.${n()}.${n()}-${d()}`
 }
 
+function gerarCargo(id: number, principal: boolean): ServidorCargo {
+  return {
+    id,
+    cargo: faker.helpers.arrayElement(CARGOS),
+    unidade: faker.helpers.arrayElement(UNIDADES),
+    dataAdmissao: faker.date.between({ from: '2010-01-01', to: '2024-12-31' }).toISOString().split('T')[0],
+    cargaHoraria: faker.helpers.arrayElement([20, 30, 40, 44]),
+    ativo: true,
+    principal
+  }
+}
+
 function gerarServidor(id: number): Servidor {
   faker.seed(id)
+
+  // Espelha a resposta real: cargos ordenados com o principal primeiro.
+  const cargos: ServidorCargo[] = [gerarCargo(id * 10 + 1, true)]
+  if (id % 3 === 0) {
+    cargos.push(gerarCargo(id * 10 + 2, false))
+  }
 
   return {
     id,
     cpf: gerarCpf(),
     name: faker.person.fullName(),
-    cargo: faker.helpers.arrayElement(CARGOS),
-    unidade: faker.helpers.arrayElement(UNIDADES),
-    dataAdmissao: faker.date.between({ from: '2010-01-01', to: '2024-12-31' }).toISOString().split('T')[0],
-    cargaHoraria: faker.helpers.arrayElement([20, 30, 40, 44])
+    status: 'ATIVO',
+    cargos
   }
 }
 
@@ -72,21 +88,21 @@ export const servidorMock = {
       dados = dados.filter(s => s.cpf.includes(String(filtros.cpf)))
     }
     if (filtros.cargo) {
-      dados = dados.filter(s => s.cargo.toLowerCase().includes(String(filtros.cargo).toLowerCase()))
+      dados = dados.filter(s => s.cargos.some(c => c.cargo.toLowerCase().includes(String(filtros.cargo).toLowerCase())))
     }
     if (filtros.unidadeId !== undefined) {
-      dados = dados.filter(s => s.unidade?.id === Number(filtros.unidadeId))
+      dados = dados.filter(s => s.cargos.some(c => c.unidade?.id === Number(filtros.unidadeId)))
     }
     if (filtros.cargaHoraria !== undefined) {
-      dados = dados.filter(s => s.cargaHoraria === Number(filtros.cargaHoraria))
+      dados = dados.filter(s => s.cargos.some(c => c.cargaHoraria === Number(filtros.cargaHoraria)))
     }
     if (filtros.dataAdmissaoInicio) {
       const inicio = new Date(String(filtros.dataAdmissaoInicio)).getTime()
-      dados = dados.filter(s => new Date(s.dataAdmissao).getTime() >= inicio)
+      dados = dados.filter(s => s.cargos.some(c => c.dataAdmissao && new Date(c.dataAdmissao).getTime() >= inicio))
     }
     if (filtros.dataAdmissaoFim) {
       const fim = new Date(String(filtros.dataAdmissaoFim)).getTime()
-      dados = dados.filter(s => new Date(s.dataAdmissao).getTime() <= fim)
+      dados = dados.filter(s => s.cargos.some(c => c.dataAdmissao && new Date(c.dataAdmissao).getTime() <= fim))
     }
 
     const ordenados = ordenar(dados as unknown as Record<string, unknown>[], sort) as unknown as Servidor[]
