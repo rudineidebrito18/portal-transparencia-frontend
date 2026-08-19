@@ -20,19 +20,11 @@ interface FolhaEditavel {
   ano: number
   salarioBruto: number
   desconto: number
-  cargoId?: number
-}
-
-interface CargoOpcao {
-  id: number
-  cargo: string
 }
 
 interface Props {
   aberto: boolean
   folha: FolhaEditavel | null
-  // Cargos do servidor dono do lançamento — sem isso não tem como escolher/validar o cargo.
-  cargos: CargoOpcao[]
   salvando: boolean
   erro: string | null
   onSalvar: (dados: FolhaPagamentoRequest) => void
@@ -41,12 +33,11 @@ interface Props {
 
 // Edição de lançamento de folha — admin-only, exige confirmação explícita porque cada
 // lançamento é tratado como definitivo por padrão (risco de fraude/adulteração de prova).
-export default function EditarFolhaModal({ aberto, folha, cargos, salvando, erro, onSalvar, onFechar }: Props) {
+export default function EditarFolhaModal({ aberto, folha, salvando, erro, onSalvar, onFechar }: Props) {
   const [mes, setMes] = useState(1)
   const [ano, setAno] = useState(new Date().getFullYear())
   const [salarioBruto, setSalarioBruto] = useState(0)
   const [desconto, setDesconto] = useState(0)
-  const [cargoId, setCargoId] = useState<number | ''>('')
 
   useEffect(() => {
     if (folha) {
@@ -54,16 +45,14 @@ export default function EditarFolhaModal({ aberto, folha, cargos, salvando, erro
       setAno(folha.ano)
       setSalarioBruto(folha.salarioBruto)
       setDesconto(folha.desconto)
-      setCargoId(folha.cargoId ?? (cargos.length === 1 ? cargos[0].id : ''))
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [folha])
 
   if (!aberto || !folha) return null
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    onSalvar({ mes, ano, salarioBruto, desconto, salarioLiquido: salarioBruto - desconto, cargoId: cargoId || undefined })
+    onSalvar({ mes, ano, salarioBruto, desconto, salarioLiquido: salarioBruto - desconto })
   }
 
   return (
@@ -88,24 +77,6 @@ export default function EditarFolhaModal({ aberto, folha, cargos, salvando, erro
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {cargos.length > 1 && (
-            <div>
-              <label className={classeLabel} htmlFor="editar-cargo">Cargo</label>
-              <select
-                id="editar-cargo"
-                required
-                value={cargoId}
-                onChange={e => setCargoId(Number(e.target.value))}
-                className={classeInput}
-              >
-                <option value="" disabled>Selecione...</option>
-                {cargos.map(c => (
-                  <option key={c.id} value={c.id}>{c.cargo}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={classeLabel} htmlFor="editar-mes">Mês</label>

@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { MdAdd, MdEdit, MdDeleteOutline } from 'react-icons/md'
+import { MdEdit, MdDeleteOutline } from 'react-icons/md'
 
 import { usePageableResource } from '@/hooks/usePageableResource'
 import AdminEmptyState from '@/modules/admin/shared/AdminEmptyState'
@@ -13,35 +13,24 @@ import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { unidadesService } from '@/modules/admin/geral/geral.service'
 import { Unidade } from '@/modules/admin/geral/types'
 import { servidorService } from '@/modules/admin/rh/servidor.service'
-import { FiltroServidor, Servidor, ServidorCargo, ServidorRequest, StatusServidor } from '@/modules/admin/rh/types'
-
-interface CargoFormState {
-  id: number | null
-  cargo: string
-  unidadeId: number
-  dataAdmissao: string
-  cargaHoraria: number
-}
+import { FiltroServidor, Servidor, ServidorRequest, StatusServidor } from '@/modules/admin/rh/types'
 
 interface FormState {
   id: number | null
   cpf: string
   name: string
+  cargo: string
+  unidadeId: number
+  dataAdmissao: string
+  cargaHoraria: number
   status: StatusServidor
-  cargos: CargoFormState[]
 }
 
-const CARGO_VAZIO: CargoFormState = { id: null, cargo: '', unidadeId: 0, dataAdmissao: '', cargaHoraria: 40 }
-const FORM_VAZIO: FormState = { id: null, cpf: '', name: '', status: 'ATIVO', cargos: [{ ...CARGO_VAZIO }] }
+const FORM_VAZIO: FormState = { id: null, cpf: '', name: '', cargo: '', unidadeId: 0, dataAdmissao: '', cargaHoraria: 40, status: 'ATIVO' }
 
 const classeInput =
   'w-full bg-admin-surface-2 border border-admin-border rounded-lg px-3 py-2 text-sm text-admin-text placeholder:text-admin-text-faint focus-visible:ring-2 focus-visible:ring-admin-accent/50 focus-visible:border-admin-accent outline-none transition-all'
 const classeLabel = 'block text-xs font-semibold uppercase tracking-wide text-admin-text-faint mb-1.5'
-
-// Cargo de referência pra exibição compacta (tabela): todos têm o mesmo peso, mostra o primeiro.
-function cargoReferencia(s: Servidor): ServidorCargo | undefined {
-  return s.cargos[0]
-}
 
 export default function ServidoresAdminPage() {
   const { usuario } = useAuth()
@@ -81,31 +70,12 @@ export default function ServidoresAdminPage() {
       id: s.id,
       cpf: s.cpf,
       name: s.name,
-      status: s.status,
-      cargos: s.cargos.map(c => ({
-        id: c.id,
-        cargo: c.cargo,
-        unidadeId: c.unidade?.id ?? 0,
-        dataAdmissao: c.dataAdmissao,
-        cargaHoraria: c.cargaHoraria
-      }))
+      cargo: s.cargo,
+      unidadeId: s.unidade?.id ?? 0,
+      dataAdmissao: s.dataAdmissao,
+      cargaHoraria: s.cargaHoraria,
+      status: s.status
     })
-  }
-
-  function adicionarCargo() {
-    if (!form) return
-    setForm({ ...form, cargos: [...form.cargos, { ...CARGO_VAZIO }] })
-  }
-
-  function removerCargo(index: number) {
-    if (!form || form.cargos.length <= 1) return
-    setForm({ ...form, cargos: form.cargos.filter((_, i) => i !== index) })
-  }
-
-  function atualizarCargo(index: number, alteracoes: Partial<CargoFormState>) {
-    if (!form) return
-    const novosCargos = form.cargos.map((c, i) => (i === index ? { ...c, ...alteracoes } : c))
-    setForm({ ...form, cargos: novosCargos })
   }
 
   async function confirmarExclusao() {
@@ -133,14 +103,11 @@ export default function ServidoresAdminPage() {
     const dados: ServidorRequest = {
       cpf: form.cpf,
       name: form.name,
-      status: form.status,
-      cargos: form.cargos.map(c => ({
-        id: c.id ?? undefined,
-        cargo: c.cargo,
-        unidade: { id: c.unidadeId },
-        dataAdmissao: c.dataAdmissao,
-        cargaHoraria: c.cargaHoraria
-      }))
+      cargo: form.cargo,
+      unidade: { id: form.unidadeId },
+      dataAdmissao: form.dataAdmissao,
+      cargaHoraria: form.cargaHoraria,
+      status: form.status
     }
 
     try {
@@ -258,6 +225,60 @@ export default function ServidoresAdminPage() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className={classeLabel} htmlFor="cargo">Cargo</label>
+                <input
+                  id="cargo"
+                  required
+                  value={form.cargo}
+                  onChange={e => setForm({ ...form, cargo: e.target.value })}
+                  className={classeInput}
+                />
+              </div>
+              <div>
+                <label className={classeLabel} htmlFor="unidadeId">Unidade</label>
+                <select
+                  id="unidadeId"
+                  required
+                  value={form.unidadeId || ''}
+                  onChange={e => setForm({ ...form, unidadeId: Number(e.target.value) })}
+                  className={classeInput}
+                >
+                  <option value="" disabled>Selecione...</option>
+                  {unidades.map(u => (
+                    <option key={u.id} value={u.id}>{u.nome}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className={classeLabel} htmlFor="dataAdmissao">Data de admissão</label>
+                <input
+                  id="dataAdmissao"
+                  type="date"
+                  required
+                  value={form.dataAdmissao}
+                  onChange={e => setForm({ ...form, dataAdmissao: e.target.value })}
+                  className={classeInput}
+                />
+              </div>
+              <div>
+                <label className={classeLabel} htmlFor="cargaHoraria">Carga horária semanal</label>
+                <input
+                  id="cargaHoraria"
+                  type="number"
+                  min={1}
+                  required
+                  value={form.cargaHoraria}
+                  onChange={e => setForm({ ...form, cargaHoraria: Number(e.target.value) })}
+                  className={classeInput}
+                />
+              </div>
+            </div>
+
             <div>
               <label className={classeLabel} htmlFor="status">Status</label>
               <select
@@ -272,94 +293,6 @@ export default function ServidoresAdminPage() {
               <p className="text-xs text-admin-text-faint mt-1">
                 Desligar preserva o histórico de folha de pagamento — excluir o cadastro é bloqueado enquanto houver folha lançada.
               </p>
-            </div>
-
-            <div className="border-t border-admin-border pt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-admin-text-faint">
-                  Cargos ({form.cargos.length})
-                </span>
-                <button
-                  type="button"
-                  onClick={adicionarCargo}
-                  className="flex items-center gap-1 text-xs font-semibold text-admin-accent hover:underline"
-                >
-                  <MdAdd size={16} /> Adicionar cargo
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                {form.cargos.map((cargo, index) => (
-                  <div key={index} className="rounded-xl border border-admin-border bg-admin-surface p-3 space-y-3">
-                    {form.cargos.length > 1 && (
-                      <div className="flex items-center justify-end">
-                        <button
-                          type="button"
-                          onClick={() => removerCargo(index)}
-                          aria-label="Remover cargo"
-                          className="p-1 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
-                        >
-                          <MdDeleteOutline size={16} />
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                        <label className={classeLabel} htmlFor={`cargo-${index}`}>Cargo</label>
-                        <input
-                          id={`cargo-${index}`}
-                          required
-                          value={cargo.cargo}
-                          onChange={e => atualizarCargo(index, { cargo: e.target.value })}
-                          className={classeInput}
-                        />
-                      </div>
-                      <div>
-                        <label className={classeLabel} htmlFor={`unidade-${index}`}>Unidade</label>
-                        <select
-                          id={`unidade-${index}`}
-                          required
-                          value={cargo.unidadeId || ''}
-                          onChange={e => atualizarCargo(index, { unidadeId: Number(e.target.value) })}
-                          className={classeInput}
-                        >
-                          <option value="" disabled>Selecione...</option>
-                          {unidades.map(u => (
-                            <option key={u.id} value={u.id}>{u.nome}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                        <label className={classeLabel} htmlFor={`dataAdmissao-${index}`}>Data de admissão</label>
-                        <input
-                          id={`dataAdmissao-${index}`}
-                          type="date"
-                          required
-                          value={cargo.dataAdmissao}
-                          onChange={e => atualizarCargo(index, { dataAdmissao: e.target.value })}
-                          className={classeInput}
-                        />
-                      </div>
-                      <div>
-                        <label className={classeLabel} htmlFor={`cargaHoraria-${index}`}>Carga horária semanal</label>
-                        <input
-                          id={`cargaHoraria-${index}`}
-                          type="number"
-                          min={1}
-                          required
-                          value={cargo.cargaHoraria}
-                          onChange={e => atualizarCargo(index, { cargaHoraria: Number(e.target.value) })}
-                          className={classeInput}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {erroForm && <AdminErrorState message={erroForm} />}
@@ -407,54 +340,43 @@ export default function ServidoresAdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.map(s => {
-                  const referencia = cargoReferencia(s)
-                  const outros = s.cargos.length - 1
-                  return (
-                    <tr key={s.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
-                      <td className="p-3.5 font-semibold text-admin-text">{s.name}</td>
-                      <td className="p-3.5 text-admin-text-muted tabular-nums">{s.cpf}</td>
-                      <td className="p-3.5 text-admin-text-muted">
-                        {referencia?.cargo ?? '-'}
-                        {outros > 0 && (
-                          <span className="ml-1.5 px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-admin-surface-3 text-admin-text-faint">
-                            +{outros}
-                          </span>
+                {data.map(s => (
+                  <tr key={s.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
+                    <td className="p-3.5 font-semibold text-admin-text">{s.name}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{s.cpf}</td>
+                    <td className="p-3.5 text-admin-text-muted">{s.cargo}</td>
+                    <td className="p-3.5 text-admin-text-muted">{s.unidade?.nome ?? '-'}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{s.dataAdmissao}</td>
+                    <td className="p-3.5 text-admin-text-muted tabular-nums">{s.cargaHoraria}h</td>
+                    <td className="p-3.5">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${s.status === 'DESLIGADO' ? 'bg-admin-error-light text-admin-error' : 'bg-admin-success-light text-admin-success'}`}>
+                        {s.status === 'DESLIGADO' ? 'Desligado' : 'Ativo'}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {podeEditar(usuario, 'rh') && (
+                          <button
+                            onClick={() => abrirEdicao(s)}
+                            aria-label="Editar"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                          >
+                            <MdEdit size={16} />
+                          </button>
                         )}
-                      </td>
-                      <td className="p-3.5 text-admin-text-muted">{referencia?.unidade?.nome ?? '-'}</td>
-                      <td className="p-3.5 text-admin-text-muted tabular-nums">{referencia?.dataAdmissao ?? '-'}</td>
-                      <td className="p-3.5 text-admin-text-muted tabular-nums">{referencia ? `${referencia.cargaHoraria}h` : '-'}</td>
-                      <td className="p-3.5">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${s.status === 'DESLIGADO' ? 'bg-admin-error-light text-admin-error' : 'bg-admin-success-light text-admin-success'}`}>
-                          {s.status === 'DESLIGADO' ? 'Desligado' : 'Ativo'}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          {podeEditar(usuario, 'rh') && (
-                            <button
-                              onClick={() => abrirEdicao(s)}
-                              aria-label="Editar"
-                              className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
-                            >
-                              <MdEdit size={16} />
-                            </button>
-                          )}
-                          {podeExcluir(usuario, 'rh') && (
-                            <button
-                              onClick={() => setIdParaExcluir(s.id)}
-                              aria-label="Excluir"
-                              className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
-                            >
-                              <MdDeleteOutline size={16} />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
+                        {podeExcluir(usuario, 'rh') && (
+                          <button
+                            onClick={() => setIdParaExcluir(s.id)}
+                            aria-label="Excluir"
+                            className="p-1.5 rounded-md text-admin-text-muted hover:bg-admin-surface-3 hover:text-admin-error transition-colors"
+                          >
+                            <MdDeleteOutline size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

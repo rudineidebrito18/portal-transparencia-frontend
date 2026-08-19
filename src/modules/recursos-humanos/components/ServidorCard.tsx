@@ -10,11 +10,6 @@ interface Props {
 }
 
 export default function ServidorCard({ servidor }: Props) {
-  // Um servidor pode ter mais de um cargo, todos com o mesmo peso — mostra o primeiro aqui; os
-  // demais aparecem completos na página de detalhes.
-  const referencia = servidor.cargos[0]
-  const outrosCargos = servidor.cargos.length - 1
-
   return (
     <Card className="p-4 flex flex-col gap-2.5">
 
@@ -28,10 +23,7 @@ export default function ServidorCard({ servidor }: Props) {
           <h2 className="text-base font-bold text-primary leading-tight">
             Nome: {servidor.name}
           </h2>
-          <p className="text-xs text-text-muted mt-0.5">
-            Cargo: {referencia?.cargo ?? 'Não informado'}
-            {outrosCargos > 0 && ` (+${outrosCargos} outro${outrosCargos > 1 ? 's' : ''})`}
-          </p>
+          <p className="text-xs text-text-muted mt-0.5">Cargo: {servidor.cargo}</p>
         </div>
       </div>
 
@@ -40,7 +32,7 @@ export default function ServidorCard({ servidor }: Props) {
         <div>
           <p className="text-xs uppercase text-text-muted">Admissão</p>
           <p className="font-semibold text-text-secondary">
-            {referencia ? formatarData(referencia.dataAdmissao) : 'Não informada'}
+            {formatarData(servidor.dataAdmissao)}
           </p>
         </div>
 
@@ -49,14 +41,14 @@ export default function ServidorCard({ servidor }: Props) {
             <MdSchedule size={12} /> Carga Horária
           </p>
           <p className="font-semibold text-text-secondary">
-            {referencia ? `${referencia.cargaHoraria}h/semana` : 'Não informada'}
+            {servidor.cargaHoraria}h/semana
           </p>
         </div>
 
         <div>
           <p className="text-xs uppercase text-text-muted">Unidade</p>
           <p className="font-semibold text-text-secondary truncate">
-            {referencia?.unidade?.nome || 'Não informada'}
+            {servidor.unidade?.nome || 'Não informada'}
           </p>
         </div>
       </div>
