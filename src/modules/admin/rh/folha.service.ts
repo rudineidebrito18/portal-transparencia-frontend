@@ -37,11 +37,11 @@ export const folhaService = {
       .then(r => r.data.content)
   },
 
-  // Mês/ano vêm do próprio arquivo (Servidores.CSV) — não são mais escolhidos na tela.
-  importar(arquivoServidores: File, arquivoRubricas: File): Promise<ImportacaoFolhaDetalhe> {
+  // Mês/ano vêm do próprio arquivo (Servidores.CSV) — não são mais escolhidos na tela. Rubricas.CSV
+  // foi descontinuado (V50): a importação usa só esse arquivo.
+  importar(arquivoServidores: File): Promise<ImportacaoFolhaDetalhe> {
     const formData = new FormData()
     formData.append('arquivoServidores', arquivoServidores)
-    formData.append('arquivoRubricas', arquivoRubricas)
 
     return api
       .post<ImportacaoFolhaDetalhe>(`${BASE}/importar`, formData)

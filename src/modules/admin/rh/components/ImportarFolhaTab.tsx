@@ -20,18 +20,20 @@ const MESES = [
 
 const MOTIVO_LABEL: Record<LinhaIgnorada['motivo'], string> = {
   SERVIDOR_NAO_CADASTRADO: 'CPF não cadastrado como servidor',
-  DUPLICADO: 'Já lançado nesse mês (duplicado)'
+  DUPLICADO_NO_ARQUIVO: 'Mesmo cargo repetido no arquivo',
+  JA_LANCADO_NO_MES: 'Já lançado nesse mês para esse cargo',
+  CARGO_NAO_ENCONTRADO: 'Cargo do arquivo não bate com nenhum cargo cadastrado do servidor'
 }
 
 const COLUNAS_EXPORTACAO_IGNORADAS: ColunaExportacao<LinhaIgnorada>[] = [
   { chave: 'cpfInformado', rotulo: 'CPF' },
   { chave: 'nomeInformado', rotulo: 'Nome' },
-  { chave: 'motivo', rotulo: 'Motivo', formatar: item => MOTIVO_LABEL[item.motivo] }
+  { chave: 'motivo', rotulo: 'Motivo', formatar: item => MOTIVO_LABEL[item.motivo] },
+  { chave: 'detalhe', rotulo: 'Cargo no arquivo', formatar: item => item.detalhe ?? '' }
 ]
 
 export default function ImportarFolhaTab() {
   const inputServidoresRef = useRef<HTMLInputElement>(null)
-  const inputRubricasRef = useRef<HTMLInputElement>(null)
 
   const [importando, setImportando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
@@ -41,9 +43,8 @@ export default function ImportarFolhaTab() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const arquivoServidores = inputServidoresRef.current?.files?.[0]
-    const arquivoRubricas = inputRubricasRef.current?.files?.[0]
-    if (!arquivoServidores || !arquivoRubricas) {
-      setErro('Selecione os dois arquivos (Servidores.CSV e Rubricas.CSV).')
+    if (!arquivoServidores) {
+      setErro('Selecione o arquivo Servidores.CSV.')
       return
     }
 
@@ -52,12 +53,11 @@ export default function ImportarFolhaTab() {
     setResultado(null)
 
     try {
-      const resposta = await folhaService.importar(arquivoServidores, arquivoRubricas)
+      const resposta = await folhaService.importar(arquivoServidores)
       setResultado(resposta)
       if (inputServidoresRef.current) inputServidoresRef.current.value = ''
-      if (inputRubricasRef.current) inputRubricasRef.current.value = ''
     } catch (e: unknown) {
-      setErro(e instanceof Error ? e.message : 'Erro ao importar arquivos.')
+      setErro(e instanceof Error ? e.message : 'Erro ao importar arquivo.')
     } finally {
       setImportando(false)
     }
@@ -68,34 +68,23 @@ export default function ImportarFolhaTab() {
       <div className="rounded-2xl border border-admin-border bg-admin-surface p-5">
         <h2 className="font-semibold text-sm text-admin-text mb-1">Importar folha via CSV</h2>
         <p className="text-xs text-admin-text-faint mb-4">
-          Os dois arquivos exportados pelo sistema de RH da prefeitura. Mês e ano são lidos do
-          próprio arquivo de servidores. Cada servidor é casado por CPF com um cadastro já
-          existente — linhas com CPF não cadastrado ou já lançado nesse mês são ignoradas e
-          reportadas no resumo abaixo, sem interromper o restante da importação.
+          Arquivo exportado pelo sistema de RH da prefeitura (Servidores.CSV). Mês e ano são lidos
+          do próprio arquivo. Cada linha é 1 cargo/mês — um servidor com mais de um cargo aparece em
+          mais de uma linha, casada com o cargo correspondente já cadastrado. Linhas com CPF não
+          cadastrado, cargo sem correspondência ou já lançado nesse mês são ignoradas e reportadas
+          no resumo abaixo, sem interromper o restante da importação.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className={classeLabel} htmlFor="importar-servidores">Servidores.CSV</label>
-              <input
-                id="importar-servidores"
-                type="file"
-                accept=".csv,text/csv"
-                ref={inputServidoresRef}
-                className={`${classeInput} file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-admin-accent/20 file:text-admin-accent file:text-xs file:font-semibold`}
-              />
-            </div>
-            <div>
-              <label className={classeLabel} htmlFor="importar-rubricas">Rubricas.CSV</label>
-              <input
-                id="importar-rubricas"
-                type="file"
-                accept=".csv,text/csv"
-                ref={inputRubricasRef}
-                className={`${classeInput} file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-admin-accent/20 file:text-admin-accent file:text-xs file:font-semibold`}
-              />
-            </div>
+          <div>
+            <label className={classeLabel} htmlFor="importar-servidores">Servidores.CSV</label>
+            <input
+              id="importar-servidores"
+              type="file"
+              accept=".csv,text/csv"
+              ref={inputServidoresRef}
+              className={`${classeInput} md:w-96 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-admin-accent/20 file:text-admin-accent file:text-xs file:font-semibold`}
+            />
           </div>
 
           {erro && <AdminErrorState message={erro} />}
@@ -143,6 +132,7 @@ export default function ImportarFolhaTab() {
                       <th className="p-3 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">CPF</th>
                       <th className="p-3 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Nome</th>
                       <th className="p-3 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Motivo</th>
+                      <th className="p-3 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Cargo no arquivo</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -151,6 +141,7 @@ export default function ImportarFolhaTab() {
                         <td className="p-3 text-admin-text-muted tabular-nums">{linha.cpfInformado}</td>
                         <td className="p-3 text-admin-text-muted">{linha.nomeInformado}</td>
                         <td className="p-3 text-admin-error">{MOTIVO_LABEL[linha.motivo]}</td>
+                        <td className="p-3 text-admin-text-muted">{linha.detalhe ?? '—'}</td>
                       </tr>
                     ))}
                   </tbody>
