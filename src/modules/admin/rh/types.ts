@@ -2,27 +2,29 @@ import { Unidade } from '@/modules/admin/geral/types'
 
 export type StatusServidor = 'ATIVO' | 'DESLIGADO'
 
-// Cargo de um servidor (1-N, migration V49): cada cargo tem unidade/carga horária/data de
-// admissão próprios. Na resposta, `cargos` vem ordenado com o principal primeiro (ver
-// ServidorMapper.toDto no backend) — o primeiro item é a referência da folha de pagamento.
-// `unidade` é objeto completo no GET, mas o front só usa o subconjunto (mesmo padrão do
-// antigo campo `unidade` do Servidor).
+// Um servidor pode ter mais de um cargo (ex.: professor + coordenador, ou dois vínculos em
+// unidades diferentes) — descoberto na importação real via CSV do RH (2026-08-18), onde 165 CPFs
+// tinham cargos distintos. Cada cargo carrega sua própria unidade/carga horária/data de admissão,
+// todos com o mesmo peso (sem hierarquia entre eles).
 export interface ServidorCargo {
   id: number
   cargo: string
   codigoCargo?: string
   codigoOrgao?: string
+  // GET /recursos-humanos/servidor só devolve {id, nome} aninhado, não a Unidade
+  // completa (que ganhou campos novos em 2026-07-16) — importa o tipo canônico
+  // de geral/types em vez de duplicar, mas só usa o subconjunto que o backend
+  // realmente manda aqui.
   unidade?: Pick<Unidade, 'id' | 'nome'>
   dataAdmissao?: string
   cargaHoraria?: number
   ativo: boolean
-  principal: boolean
 }
 
-// Request: `unidade` vem só com o id (mesmo padrão do antigo campo `unidade` do ServidorDto);
-// `id` e `principal` são opcionais — sem `principal` marcado, o primeiro cargo da lista vira
-// o principal no backend.
+// Mesmo shape do ServidorCargoDto do backend (usado tanto pra request quanto resposta lá): `id`
+// é opcional (ausente na criação), `unidade` vem só com o id.
 export interface ServidorCargoRequest {
+  id?: number
   cargo: string
   codigoCargo?: string
   codigoOrgao?: string
@@ -30,7 +32,6 @@ export interface ServidorCargoRequest {
   dataAdmissao?: string
   cargaHoraria?: number
   ativo?: boolean
-  principal?: boolean
 }
 
 export interface Servidor {
@@ -43,7 +44,9 @@ export interface Servidor {
   cargos: ServidorCargo[]
 }
 
-// PUT substitui a lista de cargos por inteiro pelos cargos enviados (orphanRemoval no backend).
+// PUT substitui a lista de cargos por inteiro pelos cargos enviados (orphanRemoval no backend) —
+// precisa mandar todos, não só os alterados (mesma semântica de editar a folha: o admin manda o
+// estado final). `status` é opcional: o backend só atualiza se vier preenchido.
 export interface ServidorRequest {
   cpf: string
   name: string
@@ -128,10 +131,14 @@ export interface FolhaPagamento {
   salarioBruto: number
   desconto: number
   salarioLiquido: number
+  // A qual cargo do servidor esse salário se refere (migration V52) — obrigatório quando o
+  // servidor tem mais de um cargo. cargoNome só vem na resposta (exibição).
+  cargoId?: number
+  cargoNome?: string
 }
 
 // PUT/DELETE existem (admin-only) — ver folha.service.ts atualizar()/excluir().
-export type FolhaPagamentoRequest = Omit<FolhaPagamento, 'id'>
+export type FolhaPagamentoRequest = Omit<FolhaPagamento, 'id' | 'cargoNome'>
 
 export interface FolhaPagamentoServidor {
   id: number
@@ -140,8 +147,10 @@ export interface FolhaPagamentoServidor {
   salarioBruto: number
   descontos: number
   salarioLiquido: number
+  servidorId: number
   nomeServidor: string
   cpfServidor: string
+  cargoId?: number
   cargo?: string
   unidadeNome?: string
   cargaHoraria?: number
@@ -151,7 +160,9 @@ export interface FolhaPagamentoServidor {
 export interface LinhaIgnorada {
   cpfInformado: string
   nomeInformado: string
-  motivo: 'SERVIDOR_NAO_CADASTRADO' | 'DUPLICADO'
+  motivo: 'SERVIDOR_NAO_CADASTRADO' | 'DUPLICADO_NO_ARQUIVO' | 'JA_LANCADO_NO_MES' | 'CARGO_NAO_ENCONTRADO'
+  // Nome do cargo do CSV, só quando o motivo é CARGO_NAO_ENCONTRADO.
+  detalhe?: string
 }
 
 // Prévia da importação de folha (POST /importar/preview, não salva nada): mês/ano detectados

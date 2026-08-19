@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { MdAdd, MdClose, MdEdit, MdDeleteOutline, MdStar } from 'react-icons/md'
+import { MdAdd, MdClose, MdEdit, MdDeleteOutline } from 'react-icons/md'
 
 import { useUrlState } from '@/hooks/useUrlState'
 import { usePageableResource } from '@/hooks/usePageableResource'
@@ -101,7 +101,6 @@ export default function ServidoresAdminPage() {
       cpf: s.cpf,
       name: s.name,
       status: s.status,
-      // GET já vem com o principal primeiro (ServidorMapper.toDto ordena assim).
       cargos: s.cargos.map(c => ({
         cargo: c.cargo,
         codigoCargo: c.codigoCargo ?? '',
@@ -158,9 +157,9 @@ export default function ServidoresAdminPage() {
       setCargoParaExcluir(null)
       recarregar()
     } catch (e: unknown) {
-      // Erro do backend é relevante aqui (cargo principal/último cargo bloqueados) —
-      // o diálogo permanece aberto pra tentar de novo, mensagem exibida via alert
-      // (padrão existente nessa página).
+      // Erro do backend é relevante aqui (último cargo restante é bloqueado) — o diálogo
+      // permanece aberto pra tentar de novo, mensagem exibida via alert (padrão existente
+      // nessa página).
       alert(e instanceof Error ? e.message : 'Erro ao excluir cargo')
     } finally {
       setExcluindoCargo(false)
@@ -178,16 +177,14 @@ export default function ServidoresAdminPage() {
       cpf: form.cpf,
       name: form.name,
       status: form.status,
-      // Primeiro cargo da lista = principal (referência da folha de pagamento).
-      cargos: form.cargos.map((c, i) => ({
+      cargos: form.cargos.map(c => ({
         cargo: c.cargo,
         codigoCargo: c.codigoCargo || undefined,
         codigoOrgao: c.codigoOrgao || undefined,
         unidade: { id: c.unidadeId },
         dataAdmissao: c.dataAdmissao || undefined,
         cargaHoraria: c.cargaHoraria || undefined,
-        ativo: c.ativo,
-        principal: i === 0
+        ativo: c.ativo
       }))
     }
 
@@ -230,7 +227,8 @@ export default function ServidoresAdminPage() {
         <>
           <div className="flex items-center justify-between">
             <p className="text-sm text-admin-text-faint">
-              Cada servidor pode ter múltiplos cargos (1-N) — o primeiro cargo é o <strong className="text-admin-text">principal</strong>, referência para a folha de pagamento.
+              Cada servidor pode ter múltiplos cargos (1-N), todos com o mesmo peso — a folha de
+              pagamento é lançada especificando a qual cargo o salário se refere.
             </p>
 
             {podeCriar(usuario, 'rh') && (
@@ -356,8 +354,7 @@ export default function ServidoresAdminPage() {
                       <div key={indice} className="rounded-xl border border-admin-border bg-admin-surface p-4 space-y-3">
                         <div className="flex items-center justify-between flex-wrap gap-2">
                           <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide bg-admin-accent/20 text-admin-accent">
-                            <MdStar size={12} />
-                            {indice === 0 ? 'Cargo principal' : `Cargo ${indice + 1}`}
+                            {`Cargo ${indice + 1}`}
                           </span>
                           {form.cargos.length > 1 && (
                             <button
@@ -524,18 +521,12 @@ export default function ServidoresAdminPage() {
                             {s.cargos.map(c => (
                               <li key={c.id} className="flex items-center gap-2">
                                 <span className="text-admin-text-muted">{c.cargo}</span>
-                                {c.principal && (
-                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-admin-accent/20 text-admin-accent whitespace-nowrap">
-                                    <MdStar size={10} />
-                                    Principal
-                                  </span>
-                                )}
                                 {c.unidade && (
                                   <span className="text-xs text-admin-text-faint truncate max-w-40" title={c.unidade.nome}>
                                     {c.unidade.nome}
                                   </span>
                                 )}
-                                {podeExcluir(usuario, 'rh') && !c.principal && s.cargos.length > 1 && (
+                                {podeExcluir(usuario, 'rh') && s.cargos.length > 1 && (
                                   <button
                                     onClick={() => setCargoParaExcluir({ servidorId: s.id, cargoId: c.id })}
                                     aria-label={`Excluir cargo ${c.cargo}`}
@@ -600,7 +591,7 @@ export default function ServidoresAdminPage() {
           <ConfirmDialog
             aberto={cargoParaExcluir !== null}
             titulo="Excluir cargo?"
-            mensagem="Remove esse cargo do servidor. O cargo principal e o último cargo restante são protegidos pelo sistema."
+            mensagem="Remove esse cargo do servidor. O último cargo restante é protegido pelo sistema — desligue o servidor em vez de remover seu único cargo."
             confirmarLabel="Excluir"
             perigoso
             carregando={excluindoCargo}

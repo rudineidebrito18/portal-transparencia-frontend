@@ -38,25 +38,24 @@ function gerarCpf(): string {
   return `${n()}.${n()}.${n()}-${d()}`
 }
 
-function gerarCargo(id: number, principal: boolean): ServidorCargo {
+function gerarCargo(id: number): ServidorCargo {
   return {
     id,
     cargo: faker.helpers.arrayElement(CARGOS),
     unidade: faker.helpers.arrayElement(UNIDADES),
     dataAdmissao: faker.date.between({ from: '2010-01-01', to: '2024-12-31' }).toISOString().split('T')[0],
     cargaHoraria: faker.helpers.arrayElement([20, 30, 40, 44]),
-    ativo: true,
-    principal
+    ativo: true
   }
 }
 
 function gerarServidor(id: number): Servidor {
   faker.seed(id)
 
-  // Espelha a resposta real: cargos ordenados com o principal primeiro.
-  const cargos: ServidorCargo[] = [gerarCargo(id * 10 + 1, true)]
+  // Um servidor pode ter mais de um cargo, todos com o mesmo peso (sem hierarquia).
+  const cargos: ServidorCargo[] = [gerarCargo(id * 10 + 1)]
   if (id % 3 === 0) {
-    cargos.push(gerarCargo(id * 10 + 2, false))
+    cargos.push(gerarCargo(id * 10 + 2))
   }
 
   return {
@@ -66,6 +65,10 @@ function gerarServidor(id: number): Servidor {
     status: 'ATIVO',
     cargos
   }
+}
+
+export function cargoReferencia(servidor: Servidor): ServidorCargo | undefined {
+  return servidor.cargos[0]
 }
 
 const TOTAL_MOCK = 85

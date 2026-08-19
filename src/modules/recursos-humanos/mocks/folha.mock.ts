@@ -2,7 +2,7 @@ import { fakerPT_BR as faker } from '@faker-js/faker'
 
 import { Page } from '@/modules/shared/types/Page'
 import { ordenar, paginar } from '@/modules/shared/mocks/mockUtils'
-import { buscarServidorMockPorId } from './servidor.mock'
+import { buscarServidorMockPorId, cargoReferencia } from './servidor.mock'
 import { FiltroFolhaPagamento, FolhaPagamento, FolhaPagamentoServidor } from '../types'
 
 interface FolhaRecord extends FolhaPagamento {
@@ -30,9 +30,7 @@ function gerarHistoricoServidor(servidorId: number): FolhaRecord[] {
 
   faker.seed(servidorId + 1000)
 
-  // Folha usa o cargo PRINCIPAL do servidor (primeiro da lista) — mesmo comportamento do backend.
-  const principal = servidor.cargos[0]
-  const salarioBase = principal ? CARGO_SALARIO_BASE[principal.cargo] ?? 2500 : 2500
+  const salarioBase = CARGO_SALARIO_BASE[cargoReferencia(servidor)?.cargo ?? ''] ?? 2500
   const hoje = new Date()
 
   return Array.from({ length: MESES_HISTORICO }, (_, i) => {
@@ -82,7 +80,7 @@ export const folhaMock = {
       .filter(f => f.mes === mes && f.ano === ano)
       .map(f => {
         const servidor = buscarServidorMockPorId(f.servidorId)
-        const principal = servidor?.cargos[0]
+        const cargo = servidor ? cargoReferencia(servidor) : undefined
 
         return {
           id: f.id,
@@ -93,11 +91,11 @@ export const folhaMock = {
           salarioLiquido: f.salarioLiquido,
           nomeServidor: servidor?.name ?? 'Desconhecido',
           cpfServidor: servidor?.cpf ?? '-',
-          cargo: principal?.cargo,
-          unidadeNome: principal?.unidade?.nome,
-          unidadeId: principal?.unidade?.id,
-          cargaHoraria: principal?.cargaHoraria,
-          dataAdmissao: principal?.dataAdmissao
+          cargo: cargo?.cargo,
+          unidadeNome: cargo?.unidade?.nome,
+          unidadeId: cargo?.unidade?.id,
+          cargaHoraria: cargo?.cargaHoraria,
+          dataAdmissao: cargo?.dataAdmissao
         }
       })
 

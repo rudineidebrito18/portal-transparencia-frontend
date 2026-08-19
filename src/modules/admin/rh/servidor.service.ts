@@ -18,6 +18,10 @@ export const servidorService = {
     return api.get<Page<Servidor>>(`${BASE}/buscar`, { params }).then(r => r.data)
   },
 
+  buscarPorId(id: number): Promise<Servidor> {
+    return api.get<Servidor>(`${BASE}/${id}`).then(r => r.data)
+  },
+
   criar(dados: ServidorRequest): Promise<Servidor> {
     return api.post<Servidor>(BASE, dados).then(r => r.data)
   },

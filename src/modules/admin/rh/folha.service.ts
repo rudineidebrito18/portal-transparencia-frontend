@@ -38,7 +38,7 @@ export const folhaService = {
       .then(r => r.data.content)
   },
 
-  // Rubricas.CSV foi descontinuado — a importação recebe só o Servidores.CSV (resumo por
+  // Rubricas.CSV foi descontinuado (V50) — a importação recebe só o Servidores.CSV (resumo por
   // servidor, pipe-delimited, sem cabeçalho). Mês/ano vêm do próprio arquivo.
   previewImportacao(arquivoServidores: File): Promise<ImportacaoFolhaPreview> {
     const formData = new FormData()

@@ -25,13 +25,16 @@ const MESES = [
 
 const MOTIVO_LABEL: Record<LinhaIgnorada['motivo'], string> = {
   SERVIDOR_NAO_CADASTRADO: 'CPF não cadastrado como servidor',
-  DUPLICADO: 'Já lançado nesse mês (duplicado)'
+  DUPLICADO_NO_ARQUIVO: 'Mesmo cargo repetido no arquivo',
+  JA_LANCADO_NO_MES: 'Já lançado nesse mês para esse cargo',
+  CARGO_NAO_ENCONTRADO: 'Cargo do arquivo não bate com nenhum cargo cadastrado do servidor'
 }
 
 const COLUNAS_EXPORTACAO_IGNORADAS: ColunaExportacao<LinhaIgnorada>[] = [
   { chave: 'cpfInformado', rotulo: 'CPF' },
   { chave: 'nomeInformado', rotulo: 'Nome' },
-  { chave: 'motivo', rotulo: 'Motivo', formatar: item => MOTIVO_LABEL[item.motivo] }
+  { chave: 'motivo', rotulo: 'Motivo', formatar: item => MOTIVO_LABEL[item.motivo] },
+  { chave: 'detalhe', rotulo: 'Cargo no arquivo', formatar: item => item.detalhe ?? '' }
 ]
 
 function BlocoLinhas({
@@ -138,9 +141,11 @@ export default function ImportarFolhaTab() {
         <h2 className="font-semibold text-sm text-admin-text mb-1">Importar folha via CSV</h2>
         <p className="text-xs text-admin-text-faint mb-4">
           Arquivo <strong className="text-admin-text">Servidores.CSV</strong> (resumo por servidor, pipe-delimited,
-          sem cabeçalho) exportado pelo sistema de RH da prefeitura. Mês e ano são lidos do próprio arquivo. O upload
-          gera uma <strong className="text-admin-text">prévia sem salvar nada</strong>: você confere os CPFs que ainda
-          não têm servidor cadastrado (e os que já têm folha no mês) e só então confirma.
+          sem cabeçalho) exportado pelo sistema de RH da prefeitura. Mês e ano são lidos do próprio arquivo. Cada
+          linha é 1 cargo/mês — um servidor com mais de um cargo aparece em mais de uma linha, casada com o cargo
+          correspondente já cadastrado. O upload gera uma <strong className="text-admin-text">prévia sem salvar
+          nada</strong>: você confere os CPFs que ainda não têm servidor cadastrado (e os que já têm folha no mês)
+          e só então confirma.
         </p>
 
         {!preview && !resultado && (
@@ -274,6 +279,7 @@ export default function ImportarFolhaTab() {
                       <th className="p-3 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">CPF</th>
                       <th className="p-3 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Nome</th>
                       <th className="p-3 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Motivo</th>
+                      <th className="p-3 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Cargo no arquivo</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -282,6 +288,7 @@ export default function ImportarFolhaTab() {
                         <td className="p-3 text-admin-text-muted tabular-nums">{linha.cpfInformado}</td>
                         <td className="p-3 text-admin-text-muted">{linha.nomeInformado}</td>
                         <td className="p-3 text-admin-error">{MOTIVO_LABEL[linha.motivo]}</td>
+                        <td className="p-3 text-admin-text-muted">{linha.detalhe ?? '—'}</td>
                       </tr>
                     ))}
                   </tbody>

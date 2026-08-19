@@ -3,9 +3,9 @@ export interface Unidade {
   nome: string
 }
 
-// Cargo do servidor (1-N): cada cargo tem unidade/carga horária/data de admissão próprios.
-// Na resposta do GET, `cargos` vem ordenado com o principal primeiro (ver ServidorMapper.toDto
-// no backend) — o primeiro item é a referência da folha de pagamento.
+// Um servidor pode ter mais de um cargo (ex.: professor + coordenador, ou dois vínculos em
+// unidades diferentes) — cada um com unidade/carga horária/data de admissão próprios, todos com
+// o mesmo peso (sem hierarquia entre eles).
 export interface ServidorCargo {
   id: number
   cargo: string
@@ -15,7 +15,6 @@ export interface ServidorCargo {
   dataAdmissao?: string
   cargaHoraria?: number
   ativo: boolean
-  principal: boolean
 }
 
 export interface Servidor {

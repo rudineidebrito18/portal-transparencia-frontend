@@ -6,10 +6,10 @@ import {
   MdCalendarToday,
   MdFingerprint,
   MdPayments,
-  MdSchedule,
-  MdStar
+  MdSchedule
 } from 'react-icons/md'
 
+import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import ErrorState from '@/components/ui/ErrorState'
 import InfoBlock from '@/components/ui/InfoBlock'
@@ -25,10 +25,7 @@ interface Props {
 
 export default function ServidorDetalhe({ servidor }: Props) {
   const { data: folhas, loading, erro } = useFolhaServidor(servidor.id)
-
-  // Cargos vêm ordenados com o principal primeiro — o cabeçalho e o grid mostram os dados
-  // do cargo principal (referência da folha de pagamento), e a lista abaixo traz todos.
-  const principal = servidor.cargos[0]
+  const referencia = servidor.cargos[0]
 
   return (
     <div className="bg-light border border-border/30 rounded-2xl shadow-md overflow-hidden mb-10">
@@ -44,64 +41,54 @@ export default function ServidorDetalhe({ servidor }: Props) {
             <h1 className="text-2xl font-extrabold text-primary tracking-tight">
               {servidor.name}
             </h1>
-            <p className="text-sm text-text-secondary font-semibold flex items-center gap-1.5">
-              {principal?.cargo ?? '—'}
-              {principal?.principal && <MdStar size={14} className="text-accent" aria-label="Cargo principal" />}
-            </p>
+            <p className="text-sm text-text-secondary font-semibold">{referencia?.cargo ?? 'Cargo não informado'}</p>
           </div>
         </div>
       </div>
 
       <div className="p-6">
 
-        {/* GRID INFO */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <InfoBlock label="CPF" value={servidor.cpf} icon={MdFingerprint} />
-          <InfoBlock label="Unidade" value={principal?.unidade?.nome} icon={MdAccountBalance} />
-          <InfoBlock label="Admissão" value={formatarData(principal?.dataAdmissao)} icon={MdCalendarToday} />
-          <InfoBlock label="Carga Horária" value={principal?.cargaHoraria ? `${principal.cargaHoraria}h/semana` : undefined} icon={MdSchedule} />
         </div>
 
         {/* CARGOS */}
-        <div className="pt-6 border-t border-border/20 mb-10">
+        <div className="mt-6 mb-10">
           <h3 className="font-bold text-primary uppercase text-sm tracking-wider mb-4 flex items-center gap-2">
-            <MdBadge /> Cargos
+            <MdAccountBalance /> Cargo{servidor.cargos.length > 1 ? 's' : ''}
           </h3>
 
-          <div className="overflow-x-auto rounded-xl border border-border/30 shadow-sm">
-            <table className="w-full text-sm bg-white">
-              <thead>
-                <tr className="bg-neutral-light/60 text-text-muted text-xs uppercase">
-                  <th className="text-left px-4 py-3 font-semibold">Cargo</th>
-                  <th className="text-left px-4 py-3 font-semibold">Unidade</th>
-                  <th className="text-left px-4 py-3 font-semibold">Admissão</th>
-                  <th className="text-left px-4 py-3 font-semibold">Carga Horária</th>
-                  <th className="text-left px-4 py-3 font-semibold">Situação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {servidor.cargos.map(cargo => (
-                  <tr key={cargo.id} className="border-t border-border/20">
-                    <td className="px-4 py-3 font-semibold text-text-secondary flex items-center gap-1.5">
-                      {cargo.cargo}
-                      {cargo.principal && <MdStar size={14} className="text-accent" aria-label="Cargo principal" />}
-                    </td>
-                    <td className="px-4 py-3 text-text-secondary">{cargo.unidade?.nome || 'Não informada'}</td>
-                    <td className="px-4 py-3 text-text-secondary">{formatarData(cargo.dataAdmissao)}</td>
-                    <td className="px-4 py-3 text-text-secondary">
-                      {cargo.cargaHoraria ? `${cargo.cargaHoraria}h/semana` : 'Não informada'}
-                    </td>
-                    <td className="px-4 py-3">
-                      {cargo.ativo ? (
-                        <span className="text-success font-semibold">Ativo</span>
-                      ) : (
-                        <span className="text-error font-semibold">Desligado</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {servidor.cargos.map(cargo => (
+              <Card key={cargo.id} hoverable={false} className="p-4">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span className="font-bold text-text-secondary">{cargo.cargo}</span>
+                  {cargo.ativo ? (
+                    <span className="text-xs text-success font-semibold">Ativo</span>
+                  ) : (
+                    <span className="text-xs text-error font-semibold">Desligado</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-xs uppercase text-text-muted">Unidade</p>
+                    <p className="font-semibold text-text-secondary truncate">{cargo.unidade?.nome ?? 'Não informada'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-text-muted flex items-center gap-1">
+                      <MdCalendarToday size={12} /> Admissão
+                    </p>
+                    <p className="font-semibold text-text-secondary">{formatarData(cargo.dataAdmissao)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-text-muted flex items-center gap-1">
+                      <MdSchedule size={12} /> Carga Horária
+                    </p>
+                    <p className="font-semibold text-text-secondary">{cargo.cargaHoraria ? `${cargo.cargaHoraria}h/semana` : 'Não informada'}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
 
