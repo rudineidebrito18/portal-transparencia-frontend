@@ -2,32 +2,56 @@ import { Unidade } from '@/modules/admin/geral/types'
 
 export type StatusServidor = 'ATIVO' | 'DESLIGADO'
 
-export interface Servidor {
+// Um servidor pode ter mais de um cargo (ex.: professor + coordenador, ou dois vínculos em
+// unidades diferentes) — descoberto na importação real via CSV do RH (2026-08-18), onde 165 CPFs
+// tinham cargos distintos. Cada cargo carrega sua própria unidade/carga horária/data de admissão,
+// todos com o mesmo peso (sem hierarquia entre eles).
+export interface ServidorCargo {
   id: number
-  cpf: string
-  name: string
   cargo: string
+  codigoCargo?: string
+  codigoOrgao?: string
   // GET /recursos-humanos/servidor só devolve {id, nome} aninhado, não a Unidade
   // completa (que ganhou campos novos em 2026-07-16) — importa o tipo canônico
   // de geral/types em vez de duplicar, mas só usa o subconjunto que o backend
   // realmente manda aqui.
   unidade?: Pick<Unidade, 'id' | 'nome'>
-  dataAdmissao: string
-  cargaHoraria: number
+  dataAdmissao?: string
+  cargaHoraria?: number
+  ativo: boolean
+}
+
+// Mesmo shape do ServidorCargoDto do backend (usado tanto pra request quanto resposta lá): `id`
+// é opcional (ausente na criação), `unidade` vem só com o id.
+export interface ServidorCargoRequest {
+  id?: number
+  cargo: string
+  codigoCargo?: string
+  codigoOrgao?: string
+  unidade: { id: number }
+  dataAdmissao?: string
+  cargaHoraria?: number
+  ativo?: boolean
+}
+
+export interface Servidor {
+  id: number
+  cpf: string
+  name: string
   // Desligar preserva o histórico de folha (excluir o registro é bloqueado enquanto houver
   // folha lançada — 2026-08-13, ver ServidorServiceImpl.deleteServidor no backend).
   status: StatusServidor
+  cargos: ServidorCargo[]
 }
 
-// Backend aceita `unidade: {id}` sozinho (sem `nome`) e resolve a FK — confirmado via curl.
+// PUT substitui a lista de cargos por inteiro pelos cargos enviados (orphanRemoval no backend) —
+// precisa mandar todos, não só os alterados (mesma semântica de editar a folha: o admin manda o
+// estado final). `status` é opcional: o backend só atualiza se vier preenchido.
 export interface ServidorRequest {
   cpf: string
   name: string
-  cargo: string
-  unidade: { id: number }
-  dataAdmissao: string
-  cargaHoraria: number
-  status: StatusServidor
+  status?: StatusServidor
+  cargos: ServidorCargoRequest[]
 }
 
 export interface FiltroServidor {
@@ -107,10 +131,14 @@ export interface FolhaPagamento {
   salarioBruto: number
   desconto: number
   salarioLiquido: number
+  // A qual cargo do servidor esse salário se refere (migration V52) — obrigatório quando o
+  // servidor tem mais de um cargo. cargoNome só vem na resposta (exibição).
+  cargoId?: number
+  cargoNome?: string
 }
 
 // PUT/DELETE existem (admin-only) — ver folha.service.ts atualizar()/excluir().
-export type FolhaPagamentoRequest = Omit<FolhaPagamento, 'id'>
+export type FolhaPagamentoRequest = Omit<FolhaPagamento, 'id' | 'cargoNome'>
 
 export interface FolhaPagamentoServidor {
   id: number
@@ -119,8 +147,10 @@ export interface FolhaPagamentoServidor {
   salarioBruto: number
   descontos: number
   salarioLiquido: number
+  servidorId: number
   nomeServidor: string
   cpfServidor: string
+  cargoId?: number
   cargo?: string
   unidadeNome?: string
   cargaHoraria?: number
@@ -130,7 +160,27 @@ export interface FolhaPagamentoServidor {
 export interface LinhaIgnorada {
   cpfInformado: string
   nomeInformado: string
-  motivo: 'SERVIDOR_NAO_CADASTRADO' | 'DUPLICADO'
+  motivo: 'SERVIDOR_NAO_CADASTRADO' | 'DUPLICADO_NO_ARQUIVO' | 'JA_LANCADO_NO_MES' | 'CARGO_NAO_ENCONTRADO'
+  // Nome do cargo do CSV, só quando o motivo é CARGO_NAO_ENCONTRADO.
+  detalhe?: string
+}
+
+// Prévia da importação de folha (POST /importar/preview, não salva nada): mês/ano detectados
+// no arquivo e as três categorias de linhas que seriam ignoradas na importação real.
+export interface FolhaLinhaPreview {
+  cpf: string
+  nome: string
+}
+
+export interface ImportacaoFolhaPreview {
+  mes: number
+  ano: number
+  totalLinhas: number
+  totalLancamentos: number
+  totalIgnorados: number
+  servidoresNaoCadastrados: FolhaLinhaPreview[]
+  linhasDuplicadasNoArquivo: FolhaLinhaPreview[]
+  jaLancadosNoMes: FolhaLinhaPreview[]
 }
 
 export interface ImportacaoFolhaResumo {
@@ -147,6 +197,54 @@ export interface ImportacaoFolhaResumo {
 
 export interface ImportacaoFolhaDetalhe extends ImportacaoFolhaResumo {
   linhasIgnoradas: LinhaIgnorada[]
+}
+
+// Motivos de uma linha do CSV de importação de servidores não virar cadastro — espelha
+// MotivoLinhaServidorIgnorada do backend.
+export type MotivoLinhaServidorIgnorada =
+  | 'CPF_INVALIDO'
+  | 'DADOS_INCOMPLETOS'
+  | 'DUPLICADO_NO_ARQUIVO'
+  | 'JA_CADASTRADO'
+  | 'UNIDADE_NAO_ENCONTRADA'
+  | 'UNIDADE_AMBIGUA'
+
+export interface LinhaServidorIgnorada {
+  cpfInformado: string
+  nomeInformado: string
+  unidadeInformada: string
+  motivo: MotivoLinhaServidorIgnorada
+  detalhe?: string
+}
+
+export interface UnidadeMatchPreview {
+  nomeInformado: string
+  unidadeId: number | null
+  unidadeNome: string | null
+  motivo: 'UNIDADE_NAO_ENCONTRADA' | 'UNIDADE_AMBIGUA' | null
+  candidatas: string[]
+}
+
+export interface ImportacaoServidorPreview {
+  totalLinhas: number
+  totalServidoresNovos: number
+  totalLinhasIgnoradas: number
+  unidadesComMatch: UnidadeMatchPreview[]
+  unidadesSemMatch: UnidadeMatchPreview[]
+}
+
+export interface ImportacaoServidorResumo {
+  id: number
+  dataImportacao: string
+  usuarioEmail: string
+  nomeArquivo: string
+  totalLinhas: number
+  totalCadastrados: number
+  totalIgnorados: number
+}
+
+export interface ImportacaoServidorDetalhe extends ImportacaoServidorResumo {
+  linhasIgnoradas: LinhaServidorIgnorada[]
 }
 
 export interface Concurso {

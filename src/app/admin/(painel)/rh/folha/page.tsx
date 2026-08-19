@@ -10,6 +10,7 @@ import ConfirmDialog from '@/modules/admin/shared/ConfirmDialog'
 import { useAuth } from '@/modules/auth/AuthContext'
 import { podeCriar, podeEditar, podeExcluir } from '@/modules/auth/permissoes'
 import { folhaService } from '@/modules/admin/rh/folha.service'
+import { servidorService } from '@/modules/admin/rh/servidor.service'
 import BuscarServidorInput from '@/modules/admin/rh/components/BuscarServidorInput'
 import EditarFolhaModal from '@/modules/admin/rh/components/EditarFolhaModal'
 import ImportarFolhaTab from '@/modules/admin/rh/components/ImportarFolhaTab'
@@ -32,7 +33,7 @@ const MESES = [
 // Edição/exclusão de lançamento — admin-only (podeEditar/podeExcluir('rh') já resolvem
 // isso), compartilhado pelas duas abas de listagem (Por servidor / Por mês).
 function useEdicaoFolha(aoMudar: () => void) {
-  const [editando, setEditando] = useState<{ id: number; mes: number; ano: number; salarioBruto: number; desconto: number } | null>(null)
+  const [editando, setEditando] = useState<{ id: number; mes: number; ano: number; salarioBruto: number; desconto: number; cargoId?: number } | null>(null)
   const [salvandoEdicao, setSalvandoEdicao] = useState(false)
   const [erroEdicao, setErroEdicao] = useState<string | null>(null)
 
@@ -99,9 +100,16 @@ function AbaPorServidor() {
   }, [servidorId])
 
   const hoje = new Date()
-  const [novaFolha, setNovaFolha] = useState({ mes: hoje.getMonth() + 1, ano: hoje.getFullYear(), salarioBruto: 0, desconto: 0 })
+  const [novaFolha, setNovaFolha] = useState({ mes: hoje.getMonth() + 1, ano: hoje.getFullYear(), salarioBruto: 0, desconto: 0, cargoId: '' as number | '' })
   const [salvando, setSalvando] = useState(false)
   const [erroForm, setErroForm] = useState<string | null>(null)
+
+  const cargosDoServidor = servidorSelecionado?.cargos ?? []
+
+  useEffect(() => {
+    setNovaFolha(f => ({ ...f, cargoId: cargosDoServidor.length === 1 ? cargosDoServidor[0].id : '' }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [servidorId])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -116,7 +124,8 @@ function AbaPorServidor() {
         ano: novaFolha.ano,
         salarioBruto: novaFolha.salarioBruto,
         desconto: novaFolha.desconto,
-        salarioLiquido: novaFolha.salarioBruto - novaFolha.desconto
+        salarioLiquido: novaFolha.salarioBruto - novaFolha.desconto,
+        cargoId: novaFolha.cargoId || undefined
       })
       carregarFolhas(servidorId)
     } catch (e: unknown) {
@@ -141,6 +150,24 @@ function AbaPorServidor() {
         <div className="rounded-2xl border border-admin-border-strong bg-admin-surface-2 p-5 shadow-admin-md">
           <form onSubmit={handleSubmit} className="space-y-4">
             <h2 className="font-semibold text-sm text-admin-text">Lançar folha</h2>
+
+            {cargosDoServidor.length > 1 && (
+              <div>
+                <label className={classeLabel} htmlFor="cargo">Cargo</label>
+                <select
+                  id="cargo"
+                  required
+                  value={novaFolha.cargoId}
+                  onChange={e => setNovaFolha({ ...novaFolha, cargoId: Number(e.target.value) })}
+                  className={`${classeInput} md:w-72`}
+                >
+                  <option value="" disabled>Selecione...</option>
+                  {cargosDoServidor.map(c => (
+                    <option key={c.id} value={c.id}>{c.cargo}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
@@ -227,6 +254,7 @@ function AbaPorServidor() {
                   <thead>
                     <tr className="border-b border-admin-border text-left">
                       <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Mês/Ano</th>
+                      <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Cargo</th>
                       <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Salário bruto</th>
                       <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Desconto</th>
                       <th className="p-3.5 text-xs font-semibold uppercase tracking-wide text-admin-text-faint">Salário líquido</th>
@@ -237,6 +265,7 @@ function AbaPorServidor() {
                     {folhas.map(f => (
                       <tr key={f.id} className="border-t border-admin-border hover:bg-admin-surface-2/60 transition-colors">
                         <td className="p-3.5 font-semibold text-admin-text">{MESES[f.mes - 1]}/{f.ano}</td>
+                        <td className="p-3.5 text-admin-text-muted">{f.cargoNome ?? '—'}</td>
                         <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarMoeda(f.salarioBruto)}</td>
                         <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarMoeda(f.desconto)}</td>
                         <td className="p-3.5 text-admin-text-muted tabular-nums">{formatarMoeda(f.salarioLiquido)}</td>
@@ -244,7 +273,7 @@ function AbaPorServidor() {
                           <td className="p-3.5 text-right whitespace-nowrap">
                             {podeEditarFolha && (
                               <button
-                                onClick={() => edicao.setEditando(f)}
+                                onClick={() => edicao.setEditando({ id: f.id, mes: f.mes, ano: f.ano, salarioBruto: f.salarioBruto, desconto: f.desconto, cargoId: f.cargoId })}
                                 aria-label="Editar lançamento"
                                 className="p-1.5 rounded-lg text-admin-text-faint hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
                               >
@@ -275,6 +304,7 @@ function AbaPorServidor() {
       <EditarFolhaModal
         aberto={edicao.editando !== null}
         folha={edicao.editando}
+        cargos={cargosDoServidor}
         salvando={edicao.salvandoEdicao}
         erro={edicao.erroEdicao}
         onSalvar={edicao.salvarEdicao}
@@ -319,6 +349,23 @@ function AbaPorMes() {
   const edicao = useEdicaoFolha(buscar)
   const podeEditarFolha = podeEditar(usuario, 'rh')
   const podeExcluirFolha = podeExcluir(usuario, 'rh')
+
+  const [cargosParaModal, setCargosParaModal] = useState<{ id: number; cargo: string }[]>([])
+  const [carregandoCargos, setCarregandoCargos] = useState(false)
+
+  // O DTO da listagem "por mês" não traz a lista completa de cargos do servidor — só o cargo
+  // desse lançamento — então precisa buscar o servidor pra montar as opções do seletor.
+  function abrirEdicao(f: FolhaPagamentoServidor) {
+    setCarregandoCargos(true)
+    servidorService
+      .buscarPorId(f.servidorId)
+      .then(servidor => {
+        setCargosParaModal(servidor.cargos)
+        edicao.setEditando({ id: f.id, mes: f.mes, ano: f.ano, salarioBruto: f.salarioBruto, desconto: f.descontos, cargoId: f.cargoId })
+      })
+      .catch(() => setCargosParaModal([]))
+      .finally(() => setCarregandoCargos(false))
+  }
 
   return (
     <div className="space-y-4">
@@ -390,9 +437,10 @@ function AbaPorMes() {
                       <td className="p-3.5 text-right whitespace-nowrap">
                         {podeEditarFolha && (
                           <button
-                            onClick={() => edicao.setEditando({ id: f.id, mes: f.mes, ano: f.ano, salarioBruto: f.salarioBruto, desconto: f.descontos })}
+                            onClick={() => abrirEdicao(f)}
+                            disabled={carregandoCargos}
                             aria-label="Editar lançamento"
-                            className="p-1.5 rounded-lg text-admin-text-faint hover:bg-admin-surface-3 hover:text-admin-accent transition-colors"
+                            className="p-1.5 rounded-lg text-admin-text-faint hover:bg-admin-surface-3 hover:text-admin-accent transition-colors disabled:opacity-60"
                           >
                             <MdEdit size={16} />
                           </button>
@@ -419,6 +467,7 @@ function AbaPorMes() {
       <EditarFolhaModal
         aberto={edicao.editando !== null}
         folha={edicao.editando}
+        cargos={cargosParaModal}
         salvando={edicao.salvandoEdicao}
         erro={edicao.erroEdicao}
         onSalvar={edicao.salvarEdicao}

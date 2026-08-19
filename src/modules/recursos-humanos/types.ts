@@ -3,14 +3,26 @@ export interface Unidade {
   nome: string
 }
 
+// Um servidor pode ter mais de um cargo (ex.: professor + coordenador, ou dois vínculos em
+// unidades diferentes) — cada um com unidade/carga horária/data de admissão próprios, todos com
+// o mesmo peso (sem hierarquia entre eles).
+export interface ServidorCargo {
+  id: number
+  cargo: string
+  codigoCargo?: string
+  codigoOrgao?: string
+  unidade?: Unidade
+  dataAdmissao?: string
+  cargaHoraria?: number
+  ativo: boolean
+}
+
 export interface Servidor {
   id: number
   cpf: string
   name: string
-  cargo: string
-  unidade?: Unidade
-  dataAdmissao: string
-  cargaHoraria: number
+  status: 'ATIVO' | 'DESLIGADO'
+  cargos: ServidorCargo[]
 }
 
 export interface FiltroServidor {
