@@ -31,6 +31,30 @@ export interface EmendaEstadual {
   dataUltimaSincronizacao: string | null
   criadoEm: string
   atualizadoEm: string
+  situacao: string | null
+  cadastroOficial: boolean | null
+  dataCadastro: string | null
+  parlamentarNomeCompleto: string | null
+  parlamentarPartido: string | null
+  parlamentarCargo: string | null
+  parlamentarUf: string | null
+  orgaoConcedenteEsfera: string | null
+  orgaoConcedenteDescricao: string | null
+  programaGovernamental: string | null
+  codigoAcaoOrcamentaria: string | null
+  contaBancoNome: string | null
+  contaBancoAgencia: string | null
+  contaBancoNumero: string | null
+  naturezaDespesa: string | null
+  codigoElementoDespesa: string | null
+  descricaoElementoDespesa: string | null
+  numeroConvenio: string | null
+  gestorEmenda: string | null
+  responsavelControleInterno: string | null
+  numeroEmpenho: string | null
+  valorSaldo: number | null
+  percentualExecucao: number | null
+  situacaoPrestacaoContas: string | null
 }
 
 // Mesmo shape do EmendaEstadualRequestDto do backend — usado tanto pra criar/editar manualmente
@@ -61,6 +85,30 @@ export interface EmendaEstadualRequest {
   fonteOrigem: FonteEmenda | null
   linkDetalhes: string | null
   viaBuscaAssistida?: boolean
+  situacao: string | null
+  cadastroOficial: boolean | null
+  dataCadastro: string | null
+  parlamentarNomeCompleto: string | null
+  parlamentarPartido: string | null
+  parlamentarCargo: string | null
+  parlamentarUf: string | null
+  orgaoConcedenteEsfera: string | null
+  orgaoConcedenteDescricao: string | null
+  programaGovernamental: string | null
+  codigoAcaoOrcamentaria: string | null
+  contaBancoNome: string | null
+  contaBancoAgencia: string | null
+  contaBancoNumero: string | null
+  naturezaDespesa: string | null
+  codigoElementoDespesa: string | null
+  descricaoElementoDespesa: string | null
+  numeroConvenio: string | null
+  gestorEmenda: string | null
+  responsavelControleInterno: string | null
+  numeroEmpenho: string | null
+  valorSaldo: number | null
+  percentualExecucao: number | null
+  situacaoPrestacaoContas: string | null
 }
 
 // Backend só filtra por ano (não tem endpoint de filtro por tipo/modalidade — são texto livre

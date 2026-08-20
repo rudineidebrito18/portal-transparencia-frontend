@@ -24,6 +24,29 @@ export interface EmendaFederal {
   dataUltimaSincronizacao: string | null
   criadoEm: string
   atualizadoEm: string
+  cadastroOficial: boolean | null
+  dataCadastro: string | null
+  autorNomeCompleto: string | null
+  autorUf: string | null
+  orgaoConcedenteEsfera: string | null
+  orgaoConcedenteDescricao: string | null
+  codigoAcaoOrcamentaria: string | null
+  descricaoAcaoOrcamentaria: string | null
+  enteBeneficiario: string | null
+  contaBancoNome: string | null
+  contaBancoAgencia: string | null
+  contaBancoNumero: string | null
+  naturezaDespesa: string | null
+  codigoElementoDespesa: string | null
+  descricaoElementoDespesa: string | null
+  numeroConvenio: string | null
+  gestorEmenda: string | null
+  responsavelControleInterno: string | null
+  numeroEmpenho: string | null
+  valorRepassado: number | null
+  valorSaldo: number | null
+  percentualExecucao: number | null
+  situacaoPrestacaoContas: string | null
 }
 
 // Mesmo shape do EmendaFederalRequestDto do backend — usado tanto pra criar/editar manualmente
@@ -49,6 +72,29 @@ export interface EmendaFederalRequest {
   fonteOrigem: FonteEmenda | null
   linkDetalhes: string | null
   viaBuscaAssistida?: boolean
+  cadastroOficial: boolean | null
+  dataCadastro: string | null
+  autorNomeCompleto: string | null
+  autorUf: string | null
+  orgaoConcedenteEsfera: string | null
+  orgaoConcedenteDescricao: string | null
+  codigoAcaoOrcamentaria: string | null
+  descricaoAcaoOrcamentaria: string | null
+  enteBeneficiario: string | null
+  contaBancoNome: string | null
+  contaBancoAgencia: string | null
+  contaBancoNumero: string | null
+  naturezaDespesa: string | null
+  codigoElementoDespesa: string | null
+  descricaoElementoDespesa: string | null
+  numeroConvenio: string | null
+  gestorEmenda: string | null
+  responsavelControleInterno: string | null
+  numeroEmpenho: string | null
+  valorRepassado: number | null
+  valorSaldo: number | null
+  percentualExecucao: number | null
+  situacaoPrestacaoContas: string | null
 }
 
 // Backend filtra por tipo OU por ano (endpoints separados /tipo/{tipo} e /ano/{ano}),

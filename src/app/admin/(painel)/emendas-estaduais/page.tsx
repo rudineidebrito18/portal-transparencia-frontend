@@ -50,7 +50,31 @@ const FORM_VAZIO: FormState = {
   codigoFavorecido: '',
   fonteOrigem: null,
   linkDetalhes: '',
-  viaBuscaAssistida: false
+  viaBuscaAssistida: false,
+  situacao: '',
+  cadastroOficial: null,
+  dataCadastro: '',
+  parlamentarNomeCompleto: '',
+  parlamentarPartido: '',
+  parlamentarCargo: '',
+  parlamentarUf: '',
+  orgaoConcedenteEsfera: '',
+  orgaoConcedenteDescricao: '',
+  programaGovernamental: '',
+  codigoAcaoOrcamentaria: '',
+  contaBancoNome: '',
+  contaBancoAgencia: '',
+  contaBancoNumero: '',
+  naturezaDespesa: '',
+  codigoElementoDespesa: '',
+  descricaoElementoDespesa: '',
+  numeroConvenio: '',
+  gestorEmenda: '',
+  responsavelControleInterno: '',
+  numeroEmpenho: '',
+  valorSaldo: null,
+  percentualExecucao: null,
+  situacaoPrestacaoContas: ''
 }
 
 const anoAtual = new Date().getFullYear()
@@ -548,6 +572,267 @@ export default function EmendasEstaduaisAdminPage() {
                   className={classeInput}
                 />
               </div>
+            </div>
+
+            <div className="border-t border-admin-border pt-4 space-y-3">
+              <span className="text-xs font-semibold uppercase tracking-wide text-admin-text-faint block">
+                Informações cadastrais adicionais (opcional — não vêm da busca automática)
+              </span>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="situacao">Situação</label>
+                  <input
+                    id="situacao"
+                    placeholder="Ex.: Em Execução"
+                    value={form.situacao ?? ''}
+                    onChange={e => setForm({ ...form, situacao: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="parlamentarNomeCompleto">Nome completo do parlamentar</label>
+                  <input
+                    id="parlamentarNomeCompleto"
+                    value={form.parlamentarNomeCompleto ?? ''}
+                    onChange={e => setForm({ ...form, parlamentarNomeCompleto: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="parlamentarUf">UF do parlamentar</label>
+                  <input
+                    id="parlamentarUf"
+                    placeholder="MA"
+                    maxLength={2}
+                    value={form.parlamentarUf ?? ''}
+                    onChange={e => setForm({ ...form, parlamentarUf: e.target.value.toUpperCase() })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="parlamentarPartido">Partido do parlamentar</label>
+                  <input
+                    id="parlamentarPartido"
+                    value={form.parlamentarPartido ?? ''}
+                    onChange={e => setForm({ ...form, parlamentarPartido: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="parlamentarCargo">Cargo do parlamentar</label>
+                  <input
+                    id="parlamentarCargo"
+                    placeholder="Deputado Estadual"
+                    value={form.parlamentarCargo ?? ''}
+                    onChange={e => setForm({ ...form, parlamentarCargo: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="orgaoConcedenteEsfera">Esfera do órgão concedente</label>
+                  <input
+                    id="orgaoConcedenteEsfera"
+                    placeholder="ESTADUAL"
+                    value={form.orgaoConcedenteEsfera ?? ''}
+                    onChange={e => setForm({ ...form, orgaoConcedenteEsfera: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="orgaoConcedenteDescricao">Descrição do órgão concedente</label>
+                  <input
+                    id="orgaoConcedenteDescricao"
+                    value={form.orgaoConcedenteDescricao ?? ''}
+                    onChange={e => setForm({ ...form, orgaoConcedenteDescricao: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="programaGovernamental">Programa governamental</label>
+                  <input
+                    id="programaGovernamental"
+                    value={form.programaGovernamental ?? ''}
+                    onChange={e => setForm({ ...form, programaGovernamental: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="codigoAcaoOrcamentaria">Código da ação orçamentária</label>
+                  <input
+                    id="codigoAcaoOrcamentaria"
+                    value={form.codigoAcaoOrcamentaria ?? ''}
+                    onChange={e => setForm({ ...form, codigoAcaoOrcamentaria: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="contaBancoNome">Banco</label>
+                  <input
+                    id="contaBancoNome"
+                    value={form.contaBancoNome ?? ''}
+                    onChange={e => setForm({ ...form, contaBancoNome: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="contaBancoAgencia">Agência</label>
+                  <input
+                    id="contaBancoAgencia"
+                    value={form.contaBancoAgencia ?? ''}
+                    onChange={e => setForm({ ...form, contaBancoAgencia: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="contaBancoNumero">Conta</label>
+                  <input
+                    id="contaBancoNumero"
+                    value={form.contaBancoNumero ?? ''}
+                    onChange={e => setForm({ ...form, contaBancoNumero: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="naturezaDespesa">Natureza da despesa</label>
+                  <input
+                    id="naturezaDespesa"
+                    value={form.naturezaDespesa ?? ''}
+                    onChange={e => setForm({ ...form, naturezaDespesa: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="codigoElementoDespesa">Código do elemento de despesa</label>
+                  <input
+                    id="codigoElementoDespesa"
+                    value={form.codigoElementoDespesa ?? ''}
+                    onChange={e => setForm({ ...form, codigoElementoDespesa: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="descricaoElementoDespesa">Descrição do elemento de despesa</label>
+                  <input
+                    id="descricaoElementoDespesa"
+                    value={form.descricaoElementoDespesa ?? ''}
+                    onChange={e => setForm({ ...form, descricaoElementoDespesa: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="numeroConvenio">Número do convênio</label>
+                  <input
+                    id="numeroConvenio"
+                    placeholder="Ex.: 001/2026"
+                    value={form.numeroConvenio ?? ''}
+                    onChange={e => setForm({ ...form, numeroConvenio: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="numeroEmpenho">Número do empenho</label>
+                  <input
+                    id="numeroEmpenho"
+                    value={form.numeroEmpenho ?? ''}
+                    onChange={e => setForm({ ...form, numeroEmpenho: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="dataCadastro">Data de cadastro na fonte</label>
+                  <input
+                    id="dataCadastro"
+                    type="date"
+                    value={form.dataCadastro ?? ''}
+                    onChange={e => setForm({ ...form, dataCadastro: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="gestorEmenda">Gestor da emenda</label>
+                  <input
+                    id="gestorEmenda"
+                    value={form.gestorEmenda ?? ''}
+                    onChange={e => setForm({ ...form, gestorEmenda: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="responsavelControleInterno">Responsável pelo controle interno</label>
+                  <input
+                    id="responsavelControleInterno"
+                    value={form.responsavelControleInterno ?? ''}
+                    onChange={e => setForm({ ...form, responsavelControleInterno: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div>
+                  <label className={classeLabel} htmlFor="valorSaldo">Saldo</label>
+                  <input
+                    id="valorSaldo"
+                    type="number"
+                    step="0.01"
+                    value={form.valorSaldo ?? ''}
+                    onChange={e => setForm({ ...form, valorSaldo: e.target.value ? Number(e.target.value) : null })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="percentualExecucao">% de execução</label>
+                  <input
+                    id="percentualExecucao"
+                    type="number"
+                    step="0.01"
+                    value={form.percentualExecucao ?? ''}
+                    onChange={e => setForm({ ...form, percentualExecucao: e.target.value ? Number(e.target.value) : null })}
+                    className={classeInput}
+                  />
+                </div>
+                <div>
+                  <label className={classeLabel} htmlFor="situacaoPrestacaoContas">Situação da prestação de contas</label>
+                  <input
+                    id="situacaoPrestacaoContas"
+                    value={form.situacaoPrestacaoContas ?? ''}
+                    onChange={e => setForm({ ...form, situacaoPrestacaoContas: e.target.value })}
+                    className={classeInput}
+                  />
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 text-sm text-admin-text-muted cursor-pointer w-fit">
+                <input
+                  type="checkbox"
+                  checked={form.cadastroOficial ?? false}
+                  onChange={e => setForm({ ...form, cadastroOficial: e.target.checked })}
+                  className="accent-admin-accent"
+                />
+                Cadastro confirmado como oficial na fonte
+              </label>
             </div>
 
             {erroForm && <AdminErrorState message={erroForm} />}

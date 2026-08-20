@@ -46,7 +46,30 @@ function gerarEmenda(id: number): EmendaFederal {
     linkDetalhes: `https://www.gov.br/transferegov/pt-br/emendas/${id}`,
     dataUltimaSincronizacao: origemCadastro === OrigemCadastroEmenda.API ? faker.date.recent({ days: 2 }).toISOString() : null,
     criadoEm: faker.date.past({ years: 1 }).toISOString(),
-    atualizadoEm: faker.date.recent({ days: 30 }).toISOString()
+    atualizadoEm: faker.date.recent({ days: 30 }).toISOString(),
+    cadastroOficial: null,
+    dataCadastro: null,
+    autorNomeCompleto: null,
+    autorUf: null,
+    orgaoConcedenteEsfera: null,
+    orgaoConcedenteDescricao: null,
+    codigoAcaoOrcamentaria: null,
+    descricaoAcaoOrcamentaria: null,
+    enteBeneficiario: null,
+    contaBancoNome: null,
+    contaBancoAgencia: null,
+    contaBancoNumero: null,
+    naturezaDespesa: null,
+    codigoElementoDespesa: null,
+    descricaoElementoDespesa: null,
+    numeroConvenio: null,
+    gestorEmenda: null,
+    responsavelControleInterno: null,
+    numeroEmpenho: null,
+    valorRepassado: null,
+    valorSaldo: null,
+    percentualExecucao: null,
+    situacaoPrestacaoContas: null
   }
 }
 

@@ -55,7 +55,31 @@ function gerarEmenda(id: number): EmendaEstadual {
     linkDetalhes: null,
     dataUltimaSincronizacao: origemCadastro === OrigemCadastroEmenda.API ? faker.date.recent({ days: 2 }).toISOString() : null,
     criadoEm: faker.date.past({ years: 1 }).toISOString(),
-    atualizadoEm: faker.date.recent({ days: 30 }).toISOString()
+    atualizadoEm: faker.date.recent({ days: 30 }).toISOString(),
+    situacao: null,
+    cadastroOficial: null,
+    dataCadastro: null,
+    parlamentarNomeCompleto: null,
+    parlamentarPartido: null,
+    parlamentarCargo: null,
+    parlamentarUf: null,
+    orgaoConcedenteEsfera: null,
+    orgaoConcedenteDescricao: null,
+    programaGovernamental: null,
+    codigoAcaoOrcamentaria: null,
+    contaBancoNome: null,
+    contaBancoAgencia: null,
+    contaBancoNumero: null,
+    naturezaDespesa: null,
+    codigoElementoDespesa: null,
+    descricaoElementoDespesa: null,
+    numeroConvenio: null,
+    gestorEmenda: null,
+    responsavelControleInterno: null,
+    numeroEmpenho: null,
+    valorSaldo: null,
+    percentualExecucao: null,
+    situacaoPrestacaoContas: null
   }
 }
 
