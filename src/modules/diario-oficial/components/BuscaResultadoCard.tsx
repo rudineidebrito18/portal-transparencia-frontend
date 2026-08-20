@@ -13,8 +13,11 @@ import { ResultadoBuscaEdicaoDiario } from '../types'
 // O trecho vem do Meilisearch já com <em>...</em> marcando o termo encontrado. Antes de
 // injetar no DOM (dangerouslySetInnerHTML), todo o resto do HTML do conteúdo indexado é
 // escapado e só a marcação <em> é restaurada — qualquer outra tag vira texto puro.
-function snippetSeguro(trecho: string): string {
-  return trecho
+// trecho pode vir null/undefined do backend quando o Meilisearch não devolve o campo
+// _formatted (ver EdicaoDiarioBuscaResultadoDto/toResultadoDto) — sem isso, o dado ficava
+// undefined aqui e travava a página inteira num .replace de undefined.
+function snippetSeguro(trecho: string | null | undefined): string {
+  return (trecho ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')

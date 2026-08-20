@@ -21,9 +21,10 @@ export function useEdicoesDiario() {
     const termo = params.termo?.trim()
 
     // Com termo preenchido, a listagem vira busca por palavra-chave no conteúdo
-    // (Meilisearch) — endpoint dedicado, que não combina com os filtros estruturados.
+    // (Meilisearch) — mas continua combinando com os filtros estruturados (tipo/número/
+    // período) já aplicados, em vez de descartá-los.
     if (termo) {
-      return diarioOficialService.buscarPorTexto(termo, params.page ?? 0, params.size ?? 10)
+      return diarioOficialService.buscarPorTexto({ ...params, termo })
     }
 
     return diarioOficialService.listar(params)

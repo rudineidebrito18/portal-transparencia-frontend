@@ -55,7 +55,7 @@ export const diarioOficialMock = {
 
   // Mock não tem conteúdo de PDF indexado (a indexação é responsabilidade do backend +
   // Meilisearch) — busca por palavra-chave só funciona contra o serviço real.
-  async buscarPorTexto(_q: string, _page: number, size: number): Promise<Page<ResultadoBuscaEdicaoDiario>> {
-    return { content: [], totalPages: 0, totalElements: 0, number: 0, size }
+  async buscarPorTexto(params: ListParams): Promise<Page<ResultadoBuscaEdicaoDiario>> {
+    return { content: [], totalPages: 0, totalElements: 0, number: 0, size: params.size ?? 10 }
   }
 }

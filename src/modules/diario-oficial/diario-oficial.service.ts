@@ -21,12 +21,15 @@ export const diarioOficialService = {
   },
 
   // GET /edicoes/buscar-texto — busca por palavra-chave no conteúdo indexado das edições
-  // (Meilisearch). O backend devolve 503 se o motor de busca estiver indisponível.
-  buscarPorTexto(q: string, page: number, size: number): Promise<Page<ResultadoBuscaEdicaoDiario>> {
-    if (USE_MOCK) return diarioOficialMock.buscarPorTexto(q, page, size)
+  // (Meilisearch), combinada com os mesmos filtros estruturados de listar() (tipo/número/
+  // período) — o backend não descarta o resto do filtro só porque um termo foi digitado.
+  // O backend devolve 503 se o motor de busca estiver indisponível.
+  buscarPorTexto(params: ListarParams): Promise<Page<ResultadoBuscaEdicaoDiario>> {
+    if (USE_MOCK) return diarioOficialMock.buscarPorTexto(params)
 
+    const { termo, ...resto } = params
     return api
-      .get<Page<ResultadoBuscaEdicaoDiario>>('/edicoes/buscar-texto', { params: { q, page, size } })
+      .get<Page<ResultadoBuscaEdicaoDiario>>('/edicoes/buscar-texto', { params: { q: termo, ...resto } })
       .then(response => response.data)
   }
 }

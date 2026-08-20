@@ -8,8 +8,9 @@ export interface EdicaoDiario {
 }
 
 export interface FiltroEdicaoDiario {
-  // Busca por palavra-chave no conteúdo indexado (Meilisearch). Quando preenchido,
-  // substitui os demais filtros — o endpoint de busca não combina com tipo/número/datas.
+  // Busca por palavra-chave no conteúdo indexado (Meilisearch). Quando preenchido, a
+  // listagem usa o endpoint de busca em vez do de filtro estruturado, mas combinada com
+  // os demais filtros abaixo (tipo/número/datas) — não os descarta.
   termo?: string
   tipo?: string
   numeroEdicao?: number
@@ -54,7 +55,8 @@ export interface ResultadoBuscaEdicaoDiario {
   numeroEdicao: number
   tipo: string
   dataPublicacao: string
-  trechoDestaque: string
+  // null quando o Meilisearch não devolve o campo _formatted (ver toResultadoDto no backend).
+  trechoDestaque: string | null
 }
 
 // Edições anteriores à existência do sistema eletrônico (publicações físicas escaneadas) —

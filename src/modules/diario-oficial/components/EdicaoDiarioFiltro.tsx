@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MdRestartAlt, MdSearch } from 'react-icons/md'
+import { MdClose, MdRestartAlt, MdSearch } from 'react-icons/md'
 
 import Button from '@/components/ui/Button'
 import FiltroCard from '@/components/ui/FiltroCard'
@@ -9,6 +9,7 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { TipoEdicaoDiario, TipoEdicaoDiarioDescricao } from '../enums'
 import { FiltroEdicaoDiario } from '../types'
+import { extrairTermos, montarTermo } from '../utils'
 
 interface Props {
   valoresIniciais?: FiltroEdicaoDiario
@@ -16,7 +17,8 @@ interface Props {
 }
 
 export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props) {
-  const [termo, setTermo] = useState(valoresIniciais?.termo ?? '')
+  const [termos, setTermos] = useState<string[]>(() => extrairTermos(valoresIniciais?.termo))
+  const [termoInput, setTermoInput] = useState('')
   const [tipo, setTipo] = useState(valoresIniciais?.tipo ?? '')
   const [numeroEdicao, setNumeroEdicao] = useState(
     valoresIniciais?.numeroEdicao ? String(valoresIniciais.numeroEdicao) : ''
@@ -24,16 +26,51 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
   const [dataInicial, setDataInicial] = useState(valoresIniciais?.dataInicial ?? '')
   const [dataFinal, setDataFinal] = useState(valoresIniciais?.dataFinal ?? '')
 
-  const filtrosAtivosCount = [termo, tipo, numeroEdicao, dataInicial, dataFinal].filter(v => v !== '').length
+  const filtrosAtivosCount =
+    (termos.length > 0 ? 1 : 0) + [tipo, numeroEdicao, dataInicial, dataFinal].filter(v => v !== '').length
+
+  function adicionarTermo() {
+    const valor = termoInput.trim()
+    if (!valor) return
+    setTermos(prev => (prev.includes(valor) ? prev : [...prev, valor]))
+    setTermoInput('')
+  }
+
+  function removerTermo(termo: string) {
+    setTermos(prev => prev.filter(t => t !== termo))
+  }
 
   function handleFiltrar() {
+    // Texto ainda digitado mas não confirmado com Enter entra na busca também — evita perder
+    // o que a pessoa escreveu se ela clicar direto em "Aplicar".
+    const valorPendente = termoInput.trim()
+    const termosFinais = valorPendente && !termos.includes(valorPendente) ? [...termos, valorPendente] : termos
+
+    if (valorPendente) {
+      setTermos(termosFinais)
+      setTermoInput('')
+    }
+
     onFiltrar({
-      termo: termo.trim() || undefined,
+      termo: montarTermo(termosFinais),
       tipo: tipo || undefined,
       numeroEdicao: numeroEdicao ? Number(numeroEdicao) : undefined,
       dataInicial: dataInicial || undefined,
       dataFinal: dataFinal || undefined
     })
+  }
+
+  // Enter com texto digitado adiciona um termo (sem submeter); Enter com o campo vazio aplica
+  // a busca — permite montar a lista e disparar tudo sem tirar a mão do teclado.
+  function handleTermoKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+
+    if (termoInput.trim()) {
+      adicionarTermo()
+    } else {
+      handleFiltrar()
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -44,7 +81,8 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
   }
 
   function limparFiltros() {
-    setTermo('')
+    setTermos([])
+    setTermoInput('')
     setTipo('')
     setNumeroEdicao('')
     setDataInicial('')
@@ -62,13 +100,35 @@ export default function EdicaoDiarioFiltro({ valoresIniciais, onFiltrar }: Props
           <Input
             id="termo"
             type="search"
-            value={termo}
-            onChange={(e) => setTermo(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Palavra-chave dentro dos PDFs publicados (ex.: licitação, decreto, nome de lei)..."
+            value={termoInput}
+            onChange={(e) => setTermoInput(e.target.value)}
+            onKeyDown={handleTermoKeyDown}
+            placeholder="Digite uma palavra ou frase e pressione Enter pra adicionar (ex.: licitação, &quot;nome da lei&quot;)..."
           />
+
+          {termos.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {termos.map(t => (
+                <span
+                  key={t}
+                  className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium"
+                >
+                  {t.includes(' ') ? `"${t}"` : t}
+                  <button
+                    type="button"
+                    onClick={() => removerTermo(t)}
+                    aria-label={`Remover termo ${t}`}
+                    className="p-0.5 rounded-full hover:bg-primary/20 transition-colors"
+                  >
+                    <MdClose size={14} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
           <p className="text-xs text-text-muted mt-1">
-            Quando preenchida, a busca por conteúdo é usada no lugar dos filtros de tipo, número e datas.
+            Quando preenchida, a busca por conteúdo é combinada com os filtros de tipo, número e datas.
           </p>
         </div>
       </div>
