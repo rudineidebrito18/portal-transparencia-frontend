@@ -1,15 +1,48 @@
-'use client'
+import DocumentoGenericoListaServidor from '@/modules/shared/components/documento-generico/DocumentoGenericoListaServidor'
+import DocumentoGenericoPaginacao from '@/modules/shared/components/documento-generico/DocumentoGenericoPaginacao'
+import { extrairFiltrosDeSearchParamsServidor } from '@/modules/shared/utils/filtroDocumentoGenerico'
+import { planejamentoService } from '../planejamento.service'
+import { PpaControles } from './PpaControles'
 
-import DocumentoGenericoListPanel from '@/modules/shared/components/documento-generico/DocumentoGenericoListPanel'
-import { useDocumentosPlanejamento } from '../hooks/useDocumentosPlanejamento'
+const ORDENACAO_PADRAO = 'data,desc'
+const TAMANHO_PAGINA = 10
 
-export default function PpaListView() {
-  const resource = useDocumentosPlanejamento('ppa')
+interface Props {
+  searchParams: Record<string, string | string[] | undefined>
+}
+
+// Fase 4: Server Component — busca no servidor via listarServidor. Ver
+// src/modules/competencias/components/CompetenciasListView.tsx (padrão de referência).
+export default async function PpaListView({ searchParams }: Props) {
+  const pagina = Number(searchParams.page ?? 0)
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : ORDENACAO_PADRAO
+  const filtros = extrairFiltrosDeSearchParamsServidor(searchParams)
+
+  const resultado = await planejamentoService.listarServidor('ppa', {
+    ...filtros,
+    page: pagina,
+    size: TAMANHO_PAGINA,
+    sort
+  })
+
   const origem = { label: 'Plano Plurianual (PPA)', href: '/ppa' }
 
   return (
-    <DocumentoGenericoListPanel
-      {...resource}
-      origem={origem} />
+    <div className="space-y-6">
+      <PpaControles
+        totalElements={resultado.totalElements}
+        atualizadoEm={new Date().toISOString()}
+        ordenacaoPadrao={ORDENACAO_PADRAO}
+        nomeBaseArquivo="ppa"
+      />
+
+      <DocumentoGenericoListaServidor
+        documentos={resultado.content}
+        origem={origem}
+        urlArquivo={id => planejamentoService.urlArquivo('ppa', id)}
+      />
+
+      <DocumentoGenericoPaginacao totalPaginas={resultado.totalPages} ordenacaoPadrao={ORDENACAO_PADRAO} />
+    </div>
   )
 }

@@ -1,8 +1,10 @@
-'use client'
-
-import { useUrlState } from '@/hooks/useUrlState'
+import DocumentoGenericoListaServidor from '@/modules/shared/components/documento-generico/DocumentoGenericoListaServidor'
+import DocumentoGenericoPaginacao from '@/modules/shared/components/documento-generico/DocumentoGenericoPaginacao'
+import { extrairFiltrosDeSearchParamsServidor } from '@/modules/shared/utils/filtroDocumentoGenerico'
+import { saudeService } from '../saude.service'
 import { RecursoSaude } from '../types'
-import DocumentoListView from './DocumentoListView'
+import SaudeControles from './SaudeControles'
+import SaudeTabs from './SaudeTabs'
 
 const CATEGORIAS: { recurso: RecursoSaude; label: string }[] = [
   { recurso: 'planos', label: 'Planos de Saúde' },
@@ -11,31 +13,57 @@ const CATEGORIAS: { recurso: RecursoSaude; label: string }[] = [
   { recurso: 'unidade', label: 'Unidades de Saúde' }
 ]
 
-export default function SaudeView() {
-  const [aba, setAba] = useUrlState<RecursoSaude>('categoria', CATEGORIAS[0].recurso)
+// Módulos "quase genéricos" com campo de exercício próprio (padrão V28/item 23 do backlog) —
+// mesma lista/motivo do DocumentoListView.tsx client que este arquivo substitui.
+const RECURSOS_COM_EXERCICIO: RecursoSaude[] = ['planos', 'relatorios']
+
+const ORDENACAO_PADRAO = 'data,desc'
+const TAMANHO_PAGINA = 10
+
+interface Props {
+  searchParams: Record<string, string | string[] | undefined>
+}
+
+export default async function SaudeView({ searchParams }: Props) {
+  const categoriaParam = typeof searchParams.categoria === 'string' ? searchParams.categoria : undefined
+  const aba = CATEGORIAS.find(c => c.recurso === categoriaParam)?.recurso ?? CATEGORIAS[0].recurso
+  const comExercicio = RECURSOS_COM_EXERCICIO.includes(aba)
+
+  const pagina = Number(searchParams.page ?? 0)
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : ORDENACAO_PADRAO
+  const filtros = extrairFiltrosDeSearchParamsServidor(searchParams)
+
+  const resultado = await saudeService.listarServidor(aba, {
+    ...filtros,
+    page: pagina,
+    size: TAMANHO_PAGINA,
+    sort
+  })
+
+  const origem = { label: 'Saúde', href: `/saude?categoria=${aba}` }
 
   return (
     <div>
-      {/* TABS */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {CATEGORIAS.map(categoria => (
-          <button
-            key={categoria.recurso}
-            onClick={() => setAba(categoria.recurso)}
-            aria-current={aba === categoria.recurso ? 'true' : undefined}
-            className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
-              ${aba === categoria.recurso
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-neutral-light text-text-secondary hover:bg-primary/10'
-              }`}
-          >
-            {categoria.label}
-          </button>
-        ))}
-      </div>
+      <SaudeTabs categorias={CATEGORIAS} abaAtiva={aba} />
 
-      {/* CONTEÚDO */}
-      <DocumentoListView key={aba} recurso={aba} />
+      <div className="space-y-6">
+        <SaudeControles
+          recurso={aba}
+          comExercicio={comExercicio}
+          totalElements={resultado.totalElements}
+          atualizadoEm={new Date().toISOString()}
+          ordenacaoPadrao={ORDENACAO_PADRAO}
+          nomeBaseArquivo={`saude-${aba}`}
+        />
+
+        <DocumentoGenericoListaServidor
+          documentos={resultado.content}
+          origem={origem}
+          urlArquivo={id => saudeService.urlArquivo(aba, id)}
+        />
+
+        <DocumentoGenericoPaginacao totalPaginas={resultado.totalPages} ordenacaoPadrao={ORDENACAO_PADRAO} />
+      </div>
     </div>
   )
 }

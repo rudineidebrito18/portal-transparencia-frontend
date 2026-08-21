@@ -4,7 +4,13 @@ import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 import LicitantesSancionadosListView from '@/modules/licitantes-sancionados/components/LicitantesSancionadosListView'
 
-export default function LicitantesSancionadosPage() {
+interface Props {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default async function LicitantesSancionadosPage({ searchParams }: Props) {
+  const params = await searchParams
+
   return (
     <div className="max-w-6xl mx-auto p-2">
       <PageHeader title="Licitantes e/ou Contratados Sancionados" breadcrumbItems={[
@@ -13,7 +19,7 @@ export default function LicitantesSancionadosPage() {
         ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
-        <LicitantesSancionadosListView />
+        <LicitantesSancionadosListView searchParams={params} />
       </Suspense>
     </div>
   )

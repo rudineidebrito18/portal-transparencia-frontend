@@ -4,7 +4,13 @@ import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 import LoaListView from '@/modules/planejamento/components/LoaListView'
 
-export default function Loa() {
+interface Props {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default async function Loa({ searchParams }: Props) {
+  const params = await searchParams
+
   return (
     <div className="max-w-6xl mx-auto p-2">
       <PageHeader title="Lei Orçamentária Anual (LOA)" breadcrumbItems={[
@@ -13,7 +19,7 @@ export default function Loa() {
         ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
-        <LoaListView />
+        <LoaListView searchParams={params} />
       </Suspense>
     </div>
   )

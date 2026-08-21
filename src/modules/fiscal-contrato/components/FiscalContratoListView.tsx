@@ -1,11 +1,48 @@
-'use client'
+import DocumentoGenericoListaServidor from '@/modules/shared/components/documento-generico/DocumentoGenericoListaServidor'
+import DocumentoGenericoPaginacao from '@/modules/shared/components/documento-generico/DocumentoGenericoPaginacao'
+import { extrairFiltrosDeSearchParamsServidor } from '@/modules/shared/utils/filtroDocumentoGenerico'
+import { fiscalContratoService } from '../fiscalContrato.service'
+import { FiscalContratoControles } from './FiscalContratoControles'
 
-import DocumentoGenericoListPanel from '@/modules/shared/components/documento-generico/DocumentoGenericoListPanel'
-import { useFiscalContrato } from '../hooks/useFiscalContrato'
+const ORDENACAO_PADRAO = 'data,desc'
+const TAMANHO_PAGINA = 10
 
-export default function FiscalContratoListView() {
-  const resource = useFiscalContrato()
+interface Props {
+  searchParams: Record<string, string | string[] | undefined>
+}
+
+// Fase 4: Server Component — busca no servidor via listarServidor. Ver
+// src/modules/competencias/components/CompetenciasListView.tsx (padrão de referência).
+export default async function FiscalContratoListView({ searchParams }: Props) {
+  const pagina = Number(searchParams.page ?? 0)
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : ORDENACAO_PADRAO
+  const filtros = extrairFiltrosDeSearchParamsServidor(searchParams)
+
+  const resultado = await fiscalContratoService.listarServidor('fiscal-contratos', {
+    ...filtros,
+    page: pagina,
+    size: TAMANHO_PAGINA,
+    sort
+  })
+
   const origem = { label: 'Fiscal de Contrato', href: '/fiscal-contrato' }
 
-  return <DocumentoGenericoListPanel {...resource} origem={origem} />
+  return (
+    <div className="space-y-6">
+      <FiscalContratoControles
+        totalElements={resultado.totalElements}
+        atualizadoEm={new Date().toISOString()}
+        ordenacaoPadrao={ORDENACAO_PADRAO}
+        nomeBaseArquivo="fiscal-contrato"
+      />
+
+      <DocumentoGenericoListaServidor
+        documentos={resultado.content}
+        origem={origem}
+        urlArquivo={id => fiscalContratoService.urlArquivo('fiscal-contratos', id)}
+      />
+
+      <DocumentoGenericoPaginacao totalPaginas={resultado.totalPages} ordenacaoPadrao={ORDENACAO_PADRAO} />
+    </div>
+  )
 }

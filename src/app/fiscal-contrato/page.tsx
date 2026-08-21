@@ -4,7 +4,13 @@ import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 import FiscalContratoListView from '@/modules/fiscal-contrato/components/FiscalContratoListView'
 
-export default function FiscalContrato() {
+interface Props {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default async function FiscalContrato({ searchParams }: Props) {
+  const params = await searchParams
+
   return (
     <div className="max-w-6xl mx-auto p-2">
       <PageHeader title="Fiscal de Contrato" breadcrumbItems={[
@@ -13,7 +19,7 @@ export default function FiscalContrato() {
         ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
-        <FiscalContratoListView />
+        <FiscalContratoListView searchParams={params} />
       </Suspense>
     </div>
   )

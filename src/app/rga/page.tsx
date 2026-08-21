@@ -4,7 +4,13 @@ import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 import RgaListView from '@/modules/planejamento/components/RgaListView'
 
-export default function Rga() {
+interface Props {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default async function Rga({ searchParams }: Props) {
+  const params = await searchParams
+
   return (
     <div className="max-w-6xl mx-auto p-2">
       <PageHeader title="Relatório de Gestão ou Atividade (RGA)" breadcrumbItems={[
@@ -13,7 +19,7 @@ export default function Rga() {
         ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
-        <RgaListView />
+        <RgaListView searchParams={params} />
       </Suspense>
     </div>
   )

@@ -1,8 +1,10 @@
-'use client'
-
-import { useUrlState } from '@/hooks/useUrlState'
+import DocumentoGenericoListaServidor from '@/modules/shared/components/documento-generico/DocumentoGenericoListaServidor'
+import DocumentoGenericoPaginacao from '@/modules/shared/components/documento-generico/DocumentoGenericoPaginacao'
+import { extrairFiltrosDeSearchParamsServidor } from '@/modules/shared/utils/filtroDocumentoGenerico'
+import { educacaoService } from '../educacao.service'
 import { RecursoEducacao } from '../types'
-import DocumentoListView from './DocumentoListView'
+import EducacaoControles from './EducacaoControles'
+import EducacaoTabs from './EducacaoTabs'
 
 const CATEGORIAS: { recurso: RecursoEducacao; label: string }[] = [
   { recurso: 'lista-alunos', label: 'Lista de Alunos' },
@@ -11,31 +13,54 @@ const CATEGORIAS: { recurso: RecursoEducacao; label: string }[] = [
   { recurso: 'planos', label: 'Plano Municipal de Educação' }
 ]
 
-export default function EducacaoView() {
-  const [aba, setAba] = useUrlState<RecursoEducacao>('categoria', CATEGORIAS[0].recurso)
+const ORDENACAO_PADRAO = 'data,desc'
+const TAMANHO_PAGINA = 10
+
+interface Props {
+  searchParams: Record<string, string | string[] | undefined>
+}
+
+// Fase 4, variante com abas: mesmo padrão de Server Component + fetch no servidor dos módulos
+// de recurso fixo, mas o recurso em si vem de ?categoria= — resolvido aqui (com fallback pra
+// primeira aba se ausente/inválido) em vez de num useState client-side.
+export default async function EducacaoView({ searchParams }: Props) {
+  const categoriaParam = typeof searchParams.categoria === 'string' ? searchParams.categoria : undefined
+  const aba = CATEGORIAS.find(c => c.recurso === categoriaParam)?.recurso ?? CATEGORIAS[0].recurso
+
+  const pagina = Number(searchParams.page ?? 0)
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : ORDENACAO_PADRAO
+  const filtros = extrairFiltrosDeSearchParamsServidor(searchParams)
+
+  const resultado = await educacaoService.listarServidor(aba, {
+    ...filtros,
+    page: pagina,
+    size: TAMANHO_PAGINA,
+    sort
+  })
+
+  const origem = { label: 'Educação', href: `/educacao?categoria=${aba}` }
 
   return (
     <div>
-      {/* TABS */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {CATEGORIAS.map(categoria => (
-          <button
-            key={categoria.recurso}
-            onClick={() => setAba(categoria.recurso)}
-            aria-current={aba === categoria.recurso ? 'true' : undefined}
-            className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
-              ${aba === categoria.recurso
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-neutral-light text-text-secondary hover:bg-primary/10'
-              }`}
-          >
-            {categoria.label}
-          </button>
-        ))}
-      </div>
+      <EducacaoTabs categorias={CATEGORIAS} abaAtiva={aba} />
 
-      {/* CONTEÚDO */}
-      <DocumentoListView key={aba} recurso={aba} />
+      <div className="space-y-6">
+        <EducacaoControles
+          recurso={aba}
+          totalElements={resultado.totalElements}
+          atualizadoEm={new Date().toISOString()}
+          ordenacaoPadrao={ORDENACAO_PADRAO}
+          nomeBaseArquivo={`educacao-${aba}`}
+        />
+
+        <DocumentoGenericoListaServidor
+          documentos={resultado.content}
+          origem={origem}
+          urlArquivo={id => educacaoService.urlArquivo(aba, id)}
+        />
+
+        <DocumentoGenericoPaginacao totalPaginas={resultado.totalPages} ordenacaoPadrao={ORDENACAO_PADRAO} />
+      </div>
     </div>
   )
 }
