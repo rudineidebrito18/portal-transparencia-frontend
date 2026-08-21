@@ -1,25 +1,11 @@
 import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
-const nextConfig: NextConfig = {
-  async rewrites() {
-    // /users/* fica fora do prefixo /api no backend (login, seção 1 do
-    // prompt-frontend-dashboard-admin.md) — reescreve pra raiz do backend
-    // em vez de reaproveitar a regra de /api acima.
-    const backendRoot = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/api\/?$/, "");
-
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`
-      },
-      {
-        source: "/users/:path*",
-        destination: `${backendRoot}/users/:path*`
-      }
-    ];
-  }
-};
+// /api/* e /users/* eram reescritos aqui via rewrites() antes da Fase 3 do plano de arquitetura
+// — agora são Route Handlers (src/app/api/[...path]/route.ts, src/app/users/[...path]/route.ts)
+// porque um rewrite só reescreve a URL, sem conseguir anexar o header do segredo compartilhado
+// que o backend passou a exigir.
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
 
