@@ -1,3 +1,4 @@
+import { BackendFetchError } from '@/utils/backendFetch'
 import { extrairFiltrosDeSearchParams } from '@/utils/searchParams'
 import { diarioOficialService } from '../diario-oficial.service'
 import { FiltroEdicaoDiario } from '../types'
@@ -26,9 +27,24 @@ export default async function DiarioOficialListView({ searchParams }: Props) {
   const termoAtivo = (filtros.termo ?? '').trim()
 
   const params = { ...filtros, page: pagina, size: TAMANHO_PAGINA, sort }
-  const resultado = termoAtivo
-    ? await diarioOficialService.buscarPorTextoServidor(params)
-    : await diarioOficialService.listarServidor(params)
+
+  let resultado
+  let buscaIndisponivel = false
+
+  if (termoAtivo) {
+    try {
+      resultado = await diarioOficialService.buscarPorTextoServidor(params)
+    } catch (erro) {
+      // 503 = Meilisearch fora do ar (o backend já sinaliza assim, ver buscarPorTexto no
+      // service) — degrada pra uma mensagem amigável em vez de derrubar a página inteira no
+      // error boundary. Qualquer outro status continua sendo um erro real, propaga normalmente.
+      if (!(erro instanceof BackendFetchError) || erro.status !== 503) throw erro
+      buscaIndisponivel = true
+      resultado = { content: [], totalElements: 0, totalPages: 0, number: 0, size: TAMANHO_PAGINA }
+    }
+  } else {
+    resultado = await diarioOficialService.listarServidor(params)
+  }
 
   return (
     <div className="space-y-6">
@@ -38,7 +54,11 @@ export default async function DiarioOficialListView({ searchParams }: Props) {
         ordenacaoPadrao={ORDENACAO_PADRAO}
       />
 
-      <EdicaoDiarioListaServidor itens={resultado.content} termoAtivo={Boolean(termoAtivo)} />
+      <EdicaoDiarioListaServidor
+        itens={resultado.content}
+        termoAtivo={Boolean(termoAtivo)}
+        buscaIndisponivel={buscaIndisponivel}
+      />
 
       <EdicaoDiarioPaginacao totalPaginas={resultado.totalPages} ordenacaoPadrao={ORDENACAO_PADRAO} />
     </div>

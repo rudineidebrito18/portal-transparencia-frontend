@@ -6,6 +6,15 @@
 // /api/* — esse hop faz sentido só quando quem inicia a chamada é o browser.
 const HEADER_GATEWAY = 'X-Internal-Gateway-Key'
 
+// Carrega o status HTTP pra quem chama poder distinguir uma falha temporária esperada (ex.:
+// 503 do Meilisearch fora do ar) de um erro real, sem parsear a mensagem de texto.
+export class BackendFetchError extends Error {
+  constructor(message: string, public readonly status: number) {
+    super(message)
+    this.name = 'BackendFetchError'
+  }
+}
+
 interface BackendFetchOptions {
   // `object`, não Record<string, ...>: os DTOs de params (ex.: ListarParams) são interfaces
   // concretas sem index signature — TS recusa atribuir uma interface a um Record estrutural
@@ -33,7 +42,7 @@ export async function backendFetch<T>(path: string, options: BackendFetchOptions
   })
 
   if (!response.ok) {
-    throw new Error(`Erro ao buscar ${path}: ${response.status}`)
+    throw new BackendFetchError(`Erro ao buscar ${path}: ${response.status}`, response.status)
   }
 
   return response.json() as Promise<T>
