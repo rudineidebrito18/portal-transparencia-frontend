@@ -1,5 +1,6 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
+import { backendFetch } from '@/utils/backendFetch'
 import { urlArquivoDocumento } from '@/utils/documento'
 import { FiltroLicitacao, LicitacaoDetalhe, LicitacaoResumo } from './types'
 
@@ -14,6 +15,13 @@ export const licitacaoService = {
     return api
       .get<Page<LicitacaoResumo>>('/licitacoes/buscar', { params })
       .then(response => response.data)
+  },
+
+  // Mesmo endpoint do listar() acima, mas chamado direto do servidor (Server Component da
+  // Fase 4) via backendFetch, não pela instância axios `api` — ver documentoGenerico.service.ts
+  // pro mesmo padrão. NUNCA chamar a partir de um 'use client'.
+  listarServidor(params: ListarParams): Promise<Page<LicitacaoResumo>> {
+    return backendFetch<Page<LicitacaoResumo>>('/licitacoes/buscar', { params })
   },
 
   buscarPorId(id: number): Promise<LicitacaoDetalhe> {
