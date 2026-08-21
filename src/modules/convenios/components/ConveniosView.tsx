@@ -1,13 +1,8 @@
-'use client'
-
-import { ComponentType } from 'react'
-
-import { useUrlState } from '@/hooks/useUrlState'
 import AcordosFirmadosListView from './AcordosFirmadosListView'
+import ConveniosTabs from './ConveniosTabs'
 import TransferenciasRealizadasListView from './TransferenciasRealizadasListView'
 import TransferenciasRecebidasListView from './TransferenciasRecebidasListView'
-
-type Aba = 'transferencias-recebidas' | 'transferencias-realizadas' | 'acordos-firmados'
+import { Aba } from '../types'
 
 const CATEGORIAS: { aba: Aba; label: string }[] = [
   { aba: 'transferencias-recebidas', label: 'Transferências Recebidas' },
@@ -15,38 +10,23 @@ const CATEGORIAS: { aba: Aba; label: string }[] = [
   { aba: 'acordos-firmados', label: 'Acordos Firmados pelo Órgão' }
 ]
 
-const CONTEUDO: Record<Aba, ComponentType> = {
-  'transferencias-recebidas': TransferenciasRecebidasListView,
-  'transferencias-realizadas': TransferenciasRealizadasListView,
-  'acordos-firmados': AcordosFirmadosListView
+interface Props {
+  searchParams: Record<string, string | string[] | undefined>
 }
 
-export default function ConveniosView() {
-  const [aba, setAba] = useUrlState<Aba>('categoria', CATEGORIAS[0].aba)
-  const Conteudo = CONTEUDO[aba]
+// Fase 4: Server Component — mesma ideia de DiarioOficialView (branch explícito por aba, já
+// que cada sub-recurso precisa de searchParams como prop).
+export default function ConveniosView({ searchParams }: Props) {
+  const categoriaParam = typeof searchParams.categoria === 'string' ? searchParams.categoria : undefined
+  const aba = CATEGORIAS.find(c => c.aba === categoriaParam)?.aba ?? CATEGORIAS[0].aba
 
   return (
     <div>
-      {/* TABS */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {CATEGORIAS.map(categoria => (
-          <button
-            key={categoria.aba}
-            onClick={() => setAba(categoria.aba)}
-            aria-current={aba === categoria.aba ? 'true' : undefined}
-            className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
-              ${aba === categoria.aba
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-neutral-light text-text-secondary hover:bg-primary/10'
-              }`}
-          >
-            {categoria.label}
-          </button>
-        ))}
-      </div>
+      <ConveniosTabs categorias={CATEGORIAS} abaAtiva={aba} />
 
-      {/* CONTEÚDO */}
-      <Conteudo key={aba} />
+      {aba === 'transferencias-recebidas' && <TransferenciasRecebidasListView searchParams={searchParams} />}
+      {aba === 'transferencias-realizadas' && <TransferenciasRealizadasListView searchParams={searchParams} />}
+      {aba === 'acordos-firmados' && <AcordosFirmadosListView searchParams={searchParams} />}
     </div>
   )
 }

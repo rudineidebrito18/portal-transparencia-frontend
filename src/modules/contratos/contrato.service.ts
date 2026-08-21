@@ -1,6 +1,7 @@
 import { Page } from '@/modules/shared/types/Page'
 import { Documento } from '@/modules/shared/types/Documento'
 import { api } from '@/services/api'
+import { backendFetch } from '@/utils/backendFetch'
 import { urlArquivoDocumento } from '@/utils/documento'
 import { Aditivo, ContratoLicitacao, FiltroContrato } from './types'
 
@@ -31,6 +32,13 @@ export const contratoService = {
       .then(response => response.data)
   },
 
+  // Mesmo endpoint do listarTodos() acima, mas chamado direto do servidor (Server Component da
+  // Fase 4) via backendFetch, não pela instância axios `api`. Usado tanto por Contratos quanto
+  // por Fiscais de Contratos (reprojeção do mesmo endpoint). NUNCA chamar de um 'use client'.
+  listarTodosServidor(params: ListarTodosParams): Promise<Page<ContratoLicitacao>> {
+    return backendFetch<Page<ContratoLicitacao>>('/licitacoes/contratos/filtro', { params })
+  },
+
   // Contratos que têm pelo menos um aditivo — usado pela listagem pública de Aditivos de
   // Contratos (lista contratos, não os aditivos soltos; cada card já leva direto pro
   // contrato, cuja página de detalhes já mostra os aditivos dele).
@@ -38,6 +46,11 @@ export const contratoService = {
     return api
       .get<Page<ContratoLicitacao>>('/licitacoes/contratos/com-aditivos', { params })
       .then(response => response.data)
+  },
+
+  // Mesmo endpoint do listarComAditivos() acima, via backendFetch — usado pelo Server Component.
+  listarComAditivosServidor(params: ListarTodosParams): Promise<Page<ContratoLicitacao>> {
+    return backendFetch<Page<ContratoLicitacao>>('/licitacoes/contratos/com-aditivos', { params })
   },
 
   listarDocumentos(contratoId: number): Promise<Documento[]> {

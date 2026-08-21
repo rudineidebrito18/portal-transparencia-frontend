@@ -1,62 +1,46 @@
-'use client'
+import { extrairFiltrosDeSearchParams } from '@/utils/searchParams'
+import { obraService } from '../obra.service'
+import { FiltroObraPublica } from '../types'
+import ObraControles from './ObraControles'
+import ObraListaServidor from './ObraListaServidor'
+import ObraPaginacao from './ObraPaginacao'
 
-import { MdSwapVert } from 'react-icons/md'
+const ORDENACAO_PADRAO = 'numero,desc'
+const TAMANHO_PAGINA = 10
+const PARAMS_RESERVADOS = new Set(['page', 'sort'])
 
-import AsyncList from '@/components/ui/AsyncList'
-import Pagination from '@/components/ui/Pagination'
-import Select from '@/components/ui/Select'
-import { formatarDataHora } from '@/utils/date'
-import { useObras } from '../hooks/useObras'
-import ObraCard from './ObraCard'
-import ObraFiltro from './ObraFiltro'
+interface Props {
+  searchParams: Record<string, string | string[] | undefined>
+}
 
-export default function ObrasListView() {
-  const {
-    data, loading, erro, pagina, totalPaginas, totalElements, atualizadoEm, setPagina, filtros, setFiltros, ordenacao, setOrdenacao
-  } = useObras()
+// Fase 4: Server Component — mesma ideia de LicitacaoListView (padrão de referência).
+export default async function ObrasListView({ searchParams }: Props) {
+  const pagina = Number(searchParams.page ?? 0)
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : ORDENACAO_PADRAO
+  const filtros = extrairFiltrosDeSearchParams<FiltroObraPublica>(searchParams, PARAMS_RESERVADOS)
+
+  const resultado = await obraService.listarServidor({
+    ...filtros,
+    page: pagina,
+    size: TAMANHO_PAGINA,
+    sort
+  })
+
+  // filtros vem de searchParams (sempre string em runtime, apesar do tipo declarar boolean) —
+  // comparação por string, mesmo valor que a URL carrega (?paralisada=true).
+  const paralisada = (filtros as unknown as Record<string, string>).paralisada === 'true'
 
   return (
     <div>
-      <ObraFiltro valoresIniciais={filtros} onFiltrar={setFiltros} />
-
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border/30 rounded-xl px-5 py-3 shadow-sm mb-6">
-        <span className="text-sm text-text-secondary">
-          <strong className="text-primary">{totalElements}</strong> obras encontradas
-          {atualizadoEm && (
-            <span className="text-text-muted"> · atualizado em {formatarDataHora(atualizadoEm)}</span>
-          )}
-        </span>
-
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 text-text-secondary text-sm">
-            <MdSwapVert />
-            Ordenar
-          </div>
-
-          <Select
-            value={ordenacao || 'numero,desc'}
-            onChange={(e) => setOrdenacao(e.target.value)}
-            aria-label="Ordenar por"
-            fullWidth={false}
-          >
-            <option value="dataInicio,desc">Mais recentes</option>
-            <option value="dataInicio,asc">Mais antigas</option>
-            <option value="valorTotal,desc">Maior valor</option>
-            <option value="valorTotal,asc">Menor valor</option>
-          </Select>
-        </div>
-      </div>
-
-      <AsyncList
-        data={data}
-        loading={loading}
-        erro={erro}
-        emptyMessage={filtros.paralisada ? 'Nenhuma obra paralisada encontrada.' : 'Nenhuma obra encontrada.'}
-        renderItem={obra => <ObraCard key={obra.id} obra={obra} />}
+      <ObraControles
+        totalElements={resultado.totalElements}
+        atualizadoEm={new Date().toISOString()}
+        ordenacaoPadrao={ORDENACAO_PADRAO}
       />
 
-      <Pagination pagina={pagina} totalPaginas={totalPaginas} onChange={setPagina} className="mt-6" />
+      <ObraListaServidor obras={resultado.content} paralisada={paralisada} />
+
+      <ObraPaginacao totalPaginas={resultado.totalPages} ordenacaoPadrao={ORDENACAO_PADRAO} />
     </div>
   )
 }

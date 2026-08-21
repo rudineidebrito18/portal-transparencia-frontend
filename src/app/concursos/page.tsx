@@ -4,7 +4,13 @@ import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 import ConcursosListView from '@/modules/concursos/components/ConcursosListView'
 
-export default function Concursos() {
+interface Props {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default async function Concursos({ searchParams }: Props) {
+  const params = await searchParams
+
   return (
     <div className="max-w-6xl mx-auto p-2">
       <PageHeader title="Concursos" breadcrumbItems={[
@@ -13,7 +19,7 @@ export default function Concursos() {
         ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>}>
-        <ConcursosListView />
+        <ConcursosListView searchParams={params} />
       </Suspense>
     </div>
   )

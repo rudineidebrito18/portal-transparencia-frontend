@@ -4,7 +4,13 @@ import PageHeader from '@/components/PageHeader'
 import Skeleton from '@/components/ui/Skeleton'
 import EmendaEstadualListView from '@/modules/emendas-estaduais/components/EmendaEstadualListView'
 
-export default function EmendasEstaduais() {
+interface Props {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default async function EmendasEstaduais({ searchParams }: Props) {
+  const params = await searchParams
+
   return (
     <div className="max-w-6xl mx-auto p-2">
       <PageHeader title="Emendas Estaduais" breadcrumbItems={[
@@ -13,7 +19,7 @@ export default function EmendasEstaduais() {
         ]} />
 
       <Suspense fallback={<div className="grid gap-4">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} />)}</div>}>
-        <EmendaEstadualListView />
+        <EmendaEstadualListView searchParams={params} />
       </Suspense>
     </div>
   )

@@ -1,4 +1,5 @@
 import { api } from '@/services/api'
+import { backendFetch } from '@/utils/backendFetch'
 import { urlArquivoDocumento } from '@/utils/documento'
 import { Page } from '@/modules/shared/types/Page'
 import { ConvenioDocumento, FiltroConvenio } from './types'
@@ -17,6 +18,12 @@ function criarServicoConvenio(path: string) {
       return api
         .get<Page<ConvenioDocumento>>(`/${path}/filtro`, { params })
         .then(response => response.data)
+    },
+
+    // Mesmo endpoint do listar() acima, mas chamado direto do servidor (Server Component da
+    // Fase 4) via backendFetch, não pela instância axios `api`. NUNCA chamar de um 'use client'.
+    listarServidor(params: ListarParams): Promise<Page<ConvenioDocumento>> {
+      return backendFetch<Page<ConvenioDocumento>>(`/${path}/filtro`, { params })
     },
 
     urlArquivo(id: number): string {
