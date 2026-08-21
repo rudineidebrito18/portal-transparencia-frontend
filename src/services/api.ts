@@ -31,6 +31,18 @@ api.interceptors.request.use((config) => {
   const token = noPainel ? lerTokenCookie() : null
   if (token) config.headers.Authorization = `Bearer ${token}`;
 
+  // No servidor (SSR/Server Components), esta instância chama o backend DIRETO (baseURL
+  // acima), não passa pelo Route Handler /api/* — que só existe pra anexar o segredo nas
+  // chamadas vindas do browser. Sem isso aqui, todo Server Component que usa `api` (ex.:
+  // NoticiasDestaque, DiarioOficialDestaque, LicitacoesRecentes na home, noticias/[id])
+  // toma 401 do InternalGatewayKeyFilter (Fase 3) — achado real: a home inteira estava
+  // mostrando "Chave de gateway interna ausente ou inválida" pro visitante antes desta
+  // correção. INTERNAL_GATEWAY_KEY é variável server-only (sem NEXT_PUBLIC_), nunca vai
+  // pro bundle do cliente.
+  if (typeof window === "undefined") {
+    config.headers["X-Internal-Gateway-Key"] = process.env.INTERNAL_GATEWAY_KEY ?? "";
+  }
+
   // Upload de arquivo (multipart/form-data) precisa de mais tempo que os 10s
   // padrão — PDFs/imagens maiores ou uma conexão mais lenta estouram isso fácil
   // ("timeout of 10000ms exceeded"), mesmo problema em qualquer módulo que sobe
