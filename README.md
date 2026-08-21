@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Frontend (Next.js 15, App Router) do Portal da Transparência. Consome a API do backend
+(`portal-transparencia-pref`, Spring Boot) através de um proxy interno server-side — o browser
+nunca fala direto com o backend.
 
-## Getting Started
-
-First, run the development server:
+## Rodando localmente
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variáveis de ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Definidas em `.env.local` (não versionado) pra desenvolvimento local, e no painel do provedor de
+hospedagem (hoje: Netlify → Site settings → Environment variables) pra produção.
 
-## Learn More
+| Variável | Descrição |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | URL base do backend (ex.: `https://api.dominio.com.br`). Usada pelo Route Handler proxy (`src/app/api/[...path]/route.ts`, `src/app/users/[...path]/route.ts`) pra saber pra onde repassar as chamadas — apesar do prefixo `NEXT_PUBLIC_`, só é lida no servidor nesses arquivos. |
+| `INTERNAL_GATEWAY_KEY` | Segredo compartilhado com o backend. **Sem prefixo `NEXT_PUBLIC_` de propósito** — só o proxy (server-side) pode ver esse valor, nunca o browser. Precisa ser **idêntico** ao valor de `app.internal-gateway.key` (env var `INTERNAL_GATEWAY_KEY` no perfil de produção do backend) — ver `PLANO-SEGURANCA-ARQUITETURA.md`, Fase 3, no repositório do backend. Sem isso (ou com valores diferentes dos dois lados), todo `/api/**` do backend responde 401/403. |
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Hospedado na **Netlify**, com deploy automático a cada push na branch `main` (repositório já
+conectado). Não existe `netlify.toml` — a Netlify detecta o projeto Next.js automaticamente
+(build command, publish dir, runtime Node pra SSR/ISR/Route Handlers/Server Actions).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Antes do primeiro deploy real** (quando o backend for publicado numa VPS): atualizar
+`NEXT_PUBLIC_API_URL` no painel da Netlify pra URL real (hoje está com um valor de exemplo, só
+pra não quebrar o build) e configurar `INTERNAL_GATEWAY_KEY` (ainda não existe lá) com o mesmo
+valor gerado no backend. Até lá, qualquer push pra `main` publica o site com as páginas que
+dependem do backend fora do ar (erro ao buscar dados), já que o proxy não tem pra onde apontar de
+verdade.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Armazenamento de mídia/arquivos usa Cloudflare R2, mas isso é resolvido inteiramente pelo backend
+(`FileStorageService`/`R2FileStorageServiceImpl`) — o frontend nunca acessa R2 diretamente, só
+consome URLs/streams através do proxy interno.

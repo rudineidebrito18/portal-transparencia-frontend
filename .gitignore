@@ -44,7 +44,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# cloudflare (opennextjs-cloudflare / wrangler)
-/.open-next/
-/.wrangler/
-cloudflare-env.d.ts
+# netlify
+/.netlify/
