@@ -5,8 +5,9 @@ import { parseApiError } from "./apiError";
 
 export type { ApiError } from "./apiError";
 
-// No navegador, usa caminho relativo (mesma origem do Next.js) para evitar CORS —
-// next.config.ts reescreve /api/* pro backend real. No servidor (SSR/Server Components),
+// No navegador, usa caminho relativo (mesma origem do Next.js) para evitar CORS — o Route
+// Handler catch-all em src/app/api/[...path]/route.ts repassa pro backend real, anexando o
+// segredo de gateway (Fase 3) que o navegador nunca vê. No servidor (SSR/Server Components),
 // chama o backend diretamente, já que não há política de CORS entre servidores.
 const baseURL = typeof window === "undefined"
   ? process.env.NEXT_PUBLIC_API_URL
@@ -43,24 +44,15 @@ api.interceptors.request.use((config) => {
   // limpo sozinho. Sem apagar aqui, toda chamada com FormData saía com
   // "Content-Type: application/json" (rejeitado pelo backend) em vez de deixar o
   // navegador montar o header multipart correto.
+  //
+  // Até a Fase 3 (segredo de gateway), upload ia DIRETO pro backend — o antigo proxy por
+  // rewrites() do Next tinha um buffer de ~10MB que truncava arquivo maior silenciosamente.
+  // O Route Handler que substituiu o rewrites() faz streaming de verdade (sem buffer
+  // intermediário) e foi validado com upload real de 30MB sem truncar — então FormData volta
+  // a usar o mesmo "/api" de qualquer outra chamada, sem desvio nenhum.
   if (config.data instanceof FormData) {
     config.timeout = 60000;
     config.headers.delete("Content-Type");
-
-    // Upload vai direto pro backend, sem passar pelo proxy de rewrites() do Next — o
-    // proxy tem um buffer de ~10MB que trunca o corpo de arquivo maior SILENCIOSAMENTE
-    // (sem erro, só timeout ~30s depois), confirmado pelo backend que o Spring/Tomcat
-    // nunca foi o gargalo (uploads de até 30MB direto no backend: 0.12–0.29s). Backend
-    // já cobre CORS pra isso (preflight OPTIONS + POST/PUT liberados pra "/**",
-    // Authorization/Content-Type nos allowedHeaders, sem allowCredentials — não precisa
-    // de cookie, só o Authorization: Bearer que esse interceptor já anexa acima).
-    // Chamadas JSON continuam via "/api" (proxy), sem mudança. Essa é a única proteção —
-    // não há flag experimental.middlewareClientMaxBodySize em next.config.ts como rede de
-    // segurança: seria redundante (nenhum upload passa pelo rewrite pra precisar disso) e
-    // arriscaria confundir quem ler o config achando que é ela que resolve o problema.
-    if (typeof window !== "undefined") {
-      config.baseURL = process.env.NEXT_PUBLIC_API_URL;
-    }
   }
 
   return config;

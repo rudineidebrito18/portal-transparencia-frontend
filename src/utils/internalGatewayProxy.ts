@@ -10,10 +10,14 @@ import { NextRequest } from 'next/server'
 // reescrevia a URL, sem anexar header nenhum).
 const HEADER_GATEWAY = 'X-Internal-Gateway-Key'
 
-// Cabeçalhos específicos da conexão browser→Next que não fazem sentido (ou atrapalham) na
+// Cabeçalhos específicos da conexão cliente→Next que não fazem sentido (ou atrapalham) na
 // chamada servidor→backend: host/connection são da conexão anterior; content-length e
-// accept-encoding são recalculados pelo runtime na nova chamada.
-const HEADERS_REQUISICAO_PARA_REMOVER = ['host', 'connection', 'content-length', 'accept-encoding']
+// accept-encoding são recalculados pelo runtime na nova chamada. expect é o mais crítico dos
+// quatro: clientes que mandam corpo grande (curl acima de ~1MB, por padrão) mandam
+// "Expect: 100-continue" — repassar esse header pro fetch() do undici (runtime Node do `next
+// dev`/local) quebra com "NotSupportedError: expect header not supported", derrubando QUALQUER
+// upload grande com 500 antes mesmo de tentar (achado real testando upload de 30MB pela Fase 3).
+const HEADERS_REQUISICAO_PARA_REMOVER = ['host', 'connection', 'content-length', 'accept-encoding', 'expect']
 
 // content-encoding/content-length do backend não valem mais depois que o fetch() do proxy já
 // decodifica o corpo — repassá-los sem ajuste faz o browser tentar descomprimir de novo (ou
