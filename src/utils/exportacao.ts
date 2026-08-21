@@ -1,5 +1,9 @@
-import { jsPDF } from 'jspdf'
-import autoTable from 'jspdf-autotable'
+// jsPDF/jspdf-autotable NÃO são importados estaticamente aqui de propósito — o Next.js roda
+// componentes client no servidor na primeira renderização (SSR), então um import estático
+// no topo do arquivo entraria no bundle do servidor mesmo a função nunca rodando lá (achado
+// real: bundle do Worker Cloudflare estourou 19MB por causa disso, jsPDF sozinho tem 29MB em
+// disco). import() dinâmico dentro de exportarPDF garante que só carrega quando alguém de
+// fato clica em "Exportar → PDF", no navegador.
 
 // Definição de coluna para exportação. `chave` é o campo no item; `formatar` permite
 // transformar o valor para exibição (datas dd/MM/yyyy, moeda, etc.). Se ausente,
@@ -116,7 +120,12 @@ export function exportarXML<T>(itens: T[], colunas: ColunaExportacao<T>[], nomeB
 
 // --- PDF (jsPDF + autotable) ---
 
-export function exportarPDF<T>(itens: T[], colunas: ColunaExportacao<T>[], nomeBase: string): void {
+export async function exportarPDF<T>(itens: T[], colunas: ColunaExportacao<T>[], nomeBase: string): Promise<void> {
+  const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable')
+  ])
+
   const linhas = normalizarLinhas(itens, colunas)
   const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' })
 

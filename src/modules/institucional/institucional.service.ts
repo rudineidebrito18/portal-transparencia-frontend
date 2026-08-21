@@ -1,9 +1,6 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
-import { institucionalMock } from './mocks/institucional.mock'
 import { ConteudoInstitucional, FiltroConteudoInstitucional, RecursoInstitucional } from './types'
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
 type ListarParams = FiltroConteudoInstitucional & {
   ativo?: boolean
@@ -15,16 +12,12 @@ type ListarParams = FiltroConteudoInstitucional & {
 function criarServicoInstitucional(recurso: RecursoInstitucional) {
   return {
     listar(params: ListarParams): Promise<Page<ConteudoInstitucional>> {
-      if (USE_MOCK) return institucionalMock.listar(recurso, params)
-
       return api
         .get<Page<ConteudoInstitucional>>(`/institucional/${recurso}/filtro`, { params })
         .then(response => response.data)
     },
 
     buscarPorId(id: number): Promise<ConteudoInstitucional> {
-      if (USE_MOCK) return institucionalMock.buscarPorId(recurso, id)
-
       return api.get<ConteudoInstitucional>(`/institucional/${recurso}/${id}`).then(response => response.data)
     }
   }

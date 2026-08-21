@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { MdMenuOpen, MdOutlineCircle, MdSearch } from 'react-icons/md'
+import { MdMenuOpen, MdSearch } from 'react-icons/md'
 
 import { REGISTRY_MODULOS_GENERICOS } from '@/modules/admin/genericos/registry'
 
@@ -108,8 +108,6 @@ export default function AdminTopbar({ colapsada, onToggleColapsada }: Props) {
     setBuscaAberta(false)
   }
 
-  const ambienteMock = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
-
   return (
     <header className="h-16 shrink-0 flex items-center gap-4 px-5 border-b border-admin-border bg-admin-surface/80 admin-glass">
       <button
@@ -159,17 +157,6 @@ export default function AdminTopbar({ colapsada, onToggleColapsada }: Props) {
           </div>
         )}
       </div>
-
-      <span
-        className={`hidden sm:flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ${
-          ambienteMock
-            ? 'bg-admin-warning-light text-admin-warning'
-            : 'bg-admin-success-light text-admin-success'
-        }`}
-      >
-        <MdOutlineCircle size={8} className="fill-current" />
-        {ambienteMock ? 'Dados de demonstração' : 'Ambiente conectado'}
-      </span>
     </header>
   )
 }

@@ -1,9 +1,6 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
-import { diarioOficialMock } from './mocks/diario-oficial.mock'
 import { DiarioOficialInfo, EdicaoDiario, FiltroEdicaoDiario, ResultadoBuscaEdicaoDiario, ValidacaoPublicaDiario } from './types'
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
 type ListarParams = FiltroEdicaoDiario & {
   page?: number
@@ -13,8 +10,6 @@ type ListarParams = FiltroEdicaoDiario & {
 
 export const diarioOficialService = {
   listar(params: ListarParams): Promise<Page<EdicaoDiario>> {
-    if (USE_MOCK) return diarioOficialMock.listar(params)
-
     return api
       .get<Page<EdicaoDiario>>('/edicoes/filtro', { params })
       .then(response => response.data)
@@ -25,8 +20,6 @@ export const diarioOficialService = {
   // período) — o backend não descarta o resto do filtro só porque um termo foi digitado.
   // O backend devolve 503 se o motor de busca estiver indisponível.
   buscarPorTexto(params: ListarParams): Promise<Page<ResultadoBuscaEdicaoDiario>> {
-    if (USE_MOCK) return diarioOficialMock.buscarPorTexto(params)
-
     const { termo, ...resto } = params
     return api
       .get<Page<ResultadoBuscaEdicaoDiario>>('/edicoes/buscar-texto', { params: { q: termo, ...resto } })

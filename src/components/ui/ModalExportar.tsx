@@ -72,7 +72,7 @@ export default function ModalExportar<T>({
         exportarXML(itens, colunas, nomeBaseArquivo)
         break
       case 'pdf':
-        exportarPDF(itens, colunas, nomeBaseArquivo)
+        void exportarPDF(itens, colunas, nomeBaseArquivo)
         break
     }
   }

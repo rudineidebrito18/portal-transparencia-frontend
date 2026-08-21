@@ -1,9 +1,6 @@
 import { Page } from '@/modules/shared/types/Page'
 import { api } from '@/services/api'
-import { emendaFederalMock } from './mocks/emendaFederal.mock'
 import { EmendaFederal, FiltroEmendaFederal } from './types'
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
 type ListarParams = FiltroEmendaFederal & {
   page?: number
@@ -13,8 +10,6 @@ type ListarParams = FiltroEmendaFederal & {
 
 export const emendaFederalService = {
   listar(params: ListarParams): Promise<Page<EmendaFederal>> {
-    if (USE_MOCK) return emendaFederalMock.listar(params)
-
     const { tipo, ano, ...pageable } = params
 
     // Backend não tem filtro combinado — /tipo/{tipo} e /ano/{ano} são endpoints

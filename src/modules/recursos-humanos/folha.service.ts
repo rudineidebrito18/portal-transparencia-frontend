@@ -1,9 +1,6 @@
 import { api } from '@/services/api'
 import { Page } from '@/modules/shared/types/Page'
-import { folhaMock } from './mocks/folha.mock'
 import { FiltroFolhaPagamento, FolhaPagamento, FolhaPagamentoServidor } from './types'
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true'
 
 type ListarPorMesParams = FiltroFolhaPagamento & {
   page?: number
@@ -13,8 +10,6 @@ type ListarPorMesParams = FiltroFolhaPagamento & {
 
 export const folhaService = {
   listarPorServidor(servidorId: number): Promise<FolhaPagamento[]> {
-    if (USE_MOCK) return folhaMock.listarPorServidor(servidorId)
-
     return api
       .get<FolhaPagamento[]>(`/recursos-humanos/folha/servidor/${servidorId}`)
       .then(response => response.data)
@@ -26,8 +21,6 @@ export const folhaService = {
     const hoje = new Date()
     const mes = params.mes ?? hoje.getMonth() + 1
     const ano = params.ano ?? hoje.getFullYear()
-
-    if (USE_MOCK) return folhaMock.listarPorMes({ ...params, mes, ano })
 
     return api
       .get<Page<FolhaPagamentoServidor>>('/recursos-humanos/folha/por-mes', { params: { ...params, mes, ano } })
