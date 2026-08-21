@@ -1,16 +1,11 @@
-'use client'
-
-import { ComponentType } from 'react'
-
-import { useUrlState } from '@/hooks/useUrlState'
 import AjudaDiarioOficial from './AjudaDiarioOficial'
+import DiarioOficialTabs from './DiarioOficialTabs'
 import EdicoesTab from './EdicoesTab'
 import EdicoesNaoEletronicasListView from './EdicoesNaoEletronicasListView'
 import ExpedienteDiarioOficial from './ExpedienteDiarioOficial'
 import QuemSomosDiarioOficial from './QuemSomosDiarioOficial'
 import LegislacaoDiarioOficialListView from '../legislacao/components/LegislacaoDiarioOficialListView'
-
-type Aba = 'edicoes' | 'legislacao' | 'nao-eletronicas' | 'quem-somos' | 'expediente' | 'ajuda'
+import { Aba } from '../types'
 
 const CATEGORIAS: { aba: Aba; label: string }[] = [
   { aba: 'edicoes', label: 'Edições' },
@@ -21,39 +16,29 @@ const CATEGORIAS: { aba: Aba; label: string }[] = [
   { aba: 'ajuda', label: 'Ajuda' }
 ]
 
-const CONTEUDO: Record<Aba, ComponentType> = {
-  edicoes: EdicoesTab,
-  legislacao: LegislacaoDiarioOficialListView,
-  'nao-eletronicas': EdicoesNaoEletronicasListView,
-  'quem-somos': QuemSomosDiarioOficial,
-  expediente: ExpedienteDiarioOficial,
-  ajuda: AjudaDiarioOficial
+interface Props {
+  searchParams: Record<string, string | string[] | undefined>
 }
 
-export default function DiarioOficialView() {
-  const [aba, setAba] = useUrlState<Aba>('categoria', CATEGORIAS[0].aba)
-  const Conteudo = CONTEUDO[aba]
+// Fase 4 (parcial): Server Component — antes era 100% client (useUrlState escolhendo qual
+// ComponentType renderizar de um Record<Aba, ComponentType> uniforme). Isso parou de funcionar
+// quando a aba "edicoes" passou a precisar de searchParams como prop e as outras não — em vez
+// de forçar uma assinatura uniforme, virou um branch explícito por aba. "legislacao" e
+// "nao-eletronicas" continuam client (fora do escopo desta migração, ver plano de arquitetura).
+export default function DiarioOficialView({ searchParams }: Props) {
+  const categoriaParam = typeof searchParams.categoria === 'string' ? searchParams.categoria : undefined
+  const aba = CATEGORIAS.find(c => c.aba === categoriaParam)?.aba ?? CATEGORIAS[0].aba
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {CATEGORIAS.map(categoria => (
-          <button
-            key={categoria.aba}
-            onClick={() => setAba(categoria.aba)}
-            aria-current={aba === categoria.aba ? 'true' : undefined}
-            className={`px-5 py-2 text-sm font-semibold rounded-full transition-all
-              ${aba === categoria.aba
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-neutral-light text-text-secondary hover:bg-primary/10'
-              }`}
-          >
-            {categoria.label}
-          </button>
-        ))}
-      </div>
+      <DiarioOficialTabs categorias={CATEGORIAS} abaAtiva={aba} />
 
-      <Conteudo key={aba} />
+      {aba === 'edicoes' && <EdicoesTab searchParams={searchParams} />}
+      {aba === 'legislacao' && <LegislacaoDiarioOficialListView />}
+      {aba === 'nao-eletronicas' && <EdicoesNaoEletronicasListView />}
+      {aba === 'quem-somos' && <QuemSomosDiarioOficial />}
+      {aba === 'expediente' && <ExpedienteDiarioOficial />}
+      {aba === 'ajuda' && <AjudaDiarioOficial />}
     </div>
   )
 }

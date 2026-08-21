@@ -1,16 +1,13 @@
-'use client'
-
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
-import ErrorState from '@/components/ui/ErrorState'
-import Skeleton from '@/components/ui/Skeleton'
-import { useDiarioOficialInfo } from '../hooks/useDiarioOficialInfo'
+import { diarioOficialInfoService } from '../diario-oficial.service'
 
-export default function QuemSomosDiarioOficial() {
-  const { data: info, loading, erro } = useDiarioOficialInfo()
+// Fase 4: Server Component — fetch único, sem paginação/filtro, então sem estado de URL
+// nenhum (diferente dos módulos com listagem). Antes era client-side (useDiarioOficialInfo +
+// useAsyncData); convertido direto porque não tinha nenhuma interatividade real.
+export default async function QuemSomosDiarioOficial() {
+  const info = await diarioOficialInfoService.buscarServidor()
 
-  if (loading) return <Skeleton className="h-40" />
-  if (erro) return <ErrorState message={erro} />
   if (!info?.quemSomos) return <EmptyState message="Ainda não há um texto de apresentação cadastrado." />
 
   return (

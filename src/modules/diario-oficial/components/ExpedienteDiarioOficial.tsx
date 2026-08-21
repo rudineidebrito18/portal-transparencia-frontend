@@ -1,18 +1,13 @@
-'use client'
-
 import { MdEmail, MdLocationOn, MdPeople, MdPhone, MdSchedule } from 'react-icons/md'
 
 import Card from '@/components/ui/Card'
-import ErrorState from '@/components/ui/ErrorState'
 import InfoBlock from '@/components/ui/InfoBlock'
-import Skeleton from '@/components/ui/Skeleton'
-import { useDiarioOficialInfo } from '../hooks/useDiarioOficialInfo'
+import { diarioOficialInfoService } from '../diario-oficial.service'
 
-export default function ExpedienteDiarioOficial() {
-  const { data: info, loading, erro } = useDiarioOficialInfo()
+// Fase 4: Server Component — ver comentário em QuemSomosDiarioOficial.tsx (mesmo motivo/padrão).
+export default async function ExpedienteDiarioOficial() {
+  const info = await diarioOficialInfoService.buscarServidor()
 
-  if (loading) return <Skeleton className="h-40" />
-  if (erro) return <ErrorState message={erro} />
   if (!info) return null
 
   return (

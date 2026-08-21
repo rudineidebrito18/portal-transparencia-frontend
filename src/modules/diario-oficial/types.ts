@@ -76,3 +76,7 @@ export interface FiltroEdicaoNaoEletronica {
   dataInicial?: string
   dataFinal?: string
 }
+
+// Abas da página /diario-oficial (ver DiarioOficialView.tsx) — extraído pra types.ts porque
+// agora mais de um arquivo (Server Component + client de abas) precisa do tipo.
+export type Aba = 'edicoes' | 'legislacao' | 'nao-eletronicas' | 'quem-somos' | 'expediente' | 'ajuda'

@@ -1,20 +1,19 @@
-'use client'
-
 import Link from 'next/link'
 import { MdNewReleases, MdVisibility } from 'react-icons/md'
 
 import Badge from '@/components/ui/Badge'
-import Skeleton from '@/components/ui/Skeleton'
 import { formatarData } from '@/utils/date'
 import { hrefDocumento } from '@/utils/documento'
-import { urlDownloadEdicao } from '../diario-oficial.service'
+import { diarioOficialService, urlDownloadEdicao } from '../diario-oficial.service'
 import { TipoEdicaoDiario, TipoEdicaoDiarioDescricao, TipoEdicaoDiarioStyle } from '../enums'
-import { useUltimaEdicao } from '../hooks/useUltimaEdicao'
 
-export default function UltimaEdicaoDestaque() {
-  const { data: edicao, loading } = useUltimaEdicao()
+// Fase 4: Server Component — ver comentário em QuemSomosDiarioOficial.tsx (mesmo motivo/padrão).
+// Sempre a edição mais recente publicada, independente de qualquer filtro aplicado na listagem
+// abaixo — por isso busca separada, não reaproveita o resultado de EdicoesListView.
+export default async function UltimaEdicaoDestaque() {
+  const pagina = await diarioOficialService.listarServidor({ page: 0, size: 1, sort: 'dataPublicacao,desc' })
+  const edicao = pagina.content[0] ?? null
 
-  if (loading) return <Skeleton className="h-28 mb-6" />
   if (!edicao) return null
 
   const tipoKey = edicao.tipo as TipoEdicaoDiario
